@@ -1,6 +1,7 @@
 """Static analysis checks for ISR-safe ring buffer implementation."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: No k_malloc usage (forbidden in ISR)
-    has_kmalloc = "k_malloc" in generated_code
+    has_kmalloc = scoped_contains(generated_code, 'k_malloc', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_kmalloc",
@@ -33,7 +34,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: No printk usage
-    has_printk = "printk" in generated_code
+    has_printk = scoped_contains(generated_code, 'printk', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_printk",

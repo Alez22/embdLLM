@@ -1,13 +1,14 @@
 """Static analysis checks for MCUboot swap type check."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate swap type check code structure."""
     details: list[CheckDetail] = []
 
-    has_mcuboot_h = "dfu/mcuboot.h" in generated_code
+    has_mcuboot_h = scoped_contains(generated_code, 'dfu/mcuboot.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mcuboot_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_swap_type_call = "mcuboot_swap_type" in generated_code
+    has_swap_type_call = scoped_contains(generated_code, 'mcuboot_swap_type', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mcuboot_swap_type_call",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_none = "BOOT_SWAP_TYPE_NONE" in generated_code
+    has_none = scoped_contains(generated_code, 'BOOT_SWAP_TYPE_NONE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="swap_type_none",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_test = "BOOT_SWAP_TYPE_TEST" in generated_code
+    has_test = scoped_contains(generated_code, 'BOOT_SWAP_TYPE_TEST', scope='code_only')
     details.append(
         CheckDetail(
             check_name="swap_type_test",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_perm = "BOOT_SWAP_TYPE_PERM" in generated_code
+    has_perm = scoped_contains(generated_code, 'BOOT_SWAP_TYPE_PERM', scope='code_only')
     details.append(
         CheckDetail(
             check_name="swap_type_perm",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_revert = "BOOT_SWAP_TYPE_REVERT" in generated_code
+    has_revert = scoped_contains(generated_code, 'BOOT_SWAP_TYPE_REVERT', scope='code_only')
     details.append(
         CheckDetail(
             check_name="swap_type_revert",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_kernel = "zephyr/kernel.h" in generated_code
+    has_kernel = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header",

@@ -1,6 +1,7 @@
 """Static analysis checks for producer-consumer threading."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: kernel header
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -21,8 +22,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: Message queue defined
     has_msgq = (
-        "K_MSGQ_DEFINE" in generated_code
-        or "k_msgq_init" in generated_code
+        scoped_contains(generated_code, 'K_MSGQ_DEFINE', scope='code_only')
+        or scoped_contains(generated_code, 'k_msgq_init', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -50,7 +51,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: k_msgq_put used (producer)
-    has_put = "k_msgq_put" in generated_code
+    has_put = scoped_contains(generated_code, 'k_msgq_put', scope='code_only')
     details.append(
         CheckDetail(
             check_name="msgq_put_called",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: k_msgq_get used (consumer)
-    has_get = "k_msgq_get" in generated_code
+    has_get = scoped_contains(generated_code, 'k_msgq_get', scope='code_only')
     details.append(
         CheckDetail(
             check_name="msgq_get_called",

@@ -2,6 +2,7 @@
 
 from embedeval.check_utils import check_no_cross_platform_apis
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 _BLE_HALLUCINATED_APIS = [
     "BLEDevice.connect",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Scan callback is non-NULL (not passing NULL as callback)
     has_callback_arg = (
-        "bt_le_scan_start" in generated_code
+        scoped_contains(generated_code, 'bt_le_scan_start', scope='code_only')
         and "NULL" not in generated_code[
             generated_code.find("bt_le_scan_start"):
             generated_code.find("bt_le_scan_start") + 60
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Scan params struct used (not NULL params)
-    has_params = "bt_le_scan_param" in generated_code
+    has_params = scoped_contains(generated_code, 'bt_le_scan_param', scope='code_only')
     details.append(
         CheckDetail(
             check_name="scan_params_struct_used",
@@ -132,10 +133,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 8: Scan type is passive or active (not invalid/omitted)
     # LLM failure: omits scan type or uses a raw integer instead of the constant
     has_scan_type = (
-        "BT_LE_SCAN_TYPE_PASSIVE" in generated_code
-        or "BT_LE_SCAN_TYPE_ACTIVE" in generated_code
-        or "BT_LE_SCAN_ACTIVE" in generated_code
-        or "BT_LE_SCAN_PASSIVE" in generated_code
+        scoped_contains(generated_code, 'BT_LE_SCAN_TYPE_PASSIVE', scope='code_only')
+        or scoped_contains(generated_code, 'BT_LE_SCAN_TYPE_ACTIVE', scope='code_only')
+        or scoped_contains(generated_code, 'BT_LE_SCAN_ACTIVE', scope='code_only')
+        or scoped_contains(generated_code, 'BT_LE_SCAN_PASSIVE', scope='code_only')
     )
     details.append(
         CheckDetail(

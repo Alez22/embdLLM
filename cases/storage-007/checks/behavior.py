@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -54,7 +55,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Success message after mount
-    has_ok = "FS MOUNTED OK" in generated_code or "MOUNTED" in generated_code or "mounted" in generated_code.lower()
+    has_ok = scoped_contains(generated_code, 'FS MOUNTED OK', scope='code_only') or scoped_contains(generated_code, 'MOUNTED', scope='code_only') or "mounted" in generated_code.lower()
     details.append(
         CheckDetail(
             check_name="mount_success_printed",
@@ -82,7 +83,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: File I/O after mount (fs_open or fs_write)
-    has_file_io = "fs_open" in generated_code or "fs_write" in generated_code
+    has_file_io = scoped_contains(generated_code, 'fs_open', scope='code_only') or scoped_contains(generated_code, 'fs_write', scope='code_only')
     details.append(
         CheckDetail(
             check_name="file_io_after_mount",

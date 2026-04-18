@@ -1,6 +1,7 @@
 """Static analysis checks for DMA memory-to-memory transfer."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: DMA header included
-    has_dma_h = "zephyr/drivers/dma.h" in generated_code
+    has_dma_h = scoped_contains(generated_code, 'zephyr/drivers/dma.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: dma_config struct used
-    has_dma_cfg = "struct dma_config" in generated_code
+    has_dma_cfg = scoped_contains(generated_code, 'struct dma_config', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_config_struct",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: dma_block_config struct used
-    has_block_cfg = "dma_block_config" in generated_code
+    has_block_cfg = scoped_contains(generated_code, 'dma_block_config', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_block_config_struct",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: dma_config() API called
-    has_dma_config_call = "dma_config(" in generated_code
+    has_dma_config_call = scoped_contains(generated_code, 'dma_config(', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_config_called",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: dma_start() API called
-    has_dma_start = "dma_start(" in generated_code
+    has_dma_start = scoped_contains(generated_code, 'dma_start(', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_start_called",

@@ -1,6 +1,7 @@
 """Static analysis checks for PM device action handler."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: PM device header
-    has_pm_h = "zephyr/pm/device.h" in generated_code
+    has_pm_h = scoped_contains(generated_code, 'zephyr/pm/device.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pm_device_header",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: PM action callback function
-    has_pm_action = "pm_device_action" in generated_code
+    has_pm_action = scoped_contains(generated_code, 'pm_device_action', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pm_action_callback",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: SUSPEND action referenced
-    has_suspend = "PM_DEVICE_ACTION_SUSPEND" in generated_code
+    has_suspend = scoped_contains(generated_code, 'PM_DEVICE_ACTION_SUSPEND', scope='code_only')
     details.append(
         CheckDetail(
             check_name="suspend_action",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: RESUME action referenced
-    has_resume = "PM_DEVICE_ACTION_RESUME" in generated_code
+    has_resume = scoped_contains(generated_code, 'PM_DEVICE_ACTION_RESUME', scope='code_only')
     details.append(
         CheckDetail(
             check_name="resume_action",
@@ -56,8 +57,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Uses switch or if-else for action dispatch
-    has_switch = "switch" in generated_code or (
-        "if" in generated_code and "action" in generated_code
+    has_switch = scoped_contains(generated_code, 'switch', scope='code_only') or (
+        scoped_contains(generated_code, 'if', scope='code_only') and scoped_contains(generated_code, 'action', scope='code_only')
     )
     details.append(
         CheckDetail(

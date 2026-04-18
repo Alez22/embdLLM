@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -28,8 +29,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # (LLM failure: using raw integer or K_SECONDS instead of K_MSEC)
     # Accept k_msleep() as equivalent to k_sleep(K_MSEC())
     has_sleep_with_kmsec = (
-        ("k_sleep" in generated_code and "K_MSEC" in generated_code)
-        or "k_msleep" in generated_code
+        (scoped_contains(generated_code, 'k_sleep', scope='code_only') and scoped_contains(generated_code, 'K_MSEC', scope='code_only'))
+        or scoped_contains(generated_code, 'k_msleep', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -47,7 +48,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         "elapsed" in generated_code.lower()
         or "diff" in generated_code.lower()
         or (
-            "-" in generated_code
+            scoped_contains(generated_code, '-', scope='code_only')
             and "uptime" in generated_code.lower()
         )
     )
@@ -66,7 +67,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     has_for_loop_as_delay = bool(
         re.search(r"for\s*\([^;]*;\s*[^;]*<\s*\d+\s*;", generated_code)
     )
-    has_busy_wait = "k_busy_wait" in generated_code
+    has_busy_wait = scoped_contains(generated_code, 'k_busy_wait', scope='code_only')
     no_busy_wait = not has_for_loop_as_delay and not has_busy_wait
     details.append(
         CheckDetail(

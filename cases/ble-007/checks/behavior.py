@@ -4,6 +4,7 @@ import re
 
 from embedeval.check_utils import check_no_cross_platform_apis
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 _BLE_HALLUCINATED_APIS = [
     "BLEDevice.connect",
@@ -60,9 +61,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Company ID is present (at least 2 bytes as per BT spec)
     has_two_byte_company_id = (
-        "0x59, 0x00" in generated_code
-        or "0x59,0x00" in generated_code
-        or "COMPANY_ID" in generated_code
+        scoped_contains(generated_code, '0x59, 0x00', scope='code_only')
+        or scoped_contains(generated_code, '0x59,0x00', scope='code_only')
+        or scoped_contains(generated_code, 'COMPANY_ID', scope='code_only')
         or bool(re.search(r"BT_DATA_MANUFACTURER_DATA.*0x[0-9a-fA-F]{2}.*0x[0-9a-fA-F]{2}", generated_code))
     )
     details.append(
@@ -76,7 +77,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Advertising data has FLAGS entry
-    has_flags = "BT_DATA_FLAGS" in generated_code
+    has_flags = scoped_contains(generated_code, 'BT_DATA_FLAGS', scope='code_only')
     details.append(
         CheckDetail(
             check_name="ad_flags_present",
@@ -88,7 +89,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: BT_DATA_MANUFACTURER_DATA type used (hallucination: using wrong type constant)
-    has_mfr_data = "BT_DATA_MANUFACTURER_DATA" in generated_code
+    has_mfr_data = scoped_contains(generated_code, 'BT_DATA_MANUFACTURER_DATA', scope='code_only')
     details.append(
         CheckDetail(
             check_name="manufacturer_data_type_correct",
@@ -101,9 +102,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: Error check on bt_enable or bt_le_adv_start
     has_err_check = (
-        "if (err)" in generated_code
-        or "if (ret)" in generated_code
-        or "< 0" in generated_code
+        scoped_contains(generated_code, 'if (err)', scope='code_only')
+        or scoped_contains(generated_code, 'if (ret)', scope='code_only')
+        or scoped_contains(generated_code, '< 0', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -116,7 +117,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 7: Advertising data uses ARRAY_SIZE for count (safe API usage)
-    has_array_size = "ARRAY_SIZE" in generated_code
+    has_array_size = scoped_contains(generated_code, 'ARRAY_SIZE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="array_size_used",

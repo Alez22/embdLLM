@@ -4,6 +4,7 @@ import re
 
 from embedeval.check_utils import check_no_cross_platform_apis, strip_comments
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -66,7 +67,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Check 6: Initial value 0xFFFF (CCITT standard)
-    has_init = "0xFFFF" in generated_code or "0xffff" in generated_code
+    has_init = scoped_contains(generated_code, '0xFFFF', scope='code_only') or scoped_contains(generated_code, '0xffff', scope='code_only')
     details.append(CheckDetail(
         check_name="initial_value_correct",
         passed=has_init,

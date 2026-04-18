@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 _FAKE_DT_PROPERTIES = [
     "pin-config",
@@ -28,7 +29,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: dma-names contains "tx" entry
-    has_tx_name = '"tx"' in generated_code
+    has_tx_name = scoped_contains(generated_code, '"tx"', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_names_has_tx",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: dma-names contains "rx" entry
-    has_rx_name = '"rx"' in generated_code
+    has_rx_name = scoped_contains(generated_code, '"rx"', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_names_has_rx",
@@ -85,7 +86,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: status = "okay" on uart0
-    has_status_okay = 'status = "okay"' in generated_code
+    has_status_okay = scoped_contains(generated_code, 'status = "okay"', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uart0_status_okay",
@@ -97,7 +98,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 7: uart0 node referenced (not some other peripheral)
-    has_uart0 = "&uart0" in generated_code
+    has_uart0 = scoped_contains(generated_code, '&uart0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uart0_node_referenced",

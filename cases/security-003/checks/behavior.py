@@ -2,7 +2,9 @@
 
 import re
 
-from embedeval.check_utils import (check_no_cross_platform_apis,
+from embedeval.check_utils import (
+    check_no_cross_platform_apis,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -49,9 +51,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: Buffer initialized to zero before use (proves RNG actually wrote data)
     has_memset_zero = (
-        "memset" in generated_code and "0" in generated_code
-        or "{0}" in generated_code
-        or "= {0}" in generated_code
+        scoped_contains(generated_code, 'memset', scope='code_only') and scoped_contains(generated_code, '0', scope='code_only')
+        or scoped_contains(generated_code, '{0}', scope='code_only')
+        or scoped_contains(generated_code, '= {0}', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -81,7 +83,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Result printed
-    has_print = "printk" in generated_code or "printf" in generated_code
+    has_print = scoped_contains(generated_code, 'printk', scope='code_only') or scoped_contains(generated_code, 'printf', scope='code_only')
     details.append(
         CheckDetail(
             check_name="result_printed",
@@ -94,7 +96,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 5: Buffer size is at least 16 bytes (meaningful RNG test)
     sizes = [int(x) for x in re.findall(r"\b(\d+)\b", generated_code)]
-    has_adequate_size = any(s >= 16 for s in sizes) or "RNG_BUF_SIZE" in generated_code
+    has_adequate_size = any(s >= 16 for s in sizes) or scoped_contains(generated_code, 'RNG_BUF_SIZE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="buffer_size_adequate",

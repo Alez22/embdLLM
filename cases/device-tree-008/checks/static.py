@@ -1,6 +1,7 @@
 """Static analysis checks for Device Tree DMA channel assignment overlay."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -22,7 +23,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: dmas property present
-    has_dmas = "dmas = " in generated_code or "dmas=" in generated_code
+    has_dmas = scoped_contains(generated_code, 'dmas = ', scope='code_only') or scoped_contains(generated_code, 'dmas=', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dmas_property_present",
@@ -34,7 +35,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: dma-names property present
-    has_dma_names = "dma-names" in generated_code
+    has_dma_names = scoped_contains(generated_code, 'dma-names', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_names_property_present",
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: uart0 node referenced
-    has_uart0 = "&uart0" in generated_code
+    has_uart0 = scoped_contains(generated_code, '&uart0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uart0_node_referenced",
@@ -58,7 +59,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: DMA phandle reference format (uses &dma)
-    has_dma_phandle = "<&dma" in generated_code
+    has_dma_phandle = scoped_contains(generated_code, '<&dma', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_phandle_format",

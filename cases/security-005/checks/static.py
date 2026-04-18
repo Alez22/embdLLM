@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,7 +11,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: psa/protected_storage.h included
-    has_ps_h = "psa/protected_storage.h" in generated_code
+    has_ps_h = scoped_contains(generated_code, 'psa/protected_storage.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="protected_storage_header",
@@ -22,7 +23,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: psa_crypto_init called (LLM failure: skips init for PS-only code)
-    has_init = "psa_crypto_init" in generated_code
+    has_init = scoped_contains(generated_code, 'psa_crypto_init', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_crypto_init_called",
@@ -34,7 +35,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: psa_ps_set called
-    has_ps_set = "psa_ps_set" in generated_code
+    has_ps_set = scoped_contains(generated_code, 'psa_ps_set', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_ps_set_called",
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: psa_ps_get called
-    has_ps_get = "psa_ps_get" in generated_code
+    has_ps_get = scoped_contains(generated_code, 'psa_ps_get', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_ps_get_called",
@@ -75,7 +76,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: PSA_SUCCESS checked
-    has_psa_success = "PSA_SUCCESS" in generated_code
+    has_psa_success = scoped_contains(generated_code, 'PSA_SUCCESS', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_success_checked",

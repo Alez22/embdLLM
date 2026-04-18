@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: sector_size configured
-    has_sector_size = "sector_size" in generated_code
+    has_sector_size = scoped_contains(generated_code, 'sector_size', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sector_size_configured",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Error handling for mount/write/read
-    has_error = "< 0" in generated_code
+    has_error = scoped_contains(generated_code, '< 0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="nvs_error_handling",
@@ -68,7 +69,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: NVS ID > 0 (ID 0 is reserved in some implementations)
-    has_id = "NVS_ID" in generated_code or "nvs_id" in generated_code.lower()
+    has_id = scoped_contains(generated_code, 'NVS_ID', scope='code_only') or "nvs_id" in generated_code.lower()
     details.append(
         CheckDetail(
             check_name="nvs_id_defined",

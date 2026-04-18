@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Fallback: if thread body couldn't be extracted, check that task_wdt_feed
     # appears near a thread definition and NOT only inside main()
     if not feed_in_thread and not thread_fn_match:
-        has_feed = "task_wdt_feed" in generated_code
+        has_feed = scoped_contains(generated_code, 'task_wdt_feed', scope='code_only')
         # Check it's associated with a thread, not just in main
         has_thread_def = bool(re.search(
             r"K_THREAD_DEFINE|k_thread_create", generated_code
@@ -98,7 +99,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: k_sleep present in worker loop (not busy-wait)
-    has_sleep = "k_sleep" in generated_code
+    has_sleep = scoped_contains(generated_code, 'k_sleep', scope='code_only')
     details.append(
         CheckDetail(
             check_name="worker_sleeps_between_feeds",

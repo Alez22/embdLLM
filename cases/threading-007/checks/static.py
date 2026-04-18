@@ -1,6 +1,7 @@
 """Static analysis checks for thread-safe singleton initialization."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: kernel header
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: k_mutex used
-    has_mutex = "k_mutex" in generated_code
+    has_mutex = scoped_contains(generated_code, 'k_mutex', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_k_mutex",
@@ -33,8 +34,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Static initialized flag
     has_flag = (
-        "initialized" in generated_code
-        and ("bool" in generated_code or "static" in generated_code)
+        scoped_contains(generated_code, 'initialized', scope='code_only')
+        and (scoped_contains(generated_code, 'bool', scope='code_only') or scoped_contains(generated_code, 'static', scope='code_only'))
     )
     details.append(
         CheckDetail(
@@ -47,8 +48,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: k_mutex_lock and k_mutex_unlock both present
-    has_lock = "k_mutex_lock" in generated_code
-    has_unlock = "k_mutex_unlock" in generated_code
+    has_lock = scoped_contains(generated_code, 'k_mutex_lock', scope='code_only')
+    has_unlock = scoped_contains(generated_code, 'k_mutex_unlock', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mutex_lock_unlock_paired",

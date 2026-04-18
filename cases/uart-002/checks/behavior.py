@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis, extract_numeric
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -9,7 +10,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: UART_RX_RDY event handled in callback
-    has_rx_rdy = "UART_RX_RDY" in generated_code
+    has_rx_rdy = scoped_contains(generated_code, 'UART_RX_RDY', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uart_rx_rdy_handled",
@@ -34,7 +35,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: device_is_ready check present
-    has_ready = "device_is_ready" in generated_code
+    has_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_ready_check",
@@ -74,7 +75,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Ends with k_sleep(K_FOREVER) — not a busy loop
-    has_forever_sleep = "K_FOREVER" in generated_code
+    has_forever_sleep = scoped_contains(generated_code, 'K_FOREVER', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sleeps_forever_not_busy_loop",

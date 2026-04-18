@@ -2,6 +2,7 @@
 
 from embedeval.check_utils import check_no_cross_platform_apis
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 _BLE_HALLUCINATED_APIS = [
     "BLEDevice.connect",
@@ -55,7 +56,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: CCC descriptor present — required for client to enable notifications
-    has_ccc = "BT_GATT_CCC" in generated_code
+    has_ccc = scoped_contains(generated_code, 'BT_GATT_CCC', scope='code_only')
     details.append(
         CheckDetail(
             check_name="ccc_descriptor_present",
@@ -67,7 +68,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: BT_GATT_CHRC_NOTIFY flag set (common LLM failure: missing notify flag)
-    has_notify_flag = "BT_GATT_CHRC_NOTIFY" in generated_code
+    has_notify_flag = scoped_contains(generated_code, 'BT_GATT_CHRC_NOTIFY', scope='code_only')
     details.append(
         CheckDetail(
             check_name="notify_chrc_flag",
@@ -98,8 +99,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Connection reference managed (bt_conn_ref / bt_conn_unref)
-    has_ref = "bt_conn_ref" in generated_code
-    has_unref = "bt_conn_unref" in generated_code
+    has_ref = scoped_contains(generated_code, 'bt_conn_ref', scope='code_only')
+    has_unref = scoped_contains(generated_code, 'bt_conn_unref', scope='code_only')
     details.append(
         CheckDetail(
             check_name="conn_reference_managed",
@@ -139,8 +140,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 8: Notify return value checked
-    has_notify_check = "bt_gatt_notify" in generated_code and (
-        "if (err" in generated_code or "if (ret" in generated_code or "< 0" in generated_code
+    has_notify_check = scoped_contains(generated_code, 'bt_gatt_notify', scope='code_only') and (
+        scoped_contains(generated_code, 'if (err', scope='code_only') or scoped_contains(generated_code, 'if (ret', scope='code_only') or scoped_contains(generated_code, '< 0', scope='code_only')
     )
     details.append(
         CheckDetail(

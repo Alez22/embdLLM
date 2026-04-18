@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis, has_error_check
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -55,7 +56,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: pm_device_runtime_disable called at end (cleanup)
     # (LLM failure: enabling runtime PM but never disabling it)
-    has_disable = "pm_device_runtime_disable" in generated_code
+    has_disable = scoped_contains(generated_code, 'pm_device_runtime_disable', scope='code_only')
     details.append(
         CheckDetail(
             check_name="runtime_pm_disabled_at_end",
@@ -68,8 +69,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 5: SUSPEND and RESUME PM actions handled in callback
     # (LLM failure: PM callback only handles one direction)
-    has_suspend_handled = "PM_DEVICE_ACTION_SUSPEND" in generated_code
-    has_resume_handled = "PM_DEVICE_ACTION_RESUME" in generated_code
+    has_suspend_handled = scoped_contains(generated_code, 'PM_DEVICE_ACTION_SUSPEND', scope='code_only')
+    has_resume_handled = scoped_contains(generated_code, 'PM_DEVICE_ACTION_RESUME', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pm_callback_handles_both_directions",

@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -13,8 +14,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 1: Both TX and RX buf_sets provided to spi_transceive
     # Must pass both tx_bufs and rx_bufs (not NULL for either)
     transceive_pos = generated_code.find("spi_transceive")
-    has_tx_bufs = "tx_bufs" in generated_code or "tx_buf_set" in generated_code
-    has_rx_bufs = "rx_bufs" in generated_code or "rx_buf_set" in generated_code
+    has_tx_bufs = scoped_contains(generated_code, 'tx_bufs', scope='code_only') or scoped_contains(generated_code, 'tx_buf_set', scope='code_only')
+    has_rx_bufs = scoped_contains(generated_code, 'rx_bufs', scope='code_only') or scoped_contains(generated_code, 'rx_buf_set', scope='code_only')
     both_populated = has_tx_bufs and has_rx_bufs
     details.append(
         CheckDetail(
@@ -28,8 +29,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: TX and RX buffers are different arrays
     # Check for two separate buffer declarations
-    has_separate_tx = "tx_buf" in generated_code
-    has_separate_rx = "rx_buf" in generated_code
+    has_separate_tx = scoped_contains(generated_code, 'tx_buf', scope='code_only')
+    has_separate_rx = scoped_contains(generated_code, 'rx_buf', scope='code_only')
     buffers_separate = has_separate_tx and has_separate_rx
     details.append(
         CheckDetail(
@@ -42,7 +43,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: spi_config has operation field with SPI_OP_MODE_MASTER
-    has_master_mode = "SPI_OP_MODE_MASTER" in generated_code
+    has_master_mode = scoped_contains(generated_code, 'SPI_OP_MODE_MASTER', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi_op_mode_master_set",
@@ -54,7 +55,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Error handling on spi_transceive return value
-    has_error_check = "< 0" in generated_code or "!= 0" in generated_code or "ret" in generated_code
+    has_error_check = scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, '!= 0', scope='code_only') or scoped_contains(generated_code, 'ret', scope='code_only')
     details.append(
         CheckDetail(
             check_name="transceive_return_checked",
@@ -66,7 +67,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: device_is_ready before transfer
-    has_ready = "device_is_ready" in generated_code
+    has_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_is_ready_before_transfer",

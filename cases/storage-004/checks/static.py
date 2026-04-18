@@ -1,6 +1,7 @@
 """Static analysis checks for Flash Area erase and write."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: flash_map header included
-    has_flash_map_h = "zephyr/storage/flash_map.h" in generated_code
+    has_flash_map_h = scoped_contains(generated_code, 'zephyr/storage/flash_map.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="flash_map_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: flash_area_open called
-    has_open = "flash_area_open" in generated_code
+    has_open = scoped_contains(generated_code, 'flash_area_open', scope='code_only')
     details.append(
         CheckDetail(
             check_name="flash_area_open_called",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: flash_area_erase called
-    has_erase = "flash_area_erase" in generated_code
+    has_erase = scoped_contains(generated_code, 'flash_area_erase', scope='code_only')
     details.append(
         CheckDetail(
             check_name="flash_area_erase_called",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: flash_area_write called
-    has_write = "flash_area_write" in generated_code
+    has_write = scoped_contains(generated_code, 'flash_area_write', scope='code_only')
     details.append(
         CheckDetail(
             check_name="flash_area_write_called",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: flash_area_close called
-    has_close = "flash_area_close" in generated_code
+    has_close = scoped_contains(generated_code, 'flash_area_close', scope='code_only')
     details.append(
         CheckDetail(
             check_name="flash_area_close_called",

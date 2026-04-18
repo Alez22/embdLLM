@@ -1,6 +1,7 @@
 """Static analysis checks for high-resolution cycle-count timing application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes zephyr/kernel.h
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Uses k_cycle_get_32 (Zephyr cycle counter)
-    has_cycle_get = "k_cycle_get_32" in generated_code
+    has_cycle_get = scoped_contains(generated_code, 'k_cycle_get_32', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_k_cycle_get_32",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Uses k_cyc_to_ns_floor64 for conversion
-    has_ns_convert = "k_cyc_to_ns_floor64" in generated_code
+    has_ns_convert = scoped_contains(generated_code, 'k_cyc_to_ns_floor64', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_k_cyc_to_ns_floor64",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Hallucination — no clock_gettime (Linux POSIX)
-    has_clock_gettime = "clock_gettime" in generated_code
+    has_clock_gettime = scoped_contains(generated_code, 'clock_gettime', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_clock_gettime_hallucination",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Hallucination — no Arduino micros()
-    has_arduino_micros = "micros()" in generated_code
+    has_arduino_micros = scoped_contains(generated_code, 'micros()', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_arduino_micros_hallucination",
@@ -68,7 +69,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Hallucination — no STM32 HAL_GetTick
-    has_hal_tick = "HAL_GetTick" in generated_code
+    has_hal_tick = scoped_contains(generated_code, 'HAL_GetTick', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_hal_gettick_hallucination",
@@ -80,7 +81,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 7: Uses uint64_t for nanosecond result (avoids overflow)
-    has_u64 = "uint64_t" in generated_code
+    has_u64 = scoped_contains(generated_code, 'uint64_t', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_uint64_for_nanoseconds",

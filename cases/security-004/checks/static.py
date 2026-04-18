@@ -1,6 +1,7 @@
 """Static analysis checks for PSA HKDF key derivation."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: psa/crypto.h included
-    has_psa_h = "psa/crypto.h" in generated_code
+    has_psa_h = scoped_contains(generated_code, 'psa/crypto.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_crypto_header",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: psa_crypto_init called
-    has_init = "psa_crypto_init" in generated_code
+    has_init = scoped_contains(generated_code, 'psa_crypto_init', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_crypto_init_called",
@@ -32,8 +33,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: HKDF algorithm with SHA-256 used (LLM failure: wrong algorithm constant)
-    has_hkdf = "PSA_ALG_HKDF" in generated_code
-    has_sha256 = "PSA_ALG_SHA_256" in generated_code
+    has_hkdf = scoped_contains(generated_code, 'PSA_ALG_HKDF', scope='code_only')
+    has_sha256 = scoped_contains(generated_code, 'PSA_ALG_SHA_256', scope='code_only')
     details.append(
         CheckDetail(
             check_name="hkdf_sha256_algorithm",
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: Salt input step present (LLM failure: skips salt, wrong derivation)
     has_salt_input = (
-        "PSA_KEY_DERIVATION_INPUT_SALT" in generated_code
+        scoped_contains(generated_code, 'PSA_KEY_DERIVATION_INPUT_SALT', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -59,8 +60,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: All three derivation input steps present
-    has_secret = "PSA_KEY_DERIVATION_INPUT_SECRET" in generated_code
-    has_info = "PSA_KEY_DERIVATION_INPUT_INFO" in generated_code
+    has_secret = scoped_contains(generated_code, 'PSA_KEY_DERIVATION_INPUT_SECRET', scope='code_only')
+    has_info = scoped_contains(generated_code, 'PSA_KEY_DERIVATION_INPUT_INFO', scope='code_only')
     details.append(
         CheckDetail(
             check_name="all_derivation_inputs_present",
@@ -72,7 +73,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: psa_key_derivation_abort called (resource cleanup)
-    has_abort = "psa_key_derivation_abort" in generated_code
+    has_abort = scoped_contains(generated_code, 'psa_key_derivation_abort', scope='code_only')
     details.append(
         CheckDetail(
             check_name="derivation_aborted",

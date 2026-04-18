@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,7 +11,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes zephyr/drivers/gpio.h
-    has_gpio_h = "zephyr/drivers/gpio.h" in generated_code
+    has_gpio_h = scoped_contains(generated_code, 'zephyr/drivers/gpio.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="gpio_header_included",
@@ -22,7 +23,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Includes zephyr/kernel.h
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -34,7 +35,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Uses k_timer (debounce mechanism)
-    has_k_timer = "k_timer" in generated_code
+    has_k_timer = scoped_contains(generated_code, 'k_timer', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_k_timer_for_debounce",
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Hallucination check — gpio_debounce() does not exist in Zephyr
-    has_fake_debounce = "gpio_debounce" in generated_code
+    has_fake_debounce = scoped_contains(generated_code, 'gpio_debounce', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_gpio_debounce_hallucination",
@@ -58,7 +59,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Hallucination check — GPIO_INT_DEBOUNCE flag does not exist
-    has_fake_flag = "GPIO_INT_DEBOUNCE" in generated_code
+    has_fake_flag = scoped_contains(generated_code, 'GPIO_INT_DEBOUNCE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_gpio_int_debounce_flag",
@@ -70,7 +71,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Uses GPIO_DT_SPEC_GET
-    has_dt_spec = "GPIO_DT_SPEC_GET" in generated_code
+    has_dt_spec = scoped_contains(generated_code, 'GPIO_DT_SPEC_GET', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_dt_spec",

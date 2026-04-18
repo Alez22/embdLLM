@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -68,7 +69,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Master mode configured
-    has_master_mode = "SPI_MODE_MASTER" in generated_code
+    has_master_mode = scoped_contains(generated_code, 'SPI_MODE_MASTER', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi_master_mode_set",

@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -85,7 +86,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: CONFIG COMMIT OK printed
-    has_commit_ok = "CONFIG COMMIT OK" in generated_code or "COMMIT OK" in generated_code
+    has_commit_ok = scoped_contains(generated_code, 'CONFIG COMMIT OK', scope='code_only') or scoped_contains(generated_code, 'COMMIT OK', scope='code_only')
     details.append(
         CheckDetail(
             check_name="commit_ok_printed",

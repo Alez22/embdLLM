@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -11,8 +12,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: inherit cmake present (not manual cmake commands)
     # (LLM failure: writing do_compile() { cmake .. && make } instead of inherit cmake)
-    has_inherit_cmake = "inherit cmake" in generated_code
-    has_manual_cmake = "cmake .." in generated_code or "cmake ${S}" in generated_code
+    has_inherit_cmake = scoped_contains(generated_code, 'inherit cmake', scope='raw')
+    has_manual_cmake = scoped_contains(generated_code, 'cmake ..', scope='raw') or scoped_contains(generated_code, 'cmake ${S}', scope='raw')
     details.append(
         CheckDetail(
             check_name="inherits_cmake_class",
@@ -25,8 +26,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: SRCREV set when using git:// (mandatory, build fails without it)
     # (LLM failure: uses git:// SRC_URI without SRCREV)
-    has_git_src = "git://" in generated_code
-    has_srcrev = "SRCREV" in generated_code
+    has_git_src = scoped_contains(generated_code, 'git://', scope='raw')
+    has_srcrev = scoped_contains(generated_code, 'SRCREV', scope='raw')
     srcrev_ok = (not has_git_src) or has_srcrev
     details.append(
         CheckDetail(
@@ -39,7 +40,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: LIC_FILES_CHKSUM has md5 or sha256 hash
-    has_hash = "md5=" in generated_code or "sha256=" in generated_code
+    has_hash = scoped_contains(generated_code, 'md5=', scope='raw') or scoped_contains(generated_code, 'sha256=', scope='raw')
     details.append(
         CheckDetail(
             check_name="lic_chksum_has_hash",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: do_install uses ${D} prefix
-    has_d_prefix = "${D}" in generated_code
+    has_d_prefix = scoped_contains(generated_code, '${D}', scope='raw')
     details.append(
         CheckDetail(
             check_name="install_uses_d_prefix",
@@ -63,8 +64,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Uses ${bindir} not hardcoded /usr/bin
-    has_bindir = "${bindir}" in generated_code
-    has_hardcoded = "/usr/bin" in generated_code
+    has_bindir = scoped_contains(generated_code, '${bindir}', scope='raw')
+    has_hardcoded = scoped_contains(generated_code, '/usr/bin', scope='raw')
     details.append(
         CheckDetail(
             check_name="uses_bindir_variable",
@@ -76,7 +77,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: S set to ${WORKDIR}/git for git sources
-    has_s_workdir_git = "${WORKDIR}/git" in generated_code or "${WORKDIR}" in generated_code
+    has_s_workdir_git = scoped_contains(generated_code, '${WORKDIR}/git', scope='raw') or scoped_contains(generated_code, '${WORKDIR}', scope='raw')
     details.append(
         CheckDetail(
             check_name="s_variable_set",

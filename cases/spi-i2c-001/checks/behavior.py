@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -12,8 +13,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: Device ready check before I2C operations
     has_ready = (
-        "device_is_ready" in generated_code
-        or "gpio_is_ready" in generated_code
+        scoped_contains(generated_code, 'device_is_ready', scope='code_only')
+        or scoped_contains(generated_code, 'gpio_is_ready', scope='code_only')
     )
     i2c_api_pos = max(
         generated_code.find("i2c_reg_read"),
@@ -66,11 +67,11 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Error handling for I2C read return value
     has_ret_check = (
-        "< 0" in generated_code
-        or "!= 0" in generated_code
-        or "ret < 0" in generated_code
-        or "rc < 0" in generated_code
-        or "err < 0" in generated_code
+        scoped_contains(generated_code, '< 0', scope='code_only')
+        or scoped_contains(generated_code, '!= 0', scope='code_only')
+        or scoped_contains(generated_code, 'ret < 0', scope='code_only')
+        or scoped_contains(generated_code, 'rc < 0', scope='code_only')
+        or scoped_contains(generated_code, 'err < 0', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -84,9 +85,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: WHO_AM_I register address defined
     has_reg_addr = (
-        "WHO_AM_I" in generated_code
-        or "0x75" in generated_code
-        or "REG" in generated_code
+        scoped_contains(generated_code, 'WHO_AM_I', scope='code_only')
+        or scoped_contains(generated_code, '0x75', scope='code_only')
+        or scoped_contains(generated_code, 'REG', scope='code_only')
     )
     details.append(
         CheckDetail(

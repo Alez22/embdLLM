@@ -3,12 +3,13 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
-    has_settings_h = "settings/settings.h" in generated_code
+    has_settings_h = scoped_contains(generated_code, 'settings/settings.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="settings_header",
@@ -19,7 +20,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    uses_save_one = "settings_save_one" in generated_code
+    uses_save_one = scoped_contains(generated_code, 'settings_save_one', scope='code_only')
     details.append(
         CheckDetail(
             check_name="settings_save_one_used",
@@ -30,7 +31,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    loads_settings = "settings_load" in generated_code
+    loads_settings = scoped_contains(generated_code, 'settings_load', scope='code_only')
     details.append(
         CheckDetail(
             check_name="settings_load_called",
@@ -58,7 +59,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
             re.IGNORECASE,
         )
     )
-    has_uptime_limit = "k_uptime_get" in generated_code
+    has_uptime_limit = scoped_contains(generated_code, 'k_uptime_get', scope='code_only')
 
     rate_limit_present = has_mod_pattern or has_every_n or has_uptime_limit
     details.append(

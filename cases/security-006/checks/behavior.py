@@ -4,6 +4,7 @@ import re
 
 from embedeval.check_utils import (
     check_no_cross_platform_apis,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -50,7 +51,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: psa_export_key called to verify denial (anti-tamper verification)
-    has_export_call = "psa_export_key" in generated_code
+    has_export_call = scoped_contains(generated_code, 'psa_export_key', scope='code_only')
     details.append(
         CheckDetail(
             check_name="export_denial_verified",
@@ -64,7 +65,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: PSA_ERROR_NOT_PERMITTED checked (correct denial status)
-    has_not_permitted = "PSA_ERROR_NOT_PERMITTED" in generated_code
+    has_not_permitted = scoped_contains(generated_code, 'PSA_ERROR_NOT_PERMITTED', scope='code_only')
     details.append(
         CheckDetail(
             check_name="not_permitted_checked",
@@ -78,7 +79,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: psa_destroy_key called (no key leak)
-    has_destroy = "psa_destroy_key" in generated_code
+    has_destroy = scoped_contains(generated_code, 'psa_destroy_key', scope='code_only')
     details.append(
         CheckDetail(
             check_name="key_destroyed",
@@ -90,7 +91,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Key attributes initialized (PSA_KEY_ATTRIBUTES_INIT)
-    has_attrs_init = "PSA_KEY_ATTRIBUTES_INIT" in generated_code
+    has_attrs_init = scoped_contains(generated_code, 'PSA_KEY_ATTRIBUTES_INIT', scope='code_only')
     details.append(
         CheckDetail(
             check_name="attributes_initialized",
@@ -104,7 +105,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Result printed (KEY SECURE or equivalent)
-    has_print = "printk" in generated_code or "printf" in generated_code
+    has_print = scoped_contains(generated_code, 'printk', scope='code_only') or scoped_contains(generated_code, 'printf', scope='code_only')
     details.append(
         CheckDetail(
             check_name="result_printed",

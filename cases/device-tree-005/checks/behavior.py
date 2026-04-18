@@ -1,6 +1,7 @@
 """Behavioral checks for multi-peripheral board Device Tree overlay."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 _FAKE_DT_PROPERTIES = [
     "pin-config",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: i2c0 enabled (AI failure: configures sensor but forgets to enable parent bus)
-    has_i2c0_enabled = "&i2c0" in generated_code
+    has_i2c0_enabled = scoped_contains(generated_code, '&i2c0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="i2c0_enabled",
@@ -52,7 +53,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: BME680 compatible string (AI failure: uses bme280 instead of bme680)
-    has_bme680_compatible = 'compatible = "bosch,bme680"' in generated_code
+    has_bme680_compatible = scoped_contains(generated_code, 'compatible = "bosch,bme680"', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bme680_compatible",
@@ -65,7 +66,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 5: BME680 at address 0x77 (AI failure: uses 0x76 which is the BME280 address)
     has_bme680_addr = (
-        "reg = <0x77>" in generated_code or "bme680@77" in generated_code
+        scoped_contains(generated_code, 'reg = <0x77>', scope='code_only') or scoped_contains(generated_code, 'bme680@77', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -78,7 +79,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: spi0 enabled
-    has_spi0_enabled = "&spi0" in generated_code
+    has_spi0_enabled = scoped_contains(generated_code, '&spi0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi0_enabled",
@@ -90,7 +91,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 7: SPI flash with jedec,spi-nor compatible
-    has_spi_nor = 'compatible = "jedec,spi-nor"' in generated_code
+    has_spi_nor = scoped_contains(generated_code, 'compatible = "jedec,spi-nor"', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi_nor_compatible",
@@ -102,7 +103,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 8: SPI flash at chip select 0 (reg = <0>)
-    has_flash_cs0 = "reg = <0>" in generated_code
+    has_flash_cs0 = scoped_contains(generated_code, 'reg = <0>', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi_flash_chip_select_0",
@@ -114,7 +115,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 9: gpio0 enabled
-    has_gpio0_enabled = "&gpio0" in generated_code
+    has_gpio0_enabled = scoped_contains(generated_code, '&gpio0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="gpio0_enabled",
@@ -140,7 +141,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 11: No conflicting reg addresses (BME680 at 0x77, not 0x76)
     has_bme680_wrong_addr = (
-        "bosch,bme680" in generated_code and "reg = <0x76>" in generated_code
+        scoped_contains(generated_code, 'bosch,bme680', scope='code_only') and scoped_contains(generated_code, 'reg = <0x76>', scope='code_only')
     )
     details.append(
         CheckDetail(

@@ -1,13 +1,14 @@
 """Static analysis checks for sensor attribute configuration before read."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate sensor attribute configuration code structure."""
     details: list[CheckDetail] = []
 
-    has_sensor_h = "zephyr/drivers/sensor.h" in generated_code
+    has_sensor_h = scoped_contains(generated_code, 'zephyr/drivers/sensor.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_attr_set = "sensor_attr_set" in generated_code
+    has_attr_set = scoped_contains(generated_code, 'sensor_attr_set', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_attr_set",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_sampling_freq = "SENSOR_ATTR_SAMPLING_FREQUENCY" in generated_code
+    has_sampling_freq = scoped_contains(generated_code, 'SENSOR_ATTR_SAMPLING_FREQUENCY', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sampling_frequency_attr",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_full_scale = "SENSOR_ATTR_FULL_SCALE" in generated_code
+    has_full_scale = scoped_contains(generated_code, 'SENSOR_ATTR_FULL_SCALE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="full_scale_attr",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_fetch = "sensor_sample_fetch" in generated_code
+    has_fetch = scoped_contains(generated_code, 'sensor_sample_fetch', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sample_fetch",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_sensor_value = "sensor_value" in generated_code
+    has_sensor_value = scoped_contains(generated_code, 'sensor_value', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_value_struct",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_device_ready = "device_is_ready" in generated_code
+    has_device_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_ready_check",

@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def _strip_comments(code: str) -> str:
@@ -52,7 +53,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: k_spin_lock called
-    has_lock = "k_spin_lock" in generated_code
+    has_lock = scoped_contains(generated_code, 'k_spin_lock', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_spin_lock_called",
@@ -64,7 +65,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: k_spinlock_key_t used (IRQ key saved — LLM failure: not saving key)
-    has_key_type = "k_spinlock_key_t" in generated_code
+    has_key_type = scoped_contains(generated_code, 'k_spinlock_key_t', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spinlock_key_saved",
@@ -76,7 +77,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: k_spin_unlock called (key must be restored)
-    has_unlock = "k_spin_unlock" in generated_code
+    has_unlock = scoped_contains(generated_code, 'k_spin_unlock', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_spin_unlock_called",

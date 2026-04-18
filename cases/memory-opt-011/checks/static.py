@@ -3,13 +3,14 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate RAM-constrained buffer code structure."""
     details: list[CheckDetail] = []
 
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_main = "void main(" in generated_code or "int main(" in generated_code
+    has_main = scoped_contains(generated_code, 'void main(', scope='code_only') or scoped_contains(generated_code, 'int main(', scope='code_only')
     details.append(
         CheckDetail(
             check_name="main_function_present",

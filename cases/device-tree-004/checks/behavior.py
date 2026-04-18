@@ -1,6 +1,7 @@
 """Behavioral checks for CAN bus controller Device Tree overlay."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 _FAKE_DT_PROPERTIES = [
     "pin-config",
@@ -26,7 +27,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: can0 node enabled with status okay
-    has_can0 = "&can0" in generated_code
+    has_can0 = scoped_contains(generated_code, '&can0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="can0_node_present",
@@ -38,7 +39,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: status = "okay" on can0
-    has_status_okay = 'status = "okay"' in generated_code
+    has_status_okay = scoped_contains(generated_code, 'status = "okay"', scope='code_only')
     details.append(
         CheckDetail(
             check_name="status_okay",
@@ -50,7 +51,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: bus-speed = <125000> (AI failure: omits bus-speed entirely)
-    has_bus_speed = "bus-speed = <125000>" in generated_code
+    has_bus_speed = scoped_contains(generated_code, 'bus-speed = <125000>', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bus_speed_125kbps",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: sample-point = <875> in permille (AI failure: uses 87 or 87.5 thinking it's percent)
-    has_sample_point = "sample-point = <875>" in generated_code
+    has_sample_point = scoped_contains(generated_code, 'sample-point = <875>', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sample_point_875_permille",
@@ -74,7 +75,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Transceiver child node with compatible string
-    has_transceiver_compatible = 'compatible = "microchip,mcp2562fd"' in generated_code
+    has_transceiver_compatible = scoped_contains(generated_code, 'compatible = "microchip,mcp2562fd"', scope='code_only')
     details.append(
         CheckDetail(
             check_name="transceiver_compatible",
@@ -112,7 +113,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 8: No fake interrupt-map without parent node
     # LLM failure: adds interrupt-map property to CAN node (wrong — CAN doesn't use interrupt-map)
-    has_interrupt_map = "interrupt-map" in generated_code
+    has_interrupt_map = scoped_contains(generated_code, 'interrupt-map', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_spurious_interrupt_map",

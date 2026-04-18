@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -13,7 +14,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     total_def_pos = generated_code.find("TOTAL_IMAGE_SIZE")
     if total_def_pos == -1:
         total_def_pos = generated_code.find("total_size")
-    loop_pos = generated_code.find("for (") if "for (" in generated_code else generated_code.find("while (")
+    loop_pos = generated_code.find("for (") if scoped_contains(generated_code, 'for (', scope='code_only') else generated_code.find("while (")
     details.append(
         CheckDetail(
             check_name="total_size_known_before_loop",
@@ -45,10 +46,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 3: Division-by-zero guard before percentage
     # (LLM failure: dividing by total without checking for zero)
     has_zero_guard = (
-        "total == 0" in generated_code
-        or "total_size == 0" in generated_code
-        or "total > 0" in generated_code
-        or "!= 0" in generated_code
+        scoped_contains(generated_code, 'total == 0', scope='code_only')
+        or scoped_contains(generated_code, 'total_size == 0', scope='code_only')
+        or scoped_contains(generated_code, 'total > 0', scope='code_only')
+        or scoped_contains(generated_code, '!= 0', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -63,8 +64,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 4: bytes_received counter uses a wide type (not uint8_t)
     # (LLM failure: using uint8_t which overflows at 256 bytes)
     has_narrow_counter = (
-        "uint8_t bytes_received" in generated_code
-        or "uint8_t received" in generated_code
+        scoped_contains(generated_code, 'uint8_t bytes_received', scope='code_only')
+        or scoped_contains(generated_code, 'uint8_t received', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -92,7 +93,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: dfu_target_done(false) on write error — rollback path
     # (LLM failure: only happy path — no abort if a chunk write fails mid-loop)
-    has_done_false = "dfu_target_done(false)" in generated_code
+    has_done_false = scoped_contains(generated_code, 'dfu_target_done(false)', scope='code_only')
     details.append(
         CheckDetail(
             check_name="abort_on_write_error",
@@ -106,8 +107,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 7: dfu_target_write return value checked inside loop
     # (LLM failure: writing chunks but not checking if each write succeeded)
     write_err_inside_loop = (
-        "dfu_target_write" in generated_code
-        and ("< 0" in generated_code or "!= 0" in generated_code)
+        scoped_contains(generated_code, 'dfu_target_write', scope='code_only')
+        and (scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, '!= 0', scope='code_only'))
         and loop_pos != -1
         and generated_code.find("dfu_target_write") > loop_pos
     )
@@ -124,9 +125,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 8: bytes_received accumulates correctly (size_t or similar wide type)
     # (LLM failure: using int instead of size_t — sign mismatch with size comparisons)
     has_size_t_counter = (
-        "size_t bytes_received" in generated_code
-        or "uint32_t bytes_received" in generated_code
-        or "size_t received" in generated_code
+        scoped_contains(generated_code, 'size_t bytes_received', scope='code_only')
+        or scoped_contains(generated_code, 'uint32_t bytes_received', scope='code_only')
+        or scoped_contains(generated_code, 'size_t received', scope='code_only')
     )
     details.append(
         CheckDetail(

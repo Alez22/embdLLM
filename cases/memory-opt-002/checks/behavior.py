@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -49,7 +50,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: CONFIG_MINIMAL_LIBC=y (enabled, not just mentioned)
-    has_minimal_libc_enabled = "CONFIG_MINIMAL_LIBC=y" in generated_code
+    has_minimal_libc_enabled = scoped_contains(generated_code, 'CONFIG_MINIMAL_LIBC=y', scope='code_only')
     details.append(
         CheckDetail(
             check_name="minimal_libc_enabled_value",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: NEWLIB_LIBC not enabled (conflicts with MINIMAL_LIBC)
     # (LLM failure: enabling both causes linker errors)
-    has_newlib_enabled = "CONFIG_NEWLIB_LIBC=y" in generated_code
+    has_newlib_enabled = scoped_contains(generated_code, 'CONFIG_NEWLIB_LIBC=y', scope='code_only')
     details.append(
         CheckDetail(
             check_name="newlib_not_conflicting",
@@ -74,7 +75,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: HEAP_MEM_POOL_SIZE present and set to 0 (heap disabled)
-    heap_disabled = "CONFIG_HEAP_MEM_POOL_SIZE=0" in generated_code
+    heap_disabled = scoped_contains(generated_code, 'CONFIG_HEAP_MEM_POOL_SIZE=0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="heap_disabled",

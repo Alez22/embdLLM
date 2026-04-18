@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -22,7 +23,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Elapsed cycles computed as end - start
-    has_subtraction = "end - start" in generated_code or "elapsed" in generated_code.lower()
+    has_subtraction = scoped_contains(generated_code, 'end - start', scope='code_only') or "elapsed" in generated_code.lower()
     details.append(
         CheckDetail(
             check_name="elapsed_cycles_computed",
@@ -61,7 +62,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Sleep between measurements (not tight loop)
-    has_sleep = "k_sleep" in generated_code
+    has_sleep = scoped_contains(generated_code, 'k_sleep', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sleep_between_measurements",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: No gettimeofday (POSIX/Linux)
-    has_gettimeofday = "gettimeofday" in generated_code
+    has_gettimeofday = scoped_contains(generated_code, 'gettimeofday', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_gettimeofday",

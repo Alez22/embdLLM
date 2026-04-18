@@ -1,6 +1,7 @@
 """Static analysis checks for Device Tree clock configuration overlay."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -22,7 +23,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: assigned-clocks property present
-    has_assigned_clocks = "assigned-clocks" in generated_code
+    has_assigned_clocks = scoped_contains(generated_code, 'assigned-clocks', scope='code_only')
     details.append(
         CheckDetail(
             check_name="assigned_clocks_present",
@@ -34,7 +35,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: assigned-clock-rates property present
-    has_clock_rates = "assigned-clock-rates" in generated_code
+    has_clock_rates = scoped_contains(generated_code, 'assigned-clock-rates', scope='code_only')
     details.append(
         CheckDetail(
             check_name="assigned_clock_rates_present",
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: status property present
-    has_status = 'status = "' in generated_code
+    has_status = scoped_contains(generated_code, 'status = "', scope='code_only')
     details.append(
         CheckDetail(
             check_name="status_present",

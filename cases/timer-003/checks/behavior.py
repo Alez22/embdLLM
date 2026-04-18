@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -39,7 +40,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         ".callback" in alarm_cfg_section
         and "NULL" not in alarm_cfg_section.split(".callback")[1].split(",")[0]
         if ".callback" in alarm_cfg_section
-        else "callback" in generated_code and "alarm_callback" in generated_code
+        else scoped_contains(generated_code, 'callback', scope='code_only') and scoped_contains(generated_code, 'alarm_callback', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -53,7 +54,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Uses counter_us_to_ticks for tick conversion (not hardcoded ticks)
     # AI failure: using raw tick values or k_ms_to_cyc macros
-    has_tick_conversion = "counter_us_to_ticks" in generated_code
+    has_tick_conversion = scoped_contains(generated_code, 'counter_us_to_ticks', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_tick_conversion",

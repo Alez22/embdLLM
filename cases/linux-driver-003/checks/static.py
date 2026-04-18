@@ -1,13 +1,14 @@
 """Static analysis checks for Linux IIO ADC driver skeleton."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate IIO driver code structure."""
     details: list[CheckDetail] = []
 
-    has_module_h = "linux/module.h" in generated_code
+    has_module_h = scoped_contains(generated_code, 'linux/module.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="module_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_iio_h = "linux/iio/iio.h" in generated_code
+    has_iio_h = scoped_contains(generated_code, 'linux/iio/iio.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="iio_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_license = "MODULE_LICENSE" in generated_code
+    has_license = scoped_contains(generated_code, 'MODULE_LICENSE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="module_license",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_chan_spec = "iio_chan_spec" in generated_code
+    has_chan_spec = scoped_contains(generated_code, 'iio_chan_spec', scope='code_only')
     details.append(
         CheckDetail(
             check_name="iio_chan_spec_defined",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_iio_voltage = "IIO_VOLTAGE" in generated_code
+    has_iio_voltage = scoped_contains(generated_code, 'IIO_VOLTAGE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="iio_voltage_type",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_read_raw = "read_raw" in generated_code
+    has_read_raw = scoped_contains(generated_code, 'read_raw', scope='code_only')
     details.append(
         CheckDetail(
             check_name="read_raw_callback",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_iio_info = "iio_info" in generated_code
+    has_iio_info = scoped_contains(generated_code, 'iio_info', scope='code_only')
     details.append(
         CheckDetail(
             check_name="iio_info_struct",

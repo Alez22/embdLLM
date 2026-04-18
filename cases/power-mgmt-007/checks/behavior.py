@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis, has_sleep_call, has_output_call
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -43,7 +44,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: pm_state_force NOT used (that forces transition, not prevention)
-    has_state_force = "pm_state_force" in generated_code
+    has_state_force = scoped_contains(generated_code, 'pm_state_force', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_pm_state_force",

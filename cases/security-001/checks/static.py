@@ -1,13 +1,14 @@
 """Static analysis checks for PSA Crypto AES."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate PSA Crypto code structure."""
     details: list[CheckDetail] = []
 
-    has_psa_h = "psa/crypto.h" in generated_code
+    has_psa_h = scoped_contains(generated_code, 'psa/crypto.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_crypto_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_init = "psa_crypto_init" in generated_code
+    has_init = scoped_contains(generated_code, 'psa_crypto_init', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_init_called",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_import = "psa_import_key" in generated_code
+    has_import = scoped_contains(generated_code, 'psa_import_key', scope='code_only')
     details.append(
         CheckDetail(
             check_name="key_imported",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_encrypt = "psa_cipher_encrypt" in generated_code
+    has_encrypt = scoped_contains(generated_code, 'psa_cipher_encrypt', scope='code_only')
     details.append(
         CheckDetail(
             check_name="encrypt_called",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_decrypt = "psa_cipher_decrypt" in generated_code
+    has_decrypt = scoped_contains(generated_code, 'psa_cipher_decrypt', scope='code_only')
     details.append(
         CheckDetail(
             check_name="decrypt_called",

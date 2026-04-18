@@ -4,6 +4,7 @@ import re
 
 from embedeval.check_utils import (
     check_no_cross_platform_apis,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -49,7 +50,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Key type is AES
-    has_aes = "PSA_KEY_TYPE_AES" in generated_code
+    has_aes = scoped_contains(generated_code, 'PSA_KEY_TYPE_AES', scope='code_only')
     details.append(
         CheckDetail(
             check_name="key_type_aes",
@@ -61,7 +62,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Key destroyed after use (resource cleanup)
-    has_destroy = "psa_destroy_key" in generated_code
+    has_destroy = scoped_contains(generated_code, 'psa_destroy_key', scope='code_only')
     details.append(
         CheckDetail(
             check_name="key_destroyed",
@@ -73,8 +74,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Both encrypt AND decrypt present (round-trip)
-    has_enc = "psa_cipher_encrypt" in generated_code
-    has_dec = "psa_cipher_decrypt" in generated_code
+    has_enc = scoped_contains(generated_code, 'psa_cipher_encrypt', scope='code_only')
+    has_dec = scoped_contains(generated_code, 'psa_cipher_decrypt', scope='code_only')
     details.append(
         CheckDetail(
             check_name="encrypt_decrypt_roundtrip",
@@ -86,7 +87,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: PSA_SUCCESS checked (not just != 0)
-    has_psa_success = "PSA_SUCCESS" in generated_code
+    has_psa_success = scoped_contains(generated_code, 'PSA_SUCCESS', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_success_checked",
@@ -98,8 +99,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Usage flags include both ENCRYPT and DECRYPT
-    has_enc_flag = "PSA_KEY_USAGE_ENCRYPT" in generated_code
-    has_dec_flag = "PSA_KEY_USAGE_DECRYPT" in generated_code
+    has_enc_flag = scoped_contains(generated_code, 'PSA_KEY_USAGE_ENCRYPT', scope='code_only')
+    has_dec_flag = scoped_contains(generated_code, 'PSA_KEY_USAGE_DECRYPT', scope='code_only')
     details.append(
         CheckDetail(
             check_name="usage_flags_both_directions",

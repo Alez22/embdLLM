@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -11,7 +12,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: RDEPENDS uses :${PN} suffix (new Yocto override syntax)
     # (LLM failure: writing RDEPENDS = "..." without :${PN} — silently ignored)
-    has_rdepends_pn = "RDEPENDS:${PN}" in generated_code
+    has_rdepends_pn = scoped_contains(generated_code, 'RDEPENDS:${PN}', scope='raw')
     details.append(
         CheckDetail(
             check_name="rdepends_has_pn_suffix",
@@ -24,8 +25,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: DEPENDS is separate from RDEPENDS (not confused)
     # (LLM failure: putting runtime deps in DEPENDS and vice versa)
-    has_depends = "DEPENDS" in generated_code
-    has_rdepends = "RDEPENDS" in generated_code
+    has_depends = scoped_contains(generated_code, 'DEPENDS', scope='raw')
+    has_rdepends = scoped_contains(generated_code, 'RDEPENDS', scope='raw')
     details.append(
         CheckDetail(
             check_name="both_depends_and_rdepends_present",
@@ -37,7 +38,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: LIC_FILES_CHKSUM has md5 or sha256 hash
-    has_hash = "md5=" in generated_code or "sha256=" in generated_code
+    has_hash = scoped_contains(generated_code, 'md5=', scope='raw') or scoped_contains(generated_code, 'sha256=', scope='raw')
     details.append(
         CheckDetail(
             check_name="lic_chksum_has_hash",
@@ -50,7 +51,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: do_compile uses ${CC} for cross-compilation
     # (LLM failure: hardcoding gcc instead of ${CC})
-    has_cc_var = "${CC}" in generated_code
+    has_cc_var = scoped_contains(generated_code, '${CC}', scope='raw')
     details.append(
         CheckDetail(
             check_name="uses_cc_variable",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: do_install uses ${D} prefix
-    has_d_prefix = "${D}" in generated_code
+    has_d_prefix = scoped_contains(generated_code, '${D}', scope='raw')
     details.append(
         CheckDetail(
             check_name="install_uses_d_prefix",
@@ -74,8 +75,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Uses ${bindir} not hardcoded /usr/bin
-    has_bindir = "${bindir}" in generated_code
-    has_hardcoded = "/usr/bin" in generated_code
+    has_bindir = scoped_contains(generated_code, '${bindir}', scope='raw')
+    has_hardcoded = scoped_contains(generated_code, '/usr/bin', scope='raw')
     details.append(
         CheckDetail(
             check_name="uses_bindir_variable",
@@ -132,8 +133,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 10: SRC_URI git:// entries have SRCREV
-    has_git = "git://" in generated_code
-    has_srcrev = "SRCREV" in generated_code
+    has_git = scoped_contains(generated_code, 'git://', scope='raw')
+    has_srcrev = scoped_contains(generated_code, 'SRCREV', scope='raw')
     srcrev_ok = (not has_git) or has_srcrev
     details.append(
         CheckDetail(

@@ -1,6 +1,7 @@
 """Behavioral checks for ESP-IDF WiFi station mode connect."""
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -20,8 +21,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: NVS error handling includes page/version cases
     has_nvs_recovery = (
-        "ESP_ERR_NVS_NO_FREE_PAGES" in generated_code
-        or "ESP_ERR_NVS_NEW_VERSION_FOUND" in generated_code
+        scoped_contains(generated_code, 'ESP_ERR_NVS_NO_FREE_PAGES', scope='code_only')
+        or scoped_contains(generated_code, 'ESP_ERR_NVS_NEW_VERSION_FOUND', scope='code_only')
     )
     details.append(CheckDetail(
         check_name="nvs_error_recovery",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Check 3: esp_netif_init called
-    has_netif_init = "esp_netif_init" in generated_code
+    has_netif_init = scoped_contains(generated_code, 'esp_netif_init', scope='code_only')
     details.append(CheckDetail(
         check_name="esp_netif_init_called",
         passed=has_netif_init,
@@ -42,7 +43,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Check 4: Reconnect on disconnect handled in event handler
-    has_reconnect = "esp_wifi_connect" in generated_code
+    has_reconnect = scoped_contains(generated_code, 'esp_wifi_connect', scope='code_only')
     details.append(CheckDetail(
         check_name="reconnect_on_disconnect",
         passed=has_reconnect,
@@ -52,7 +53,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Check 5: WIFI_INIT_CONFIG_DEFAULT macro used for safe initialization
-    has_default_cfg = "WIFI_INIT_CONFIG_DEFAULT" in generated_code
+    has_default_cfg = scoped_contains(generated_code, 'WIFI_INIT_CONFIG_DEFAULT', scope='code_only')
     details.append(CheckDetail(
         check_name="wifi_init_config_default",
         passed=has_default_cfg,
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Check 6: esp_wifi_start called
-    has_wifi_start = "esp_wifi_start" in generated_code
+    has_wifi_start = scoped_contains(generated_code, 'esp_wifi_start', scope='code_only')
     details.append(CheckDetail(
         check_name="esp_wifi_start_called",
         passed=has_wifi_start,

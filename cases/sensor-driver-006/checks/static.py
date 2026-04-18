@@ -1,13 +1,14 @@
 """Static analysis checks for custom sensor driver with I2C backend."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate I2C-backed custom sensor driver code structure."""
     details: list[CheckDetail] = []
 
-    has_sensor_h = "zephyr/drivers/sensor.h" in generated_code
+    has_sensor_h = scoped_contains(generated_code, 'zephyr/drivers/sensor.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_i2c_h = "zephyr/drivers/i2c.h" in generated_code
+    has_i2c_h = scoped_contains(generated_code, 'zephyr/drivers/i2c.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="i2c_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_register_macro = "SENSOR_DEVICE_DT_INST_DEFINE" in generated_code
+    has_register_macro = scoped_contains(generated_code, 'SENSOR_DEVICE_DT_INST_DEFINE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_device_dt_inst_define",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_driver_api = "sensor_driver_api" in generated_code
+    has_driver_api = scoped_contains(generated_code, 'sensor_driver_api', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_driver_api_struct",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_who_am_i = "WHO_AM_I" in generated_code or "who_am_i" in generated_code
+    has_who_am_i = scoped_contains(generated_code, 'WHO_AM_I', scope='code_only') or scoped_contains(generated_code, 'who_am_i', scope='code_only')
     details.append(
         CheckDetail(
             check_name="who_am_i_register_read",
@@ -74,9 +75,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_i2c_read = (
-        "i2c_reg_read_byte" in generated_code
-        or "i2c_read" in generated_code
-        or "i2c_write_read" in generated_code
+        scoped_contains(generated_code, 'i2c_reg_read_byte', scope='code_only')
+        or scoped_contains(generated_code, 'i2c_read', scope='code_only')
+        or scoped_contains(generated_code, 'i2c_write_read', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -88,7 +89,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_enodev = "ENODEV" in generated_code
+    has_enodev = scoped_contains(generated_code, 'ENODEV', scope='code_only')
     details.append(
         CheckDetail(
             check_name="enodev_on_bad_who_am_i",

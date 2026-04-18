@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,7 +11,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: k_msgq used (not a custom queue)
-    has_msgq = "k_msgq" in generated_code
+    has_msgq = scoped_contains(generated_code, 'k_msgq', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_msgq_used",
@@ -22,7 +23,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: K_NO_WAIT used in ISR put (LLM failure: uses K_FOREVER which blocks)
-    has_no_wait = "K_NO_WAIT" in generated_code
+    has_no_wait = scoped_contains(generated_code, 'K_NO_WAIT', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_no_wait_in_isr_put",
@@ -50,7 +51,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: No k_malloc in ISR handler (forbidden)
-    has_kmalloc = "k_malloc" in generated_code
+    has_kmalloc = scoped_contains(generated_code, 'k_malloc', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_kmalloc_in_isr",
@@ -63,8 +64,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 5: Consumer thread defined (K_THREAD_DEFINE or k_thread_create)
     has_thread = (
-        "K_THREAD_DEFINE" in generated_code
-        or "k_thread_create" in generated_code
+        scoped_contains(generated_code, 'K_THREAD_DEFINE', scope='code_only')
+        or scoped_contains(generated_code, 'k_thread_create', scope='code_only')
     )
     details.append(
         CheckDetail(

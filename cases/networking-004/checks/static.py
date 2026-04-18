@@ -1,13 +1,14 @@
 """Static analysis checks for CoAP client GET request."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate CoAP client code structure."""
     details: list[CheckDetail] = []
 
-    has_coap_h = "zephyr/net/coap.h" in generated_code
+    has_coap_h = scoped_contains(generated_code, 'zephyr/net/coap.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="coap_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_socket_h = "zephyr/net/socket.h" in generated_code
+    has_socket_h = scoped_contains(generated_code, 'zephyr/net/socket.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="socket_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_packet_init = "coap_packet_init" in generated_code
+    has_packet_init = scoped_contains(generated_code, 'coap_packet_init', scope='code_only')
     details.append(
         CheckDetail(
             check_name="coap_packet_init_called",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_append_option = "coap_packet_append_option" in generated_code
+    has_append_option = scoped_contains(generated_code, 'coap_packet_append_option', scope='code_only')
     details.append(
         CheckDetail(
             check_name="coap_append_option_called",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_uri_path = "COAP_OPTION_URI_PATH" in generated_code
+    has_uri_path = scoped_contains(generated_code, 'COAP_OPTION_URI_PATH', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uri_path_option",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_get_method = "COAP_METHOD_GET" in generated_code
+    has_get_method = scoped_contains(generated_code, 'COAP_METHOD_GET', scope='code_only')
     details.append(
         CheckDetail(
             check_name="coap_get_method",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_parse = "coap_packet_parse" in generated_code
+    has_parse = scoped_contains(generated_code, 'coap_packet_parse', scope='code_only')
     details.append(
         CheckDetail(
             check_name="coap_packet_parse_called",
@@ -84,7 +85,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_get_code = "coap_header_get_code" in generated_code
+    has_get_code = scoped_contains(generated_code, 'coap_header_get_code', scope='code_only')
     details.append(
         CheckDetail(
             check_name="coap_header_get_code_called",

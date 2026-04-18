@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -11,7 +12,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: device_is_ready() before scan loop
-    has_ready = "device_is_ready" in generated_code
+    has_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     loop_match = re.search(r'\bfor\s*\(', generated_code)
     loop_pos = loop_match.start() if loop_match else -1
     ready_pos = generated_code.find("device_is_ready")
@@ -41,8 +42,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Positive check: lower bound is 0x08 or a named constant near it
     has_valid_lower = bool(
         re.search(r"0[xX]0*8", generated_code)
-        or "SCAN_ADDR_MIN" in generated_code
-        or "ADDR_MIN" in generated_code
+        or scoped_contains(generated_code, 'SCAN_ADDR_MIN', scope='code_only')
+        or scoped_contains(generated_code, 'ADDR_MIN', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -57,8 +58,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 3: Reserved high addresses (0x78-0x7F) not scanned
     has_valid_upper = bool(
         re.search(r"0[xX]7[Ff]|0[xX]77", generated_code)
-        or "SCAN_ADDR_MAX" in generated_code
-        or "ADDR_MAX" in generated_code
+        or scoped_contains(generated_code, 'SCAN_ADDR_MAX', scope='code_only')
+        or scoped_contains(generated_code, 'ADDR_MAX', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -72,10 +73,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: ACK check distinguishes found from not-found
     has_ack_check = (
-        "== 0" in generated_code
-        or "ret == 0" in generated_code
-        or "!ret" in generated_code
-        or "rc == 0" in generated_code
+        scoped_contains(generated_code, '== 0', scope='code_only')
+        or scoped_contains(generated_code, 'ret == 0', scope='code_only')
+        or scoped_contains(generated_code, '!ret', scope='code_only')
+        or scoped_contains(generated_code, 'rc == 0', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -90,7 +91,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 5: Found device count reported
     has_count = bool(
         re.search(r"found|count|device", generated_code, re.IGNORECASE)
-        and "printk" in generated_code
+        and scoped_contains(generated_code, 'printk', scope='code_only')
     )
     details.append(
         CheckDetail(

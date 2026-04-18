@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -65,7 +66,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Deadline miss printed
-    has_deadline_msg = "DEADLINE" in generated_code or "deadline" in generated_code.lower()
+    has_deadline_msg = scoped_contains(generated_code, 'DEADLINE', scope='code_only') or "deadline" in generated_code.lower()
     details.append(
         CheckDetail(
             check_name="deadline_miss_reported",

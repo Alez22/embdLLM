@@ -1,13 +1,14 @@
 """Behavioral checks for ESP-IDF high-resolution periodic timer."""
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Callback function defined (must be a proper function, not a lambda)
-    has_callback_fn = ".callback" in generated_code and "void" in generated_code
+    has_callback_fn = scoped_contains(generated_code, '.callback', scope='code_only') and scoped_contains(generated_code, 'void', scope='code_only')
     details.append(CheckDetail(
         check_name="callback_function_defined",
         passed=has_callback_fn,
@@ -41,7 +42,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Check 4: esp_timer_stop called (timer stopped when done)
-    has_stop = "esp_timer_stop" in generated_code
+    has_stop = scoped_contains(generated_code, 'esp_timer_stop', scope='code_only')
     details.append(CheckDetail(
         check_name="esp_timer_stop_called",
         passed=has_stop,

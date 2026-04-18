@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -63,7 +64,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: ENOSPC handled gracefully (not aborting on it)
-    has_enospc = "ENOSPC" in generated_code
+    has_enospc = scoped_contains(generated_code, 'ENOSPC', scope='code_only')
     details.append(
         CheckDetail(
             check_name="enospc_graceful_handling",

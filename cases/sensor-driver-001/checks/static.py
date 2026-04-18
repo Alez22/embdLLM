@@ -1,13 +1,14 @@
 """Static analysis checks for Zephyr sensor API temperature read."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate sensor code structure."""
     details: list[CheckDetail] = []
 
-    has_sensor_h = "zephyr/drivers/sensor.h" in generated_code
+    has_sensor_h = scoped_contains(generated_code, 'zephyr/drivers/sensor.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_fetch = "sensor_sample_fetch" in generated_code
+    has_fetch = scoped_contains(generated_code, 'sensor_sample_fetch', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sample_fetch",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_get = "sensor_channel_get" in generated_code
+    has_get = scoped_contains(generated_code, 'sensor_channel_get', scope='code_only')
     details.append(
         CheckDetail(
             check_name="channel_get",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_sv = "sensor_value" in generated_code
+    has_sv = scoped_contains(generated_code, 'sensor_value', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_value_struct",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_chan = "SENSOR_CHAN" in generated_code
+    has_chan = scoped_contains(generated_code, 'SENSOR_CHAN', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_channel_enum",

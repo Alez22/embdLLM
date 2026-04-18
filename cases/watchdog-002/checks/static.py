@@ -1,6 +1,7 @@
 """Static analysis checks for task watchdog application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes task_wdt header (AI failure: using wdt driver header instead)
-    has_task_wdt_h = "zephyr/task_wdt/task_wdt.h" in generated_code
+    has_task_wdt_h = scoped_contains(generated_code, 'zephyr/task_wdt/task_wdt.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="task_wdt_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Includes kernel header
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Uses task_wdt_init
-    has_init = "task_wdt_init" in generated_code
+    has_init = scoped_contains(generated_code, 'task_wdt_init', scope='code_only')
     details.append(
         CheckDetail(
             check_name="task_wdt_init_called",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Uses task_wdt_add
-    has_add = "task_wdt_add" in generated_code
+    has_add = scoped_contains(generated_code, 'task_wdt_add', scope='code_only')
     details.append(
         CheckDetail(
             check_name="task_wdt_add_called",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Uses task_wdt_feed
-    has_feed = "task_wdt_feed" in generated_code
+    has_feed = scoped_contains(generated_code, 'task_wdt_feed', scope='code_only')
     details.append(
         CheckDetail(
             check_name="task_wdt_feed_called",
@@ -69,7 +70,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: Uses k_thread_create or K_THREAD_DEFINE for worker thread
     has_thread = (
-        "k_thread_create" in generated_code or "K_THREAD_DEFINE" in generated_code
+        scoped_contains(generated_code, 'k_thread_create', scope='code_only') or scoped_contains(generated_code, 'K_THREAD_DEFINE', scope='code_only')
     )
     details.append(
         CheckDetail(

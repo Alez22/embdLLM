@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis, extract_function_body, strip_comments
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Elapsed time calculated (subtraction of two counter values)
-    has_elapsed = "-" in generated_code and "ticks" in generated_code.lower()
+    has_elapsed = scoped_contains(generated_code, '-', scope='code_only') and "ticks" in generated_code.lower()
     details.append(
         CheckDetail(
             check_name="elapsed_ticks_calculated",
@@ -58,7 +59,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: device_is_ready check present
-    has_ready = "device_is_ready" in generated_code
+    has_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_ready_check",

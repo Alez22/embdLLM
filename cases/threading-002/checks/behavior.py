@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -13,8 +14,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 1: Counter increment appears inside a mutex-locked region
     # Strategy: look for lock...increment...unlock pattern within any function body.
     # (LLM failure: incrementing counter outside the mutex)
-    has_lock = "k_mutex_lock" in generated_code
-    has_increment = "++" in generated_code or "+= 1" in generated_code
+    has_lock = scoped_contains(generated_code, 'k_mutex_lock', scope='code_only')
+    has_increment = scoped_contains(generated_code, '++', scope='code_only') or scoped_contains(generated_code, '+= 1', scope='code_only')
     # Find whether any occurrence of "++" falls between a lock and unlock pair
     increment_inside_lock = False
     if has_lock and has_increment:
@@ -53,7 +54,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Thread sleeps between increments (not a tight lock-holding loop)
     # (LLM failure: holding mutex across k_sleep, starvation)
-    has_sleep = "k_sleep" in generated_code or "k_msleep" in generated_code
+    has_sleep = scoped_contains(generated_code, 'k_sleep', scope='code_only') or scoped_contains(generated_code, 'k_msleep', scope='code_only')
     details.append(
         CheckDetail(
             check_name="thread_yields_between_increments",
@@ -66,7 +67,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: K_FOREVER used for mutex lock timeout (blocking)
     # (LLM failure: using K_NO_WAIT which may silently skip the lock)
-    has_forever_lock = "K_FOREVER" in generated_code and "k_mutex_lock" in generated_code
+    has_forever_lock = scoped_contains(generated_code, 'K_FOREVER', scope='code_only') and scoped_contains(generated_code, 'k_mutex_lock', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mutex_lock_blocks_forever",
@@ -79,9 +80,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 5: k_mutex used (not k_sem) as the synchronization primitive
     # (LLM failure: using k_sem instead of k_mutex — semantically wrong for mutual exclusion)
-    uses_mutex = "k_mutex_lock" in generated_code
+    uses_mutex = scoped_contains(generated_code, 'k_mutex_lock', scope='code_only')
     uses_sem_without_mutex = (
-        ("k_sem_take" in generated_code or "k_sem_give" in generated_code)
+        (scoped_contains(generated_code, 'k_sem_take', scope='code_only') or scoped_contains(generated_code, 'k_sem_give', scope='code_only'))
         and not uses_mutex
     )
     correct_primitive = uses_mutex and not uses_sem_without_mutex

@@ -1,6 +1,7 @@
 """Static analysis checks for deadlock-free multi-mutex acquisition."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: kernel header
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Uses k_mutex (not k_sem or POSIX mutex)
-    has_kmutex = "k_mutex" in generated_code
+    has_kmutex = scoped_contains(generated_code, 'k_mutex', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_k_mutex",

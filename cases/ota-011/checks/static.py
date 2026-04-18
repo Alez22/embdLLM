@@ -3,12 +3,13 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
-    has_mcuboot_h = "dfu/mcuboot.h" in generated_code
+    has_mcuboot_h = scoped_contains(generated_code, 'dfu/mcuboot.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mcuboot_header",
@@ -19,7 +20,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    checks_confirmed = "boot_is_img_confirmed" in generated_code
+    checks_confirmed = scoped_contains(generated_code, 'boot_is_img_confirmed', scope='code_only')
     details.append(
         CheckDetail(
             check_name="checks_already_confirmed",
@@ -41,7 +42,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    confirms = "boot_write_img_confirmed" in generated_code
+    confirms = scoped_contains(generated_code, 'boot_write_img_confirmed', scope='code_only')
     details.append(
         CheckDetail(
             check_name="confirm_api_called",

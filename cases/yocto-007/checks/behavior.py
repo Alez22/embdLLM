@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -12,9 +13,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 1: IMAGE_INSTALL uses += not = (avoid overriding base packages)
     # (LLM failure: IMAGE_INSTALL = "..." strips all base packages)
     has_append = (
-        "IMAGE_INSTALL +=" in generated_code
-        or "IMAGE_INSTALL:append" in generated_code
-        or "IMAGE_INSTALL_append" in generated_code
+        scoped_contains(generated_code, 'IMAGE_INSTALL +=', scope='raw')
+        or scoped_contains(generated_code, 'IMAGE_INSTALL:append', scope='raw')
+        or scoped_contains(generated_code, 'IMAGE_INSTALL_append', scope='raw')
     )
     details.append(
         CheckDetail(
@@ -27,7 +28,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: inherit core-image or image (not inherit package or other wrong class)
-    has_core_image = "inherit core-image" in generated_code or "inherit image" in generated_code
+    has_core_image = scoped_contains(generated_code, 'inherit core-image', scope='raw') or scoped_contains(generated_code, 'inherit image', scope='raw')
     details.append(
         CheckDetail(
             check_name="inherits_correct_image_class",
@@ -39,7 +40,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: No do_compile function (image recipes don't compile anything)
-    has_do_compile = "do_compile" in generated_code
+    has_do_compile = scoped_contains(generated_code, 'do_compile', scope='raw')
     details.append(
         CheckDetail(
             check_name="no_do_compile_in_image_recipe",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: No do_install function (image recipes don't install like packages)
-    has_do_install = "do_install" in generated_code
+    has_do_install = scoped_contains(generated_code, 'do_install', scope='raw')
     details.append(
         CheckDetail(
             check_name="no_do_install_in_image_recipe",
@@ -64,10 +65,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 5: At least one meaningful package listed
     has_packages = (
-        "busybox" in generated_code
-        or "packagegroup" in generated_code
-        or "openssh" in generated_code
-        or "bash" in generated_code
+        scoped_contains(generated_code, 'busybox', scope='raw')
+        or scoped_contains(generated_code, 'packagegroup', scope='raw')
+        or scoped_contains(generated_code, 'openssh', scope='raw')
+        or scoped_contains(generated_code, 'bash', scope='raw')
     )
     details.append(
         CheckDetail(
@@ -139,11 +140,11 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 10: IMAGE_ROOTFS_SIZE uses ?= (weak assignment) or += (not hard =)
     # (LLM failure: IMAGE_ROOTFS_SIZE = ... overrides any board-specific value)
-    has_rootfs_size = "IMAGE_ROOTFS_SIZE" in generated_code
+    has_rootfs_size = scoped_contains(generated_code, 'IMAGE_ROOTFS_SIZE', scope='raw')
     rootfs_uses_weak = (
         not has_rootfs_size
-        or "IMAGE_ROOTFS_SIZE ?=" in generated_code
-        or "IMAGE_ROOTFS_SIZE +=" in generated_code
+        or scoped_contains(generated_code, 'IMAGE_ROOTFS_SIZE ?=', scope='raw')
+        or scoped_contains(generated_code, 'IMAGE_ROOTFS_SIZE +=', scope='raw')
     )
     details.append(
         CheckDetail(

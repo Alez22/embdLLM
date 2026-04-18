@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -11,7 +12,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: inherit module present
     # (LLM failure: writing custom do_compile with make commands instead of inherit module)
-    has_inherit_module = "inherit module" in generated_code
+    has_inherit_module = scoped_contains(generated_code, 'inherit module', scope='raw')
     details.append(
         CheckDetail(
             check_name="inherits_module_class",
@@ -24,7 +25,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: KERNEL_MODULE_AUTOLOAD set (module loads at boot)
     # (LLM failure: module installed but not added to autoload list)
-    has_autoload = "KERNEL_MODULE_AUTOLOAD" in generated_code
+    has_autoload = scoped_contains(generated_code, 'KERNEL_MODULE_AUTOLOAD', scope='raw')
     details.append(
         CheckDetail(
             check_name="kernel_module_autoload_set",
@@ -36,7 +37,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: LIC_FILES_CHKSUM has md5 or sha256 hash
-    has_hash = "md5=" in generated_code or "sha256=" in generated_code
+    has_hash = scoped_contains(generated_code, 'md5=', scope='raw') or scoped_contains(generated_code, 'sha256=', scope='raw')
     details.append(
         CheckDetail(
             check_name="lic_chksum_has_hash",
@@ -49,7 +50,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: GPL license used (kernel modules must be GPL)
     # (LLM failure: MIT or BSD license for a kernel module — taints kernel)
-    has_gpl = "GPL" in generated_code
+    has_gpl = scoped_contains(generated_code, 'GPL', scope='raw')
     details.append(
         CheckDetail(
             check_name="gpl_license_used",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 5: SRC_URI includes a Makefile or .c source file
     # (LLM failure: recipe with no source files referenced)
-    has_makefile = "Makefile" in generated_code or ".c" in generated_code
+    has_makefile = scoped_contains(generated_code, 'Makefile', scope='raw') or scoped_contains(generated_code, '.c', scope='raw')
     details.append(
         CheckDetail(
             check_name="source_files_in_src_uri",
@@ -75,7 +76,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: No custom do_compile (module class handles it)
     # (LLM failure: writing do_compile that bypasses kbuild integration)
-    has_custom_compile = "do_compile()" in generated_code
+    has_custom_compile = scoped_contains(generated_code, 'do_compile()', scope='raw')
     details.append(
         CheckDetail(
             check_name="no_custom_do_compile",
@@ -120,7 +121,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 9: No hardcoded /usr/lib or /usr/bin paths
     has_hardcoded_lib = bool(re.search(r'(?<!\$\{D\})/usr/lib\b', generated_code))
-    has_hardcoded_bin = "/usr/bin" in generated_code
+    has_hardcoded_bin = scoped_contains(generated_code, '/usr/bin', scope='raw')
     details.append(
         CheckDetail(
             check_name="no_hardcoded_paths",

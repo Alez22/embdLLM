@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import has_output_call
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -11,7 +12,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: kernel.h included
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -23,7 +24,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: watchdog header included
-    has_wdt_h = "zephyr/drivers/watchdog.h" in generated_code
+    has_wdt_h = scoped_contains(generated_code, 'zephyr/drivers/watchdog.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="watchdog_header_included",
@@ -35,8 +36,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: NVS or settings header included (persistent storage)
-    has_nvs_h = "zephyr/fs/nvs.h" in generated_code or "nvs.h" in generated_code
-    has_settings_h = "zephyr/settings/settings.h" in generated_code
+    has_nvs_h = scoped_contains(generated_code, 'zephyr/fs/nvs.h', scope='code_only') or scoped_contains(generated_code, 'nvs.h', scope='code_only')
+    has_settings_h = scoped_contains(generated_code, 'zephyr/settings/settings.h', scope='code_only')
     has_persistent = has_nvs_h or has_settings_h
     details.append(
         CheckDetail(

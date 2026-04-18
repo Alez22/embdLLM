@@ -4,6 +4,7 @@ import re
 
 from embedeval.check_utils import check_no_cross_platform_apis
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 # BLE-specific cross-platform hallucination patterns (not in check_utils)
 _BLE_HALLUCINATED_APIS = [
@@ -60,9 +61,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Custom 128-bit UUID defined (not standard 16-bit)
     has_128bit = (
-        "BT_UUID_128_ENCODE" in generated_code
-        or "BT_UUID_INIT_128" in generated_code
-        or "BT_UUID_DECLARE_128" in generated_code
+        scoped_contains(generated_code, 'BT_UUID_128_ENCODE', scope='code_only')
+        or scoped_contains(generated_code, 'BT_UUID_INIT_128', scope='code_only')
+        or scoped_contains(generated_code, 'BT_UUID_DECLARE_128', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -75,8 +76,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Characteristic has both READ and WRITE
-    has_read = "BT_GATT_CHRC_READ" in generated_code
-    has_write = "BT_GATT_CHRC_WRITE" in generated_code
+    has_read = scoped_contains(generated_code, 'BT_GATT_CHRC_READ', scope='code_only')
+    has_write = scoped_contains(generated_code, 'BT_GATT_CHRC_WRITE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="read_write_characteristic",
@@ -88,7 +89,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Read callback uses bt_gatt_attr_read (not raw memcpy without bounds)
-    has_attr_read = "bt_gatt_attr_read" in generated_code
+    has_attr_read = scoped_contains(generated_code, 'bt_gatt_attr_read', scope='code_only')
     details.append(
         CheckDetail(
             check_name="read_uses_attr_read",
@@ -102,9 +103,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 6: Write callback has offset+len bounds check
     # LLM failure: raw memcpy without checking offset + len > sizeof(buf)
     has_bounds_check = (
-        "offset + len" in generated_code
-        or "offset+len" in generated_code
-        or "BT_ATT_ERR_INVALID_OFFSET" in generated_code
+        scoped_contains(generated_code, 'offset + len', scope='code_only')
+        or scoped_contains(generated_code, 'offset+len', scope='code_only')
+        or scoped_contains(generated_code, 'BT_ATT_ERR_INVALID_OFFSET', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -134,7 +135,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 8: BT_GATT_PRIMARY_SERVICE in service definition
-    has_primary = "BT_GATT_PRIMARY_SERVICE" in generated_code
+    has_primary = scoped_contains(generated_code, 'BT_GATT_PRIMARY_SERVICE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="primary_service_attribute",
@@ -148,11 +149,11 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 9: Write callback validates attribute length
     # LLM failure: accepts any write length without validating against expected size
     has_write_len_check = (
-        "BT_ATT_ERR_INVALID_ATTRIBUTE_LEN" in generated_code
+        scoped_contains(generated_code, 'BT_ATT_ERR_INVALID_ATTRIBUTE_LEN', scope='code_only')
         or (
-            "sizeof" in generated_code
-            and ("write" in generated_code.lower() or "len" in generated_code)
-            and (">" in generated_code or "!=" in generated_code)
+            scoped_contains(generated_code, 'sizeof', scope='code_only')
+            and ("write" in generated_code.lower() or scoped_contains(generated_code, 'len', scope='code_only'))
+            and (scoped_contains(generated_code, '>', scope='code_only') or scoped_contains(generated_code, '!=', scope='code_only'))
         )
     )
     details.append(

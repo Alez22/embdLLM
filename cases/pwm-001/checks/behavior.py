@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -53,8 +54,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     import re
     has_varying_duty = bool(
         re.search(r'duty\w*\s*[+\-]?=', generated_code)
-        or "duty++" in generated_code
-        or "duty--" in generated_code
+        or scoped_contains(generated_code, 'duty++', scope='code_only')
+        or scoped_contains(generated_code, 'duty--', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -93,7 +94,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 6: Period passed as nanoseconds to pwm_set_dt (not 0 or 1 which are wrong)
     # Heuristic: the literal 0 as period would be invalid; check that a non-trivial period is used
     pwm_set_pos = generated_code.find("pwm_set_dt")
-    has_nonzero_period = pwm_set_pos != -1 and "pwm_set_dt(&" in generated_code
+    has_nonzero_period = pwm_set_pos != -1 and scoped_contains(generated_code, 'pwm_set_dt(&', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pwm_set_dt_called_with_args",

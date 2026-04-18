@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -24,12 +25,12 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 2: Accel and gyro use different sensor channel enums
     # (LLM failure: using SENSOR_CHAN_ACCEL_X for both, or mixing up channels)
     has_accel_chan = (
-        "SENSOR_CHAN_ACCEL_X" in generated_code
-        or "SENSOR_CHAN_ACCEL_XYZ" in generated_code
+        scoped_contains(generated_code, 'SENSOR_CHAN_ACCEL_X', scope='code_only')
+        or scoped_contains(generated_code, 'SENSOR_CHAN_ACCEL_XYZ', scope='code_only')
     )
     has_gyro_chan = (
-        "SENSOR_CHAN_GYRO_X" in generated_code
-        or "SENSOR_CHAN_GYRO_XYZ" in generated_code
+        scoped_contains(generated_code, 'SENSOR_CHAN_GYRO_X', scope='code_only')
+        or scoped_contains(generated_code, 'SENSOR_CHAN_GYRO_XYZ', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -89,9 +90,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: sensor_value_to_double or manual conversion used for computation
     has_float_conversion = (
-        "sensor_value_to_double" in generated_code
-        or "sensor_value_to_float" in generated_code
-        or "val1" in generated_code
+        scoped_contains(generated_code, 'sensor_value_to_double', scope='code_only')
+        or scoped_contains(generated_code, 'sensor_value_to_float', scope='code_only')
+        or scoped_contains(generated_code, 'val1', scope='code_only')
     )
     details.append(
         CheckDetail(

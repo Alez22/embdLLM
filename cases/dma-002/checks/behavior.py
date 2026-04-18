@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -11,9 +12,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: PERIPHERAL_TO_MEMORY direction set (not MEMORY_TO_MEMORY)
-    has_p2m = "PERIPHERAL_TO_MEMORY" in generated_code
+    has_p2m = scoped_contains(generated_code, 'PERIPHERAL_TO_MEMORY', scope='code_only')
     has_m2m_wrong = (
-        "MEMORY_TO_MEMORY" in generated_code
+        scoped_contains(generated_code, 'MEMORY_TO_MEMORY', scope='code_only')
         and "PERIPHERAL_TO_MEMORY" not in generated_code
     )
     details.append(
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 2: Source address adjustment is NO_CHANGE (peripheral register is fixed)
     has_no_change = bool(re.search(
         r'source_addr_adj\s*=\s*DMA_ADDR_ADJ_NO_CHANGE', generated_code
-    )) or "DMA_ADDR_ADJ_NO_CHANGE" in generated_code
+    )) or scoped_contains(generated_code, 'DMA_ADDR_ADJ_NO_CHANGE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="source_addr_fixed",
@@ -43,7 +44,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 3: Destination address increments into memory buffer
     has_increment = bool(re.search(
         r'dest_addr_adj\s*=\s*DMA_ADDR_ADJ_INCREMENT', generated_code
-    )) or "DMA_ADDR_ADJ_INCREMENT" in generated_code
+    )) or scoped_contains(generated_code, 'DMA_ADDR_ADJ_INCREMENT', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dest_addr_increments",
@@ -84,7 +85,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: device_is_ready() called
-    has_ready = "device_is_ready" in generated_code
+    has_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_ready_check",

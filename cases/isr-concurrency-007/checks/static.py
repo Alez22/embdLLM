@@ -1,6 +1,7 @@
 """Static analysis checks for nested interrupt priority management."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: zephyr/irq.h or zephyr/kernel.h present
-    has_irq_h = "zephyr/irq.h" in generated_code or "zephyr/kernel.h" in generated_code
+    has_irq_h = scoped_contains(generated_code, 'zephyr/irq.h', scope='code_only') or scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="irq_header_included",
@@ -52,7 +53,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: irq_lock/irq_unlock NOT used for priority management
     # (Wrong approach — these globally disable ALL interrupts)
-    has_irq_lock = "irq_lock()" in generated_code or "irq_unlock(" in generated_code
+    has_irq_lock = scoped_contains(generated_code, 'irq_lock()', scope='code_only') or scoped_contains(generated_code, 'irq_unlock(', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_irq_lock_for_priority",

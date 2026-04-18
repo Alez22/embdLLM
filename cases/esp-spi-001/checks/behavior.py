@@ -1,6 +1,7 @@
 """Behavioral checks for ESP-IDF SPI master half-duplex write."""
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -19,7 +20,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Check 2: spi_device_interface_config_t struct used
-    has_dev_cfg = "spi_device_interface_config_t" in generated_code
+    has_dev_cfg = scoped_contains(generated_code, 'spi_device_interface_config_t', scope='code_only')
     details.append(CheckDetail(
         check_name="spi_device_interface_config_struct",
         passed=has_dev_cfg,
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Check 3: spi_transaction_t used (not raw buffer transfer)
-    has_transaction = "spi_transaction_t" in generated_code
+    has_transaction = scoped_contains(generated_code, 'spi_transaction_t', scope='code_only')
     details.append(CheckDetail(
         check_name="spi_transaction_struct",
         passed=has_transaction,
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Check 5: SPI_DMA_CH_AUTO or explicit DMA channel used
-    has_dma = "SPI_DMA_CH_AUTO" in generated_code or "SPI_DMA_DISABLED" in generated_code
+    has_dma = scoped_contains(generated_code, 'SPI_DMA_CH_AUTO', scope='code_only') or scoped_contains(generated_code, 'SPI_DMA_DISABLED', scope='code_only')
     details.append(CheckDetail(
         check_name="dma_channel_specified",
         passed=has_dma,

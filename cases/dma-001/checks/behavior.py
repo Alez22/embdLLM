@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -27,7 +28,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: MEMORY_TO_MEMORY direction set
-    has_m2m = "MEMORY_TO_MEMORY" in generated_code
+    has_m2m = scoped_contains(generated_code, 'MEMORY_TO_MEMORY', scope='code_only')
     details.append(
         CheckDetail(
             check_name="memory_to_memory_direction",
@@ -74,7 +75,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Block size > 0 (LLM failure: zero-size transfer)
-    has_block_size = "block_size" in generated_code
+    has_block_size = scoped_contains(generated_code, 'block_size', scope='code_only')
     details.append(
         CheckDetail(
             check_name="block_size_set",
@@ -86,7 +87,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Error handling for dma_config/dma_start
-    has_error_check = "< 0" in generated_code or "!= 0" in generated_code
+    has_error_check = scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, '!= 0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_error_handling",
@@ -98,7 +99,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 7: Device ready check
-    has_ready = "device_is_ready" in generated_code
+    has_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_ready_check",

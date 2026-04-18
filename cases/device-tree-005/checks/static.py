@@ -1,6 +1,7 @@
 """Static analysis checks for multi-peripheral board Device Tree overlay."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -35,9 +36,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: All three bus nodes referenced
-    has_i2c0 = "i2c0" in generated_code
-    has_spi0 = "spi0" in generated_code
-    has_gpio0 = "gpio0" in generated_code
+    has_i2c0 = scoped_contains(generated_code, 'i2c0', scope='code_only')
+    has_spi0 = scoped_contains(generated_code, 'spi0', scope='code_only')
+    has_gpio0 = scoped_contains(generated_code, 'gpio0', scope='code_only')
     all_buses = has_i2c0 and has_spi0 and has_gpio0
     details.append(
         CheckDetail(

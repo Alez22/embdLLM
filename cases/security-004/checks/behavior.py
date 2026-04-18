@@ -2,7 +2,9 @@
 
 import re
 
-from embedeval.check_utils import (check_no_cross_platform_apis,
+from embedeval.check_utils import (
+    check_no_cross_platform_apis,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -54,7 +56,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: psa_key_derivation_output_bytes called (actual key extraction)
-    has_output = "psa_key_derivation_output_bytes" in generated_code
+    has_output = scoped_contains(generated_code, 'psa_key_derivation_output_bytes', scope='code_only')
     details.append(
         CheckDetail(
             check_name="output_bytes_called",
@@ -91,7 +93,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: PSA_SUCCESS checked
-    has_psa_success = "PSA_SUCCESS" in generated_code
+    has_psa_success = scoped_contains(generated_code, 'PSA_SUCCESS', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_success_checked",
@@ -106,8 +108,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     sizes = [int(x) for x in re.findall(r"\b(\d+)\b", generated_code)]
     has_adequate_key = (
         any(s >= 16 for s in sizes)
-        or "DERIVED_KEY_SIZE" in generated_code
-        or "KEY_LEN" in generated_code
+        or scoped_contains(generated_code, 'DERIVED_KEY_SIZE', scope='code_only')
+        or scoped_contains(generated_code, 'KEY_LEN', scope='code_only')
     )
     details.append(
         CheckDetail(

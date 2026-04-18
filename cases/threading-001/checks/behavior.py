@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis, strip_comments
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -76,7 +77,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Message struct defined with data field
-    has_struct = "struct" in generated_code
+    has_struct = scoped_contains(generated_code, 'struct', scope='code_only')
     has_data_field = bool(
         re.search(
             r"(?:u?int\d*_t|int|char|float|double|size_t|bool)\s+\w+",

@@ -1,6 +1,7 @@
 """Static analysis checks for multi-thread watchdog monitoring application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes zephyr/drivers/watchdog.h
-    has_wdt_h = "zephyr/drivers/watchdog.h" in generated_code
+    has_wdt_h = scoped_contains(generated_code, 'zephyr/drivers/watchdog.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="watchdog_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Includes zephyr/sys/atomic.h
-    has_atomic_h = "zephyr/sys/atomic.h" in generated_code
+    has_atomic_h = scoped_contains(generated_code, 'zephyr/sys/atomic.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="atomic_header_included",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Uses atomic_t for health flags (not volatile int)
-    has_atomic_t = "atomic_t" in generated_code
+    has_atomic_t = scoped_contains(generated_code, 'atomic_t', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_atomic_t_for_flags",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: atomic_set used to set flags
-    has_atomic_set = "atomic_set" in generated_code
+    has_atomic_set = scoped_contains(generated_code, 'atomic_set', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_atomic_set",
@@ -56,8 +57,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: atomic_clear or atomic_set to 0 used to clear flags after check
-    has_atomic_clear = "atomic_clear" in generated_code or (
-        "atomic_set" in generated_code and ", 0)" in generated_code
+    has_atomic_clear = scoped_contains(generated_code, 'atomic_clear', scope='code_only') or (
+        scoped_contains(generated_code, 'atomic_set', scope='code_only') and scoped_contains(generated_code, ', 0)', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -70,8 +71,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: wdt_install_timeout and wdt_setup called
-    has_install = "wdt_install_timeout" in generated_code
-    has_setup = "wdt_setup" in generated_code
+    has_install = scoped_contains(generated_code, 'wdt_install_timeout', scope='code_only')
+    has_setup = scoped_contains(generated_code, 'wdt_setup', scope='code_only')
     details.append(
         CheckDetail(
             check_name="wdt_configured",

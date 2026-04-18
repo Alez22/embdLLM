@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -61,7 +62,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 4: No blocking sleep inside poll loop (AI failure: sleeping in tight poll loop
     # with a long delay defeats the purpose of poll-based echo)
     # Warn if k_msleep with large value appears — heuristic check
-    has_long_sleep = "k_msleep(1000" in generated_code or "k_sleep(K_SECONDS" in generated_code
+    has_long_sleep = scoped_contains(generated_code, 'k_msleep(1000', scope='code_only') or scoped_contains(generated_code, 'k_sleep(K_SECONDS', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_long_sleep_in_poll_loop",
@@ -75,8 +76,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 5: No ISR callback used for simple poll implementation
     # (uart_irq_rx_enable is valid but the prompt asks for poll — penalise if both
     # poll API and IRQ are mixed, which is a common confusion pattern)
-    has_poll_in = "uart_poll_in" in generated_code
-    has_irq_rx = "uart_irq_rx_enable" in generated_code
+    has_poll_in = scoped_contains(generated_code, 'uart_poll_in', scope='code_only')
+    has_irq_rx = scoped_contains(generated_code, 'uart_irq_rx_enable', scope='code_only')
     no_mixed_api = not (has_poll_in and has_irq_rx)
     details.append(
         CheckDetail(

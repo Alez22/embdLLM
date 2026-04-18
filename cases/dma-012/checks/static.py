@@ -3,12 +3,13 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
-    has_dma_h = "drivers/dma.h" in generated_code
+    has_dma_h = scoped_contains(generated_code, 'drivers/dma.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_dma_config = (
-        "dma_config" in generated_code and "dma_block_config" in generated_code
+        scoped_contains(generated_code, 'dma_config', scope='code_only') and scoped_contains(generated_code, 'dma_block_config', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_start = "dma_start" in generated_code
+    has_start = scoped_contains(generated_code, 'dma_start', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_start_called",
@@ -77,7 +78,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_mem_to_mem = "MEMORY_TO_MEMORY" in generated_code
+    has_mem_to_mem = scoped_contains(generated_code, 'MEMORY_TO_MEMORY', scope='code_only')
     details.append(
         CheckDetail(
             check_name="direction_memory_to_memory",

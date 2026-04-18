@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -72,7 +73,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: k_work_init_delayable called before scheduling
     # (LLM failure: scheduling uninitialized work item)
-    has_init_delayable = "k_work_init_delayable" in generated_code
+    has_init_delayable = scoped_contains(generated_code, 'k_work_init_delayable', scope='code_only')
     details.append(
         CheckDetail(
             check_name="delayable_work_initialized",
@@ -85,9 +86,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: k_work_schedule_for_queue used (not k_work_schedule for system queue)
     # (LLM failure: submitting to default system queue, not the custom queue)
-    has_schedule_for_queue = "k_work_schedule_for_queue" in generated_code
+    has_schedule_for_queue = scoped_contains(generated_code, 'k_work_schedule_for_queue', scope='code_only')
     uses_system_queue_only = (
-        "k_work_schedule(" in generated_code
+        scoped_contains(generated_code, 'k_work_schedule(', scope='code_only')
         and not has_schedule_for_queue
     )
     details.append(
@@ -102,7 +103,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 5: K_THREAD_STACK_SIZEOF used in k_work_queue_start (not raw integer)
     # (LLM failure: passing raw stack size number instead of macro)
-    has_stack_sizeof = "K_THREAD_STACK_SIZEOF" in generated_code
+    has_stack_sizeof = scoped_contains(generated_code, 'K_THREAD_STACK_SIZEOF', scope='code_only')
     details.append(
         CheckDetail(
             check_name="stack_sizeof_macro_used",

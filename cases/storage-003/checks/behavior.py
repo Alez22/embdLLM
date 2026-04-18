@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -45,7 +46,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: FS_O_CREATE flag present for file creation
-    has_create = "FS_O_CREATE" in generated_code
+    has_create = scoped_contains(generated_code, 'FS_O_CREATE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="fs_o_create_present",
@@ -70,7 +71,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: error handling present
-    has_error = "< 0" in generated_code
+    has_error = scoped_contains(generated_code, '< 0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="error_handling",
@@ -82,7 +83,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: fs_seek called before reading back written data
-    has_seek = "fs_seek" in generated_code or "lfs_file_seek" in generated_code
+    has_seek = scoped_contains(generated_code, 'fs_seek', scope='code_only') or scoped_contains(generated_code, 'lfs_file_seek', scope='code_only')
     details.append(
         CheckDetail(
             check_name="seek_before_read",

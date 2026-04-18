@@ -1,6 +1,7 @@
 """Static analysis checks for Atomic Config Update (Write-then-Commit)."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: nvs.h included
-    has_nvs_h = "zephyr/fs/nvs.h" in generated_code
+    has_nvs_h = scoped_contains(generated_code, 'zephyr/fs/nvs.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="nvs_header_included",
@@ -48,7 +49,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: nvs_read called for verification
-    has_read = "nvs_read" in generated_code
+    has_read = scoped_contains(generated_code, 'nvs_read', scope='code_only')
     details.append(
         CheckDetail(
             check_name="nvs_read_for_verify",
@@ -60,7 +61,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: memcmp used for verification
-    has_memcmp = "memcmp" in generated_code
+    has_memcmp = scoped_contains(generated_code, 'memcmp', scope='code_only')
     details.append(
         CheckDetail(
             check_name="memcmp_verification",
@@ -72,7 +73,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: nvs_delete called to clean temp slot
-    has_delete = "nvs_delete" in generated_code
+    has_delete = scoped_contains(generated_code, 'nvs_delete', scope='code_only')
     details.append(
         CheckDetail(
             check_name="temp_slot_deleted",

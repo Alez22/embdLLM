@@ -4,6 +4,7 @@ import re
 
 from embedeval.check_utils import check_no_cross_platform_apis
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 _BLE_HALLUCINATED_APIS = [
     "BLEDevice.connect",
@@ -57,8 +58,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: scan before connect (both must be present)
-    has_scan_start = "bt_le_scan_start" in generated_code
-    has_conn_create = "bt_conn_le_create" in generated_code
+    has_scan_start = scoped_contains(generated_code, 'bt_le_scan_start', scope='code_only')
+    has_conn_create = scoped_contains(generated_code, 'bt_conn_le_create', scope='code_only')
     scan_before_connect = has_scan_start and has_conn_create
     details.append(
         CheckDetail(
@@ -129,7 +130,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 7: default_conn set to NULL after disconnect
-    has_null_assign = "default_conn = NULL" in generated_code or "= NULL" in generated_code
+    has_null_assign = scoped_contains(generated_code, 'default_conn = NULL', scope='code_only') or scoped_contains(generated_code, '= NULL', scope='code_only')
     details.append(
         CheckDetail(
             check_name="default_conn_cleared_on_disconnect",

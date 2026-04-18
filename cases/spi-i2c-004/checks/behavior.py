@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -41,9 +42,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Verification comparison after read
     has_compare = (
-        "==" in generated_code
-        or "!=" in generated_code
-        or "memcmp" in generated_code
+        scoped_contains(generated_code, '==', scope='code_only')
+        or scoped_contains(generated_code, '!=', scope='code_only')
+        or scoped_contains(generated_code, 'memcmp', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: device_is_ready() called
-    has_ready = "device_is_ready" in generated_code
+    has_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_ready_check",

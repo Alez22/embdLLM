@@ -1,13 +1,14 @@
 """Static analysis checks for OTA progress reporting."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate OTA progress reporting code structure."""
     details: list[CheckDetail] = []
 
-    has_dfu_target = "dfu/dfu_target.h" in generated_code
+    has_dfu_target = scoped_contains(generated_code, 'dfu/dfu_target.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dfu_target_header",
@@ -19,8 +20,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_total_size = (
-        "TOTAL_IMAGE_SIZE" in generated_code
-        or "total_size" in generated_code
+        scoped_contains(generated_code, 'TOTAL_IMAGE_SIZE', scope='code_only')
+        or scoped_contains(generated_code, 'total_size', scope='code_only')
         or "image_size" in generated_code.lower()
     )
     details.append(
@@ -34,7 +35,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_progress = (
-        "report_progress" in generated_code
+        scoped_contains(generated_code, 'report_progress', scope='code_only')
         or "progress" in generated_code.lower()
     )
     details.append(
@@ -48,10 +49,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_div_zero_guard = (
-        "total == 0" in generated_code
-        or "total_size == 0" in generated_code
-        or "!= 0" in generated_code
-        or "total > 0" in generated_code
+        scoped_contains(generated_code, 'total == 0', scope='code_only')
+        or scoped_contains(generated_code, 'total_size == 0', scope='code_only')
+        or scoped_contains(generated_code, '!= 0', scope='code_only')
+        or scoped_contains(generated_code, 'total > 0', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -64,9 +65,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_percentage_calc = (
-        "* 100" in generated_code
-        or "* 100U" in generated_code
-        or "pct" in generated_code
+        scoped_contains(generated_code, '* 100', scope='code_only')
+        or scoped_contains(generated_code, '* 100U', scope='code_only')
+        or scoped_contains(generated_code, 'pct', scope='code_only')
         or "percent" in generated_code.lower()
     )
     details.append(
@@ -80,8 +81,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_bytes_received = (
-        "bytes_received" in generated_code
-        or "received" in generated_code
+        scoped_contains(generated_code, 'bytes_received', scope='code_only')
+        or scoped_contains(generated_code, 'received', scope='code_only')
     )
     details.append(
         CheckDetail(

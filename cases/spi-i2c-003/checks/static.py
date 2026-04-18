@@ -4,6 +4,7 @@ import re
 
 from embedeval.check_utils import resolve_define
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -11,7 +12,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: I2C header included
-    has_i2c_h = "zephyr/drivers/i2c.h" in generated_code
+    has_i2c_h = scoped_contains(generated_code, 'zephyr/drivers/i2c.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="i2c_header_included",
@@ -24,8 +25,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: Device obtained via DT
     has_dev_get = (
-        "DEVICE_DT_GET" in generated_code
-        or "device_get_binding" in generated_code
+        scoped_contains(generated_code, 'DEVICE_DT_GET', scope='code_only')
+        or scoped_contains(generated_code, 'device_get_binding', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -39,9 +40,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Burst read API used
     has_burst = (
-        "i2c_burst_read" in generated_code
-        or "i2c_write_read" in generated_code
-        or "i2c_transfer" in generated_code
+        scoped_contains(generated_code, 'i2c_burst_read', scope='code_only')
+        or scoped_contains(generated_code, 'i2c_write_read', scope='code_only')
+        or scoped_contains(generated_code, 'i2c_transfer', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -55,10 +56,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: 6-byte receive buffer
     has_six_bytes = (
-        "[6]" in generated_code
-        or "6]" in generated_code
-        or ", 6" in generated_code
-        or "ACCEL_DATA_LEN" in generated_code
+        scoped_contains(generated_code, '[6]', scope='code_only')
+        or scoped_contains(generated_code, '6]', scope='code_only')
+        or scoped_contains(generated_code, ', 6', scope='code_only')
+        or scoped_contains(generated_code, 'ACCEL_DATA_LEN', scope='code_only')
     )
     # Also accept macros that resolve to 6 via #define
     if not has_six_bytes:
@@ -84,7 +85,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Register base address 0x28 referenced
-    has_reg = "0x28" in generated_code
+    has_reg = scoped_contains(generated_code, '0x28', scope='code_only')
     details.append(
         CheckDetail(
             check_name="start_register_0x28",

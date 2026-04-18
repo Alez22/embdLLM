@@ -1,13 +1,14 @@
 """Static analysis checks for Zephyr stack size optimization Kconfig."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate Kconfig fragment structure for memory optimization."""
     details: list[CheckDetail] = []
 
-    has_main_stack = "CONFIG_MAIN_STACK_SIZE" in generated_code
+    has_main_stack = scoped_contains(generated_code, 'CONFIG_MAIN_STACK_SIZE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="main_stack_size_defined",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_isr_stack = "CONFIG_ISR_STACK_SIZE" in generated_code
+    has_isr_stack = scoped_contains(generated_code, 'CONFIG_ISR_STACK_SIZE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="isr_stack_size_defined",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_minimal_libc = "CONFIG_MINIMAL_LIBC" in generated_code
+    has_minimal_libc = scoped_contains(generated_code, 'CONFIG_MINIMAL_LIBC', scope='code_only')
     details.append(
         CheckDetail(
             check_name="minimal_libc_enabled",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_newlib_conflict = "CONFIG_NEWLIB_LIBC=y" in generated_code
+    has_newlib_conflict = scoped_contains(generated_code, 'CONFIG_NEWLIB_LIBC=y', scope='code_only')
     details.append(
         CheckDetail(
             check_name="newlib_not_enabled",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_heap_size = "CONFIG_HEAP_MEM_POOL_SIZE" in generated_code
+    has_heap_size = scoped_contains(generated_code, 'CONFIG_HEAP_MEM_POOL_SIZE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="heap_pool_size_set",

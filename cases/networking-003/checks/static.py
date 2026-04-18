@@ -1,13 +1,14 @@
 """Static analysis checks for TCP client with connection retry."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate TCP retry client code structure."""
     details: list[CheckDetail] = []
 
-    has_socket_h = "zephyr/net/socket.h" in generated_code
+    has_socket_h = scoped_contains(generated_code, 'zephyr/net/socket.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="socket_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_errno_h = "errno.h" in generated_code
+    has_errno_h = scoped_contains(generated_code, 'errno.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="errno_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_sock_stream = "SOCK_STREAM" in generated_code
+    has_sock_stream = scoped_contains(generated_code, 'SOCK_STREAM', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sock_stream_used",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_connect = "zsock_connect" in generated_code
+    has_connect = scoped_contains(generated_code, 'zsock_connect', scope='code_only')
     details.append(
         CheckDetail(
             check_name="zsock_connect_called",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_max_retries = "MAX_RETRIES" in generated_code or "max_retries" in generated_code or "3" in generated_code
+    has_max_retries = scoped_contains(generated_code, 'MAX_RETRIES', scope='code_only') or scoped_contains(generated_code, 'max_retries', scope='code_only') or scoped_contains(generated_code, '3', scope='code_only')
     details.append(
         CheckDetail(
             check_name="max_retries_defined",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_sleep = "k_sleep" in generated_code
+    has_sleep = scoped_contains(generated_code, 'k_sleep', scope='code_only')
     details.append(
         CheckDetail(
             check_name="backoff_sleep",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_close = "zsock_close" in generated_code
+    has_close = scoped_contains(generated_code, 'zsock_close', scope='code_only')
     details.append(
         CheckDetail(
             check_name="zsock_close_called",

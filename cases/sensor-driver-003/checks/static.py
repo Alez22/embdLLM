@@ -1,13 +1,14 @@
 """Static analysis checks for multi-channel accelerometer read."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate multi-channel sensor read code structure."""
     details: list[CheckDetail] = []
 
-    has_sensor_h = "zephyr/drivers/sensor.h" in generated_code
+    has_sensor_h = scoped_contains(generated_code, 'zephyr/drivers/sensor.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_fetch = "sensor_sample_fetch" in generated_code
+    has_fetch = scoped_contains(generated_code, 'sensor_sample_fetch', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sample_fetch",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_accel_x = "SENSOR_CHAN_ACCEL_X" in generated_code
+    has_accel_x = scoped_contains(generated_code, 'SENSOR_CHAN_ACCEL_X', scope='code_only')
     details.append(
         CheckDetail(
             check_name="accel_x_channel",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_accel_y = "SENSOR_CHAN_ACCEL_Y" in generated_code
+    has_accel_y = scoped_contains(generated_code, 'SENSOR_CHAN_ACCEL_Y', scope='code_only')
     details.append(
         CheckDetail(
             check_name="accel_y_channel",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_accel_z = "SENSOR_CHAN_ACCEL_Z" in generated_code
+    has_accel_z = scoped_contains(generated_code, 'SENSOR_CHAN_ACCEL_Z', scope='code_only')
     details.append(
         CheckDetail(
             check_name="accel_z_channel",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_sensor_value = "sensor_value" in generated_code
+    has_sensor_value = scoped_contains(generated_code, 'sensor_value', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_value_struct",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_channel_get = "sensor_channel_get" in generated_code
+    has_channel_get = scoped_contains(generated_code, 'sensor_channel_get', scope='code_only')
     details.append(
         CheckDetail(
             check_name="channel_get",

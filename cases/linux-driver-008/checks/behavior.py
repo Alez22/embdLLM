@@ -2,7 +2,9 @@
 
 import re
 
-from embedeval.check_utils import (check_no_cross_platform_apis,
+from embedeval.check_utils import (
+    check_no_cross_platform_apis,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -16,7 +18,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: proc_remove or remove_proc_entry called in exit
     has_remove = (
-        "proc_remove" in generated_code or "remove_proc_entry" in generated_code
+        scoped_contains(generated_code, 'proc_remove', scope='code_only') or scoped_contains(generated_code, 'remove_proc_entry', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -29,7 +31,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: seq_printf used (NOT sprintf/snprintf to user buffer)
-    has_seq_printf = "seq_printf" in generated_code
+    has_seq_printf = scoped_contains(generated_code, 'seq_printf', scope='code_only')
     details.append(
         CheckDetail(
             check_name="seq_printf_not_raw_sprintf",
@@ -41,7 +43,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: single_open used (standard pattern for simple seq files)
-    has_single_open = "single_open" in generated_code
+    has_single_open = scoped_contains(generated_code, 'single_open', scope='code_only')
     details.append(
         CheckDetail(
             check_name="single_open_used",
@@ -53,7 +55,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: proc_ops has proc_read = seq_read
-    has_seq_read = "seq_read" in generated_code
+    has_seq_read = scoped_contains(generated_code, 'seq_read', scope='code_only')
     details.append(
         CheckDetail(
             check_name="seq_read_in_proc_ops",
@@ -66,10 +68,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 5: proc_create result checked for NULL
     has_null_check = (
-        "!entry" in generated_code
-        or "== NULL" in generated_code
-        or "IS_ERR" in generated_code
-        or "ENOMEM" in generated_code
+        scoped_contains(generated_code, '!entry', scope='code_only')
+        or scoped_contains(generated_code, '== NULL', scope='code_only')
+        or scoped_contains(generated_code, 'IS_ERR', scope='code_only')
+        or scoped_contains(generated_code, 'ENOMEM', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -82,7 +84,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: show function uses seq_file parameter
-    has_show_fn = "seq_file" in generated_code
+    has_show_fn = scoped_contains(generated_code, 'seq_file', scope='code_only')
     details.append(
         CheckDetail(
             check_name="show_function_uses_seq_file",
@@ -98,7 +100,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Pattern: if (!entry) { return -ENOMEM; } — no braces or with braces
     proc_failure_handled = bool(
         re.search(r'if\s*\(\s*!\s*\w+\s*\)', generated_code)
-        and ("return -ENOMEM" in generated_code or "return -" in generated_code)
+        and (scoped_contains(generated_code, 'return -ENOMEM', scope='code_only') or scoped_contains(generated_code, 'return -', scope='code_only'))
     ) or bool(
         re.search(r'if\s*\(\s*!\s*\w+\s*\)\s*(?:\{[^}]*\}|[^;]+;)', generated_code)
     )

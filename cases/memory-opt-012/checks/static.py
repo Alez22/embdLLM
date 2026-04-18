@@ -3,13 +3,14 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: kernel.h included
-    has_header = "zephyr/kernel.h" in generated_code
+    has_header = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(CheckDetail(
         check_name="kernel_header",
         passed=has_header,
@@ -35,7 +36,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Check 3: No stdio.h (use printk, not printf)
-    has_stdio = "stdio.h" in generated_code or "stdlib.h" in generated_code
+    has_stdio = scoped_contains(generated_code, 'stdio.h', scope='code_only') or scoped_contains(generated_code, 'stdlib.h', scope='code_only')
     details.append(CheckDetail(
         check_name="no_stdio",
         passed=not has_stdio,
@@ -45,7 +46,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Check 4: CRC polynomial present
-    has_poly = "0x1021" in generated_code or "0x8408" in generated_code
+    has_poly = scoped_contains(generated_code, '0x1021', scope='code_only') or scoped_contains(generated_code, '0x8408', scope='code_only')
     details.append(CheckDetail(
         check_name="crc_polynomial_present",
         passed=has_poly,
@@ -55,7 +56,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Check 5: Has main function
-    has_main = "int main(" in generated_code or "void main(" in generated_code
+    has_main = scoped_contains(generated_code, 'int main(', scope='code_only') or scoped_contains(generated_code, 'void main(', scope='code_only')
     details.append(CheckDetail(
         check_name="main_function",
         passed=has_main,

@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 _FAKE_DT_PROPERTIES = [
     "pin-config",
@@ -58,7 +59,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: status = "okay"
-    has_status_okay = 'status = "okay"' in generated_code
+    has_status_okay = scoped_contains(generated_code, 'status = "okay"', scope='code_only')
     details.append(
         CheckDetail(
             check_name="status_okay",
@@ -98,9 +99,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 7: uart0 (or relevant peripheral) referenced
     has_peripheral_node = (
-        "&uart0" in generated_code
-        or "&usart1" in generated_code
-        or "&uart" in generated_code
+        scoped_contains(generated_code, '&uart0', scope='code_only')
+        or scoped_contains(generated_code, '&usart1', scope='code_only')
+        or scoped_contains(generated_code, '&uart', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -113,7 +114,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 8: assigned-clock-rates present (not just assigned-clocks alone)
-    has_clock_rates = "assigned-clock-rates" in generated_code
+    has_clock_rates = scoped_contains(generated_code, 'assigned-clock-rates', scope='code_only')
     details.append(
         CheckDetail(
             check_name="assigned_clock_rates_present",

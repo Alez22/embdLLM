@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -64,9 +65,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
             re.IGNORECASE | re.DOTALL,
         )
     ) or (
-        "< 0" in generated_code
-        and "PM_DEVICE_ACTION_RESUME" in generated_code
-        and "PM_DEVICE_ACTION_SUSPEND" in generated_code
+        scoped_contains(generated_code, '< 0', scope='code_only')
+        and scoped_contains(generated_code, 'PM_DEVICE_ACTION_RESUME', scope='code_only')
+        and scoped_contains(generated_code, 'PM_DEVICE_ACTION_SUSPEND', scope='code_only')
     )
     details.append(
         CheckDetail(

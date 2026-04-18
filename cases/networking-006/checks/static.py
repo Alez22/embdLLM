@@ -1,13 +1,14 @@
 """Static analysis checks for TCP server with buffer overflow protection."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate TCP server buffer safety."""
     details: list[CheckDetail] = []
 
-    has_socket_h = "zephyr/net/socket.h" in generated_code
+    has_socket_h = scoped_contains(generated_code, 'zephyr/net/socket.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="socket_header",
@@ -19,7 +20,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Buffer must be declared (any reasonable static buffer)
-    has_recv_buf = "recv_buf" in generated_code
+    has_recv_buf = scoped_contains(generated_code, 'recv_buf', scope='code_only')
     details.append(
         CheckDetail(
             check_name="recv_buffer_declared",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # recv call must not use an unbounded size (no recv(sock, buf, 9999 or large literal)
     # Positive check: uses sizeof(recv_buf) or sizeof(recv_buf) - 1
-    has_bounded_recv = "sizeof(recv_buf)" in generated_code
+    has_bounded_recv = scoped_contains(generated_code, 'sizeof(recv_buf)', scope='code_only')
     details.append(
         CheckDetail(
             check_name="recv_size_bounded",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # No unsafe sprintf
-    has_sprintf = "sprintf(" in generated_code and "snprintf(" not in generated_code
+    has_sprintf = scoped_contains(generated_code, 'sprintf(', scope='code_only') and "snprintf(" not in generated_code
     details.append(
         CheckDetail(
             check_name="no_unsafe_sprintf",
@@ -55,7 +56,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_listen = "zsock_listen" in generated_code or "listen(" in generated_code
+    has_listen = scoped_contains(generated_code, 'zsock_listen', scope='code_only') or scoped_contains(generated_code, 'listen(', scope='code_only')
     details.append(
         CheckDetail(
             check_name="listen_called",
@@ -66,7 +67,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_accept = "zsock_accept" in generated_code or "accept(" in generated_code
+    has_accept = scoped_contains(generated_code, 'zsock_accept', scope='code_only') or scoped_contains(generated_code, 'accept(', scope='code_only')
     details.append(
         CheckDetail(
             check_name="accept_called",

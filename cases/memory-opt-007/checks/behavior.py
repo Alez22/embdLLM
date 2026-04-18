@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -22,12 +23,12 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Static array defined at compile time
-    has_static = "static" in generated_code and (
-        "[POOL_SIZE]" in generated_code
-        or "[8]" in generated_code
-        or "[16]" in generated_code
-        or "[4]" in generated_code
-        or "pool[" in generated_code
+    has_static = scoped_contains(generated_code, 'static', scope='code_only') and (
+        scoped_contains(generated_code, '[POOL_SIZE]', scope='code_only')
+        or scoped_contains(generated_code, '[8]', scope='code_only')
+        or scoped_contains(generated_code, '[16]', scope='code_only')
+        or scoped_contains(generated_code, '[4]', scope='code_only')
+        or scoped_contains(generated_code, 'pool[', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -41,13 +42,13 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Free list or bitmap tracking allocations
     has_freelist = (
-        "free_next" in generated_code
-        or "free_list" in generated_code
-        or "free_head" in generated_code
-        or "in_use" in generated_code
-        or "bitmap" in generated_code
-        or "used[" in generated_code
-        or "available[" in generated_code
+        scoped_contains(generated_code, 'free_next', scope='code_only')
+        or scoped_contains(generated_code, 'free_list', scope='code_only')
+        or scoped_contains(generated_code, 'free_head', scope='code_only')
+        or scoped_contains(generated_code, 'in_use', scope='code_only')
+        or scoped_contains(generated_code, 'bitmap', scope='code_only')
+        or scoped_contains(generated_code, 'used[', scope='code_only')
+        or scoped_contains(generated_code, 'available[', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -60,8 +61,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: alloc and free are both implemented (balanced interface)
-    has_alloc = "_alloc" in generated_code
-    has_free = "_free" in generated_code
+    has_alloc = scoped_contains(generated_code, '_alloc', scope='code_only')
+    has_free = scoped_contains(generated_code, '_free', scope='code_only')
     details.append(
         CheckDetail(
             check_name="alloc_and_free_both_implemented",
@@ -75,12 +76,12 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 5: Bounds validation in free function
     import re as _re
     has_bounds_check = (
-        ">= &pool" in generated_code
-        or "< pool" in generated_code
-        or "< &pool" in generated_code
-        or ">= pool" in generated_code
-        or "obj <" in generated_code
-        or "obj >" in generated_code
+        scoped_contains(generated_code, '>= &pool', scope='code_only')
+        or scoped_contains(generated_code, '< pool', scope='code_only')
+        or scoped_contains(generated_code, '< &pool', scope='code_only')
+        or scoped_contains(generated_code, '>= pool', scope='code_only')
+        or scoped_contains(generated_code, 'obj <', scope='code_only')
+        or scoped_contains(generated_code, 'obj >', scope='code_only')
         or "within" in generated_code.lower()
         or bool(_re.search(r'offset\s*<\s*0', generated_code))
         or bool(_re.search(r'offset\s*>=\s*(?:POOL|MAX|pool_size|POOL_SIZE)', generated_code))

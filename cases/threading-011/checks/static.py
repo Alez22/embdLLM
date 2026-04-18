@@ -1,13 +1,14 @@
 """Static analysis checks for periodic control loop with deadline handling."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate periodic control loop code structure."""
     details: list[CheckDetail] = []
 
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -19,8 +20,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_thread = (
-        "K_THREAD_DEFINE" in generated_code
-        or "k_thread_create" in generated_code
+        scoped_contains(generated_code, 'K_THREAD_DEFINE', scope='code_only')
+        or scoped_contains(generated_code, 'k_thread_create', scope='code_only')
     )
     details.append(
         CheckDetail(

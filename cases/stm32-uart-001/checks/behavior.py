@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -9,7 +10,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Baud rate configured as 115200
-    has_baud = "115200" in generated_code
+    has_baud = scoped_contains(generated_code, '115200', scope='code_only')
     details.append(
         CheckDetail(
             check_name="baud_rate_115200_configured",
@@ -22,8 +23,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: Interrupt receive (not polling) is the primary receive mechanism
     # LLM failure: uses HAL_UART_Receive (blocking/polling) instead of _IT
-    has_receive_it = "HAL_UART_Receive_IT" in generated_code
-    has_polling_only = "HAL_UART_Receive" in generated_code and not has_receive_it
+    has_receive_it = scoped_contains(generated_code, 'HAL_UART_Receive_IT', scope='code_only')
+    has_polling_only = scoped_contains(generated_code, 'HAL_UART_Receive', scope='code_only') and not has_receive_it
     details.append(
         CheckDetail(
             check_name="non_polling_receive",
@@ -35,7 +36,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: RxCpltCallback defined to handle completed receive
-    has_rx_callback = "HAL_UART_RxCpltCallback" in generated_code
+    has_rx_callback = scoped_contains(generated_code, 'HAL_UART_RxCpltCallback', scope='code_only')
     details.append(
         CheckDetail(
             check_name="rx_complete_callback_defined",
@@ -65,7 +66,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Error callback defined
-    has_error_callback = "HAL_UART_ErrorCallback" in generated_code
+    has_error_callback = scoped_contains(generated_code, 'HAL_UART_ErrorCallback', scope='code_only')
     details.append(
         CheckDetail(
             check_name="error_callback_defined",

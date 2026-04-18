@@ -1,6 +1,7 @@
 """Static analysis checks for NVS key-value store."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: NVS header
-    has_nvs_h = "zephyr/fs/nvs.h" in generated_code
+    has_nvs_h = scoped_contains(generated_code, 'zephyr/fs/nvs.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="nvs_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: nvs_mount called
-    has_mount = "nvs_mount" in generated_code
+    has_mount = scoped_contains(generated_code, 'nvs_mount', scope='code_only')
     details.append(
         CheckDetail(
             check_name="nvs_mount_called",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: nvs_write called
-    has_write = "nvs_write" in generated_code
+    has_write = scoped_contains(generated_code, 'nvs_write', scope='code_only')
     details.append(
         CheckDetail(
             check_name="nvs_write_called",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: nvs_read called
-    has_read = "nvs_read" in generated_code
+    has_read = scoped_contains(generated_code, 'nvs_read', scope='code_only')
     details.append(
         CheckDetail(
             check_name="nvs_read_called",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: struct nvs_fs defined
-    has_fs = "struct nvs_fs" in generated_code or "nvs_fs" in generated_code
+    has_fs = scoped_contains(generated_code, 'struct nvs_fs', scope='code_only') or scoped_contains(generated_code, 'nvs_fs', scope='code_only')
     details.append(
         CheckDetail(
             check_name="nvs_fs_struct",

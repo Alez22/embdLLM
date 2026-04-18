@@ -2,8 +2,10 @@
 
 import re
 
-from embedeval.check_utils import (check_no_cross_platform_apis,
+from embedeval.check_utils import (
+    check_no_cross_platform_apis,
     extract_error_blocks,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -16,7 +18,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     stripped = strip_comments(generated_code)
 
     # Check 1: free_irq called in exit (balances request_irq in init)
-    has_free_irq = "free_irq" in generated_code
+    has_free_irq = scoped_contains(generated_code, 'free_irq', scope='code_only')
     details.append(
         CheckDetail(
             check_name="free_irq_in_exit",
@@ -29,8 +31,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: spin_lock used in IRQ handler (not mutex — mutex can sleep)
     has_spinlock = (
-        "spin_lock" in generated_code
-        or "DEFINE_SPINLOCK" in generated_code
+        scoped_contains(generated_code, 'spin_lock', scope='code_only')
+        or scoped_contains(generated_code, 'DEFINE_SPINLOCK', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -43,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: wait_event_interruptible used in read (blocks until IRQ fires)
-    has_wait_event = "wait_event_interruptible" in generated_code
+    has_wait_event = scoped_contains(generated_code, 'wait_event_interruptible', scope='code_only')
     details.append(
         CheckDetail(
             check_name="wait_event_interruptible_in_read",
@@ -55,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: wake_up_interruptible called from IRQ handler
-    has_wake_up = "wake_up_interruptible" in generated_code
+    has_wake_up = scoped_contains(generated_code, 'wake_up_interruptible', scope='code_only')
     details.append(
         CheckDetail(
             check_name="wake_up_interruptible_in_handler",
@@ -67,7 +69,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: IRQ_HANDLED returned from handler (not IRQ_NONE or 0)
-    has_irq_handled = "IRQ_HANDLED" in generated_code
+    has_irq_handled = scoped_contains(generated_code, 'IRQ_HANDLED', scope='code_only')
     details.append(
         CheckDetail(
             check_name="irq_handled_returned",
@@ -79,7 +81,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: copy_to_user used (not direct pointer access in read)
-    has_copy_to = "copy_to_user" in generated_code
+    has_copy_to = scoped_contains(generated_code, 'copy_to_user', scope='code_only')
     details.append(
         CheckDetail(
             check_name="copy_to_user_in_read",

@@ -6,6 +6,7 @@ from embedeval.check_utils import (
     check_no_cross_platform_apis,
     check_no_isr_forbidden,
     find_isr_bodies,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     stripped = strip_comments(generated_code)
 
     # Check 1: Ring buffer struct defined
-    has_struct = "struct" in generated_code and (
+    has_struct = scoped_contains(generated_code, 'struct', scope='code_only') and (
         "ring_buf" in generated_code.lower()
         or "ringbuf" in generated_code.lower()
         or "ring_buffer" in generated_code.lower()
@@ -68,7 +69,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     has_full_check = bool(
         re.search(r"(full|== \(uint32_t\)|next_head ==|return -1.*full)", generated_code, re.IGNORECASE)
         or "is_full" in generated_code.lower()
-        or ("return -1" in generated_code and "full" in generated_code.lower())
+        or (scoped_contains(generated_code, 'return -1', scope='code_only') and "full" in generated_code.lower())
     )
     details.append(
         CheckDetail(
@@ -84,7 +85,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     has_empty_check = bool(
         re.search(r"(empty|head == tail|tail == head|return -1.*empty)", generated_code, re.IGNORECASE)
         or "is_empty" in generated_code.lower()
-        or ("return -1" in generated_code and "empty" in generated_code.lower())
+        or (scoped_contains(generated_code, 'return -1', scope='code_only') and "empty" in generated_code.lower())
     )
     details.append(
         CheckDetail(

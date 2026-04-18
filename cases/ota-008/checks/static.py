@@ -1,13 +1,14 @@
 """Static analysis checks for OTA rollback with timeout."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate OTA rollback timeout code structure."""
     details: list[CheckDetail] = []
 
-    has_mcuboot_h = "dfu/mcuboot.h" in generated_code
+    has_mcuboot_h = scoped_contains(generated_code, 'dfu/mcuboot.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mcuboot_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_reboot_h = "sys/reboot.h" in generated_code
+    has_reboot_h = scoped_contains(generated_code, 'sys/reboot.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="reboot_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_confirmed_check = "boot_is_img_confirmed" in generated_code
+    has_confirmed_check = scoped_contains(generated_code, 'boot_is_img_confirmed', scope='code_only')
     details.append(
         CheckDetail(
             check_name="img_confirmed_check",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_write_confirmed = "boot_write_img_confirmed" in generated_code
+    has_write_confirmed = scoped_contains(generated_code, 'boot_write_img_confirmed', scope='code_only')
     details.append(
         CheckDetail(
             check_name="write_img_confirmed",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_sys_reboot = "sys_reboot" in generated_code
+    has_sys_reboot = scoped_contains(generated_code, 'sys_reboot', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sys_reboot_for_rollback",
@@ -63,10 +64,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_timeout = (
-        "CONFIRM_TIMEOUT" in generated_code
+        scoped_contains(generated_code, 'CONFIRM_TIMEOUT', scope='code_only')
         or "timeout" in generated_code.lower()
-        or "deadline" in generated_code
-        or "k_uptime" in generated_code
+        or scoped_contains(generated_code, 'deadline', scope='code_only')
+        or scoped_contains(generated_code, 'k_uptime', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -78,7 +79,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_self_test = "self_test" in generated_code or "selftest" in generated_code
+    has_self_test = scoped_contains(generated_code, 'self_test', scope='code_only') or scoped_contains(generated_code, 'selftest', scope='code_only')
     details.append(
         CheckDetail(
             check_name="self_test_function",

@@ -1,13 +1,14 @@
 """Static analysis checks for Yocto recipe with patch."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate Yocto patch recipe structure."""
     details: list[CheckDetail] = []
 
-    has_patch_in_uri = ".patch" in generated_code and "SRC_URI" in generated_code
+    has_patch_in_uri = scoped_contains(generated_code, '.patch', scope='raw') and scoped_contains(generated_code, 'SRC_URI', scope='raw')
     details.append(
         CheckDetail(
             check_name="patch_file_in_src_uri",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_filesextrapaths = "FILESEXTRAPATHS" in generated_code
+    has_filesextrapaths = scoped_contains(generated_code, 'FILESEXTRAPATHS', scope='raw')
     details.append(
         CheckDetail(
             check_name="filesextrapaths_set",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_license = "LICENSE" in generated_code
+    has_license = scoped_contains(generated_code, 'LICENSE', scope='raw')
     details.append(
         CheckDetail(
             check_name="license_defined",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_lic_chksum = "LIC_FILES_CHKSUM" in generated_code
+    has_lic_chksum = scoped_contains(generated_code, 'LIC_FILES_CHKSUM', scope='raw')
     details.append(
         CheckDetail(
             check_name="lic_files_chksum_defined",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_do_install = "do_install" in generated_code
+    has_do_install = scoped_contains(generated_code, 'do_install', scope='raw')
     details.append(
         CheckDetail(
             check_name="do_install_defined",

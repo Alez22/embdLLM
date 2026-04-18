@@ -1,12 +1,13 @@
 """Behavioral checks for dma-010."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
-    has_device_ready = "device_is_ready" in generated_code
+    has_device_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_ready_check",
@@ -18,9 +19,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_completion_wait = (
-        "dma_done" in generated_code
-        or "dma_callback" in generated_code
-        or "k_sem" in generated_code
+        scoped_contains(generated_code, 'dma_done', scope='code_only')
+        or scoped_contains(generated_code, 'dma_callback', scope='code_only')
+        or scoped_contains(generated_code, 'k_sem', scope='code_only')
     )
     details.append(
         CheckDetail(

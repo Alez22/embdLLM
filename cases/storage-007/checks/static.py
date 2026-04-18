@@ -1,6 +1,7 @@
 """Static analysis checks for LittleFS Mount with Format-on-Failure Recovery."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: fs/fs.h included
-    has_fs_h = "zephyr/fs/fs.h" in generated_code
+    has_fs_h = scoped_contains(generated_code, 'zephyr/fs/fs.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="fs_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: fs/littlefs.h included
-    has_lfs_h = "zephyr/fs/littlefs.h" in generated_code
+    has_lfs_h = scoped_contains(generated_code, 'zephyr/fs/littlefs.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="littlefs_header_included",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: fs_mount called
-    has_mount = "fs_mount" in generated_code
+    has_mount = scoped_contains(generated_code, 'fs_mount', scope='code_only')
     details.append(
         CheckDetail(
             check_name="fs_mount_called",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: fs_mkfs called for format-on-failure recovery (LLM failure: no recovery)
-    has_mkfs = "fs_mkfs" in generated_code
+    has_mkfs = scoped_contains(generated_code, 'fs_mkfs', scope='code_only')
     details.append(
         CheckDetail(
             check_name="fs_mkfs_on_failure",
@@ -69,7 +70,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: FS_LITTLEFS type referenced
-    has_lfs_type = "FS_LITTLEFS" in generated_code
+    has_lfs_type = scoped_contains(generated_code, 'FS_LITTLEFS', scope='code_only')
     details.append(
         CheckDetail(
             check_name="fs_littlefs_type",

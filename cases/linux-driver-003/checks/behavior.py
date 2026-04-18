@@ -2,8 +2,10 @@
 
 import re
 
-from embedeval.check_utils import (check_no_cross_platform_apis,
+from embedeval.check_utils import (
+    check_no_cross_platform_apis,
     extract_error_blocks,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -16,7 +18,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     stripped = strip_comments(generated_code)
 
     # Check 1: read_raw returns IIO_VAL_INT (not 0 or 1)
-    has_iio_val_int = "IIO_VAL_INT" in generated_code
+    has_iio_val_int = scoped_contains(generated_code, 'IIO_VAL_INT', scope='code_only')
     details.append(
         CheckDetail(
             check_name="read_raw_returns_iio_val_int",
@@ -28,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: IIO_CHAN_INFO_RAW handled in read_raw switch/if
-    has_raw_mask = "IIO_CHAN_INFO_RAW" in generated_code
+    has_raw_mask = scoped_contains(generated_code, 'IIO_CHAN_INFO_RAW', scope='code_only')
     details.append(
         CheckDetail(
             check_name="iio_chan_info_raw_handled",
@@ -40,7 +42,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Uses devm_ prefixed alloc (not manual iio_device_alloc)
-    has_devm_alloc = "devm_iio_device_alloc" in generated_code
+    has_devm_alloc = scoped_contains(generated_code, 'devm_iio_device_alloc', scope='code_only')
     details.append(
         CheckDetail(
             check_name="devm_iio_device_alloc_used",
@@ -53,8 +55,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: devm_iio_device_register or iio_device_register called
     has_register = (
-        "devm_iio_device_register" in generated_code
-        or "iio_device_register" in generated_code
+        scoped_contains(generated_code, 'devm_iio_device_register', scope='code_only')
+        or scoped_contains(generated_code, 'iio_device_register', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -67,7 +69,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: indio_dev->info assigned (links read_raw to device)
-    has_info_assign = "->info" in generated_code or ".info" in generated_code
+    has_info_assign = scoped_contains(generated_code, '->info', scope='code_only') or scoped_contains(generated_code, '.info', scope='code_only')
     details.append(
         CheckDetail(
             check_name="iio_info_assigned",
@@ -79,7 +81,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: num_channels set (otherwise IIO reports 0 channels)
-    has_num_channels = "num_channels" in generated_code
+    has_num_channels = scoped_contains(generated_code, 'num_channels', scope='code_only')
     details.append(
         CheckDetail(
             check_name="num_channels_set",
@@ -94,8 +96,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # LLM failure: calling devm_iio_device_alloc, not checking NULL, proceeding to crash
     error_blocks = extract_error_blocks(generated_code)
     has_enomem_check = (
-        "ENOMEM" in generated_code
-        or "!indio_dev" in generated_code
+        scoped_contains(generated_code, 'ENOMEM', scope='code_only')
+        or scoped_contains(generated_code, '!indio_dev', scope='code_only')
         or bool(re.search(r'if\s*\(\s*!\s*\w+\s*\)', generated_code))
     )
     details.append(

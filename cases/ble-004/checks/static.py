@@ -1,13 +1,14 @@
 """Static analysis checks for BLE connection callbacks."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate BLE connection callback code structure."""
     details: list[CheckDetail] = []
 
-    has_bt_h = "zephyr/bluetooth/bluetooth.h" in generated_code
+    has_bt_h = scoped_contains(generated_code, 'zephyr/bluetooth/bluetooth.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bluetooth_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_conn_h = "zephyr/bluetooth/conn.h" in generated_code
+    has_conn_h = scoped_contains(generated_code, 'zephyr/bluetooth/conn.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="conn_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_conn_cb = "bt_conn_cb" in generated_code
+    has_conn_cb = scoped_contains(generated_code, 'bt_conn_cb', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bt_conn_cb_defined",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_cb_register = "bt_conn_cb_register" in generated_code or "BT_CONN_CB_DEFINE" in generated_code
+    has_cb_register = scoped_contains(generated_code, 'bt_conn_cb_register', scope='code_only') or scoped_contains(generated_code, 'BT_CONN_CB_DEFINE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="conn_cb_registered",
@@ -51,8 +52,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_connected_cb = ".connected" in generated_code or "connected" in generated_code
-    has_disconnected_cb = ".disconnected" in generated_code or "disconnected" in generated_code
+    has_connected_cb = scoped_contains(generated_code, '.connected', scope='code_only') or scoped_contains(generated_code, 'connected', scope='code_only')
+    has_disconnected_cb = scoped_contains(generated_code, '.disconnected', scope='code_only') or scoped_contains(generated_code, 'disconnected', scope='code_only')
     details.append(
         CheckDetail(
             check_name="both_callbacks_defined",
@@ -63,7 +64,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_addr_print = "bt_addr_le_to_str" in generated_code or "bt_conn_get_info" in generated_code
+    has_addr_print = scoped_contains(generated_code, 'bt_addr_le_to_str', scope='code_only') or scoped_contains(generated_code, 'bt_conn_get_info', scope='code_only')
     details.append(
         CheckDetail(
             check_name="peer_address_printed",

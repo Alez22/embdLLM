@@ -1,6 +1,7 @@
 """Static analysis checks for ADC oversampling application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes zephyr/drivers/adc.h
-    has_adc_h = "zephyr/drivers/adc.h" in generated_code
+    has_adc_h = scoped_contains(generated_code, 'zephyr/drivers/adc.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="adc_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Includes zephyr/kernel.h
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Uses adc_channel_setup
-    has_setup = "adc_channel_setup" in generated_code
+    has_setup = scoped_contains(generated_code, 'adc_channel_setup', scope='code_only')
     details.append(
         CheckDetail(
             check_name="adc_channel_setup_called",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Oversampling field set in adc_sequence
-    has_oversampling = "oversampling" in generated_code
+    has_oversampling = scoped_contains(generated_code, 'oversampling', scope='code_only')
     details.append(
         CheckDetail(
             check_name="oversampling_configured",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Cross-platform — no Arduino analogRead
-    has_arduino = "analogRead" in generated_code
+    has_arduino = scoped_contains(generated_code, 'analogRead', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_arduino_analogread",
@@ -68,7 +69,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Cross-platform — no STM32 HAL_ADC
-    has_hal_adc = "HAL_ADC_Start" in generated_code or "HAL_ADC_GetValue" in generated_code
+    has_hal_adc = scoped_contains(generated_code, 'HAL_ADC_Start', scope='code_only') or scoped_contains(generated_code, 'HAL_ADC_GetValue', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_stm32_hal_adc",
@@ -80,7 +81,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 7: Uses adc_read
-    has_adc_read = "adc_read" in generated_code
+    has_adc_read = scoped_contains(generated_code, 'adc_read', scope='code_only')
     details.append(
         CheckDetail(
             check_name="adc_read_called",

@@ -1,13 +1,14 @@
 """Static analysis checks for Yocto recipe with DEPENDS and RDEPENDS."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate dependency BitBake recipe structure."""
     details: list[CheckDetail] = []
 
-    has_summary = "SUMMARY" in generated_code
+    has_summary = scoped_contains(generated_code, 'SUMMARY', scope='raw')
     details.append(
         CheckDetail(
             check_name="summary_defined",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_license = "LICENSE" in generated_code
+    has_license = scoped_contains(generated_code, 'LICENSE', scope='raw')
     details.append(
         CheckDetail(
             check_name="license_defined",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_depends = "DEPENDS" in generated_code
+    has_depends = scoped_contains(generated_code, 'DEPENDS', scope='raw')
     details.append(
         CheckDetail(
             check_name="depends_defined",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_rdepends = "RDEPENDS" in generated_code
+    has_rdepends = scoped_contains(generated_code, 'RDEPENDS', scope='raw')
     details.append(
         CheckDetail(
             check_name="rdepends_defined",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_do_compile = "do_compile" in generated_code
+    has_do_compile = scoped_contains(generated_code, 'do_compile', scope='raw')
     details.append(
         CheckDetail(
             check_name="do_compile_defined",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_do_install = "do_install" in generated_code
+    has_do_install = scoped_contains(generated_code, 'do_install', scope='raw')
     details.append(
         CheckDetail(
             check_name="do_install_defined",

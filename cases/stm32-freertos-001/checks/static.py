@@ -1,6 +1,7 @@
 """Static analysis checks for STM32 FreeRTOS producer-consumer application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: STM32 HAL header
-    has_hal_header = "stm32f4xx_hal.h" in generated_code
+    has_hal_header = scoped_contains(generated_code, 'stm32f4xx_hal.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="stm32_hal_header_included",

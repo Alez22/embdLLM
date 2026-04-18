@@ -1,6 +1,7 @@
 """Static analysis checks for GPIO button interrupt application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes zephyr/drivers/gpio.h
-    has_gpio_h = "zephyr/drivers/gpio.h" in generated_code
+    has_gpio_h = scoped_contains(generated_code, 'zephyr/drivers/gpio.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="gpio_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Includes zephyr/kernel.h
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Uses GPIO_DT_SPEC_GET for devicetree binding
-    has_dt_spec = "GPIO_DT_SPEC_GET" in generated_code
+    has_dt_spec = scoped_contains(generated_code, 'GPIO_DT_SPEC_GET', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_dt_spec",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Has a callback function (gpio_callback struct)
-    has_callback_struct = "gpio_callback" in generated_code
+    has_callback_struct = scoped_contains(generated_code, 'gpio_callback', scope='code_only')
     details.append(
         CheckDetail(
             check_name="gpio_callback_struct",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Uses gpio_init_callback
-    has_init_cb = "gpio_init_callback" in generated_code
+    has_init_cb = scoped_contains(generated_code, 'gpio_init_callback', scope='code_only')
     details.append(
         CheckDetail(
             check_name="gpio_init_callback_called",

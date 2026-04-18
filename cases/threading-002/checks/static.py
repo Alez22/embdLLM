@@ -1,6 +1,7 @@
 """Static analysis checks for mutex-protected shared counter."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: kernel header
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -20,8 +21,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Mutex defined (K_MUTEX_DEFINE or struct k_mutex)
-    has_mutex_define = "K_MUTEX_DEFINE" in generated_code
-    has_mutex_struct = "struct k_mutex" in generated_code
+    has_mutex_define = scoped_contains(generated_code, 'K_MUTEX_DEFINE', scope='code_only')
+    has_mutex_struct = scoped_contains(generated_code, 'struct k_mutex', scope='code_only')
     has_mutex = has_mutex_define or has_mutex_struct
     details.append(
         CheckDetail(
@@ -34,7 +35,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: k_mutex_lock called
-    has_lock = "k_mutex_lock" in generated_code
+    has_lock = scoped_contains(generated_code, 'k_mutex_lock', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mutex_lock_called",
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: k_mutex_unlock called
-    has_unlock = "k_mutex_unlock" in generated_code
+    has_unlock = scoped_contains(generated_code, 'k_mutex_unlock', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mutex_unlock_called",
@@ -59,12 +60,12 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 5: Shared counter (global variable)
     has_counter = (
-        "uint32_t" in generated_code
-        or "int" in generated_code
+        scoped_contains(generated_code, 'uint32_t', scope='code_only')
+        or scoped_contains(generated_code, 'int', scope='code_only')
     ) and (
-        "counter" in generated_code
-        or "shared" in generated_code
-        or "count" in generated_code
+        scoped_contains(generated_code, 'counter', scope='code_only')
+        or scoped_contains(generated_code, 'shared', scope='code_only')
+        or scoped_contains(generated_code, 'count', scope='code_only')
     )
     details.append(
         CheckDetail(

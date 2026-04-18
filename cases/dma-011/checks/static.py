@@ -3,12 +3,13 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
-    has_dma_h = "drivers/dma.h" in generated_code
+    has_dma_h = scoped_contains(generated_code, 'drivers/dma.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_header_included",

@@ -1,6 +1,7 @@
 """Static analysis checks for watchdog pre-timeout ISR callback application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes zephyr/drivers/watchdog.h
-    has_wdt_h = "zephyr/drivers/watchdog.h" in generated_code
+    has_wdt_h = scoped_contains(generated_code, 'zephyr/drivers/watchdog.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="watchdog_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Includes zephyr/kernel.h
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -50,7 +51,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Callback registered in wdt_timeout_cfg (.callback field set)
-    has_callback_set = ".callback" in generated_code and "NULL" not in re.sub(
+    has_callback_set = scoped_contains(generated_code, '.callback', scope='code_only') and "NULL" not in re.sub(
         r"\.callback\s*=\s*NULL", "", generated_code
     )
     # More robust: check callback field is assigned to a non-NULL function
@@ -66,8 +67,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: wdt_install_timeout and wdt_setup called
-    has_install = "wdt_install_timeout" in generated_code
-    has_setup = "wdt_setup" in generated_code
+    has_install = scoped_contains(generated_code, 'wdt_install_timeout', scope='code_only')
+    has_setup = scoped_contains(generated_code, 'wdt_setup', scope='code_only')
     details.append(
         CheckDetail(
             check_name="wdt_install_and_setup",
@@ -79,7 +80,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: WDT_FLAG_RESET_SOC used
-    has_reset_flag = "WDT_FLAG_RESET_SOC" in generated_code
+    has_reset_flag = scoped_contains(generated_code, 'WDT_FLAG_RESET_SOC', scope='code_only')
     details.append(
         CheckDetail(
             check_name="reset_soc_flag",

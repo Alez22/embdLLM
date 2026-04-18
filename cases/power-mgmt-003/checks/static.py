@@ -1,6 +1,7 @@
 """Static analysis checks for PM device with state tracking."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: PM device header
-    has_pm_h = "zephyr/pm/device.h" in generated_code
+    has_pm_h = scoped_contains(generated_code, 'zephyr/pm/device.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pm_device_header",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: PM action callback
-    has_pm_action = "pm_device_action" in generated_code
+    has_pm_action = scoped_contains(generated_code, 'pm_device_action', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pm_action_callback",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: SUSPEND action handled
-    has_suspend = "PM_DEVICE_ACTION_SUSPEND" in generated_code
+    has_suspend = scoped_contains(generated_code, 'PM_DEVICE_ACTION_SUSPEND', scope='code_only')
     details.append(
         CheckDetail(
             check_name="suspend_action_handled",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: RESUME action handled
-    has_resume = "PM_DEVICE_ACTION_RESUME" in generated_code
+    has_resume = scoped_contains(generated_code, 'PM_DEVICE_ACTION_RESUME', scope='code_only')
     details.append(
         CheckDetail(
             check_name="resume_action_handled",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: -EALREADY returned for duplicate transitions
-    has_ealready = "EALREADY" in generated_code
+    has_ealready = scoped_contains(generated_code, 'EALREADY', scope='code_only')
     details.append(
         CheckDetail(
             check_name="ealready_error_code",
@@ -69,9 +70,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: State tracking variable present
     has_state_var = (
-        "suspended" in generated_code
-        or "state" in generated_code
-        or "active" in generated_code
+        scoped_contains(generated_code, 'suspended', scope='code_only')
+        or scoped_contains(generated_code, 'state', scope='code_only')
+        or scoped_contains(generated_code, 'active', scope='code_only')
     )
     details.append(
         CheckDetail(

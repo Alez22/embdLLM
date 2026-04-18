@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -11,7 +12,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: inherit systemd present
     # (LLM failure: sets SYSTEMD_SERVICE but forgets inherit systemd)
-    has_inherit_systemd = "inherit systemd" in generated_code
+    has_inherit_systemd = scoped_contains(generated_code, 'inherit systemd', scope='raw')
     details.append(
         CheckDetail(
             check_name="inherits_systemd_class",
@@ -24,7 +25,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: SYSTEMD_SERVICE uses :${PN} override syntax
     # (LLM failure: using SYSTEMD_SERVICE = "..." without :${PN} = ignored)
-    has_systemd_service_pn = "SYSTEMD_SERVICE:${PN}" in generated_code
+    has_systemd_service_pn = scoped_contains(generated_code, 'SYSTEMD_SERVICE:${PN}', scope='raw')
     details.append(
         CheckDetail(
             check_name="systemd_service_has_pn_suffix",
@@ -37,7 +38,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: SYSTEMD_AUTO_ENABLE set to "enable"
     # (LLM failure: omitting SYSTEMD_AUTO_ENABLE means service is installed but not enabled)
-    has_auto_enable = "SYSTEMD_AUTO_ENABLE" in generated_code
+    has_auto_enable = scoped_contains(generated_code, 'SYSTEMD_AUTO_ENABLE', scope='raw')
     details.append(
         CheckDetail(
             check_name="systemd_auto_enable_set",
@@ -50,7 +51,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: .service file referenced in SRC_URI
     # (LLM failure: service in SYSTEMD_SERVICE but not fetched via SRC_URI)
-    has_service_in_uri = ".service" in generated_code and "SRC_URI" in generated_code
+    has_service_in_uri = scoped_contains(generated_code, '.service', scope='raw') and scoped_contains(generated_code, 'SRC_URI', scope='raw')
     details.append(
         CheckDetail(
             check_name="service_file_in_src_uri",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: do_install places service file under systemd_unitdir
-    has_systemd_unitdir = "${systemd_unitdir}" in generated_code
+    has_systemd_unitdir = scoped_contains(generated_code, '${systemd_unitdir}', scope='raw')
     details.append(
         CheckDetail(
             check_name="service_installed_to_systemd_unitdir",
@@ -74,7 +75,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: ${D} used in do_install
-    has_d_prefix = "${D}" in generated_code
+    has_d_prefix = scoped_contains(generated_code, '${D}', scope='raw')
     details.append(
         CheckDetail(
             check_name="install_uses_d_prefix",
@@ -120,7 +121,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 9: No hardcoded /usr/lib or /usr/bin paths
     has_hardcoded_lib = bool(re.search(r'(?<!\$\{D\})/usr/lib\b', generated_code))
-    has_hardcoded_bin = "/usr/bin" in generated_code
+    has_hardcoded_bin = scoped_contains(generated_code, '/usr/bin', scope='raw')
     details.append(
         CheckDetail(
             check_name="no_hardcoded_paths",
@@ -132,8 +133,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 10: SRC_URI git:// entries have SRCREV
-    has_git = "git://" in generated_code
-    has_srcrev = "SRCREV" in generated_code
+    has_git = scoped_contains(generated_code, 'git://', scope='raw')
+    has_srcrev = scoped_contains(generated_code, 'SRCREV', scope='raw')
     srcrev_ok = (not has_git) or has_srcrev
     details.append(
         CheckDetail(

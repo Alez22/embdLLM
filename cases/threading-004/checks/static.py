@@ -1,6 +1,7 @@
 """Static analysis checks for priority inheritance mutex."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: kernel header
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -21,8 +22,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: k_mutex used (not k_sem — only mutex provides priority inheritance)
     has_mutex = (
-        "K_MUTEX_DEFINE" in generated_code
-        or "struct k_mutex" in generated_code
+        scoped_contains(generated_code, 'K_MUTEX_DEFINE', scope='code_only')
+        or scoped_contains(generated_code, 'struct k_mutex', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -35,7 +36,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: k_mutex_lock called
-    has_lock = "k_mutex_lock" in generated_code
+    has_lock = scoped_contains(generated_code, 'k_mutex_lock', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mutex_lock_called",
@@ -47,7 +48,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: k_mutex_unlock called
-    has_unlock = "k_mutex_unlock" in generated_code
+    has_unlock = scoped_contains(generated_code, 'k_mutex_unlock', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mutex_unlock_called",

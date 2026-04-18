@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -24,7 +25,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: Callback contains sensor_sample_fetch
     # (LLM failure: empty callback or callback that only prints without fetching)
-    has_fetch_in_callback = "sensor_sample_fetch" in generated_code
+    has_fetch_in_callback = scoped_contains(generated_code, 'sensor_sample_fetch', scope='code_only')
     details.append(
         CheckDetail(
             check_name="fetch_in_callback",
@@ -37,7 +38,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Uses SENSOR_TRIG_DATA_READY (not wrong trigger type)
     # (LLM failure: using SENSOR_TRIG_THRESHOLD or SENSOR_TRIG_TIMER instead)
-    has_data_ready = "SENSOR_TRIG_DATA_READY" in generated_code
+    has_data_ready = scoped_contains(generated_code, 'SENSOR_TRIG_DATA_READY', scope='code_only')
     details.append(
         CheckDetail(
             check_name="correct_trigger_type",
@@ -66,7 +67,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 5: Main sleeps forever after trigger setup (event-driven, not polling)
     # (LLM failure: busy-polling in a loop instead of using trigger)
-    has_sleep_forever = "K_FOREVER" in generated_code
+    has_sleep_forever = scoped_contains(generated_code, 'K_FOREVER', scope='code_only')
     details.append(
         CheckDetail(
             check_name="event_driven_sleep",

@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -28,7 +29,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Error check on recv return (< 0 or <= 0)
-    has_recv_err = "< 0" in generated_code or "<= 0" in generated_code
+    has_recv_err = scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, '<= 0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="recv_error_check",
@@ -42,7 +43,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 3: Connection-closed check (ret == 0) — scoped to recv context
     has_closed_check = bool(re.search(
         r'(?:ret|len|n|bytes)\s*==\s*0', generated_code
-    )) and ("recv" in generated_code)
+    )) and (scoped_contains(generated_code, 'recv', scope='code_only'))
     details.append(
         CheckDetail(
             check_name="connection_closed_check",
@@ -55,7 +56,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: recv size is strictly less than buffer (sizeof - 1 pattern)
     # Catches the CWE-120 pattern where recv fills entire buffer with no room for '\0'
-    has_minus_one = "sizeof(recv_buf) - 1" in generated_code or "RECV_BUF_SIZE - 1" in generated_code
+    has_minus_one = scoped_contains(generated_code, 'sizeof(recv_buf) - 1', scope='code_only') or scoped_contains(generated_code, 'RECV_BUF_SIZE - 1', scope='code_only')
     details.append(
         CheckDetail(
             check_name="recv_minus_one_for_null",
@@ -79,7 +80,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: No POSIX recv() — should use zsock_recv
-    uses_posix_recv = " recv(" in generated_code and "zsock_recv" not in generated_code
+    uses_posix_recv = scoped_contains(generated_code, ' recv(', scope='code_only') and "zsock_recv" not in generated_code
     details.append(
         CheckDetail(
             check_name="uses_zsock_recv",

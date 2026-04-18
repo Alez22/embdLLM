@@ -1,6 +1,7 @@
 """Behavioral checks for Zephyr USB CDC ACM Kconfig fragment (metamorphic properties)."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 _HALLUCINATED_CONFIGS = [
     "CONFIG_SECURE_MODE",
@@ -109,7 +110,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: No use of CONFIG_USB_SERIAL (wrong/non-existent option)
     # LLM failure: uses CONFIG_USB_SERIAL instead of CONFIG_USB_CDC_ACM
-    has_fake_usb_serial = "CONFIG_USB_SERIAL" in generated_code
+    has_fake_usb_serial = scoped_contains(generated_code, 'CONFIG_USB_SERIAL', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_fake_usb_serial_option",

@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis, strip_comments
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -49,8 +50,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
             generated_code,
         )
     )
-    has_k_poll = "k_poll" in generated_code
-    has_timer = "k_timer" in generated_code
+    has_k_poll = scoped_contains(generated_code, 'k_poll', scope='code_only')
+    has_timer = scoped_contains(generated_code, 'k_timer', scope='code_only')
     has_timeout = has_sem_timeout or has_k_poll or has_timer
     details.append(
         CheckDetail(

@@ -1,6 +1,7 @@
 """Behavioral checks for isr-concurrency-012."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Shared struct declared static (not on stack)
     has_shared_struct = (
-        "static" in generated_code and "shared" in generated_code.lower()
+        scoped_contains(generated_code, 'static', scope='code_only') and "shared" in generated_code.lower()
     )
     details.append(
         CheckDetail(
@@ -21,7 +22,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_worker_thread = (
-        "k_thread_create" in generated_code or "K_THREAD_DEFINE" in generated_code
+        scoped_contains(generated_code, 'k_thread_create', scope='code_only') or scoped_contains(generated_code, 'K_THREAD_DEFINE', scope='code_only')
     )
     details.append(
         CheckDetail(

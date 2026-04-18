@@ -1,6 +1,7 @@
 """Static analysis checks for ADC single channel read application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes zephyr/drivers/adc.h
-    has_adc_h = "zephyr/drivers/adc.h" in generated_code
+    has_adc_h = scoped_contains(generated_code, 'zephyr/drivers/adc.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="adc_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Includes zephyr/kernel.h
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -47,7 +48,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Defines adc_sequence struct (AI failure: calling adc_read without sequence)
-    has_adc_sequence = "adc_sequence" in generated_code
+    has_adc_sequence = scoped_contains(generated_code, 'adc_sequence', scope='code_only')
     details.append(
         CheckDetail(
             check_name="adc_sequence_defined",

@@ -1,6 +1,7 @@
 """Static analysis checks for SPI flash write and read verify."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: SPI header included
-    has_spi_h = "zephyr/drivers/spi.h" in generated_code
+    has_spi_h = scoped_contains(generated_code, 'zephyr/drivers/spi.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Write enable command present (0x06)
-    has_wren = "0x06" in generated_code or "WREN" in generated_code
+    has_wren = scoped_contains(generated_code, '0x06', scope='code_only') or scoped_contains(generated_code, 'WREN', scope='code_only')
     details.append(
         CheckDetail(
             check_name="write_enable_command",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Write command present (0x02)
-    has_write_cmd = "0x02" in generated_code
+    has_write_cmd = scoped_contains(generated_code, '0x02', scope='code_only')
     details.append(
         CheckDetail(
             check_name="write_command_0x02",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Read command present (0x03)
-    has_read_cmd = "0x03" in generated_code
+    has_read_cmd = scoped_contains(generated_code, '0x03', scope='code_only')
     details.append(
         CheckDetail(
             check_name="read_command_0x03",
@@ -57,11 +58,11 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 5: Busy-wait polling loop present
     has_poll = (
-        "WIP" in generated_code
-        or "0x05" in generated_code
-        or "RDSR" in generated_code
-        or ("for" in generated_code and "poll" in generated_code.lower())
-        or ("while" in generated_code and ("status" in generated_code.lower()
+        scoped_contains(generated_code, 'WIP', scope='code_only')
+        or scoped_contains(generated_code, '0x05', scope='code_only')
+        or scoped_contains(generated_code, 'RDSR', scope='code_only')
+        or (scoped_contains(generated_code, 'for', scope='code_only') and "poll" in generated_code.lower())
+        or (scoped_contains(generated_code, 'while', scope='code_only') and ("status" in generated_code.lower()
                                            or "busy" in generated_code.lower()))
     )
     details.append(

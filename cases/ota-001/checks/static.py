@@ -1,13 +1,14 @@
 """Static analysis checks for OTA image confirmation."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate OTA code structure."""
     details: list[CheckDetail] = []
 
-    has_mcuboot_h = "dfu/mcuboot.h" in generated_code
+    has_mcuboot_h = scoped_contains(generated_code, 'dfu/mcuboot.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mcuboot_dfu_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_confirmed = "boot_is_img_confirmed" in generated_code
+    has_confirmed = scoped_contains(generated_code, 'boot_is_img_confirmed', scope='code_only')
     details.append(
         CheckDetail(
             check_name="img_confirmed_check",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_write = "boot_write_img_confirmed" in generated_code
+    has_write = scoped_contains(generated_code, 'boot_write_img_confirmed', scope='code_only')
     details.append(
         CheckDetail(
             check_name="img_write_confirmed",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_kernel = "zephyr/kernel.h" in generated_code
+    has_kernel = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header",

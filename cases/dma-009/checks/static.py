@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,7 +11,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: DMA header included
-    has_dma_h = "zephyr/drivers/dma.h" in generated_code
+    has_dma_h = scoped_contains(generated_code, 'zephyr/drivers/dma.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_header_included",
@@ -67,7 +68,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: kernel.h included
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",

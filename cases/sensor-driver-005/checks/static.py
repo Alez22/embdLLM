@@ -1,13 +1,14 @@
 """Static analysis checks for custom sensor driver registration."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate custom sensor driver code structure."""
     details: list[CheckDetail] = []
 
-    has_sensor_h = "zephyr/drivers/sensor.h" in generated_code
+    has_sensor_h = scoped_contains(generated_code, 'zephyr/drivers/sensor.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_register_macro = "SENSOR_DEVICE_DT_INST_DEFINE" in generated_code
+    has_register_macro = scoped_contains(generated_code, 'SENSOR_DEVICE_DT_INST_DEFINE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_device_dt_inst_define",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_driver_api = "sensor_driver_api" in generated_code
+    has_driver_api = scoped_contains(generated_code, 'sensor_driver_api', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_driver_api_struct",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_sample_fetch = "sample_fetch" in generated_code
+    has_sample_fetch = scoped_contains(generated_code, 'sample_fetch', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sample_fetch_implemented",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_channel_get = "channel_get" in generated_code
+    has_channel_get = scoped_contains(generated_code, 'channel_get', scope='code_only')
     details.append(
         CheckDetail(
             check_name="channel_get_implemented",
@@ -63,8 +64,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_correct_init_sig = (
-        "const struct device *dev" in generated_code
-        and "my_sensor_init" in generated_code
+        scoped_contains(generated_code, 'const struct device *dev', scope='code_only')
+        and scoped_contains(generated_code, 'my_sensor_init', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -76,7 +77,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_enotsup = "ENOTSUP" in generated_code
+    has_enotsup = scoped_contains(generated_code, 'ENOTSUP', scope='code_only')
     details.append(
         CheckDetail(
             check_name="unsupported_channel_error",

@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis, has_error_check, strip_comments
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -26,7 +27,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 2: Default/unsupported action returns error
     # (LLM failure: no default case, silently succeeds for unknown actions)
     has_enotsup = "ENOTSUP" in stripped
-    has_default = "default" in generated_code or "else" in generated_code
+    has_default = scoped_contains(generated_code, 'default', scope='code_only') or scoped_contains(generated_code, 'else', scope='code_only')
     details.append(
         CheckDetail(
             check_name="unsupported_action_error",

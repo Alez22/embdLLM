@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,7 +11,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: DMA header included
-    has_dma_h = "zephyr/drivers/dma.h" in generated_code
+    has_dma_h = scoped_contains(generated_code, 'zephyr/drivers/dma.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_header_included",
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: dma_stop called
-    has_dma_stop = "dma_stop" in generated_code
+    has_dma_stop = scoped_contains(generated_code, 'dma_stop', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_stop_called",
@@ -58,7 +59,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: DMA callback present
-    has_callback = "dma_callback" in generated_code or "callback" in generated_code
+    has_callback = scoped_contains(generated_code, 'dma_callback', scope='code_only') or scoped_contains(generated_code, 'callback', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_callback_defined",
@@ -70,7 +71,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: dma_config and dma_start present
-    has_dma_api = "dma_config" in generated_code and "dma_start" in generated_code
+    has_dma_api = scoped_contains(generated_code, 'dma_config', scope='code_only') and scoped_contains(generated_code, 'dma_start', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_config_and_start_present",

@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -42,7 +43,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 3: Return value of flash_erase checked
     erase_ret_checked = bool(
         re.search(r'flash_erase\s*\(.*\)\s*[;<]', generated_code)
-        and ("< 0" in generated_code or "!= 0" in generated_code or "ret" in generated_code)
+        and (scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, '!= 0', scope='code_only') or scoped_contains(generated_code, 'ret', scope='code_only'))
     )
     details.append(
         CheckDetail(
@@ -67,7 +68,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: device_is_ready or similar device check
-    has_ready_check = "device_is_ready" in generated_code or "IS_ENABLED" in generated_code
+    has_ready_check = scoped_contains(generated_code, 'device_is_ready', scope='code_only') or scoped_contains(generated_code, 'IS_ENABLED', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_ready_checked",
@@ -81,7 +82,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 6: Write count reset on sector rotation
     has_reset = bool(re.search(r'write_count\w*(?:\[.*?\])?\s*=\s*0', generated_code)) or \
                 bool(re.search(r'write_count\w*\s*=\s*\{0\}', generated_code)) or \
-                "memset" in generated_code
+                scoped_contains(generated_code, 'memset', scope='code_only')
     details.append(
         CheckDetail(
             check_name="write_count_reset_on_rotation",

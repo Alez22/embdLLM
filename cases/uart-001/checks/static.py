@@ -1,6 +1,7 @@
 """Static analysis checks for UART echo application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes zephyr/drivers/uart.h
-    has_uart_h = "zephyr/drivers/uart.h" in generated_code
+    has_uart_h = scoped_contains(generated_code, 'zephyr/drivers/uart.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uart_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Includes zephyr/kernel.h
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Gets UART device from devicetree
-    has_device_dt = "DEVICE_DT_GET" in generated_code or "DT_ALIAS" in generated_code
+    has_device_dt = scoped_contains(generated_code, 'DEVICE_DT_GET', scope='code_only') or scoped_contains(generated_code, 'DT_ALIAS', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_devicetree_binding",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Uses uart_poll_in (not printf or other non-UART APIs)
-    has_uart_poll_in = "uart_poll_in" in generated_code
+    has_uart_poll_in = scoped_contains(generated_code, 'uart_poll_in', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_uart_poll_in",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Uses uart_poll_out (not printf)
-    has_uart_poll_out = "uart_poll_out" in generated_code
+    has_uart_poll_out = scoped_contains(generated_code, 'uart_poll_out', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_uart_poll_out",
@@ -68,7 +69,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: No use of printf (AI failure pattern: using printf instead of UART API)
-    has_printf = "printf" in generated_code
+    has_printf = scoped_contains(generated_code, 'printf', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_printf_usage",

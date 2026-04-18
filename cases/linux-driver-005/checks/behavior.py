@@ -2,8 +2,10 @@
 
 import re
 
-from embedeval.check_utils import (check_no_cross_platform_apis,
+from embedeval.check_utils import (
+    check_no_cross_platform_apis,
     extract_error_blocks,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -16,7 +18,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     stripped = strip_comments(generated_code)
 
     # Check 1: sysfs_remove_group called in remove
-    has_remove_group = "sysfs_remove_group" in generated_code
+    has_remove_group = scoped_contains(generated_code, 'sysfs_remove_group', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sysfs_remove_group_in_remove",
@@ -28,8 +30,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: show uses sysfs_emit (not sprintf or snprintf)
-    has_sysfs_emit = "sysfs_emit" in generated_code
-    has_raw_sprintf = "sprintf(" in generated_code and "sysfs_emit" not in generated_code
+    has_sysfs_emit = scoped_contains(generated_code, 'sysfs_emit', scope='code_only')
+    has_raw_sprintf = scoped_contains(generated_code, 'sprintf(', scope='code_only') and "sysfs_emit" not in generated_code
     details.append(
         CheckDetail(
             check_name="sysfs_emit_in_show",
@@ -42,9 +44,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: store uses kstrtoint or kstrtol (not sscanf or atoi)
     has_kstrtoint = (
-        "kstrtoint" in generated_code
-        or "kstrtol" in generated_code
-        or "kstrtou" in generated_code
+        scoped_contains(generated_code, 'kstrtoint', scope='code_only')
+        or scoped_contains(generated_code, 'kstrtol', scope='code_only')
+        or scoped_contains(generated_code, 'kstrtou', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -57,7 +59,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: store returns count on success (not 0 or length)
-    has_return_count = "return count" in generated_code
+    has_return_count = scoped_contains(generated_code, 'return count', scope='code_only')
     details.append(
         CheckDetail(
             check_name="store_returns_count",
@@ -69,7 +71,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: show output is newline-terminated (sysfs convention)
-    has_newline = "\\n" in generated_code
+    has_newline = scoped_contains(generated_code, '\\n', scope='code_only')
     details.append(
         CheckDetail(
             check_name="show_newline_terminated",
@@ -81,7 +83,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: attribute_group wired up to sysfs_create_group
-    has_group_used = "sysfs_create_group" in generated_code and "attribute_group" in generated_code
+    has_group_used = scoped_contains(generated_code, 'sysfs_create_group', scope='code_only') and scoped_contains(generated_code, 'attribute_group', scope='code_only')
     details.append(
         CheckDetail(
             check_name="attr_group_used_in_create",
@@ -96,8 +98,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # LLM failure: calling sysfs_create_group without checking return value
     error_blocks = extract_error_blocks(generated_code)
     has_group_err_handling = (
-        "sysfs_create_group" in generated_code
-        and ("return ret" in generated_code or bool(re.search(r'if\s*\(\s*ret\s*\)', generated_code)))
+        scoped_contains(generated_code, 'sysfs_create_group', scope='code_only')
+        and (scoped_contains(generated_code, 'return ret', scope='code_only') or bool(re.search(r'if\s*\(\s*ret\s*\)', generated_code)))
     )
     details.append(
         CheckDetail(

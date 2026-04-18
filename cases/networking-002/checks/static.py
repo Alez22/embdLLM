@@ -1,13 +1,14 @@
 """Static analysis checks for UDP socket send/receive."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate UDP socket code structure."""
     details: list[CheckDetail] = []
 
-    has_socket_h = "zephyr/net/socket.h" in generated_code
+    has_socket_h = scoped_contains(generated_code, 'zephyr/net/socket.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="socket_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_socket = "zsock_socket" in generated_code
+    has_socket = scoped_contains(generated_code, 'zsock_socket', scope='code_only')
     details.append(
         CheckDetail(
             check_name="zsock_socket_called",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_af_inet = "AF_INET" in generated_code
+    has_af_inet = scoped_contains(generated_code, 'AF_INET', scope='code_only')
     details.append(
         CheckDetail(
             check_name="af_inet_used",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_sock_dgram = "SOCK_DGRAM" in generated_code
+    has_sock_dgram = scoped_contains(generated_code, 'SOCK_DGRAM', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sock_dgram_used",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_htons = "htons" in generated_code
+    has_htons = scoped_contains(generated_code, 'htons', scope='code_only')
     details.append(
         CheckDetail(
             check_name="htons_for_port",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_sendto = "zsock_sendto" in generated_code
+    has_sendto = scoped_contains(generated_code, 'zsock_sendto', scope='code_only')
     details.append(
         CheckDetail(
             check_name="zsock_sendto_called",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_recvfrom = "zsock_recvfrom" in generated_code
+    has_recvfrom = scoped_contains(generated_code, 'zsock_recvfrom', scope='code_only')
     details.append(
         CheckDetail(
             check_name="zsock_recvfrom_called",
@@ -84,7 +85,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_close = "zsock_close" in generated_code
+    has_close = scoped_contains(generated_code, 'zsock_close', scope='code_only')
     details.append(
         CheckDetail(
             check_name="zsock_close_called",

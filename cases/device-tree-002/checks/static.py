@@ -1,6 +1,7 @@
 """Static analysis checks for SPI NOR flash Device Tree overlay."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -22,7 +23,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: compatible string present and in correct format
-    has_compatible = 'compatible = "' in generated_code
+    has_compatible = scoped_contains(generated_code, 'compatible = "', scope='code_only')
     details.append(
         CheckDetail(
             check_name="compatible_present",
@@ -34,7 +35,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: reg property present
-    has_reg = "reg = <" in generated_code
+    has_reg = scoped_contains(generated_code, 'reg = <', scope='code_only')
     details.append(
         CheckDetail(
             check_name="reg_property_present",
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: status property present
-    has_status = 'status = "' in generated_code
+    has_status = scoped_contains(generated_code, 'status = "', scope='code_only')
     details.append(
         CheckDetail(
             check_name="status_property_present",
@@ -58,7 +59,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: spi-max-frequency property present (AI commonly omits this)
-    has_freq = "spi-max-frequency" in generated_code
+    has_freq = scoped_contains(generated_code, 'spi-max-frequency', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi_max_frequency_present",
@@ -70,7 +71,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: spi0 bus referenced (not direct root node)
-    has_spi_bus = "spi0" in generated_code
+    has_spi_bus = scoped_contains(generated_code, 'spi0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi_bus_referenced",

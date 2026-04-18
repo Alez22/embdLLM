@@ -1,14 +1,15 @@
 """Static analysis checks for object pool pattern."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate object pool code structure."""
     details: list[CheckDetail] = []
 
-    has_static_array = "static" in generated_code and "pool[" in generated_code.lower() or (
-        "static" in generated_code and "[" in generated_code
+    has_static_array = scoped_contains(generated_code, 'static', scope='code_only') and "pool[" in generated_code.lower() or (
+        scoped_contains(generated_code, 'static', scope='code_only') and scoped_contains(generated_code, '[', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_alloc_fn = "pool_alloc" in generated_code or "_alloc(" in generated_code
+    has_alloc_fn = scoped_contains(generated_code, 'pool_alloc', scope='code_only') or scoped_contains(generated_code, '_alloc(', scope='code_only')
     details.append(
         CheckDetail(
             check_name="alloc_function_defined",
@@ -31,7 +32,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_free_fn = "pool_free" in generated_code or "_free(" in generated_code
+    has_free_fn = scoped_contains(generated_code, 'pool_free', scope='code_only') or scoped_contains(generated_code, '_free(', scope='code_only')
     details.append(
         CheckDetail(
             check_name="free_function_defined",
@@ -54,7 +55,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_null_return = "return NULL" in generated_code
+    has_null_return = scoped_contains(generated_code, 'return NULL', scope='code_only')
     details.append(
         CheckDetail(
             check_name="null_returned_on_exhaustion",

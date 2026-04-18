@@ -1,13 +1,14 @@
 """Static analysis checks for Zephyr memory domain with partitions."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate memory domain code structure."""
     details: list[CheckDetail] = []
 
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_appmem_h = "app_memdomain.h" in generated_code
+    has_appmem_h = scoped_contains(generated_code, 'app_memdomain.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="app_memdomain_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_partition_define = "K_APPMEM_PARTITION_DEFINE" in generated_code
+    has_partition_define = scoped_contains(generated_code, 'K_APPMEM_PARTITION_DEFINE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="partition_defined",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_mem_domain = "k_mem_domain" in generated_code
+    has_mem_domain = scoped_contains(generated_code, 'k_mem_domain', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mem_domain_declared",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_domain_init = "k_mem_domain_init" in generated_code
+    has_domain_init = scoped_contains(generated_code, 'k_mem_domain_init', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mem_domain_init_called",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_add_partition = "k_mem_domain_add_partition" in generated_code
+    has_add_partition = scoped_contains(generated_code, 'k_mem_domain_add_partition', scope='code_only')
     details.append(
         CheckDetail(
             check_name="partition_added_to_domain",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_add_thread = "k_mem_domain_add_thread" in generated_code
+    has_add_thread = scoped_contains(generated_code, 'k_mem_domain_add_thread', scope='code_only')
     details.append(
         CheckDetail(
             check_name="thread_added_to_domain",

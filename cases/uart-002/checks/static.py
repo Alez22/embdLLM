@@ -1,6 +1,7 @@
 """Static analysis checks for UART async API with DMA application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes zephyr/drivers/uart.h
-    has_uart_h = "zephyr/drivers/uart.h" in generated_code
+    has_uart_h = scoped_contains(generated_code, 'zephyr/drivers/uart.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uart_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Includes zephyr/kernel.h
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Uses uart_callback_set (async API, not polling)
-    has_callback_set = "uart_callback_set" in generated_code
+    has_callback_set = scoped_contains(generated_code, 'uart_callback_set', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_uart_callback_set",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Uses uart_tx (async transmit)
-    has_uart_tx = "uart_tx" in generated_code
+    has_uart_tx = scoped_contains(generated_code, 'uart_tx', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_uart_tx",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Uses uart_rx_enable
-    has_rx_enable = "uart_rx_enable" in generated_code
+    has_rx_enable = scoped_contains(generated_code, 'uart_rx_enable', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_uart_rx_enable",
@@ -68,8 +69,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Hallucination — uart_read() and uart_write() do not exist in Zephyr
-    has_fake_read = "uart_read(" in generated_code
-    has_fake_write = "uart_write(" in generated_code
+    has_fake_read = scoped_contains(generated_code, 'uart_read(', scope='code_only')
+    has_fake_write = scoped_contains(generated_code, 'uart_write(', scope='code_only')
     has_hallucination = has_fake_read or has_fake_write
     details.append(
         CheckDetail(
@@ -82,7 +83,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 7: No polling API (uart_poll_in/out should not be used in async context)
-    has_polling = "uart_poll_in" in generated_code or "uart_poll_out" in generated_code
+    has_polling = scoped_contains(generated_code, 'uart_poll_in', scope='code_only') or scoped_contains(generated_code, 'uart_poll_out', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_polling_uart_api",

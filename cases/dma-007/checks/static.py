@@ -1,6 +1,7 @@
 """Static analysis checks for DMA channel priority configuration."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: DMA header included
-    has_dma_h = "zephyr/drivers/dma.h" in generated_code
+    has_dma_h = scoped_contains(generated_code, 'zephyr/drivers/dma.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: channel_priority field used
-    has_priority = "channel_priority" in generated_code
+    has_priority = scoped_contains(generated_code, 'channel_priority', scope='code_only')
     details.append(
         CheckDetail(
             check_name="channel_priority_field_used",
@@ -58,7 +59,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: DEVICE_DT_GET present
-    has_dev_get = "DEVICE_DT_GET" in generated_code
+    has_dev_get = scoped_contains(generated_code, 'DEVICE_DT_GET', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_dt_get_present",

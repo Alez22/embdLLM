@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -31,7 +32,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Timer initialized with k_timer_init
-    has_timer_init = "k_timer_init" in generated_code
+    has_timer_init = scoped_contains(generated_code, 'k_timer_init', scope='code_only')
     details.append(
         CheckDetail(
             check_name="timer_initialized",
@@ -60,7 +61,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: k_timer_stop called after wakeup (cleanup)
-    has_timer_stop = "k_timer_stop" in generated_code
+    has_timer_stop = scoped_contains(generated_code, 'k_timer_stop', scope='code_only')
     details.append(
         CheckDetail(
             check_name="timer_stopped_after_wakeup",
@@ -74,7 +75,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 5: After-wakeup message printed
     has_wakeup_msg = bool(
         re.search(r"(return|wakeup|wake|resumed|awake)", generated_code, re.IGNORECASE)
-    ) and "printk" in generated_code
+    ) and scoped_contains(generated_code, 'printk', scope='code_only')
     details.append(
         CheckDetail(
             check_name="wakeup_message_printed",

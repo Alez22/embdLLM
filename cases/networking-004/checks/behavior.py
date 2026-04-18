@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -9,8 +10,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: CON message type used (reliable delivery), not NON
-    has_con = "COAP_TYPE_CON" in generated_code
-    has_non = "COAP_TYPE_NON" in generated_code
+    has_con = scoped_contains(generated_code, 'COAP_TYPE_CON', scope='code_only')
+    has_non = scoped_contains(generated_code, 'COAP_TYPE_NON', scope='code_only')
     details.append(
         CheckDetail(
             check_name="coap_con_message_type",
@@ -24,8 +25,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 2: Token is set (non-zero length token, common LLM failure: no token)
     has_token = (
         "token" in generated_code.lower()
-        and ("0x0" in generated_code or "{0x" in generated_code or "token[]" in generated_code
-             or "sizeof(token)" in generated_code or "token_len" in generated_code)
+        and (scoped_contains(generated_code, '0x0', scope='code_only') or scoped_contains(generated_code, '{0x', scope='code_only') or scoped_contains(generated_code, 'token[]', scope='code_only')
+             or scoped_contains(generated_code, 'sizeof(token)', scope='code_only') or scoped_contains(generated_code, 'token_len', scope='code_only'))
     )
     details.append(
         CheckDetail(
@@ -52,7 +53,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Standard CoAP port used (5683)
-    has_coap_port = "5683" in generated_code
+    has_coap_port = scoped_contains(generated_code, '5683', scope='code_only')
     details.append(
         CheckDetail(
             check_name="coap_standard_port",
@@ -64,7 +65,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Response parsed with coap_packet_parse
-    has_parse = "coap_packet_parse" in generated_code
+    has_parse = scoped_contains(generated_code, 'coap_packet_parse', scope='code_only')
     details.append(
         CheckDetail(
             check_name="response_parsed",
@@ -76,7 +77,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Socket closed after use
-    has_close = "zsock_close" in generated_code
+    has_close = scoped_contains(generated_code, 'zsock_close', scope='code_only')
     details.append(
         CheckDetail(
             check_name="socket_closed",

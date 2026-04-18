@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -35,8 +36,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Both source and destination buffers declared as static arrays
-    has_src = "src_buf" in generated_code or "src" in generated_code
-    has_dst = "dst_buf" in generated_code or "dst" in generated_code
+    has_src = scoped_contains(generated_code, 'src_buf', scope='code_only') or scoped_contains(generated_code, 'src', scope='code_only')
+    has_dst = scoped_contains(generated_code, 'dst_buf', scope='code_only') or scoped_contains(generated_code, 'dst', scope='code_only')
     both_buffers = has_src and has_dst
     details.append(
         CheckDetail(
@@ -63,7 +64,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Semaphore used for completion synchronization
-    has_sem = "k_sem_take" in generated_code or "K_SEM_DEFINE" in generated_code
+    has_sem = scoped_contains(generated_code, 'k_sem_take', scope='code_only') or scoped_contains(generated_code, 'K_SEM_DEFINE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="semaphore_synchronization",
@@ -75,7 +76,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: memcmp verification or success message
-    has_verify = "memcmp" in generated_code or "Aligned DMA OK" in generated_code
+    has_verify = scoped_contains(generated_code, 'memcmp', scope='code_only') or scoped_contains(generated_code, 'Aligned DMA OK', scope='code_only')
     details.append(
         CheckDetail(
             check_name="buffer_verified_after_dma",

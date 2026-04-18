@@ -1,6 +1,7 @@
 """Static analysis checks for DMA with cache coherency."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: DMA header included
-    has_dma_h = "zephyr/drivers/dma.h" in generated_code
+    has_dma_h = scoped_contains(generated_code, 'zephyr/drivers/dma.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_header_included",
@@ -21,8 +22,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: Cache header included (accept both old and new paths)
     has_cache_h = (
-        "zephyr/cache.h" in generated_code
-        or "zephyr/sys/cache.h" in generated_code
+        scoped_contains(generated_code, 'zephyr/cache.h', scope='code_only')
+        or scoped_contains(generated_code, 'zephyr/sys/cache.h', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -35,7 +36,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Cache flush used
-    has_flush = "sys_cache_data_flush_range" in generated_code
+    has_flush = scoped_contains(generated_code, 'sys_cache_data_flush_range', scope='code_only')
     details.append(
         CheckDetail(
             check_name="cache_flush_present",
@@ -47,7 +48,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Cache invalidate used
-    has_invd = "sys_cache_data_invd_range" in generated_code
+    has_invd = scoped_contains(generated_code, 'sys_cache_data_invd_range', scope='code_only')
     details.append(
         CheckDetail(
             check_name="cache_invalidate_present",
@@ -59,7 +60,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: __aligned attribute on destination buffer
-    has_aligned = "__aligned" in generated_code
+    has_aligned = scoped_contains(generated_code, '__aligned', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dst_buffer_aligned",

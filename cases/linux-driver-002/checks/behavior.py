@@ -2,8 +2,10 @@
 
 import re
 
-from embedeval.check_utils import (check_no_cross_platform_apis,
+from embedeval.check_utils import (
+    check_no_cross_platform_apis,
     extract_error_blocks,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -16,7 +18,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     stripped = strip_comments(generated_code)
 
     # Check 1: of_match_table wired into driver.of_match_table
-    has_of_match_table = ".of_match_table" in generated_code
+    has_of_match_table = scoped_contains(generated_code, '.of_match_table', scope='code_only')
     details.append(
         CheckDetail(
             check_name="of_match_table_assigned",
@@ -28,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: MODULE_DEVICE_TABLE(of, ...) present
-    has_module_device_table = "MODULE_DEVICE_TABLE(of" in generated_code
+    has_module_device_table = scoped_contains(generated_code, 'MODULE_DEVICE_TABLE(of', scope='code_only')
     details.append(
         CheckDetail(
             check_name="module_device_table_of",
@@ -40,7 +42,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: probe returns 0 on success (not void, not negative)
-    has_probe_return = "return 0" in generated_code
+    has_probe_return = scoped_contains(generated_code, 'return 0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="probe_returns_zero",
@@ -71,8 +73,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 5: module_platform_driver() or explicit register/unregister
     has_register = (
-        "module_platform_driver" in generated_code
-        or "platform_driver_register" in generated_code
+        scoped_contains(generated_code, 'module_platform_driver', scope='code_only')
+        or scoped_contains(generated_code, 'platform_driver_register', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -85,7 +87,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: probe function has correct first argument type
-    has_platform_device_arg = "struct platform_device" in generated_code
+    has_platform_device_arg = scoped_contains(generated_code, 'struct platform_device', scope='code_only')
     details.append(
         CheckDetail(
             check_name="probe_platform_device_arg",

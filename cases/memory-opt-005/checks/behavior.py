@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: K_APPMEM_PARTITION_DEFINE used to define partition
     # (LLM failure: using K_MEM_PARTITION_DEFINE which is the old/wrong API)
-    has_appmem_partition = "K_APPMEM_PARTITION_DEFINE" in generated_code
+    has_appmem_partition = scoped_contains(generated_code, 'K_APPMEM_PARTITION_DEFINE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="appmem_partition_define_used",
@@ -59,7 +60,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: K_APP_DMEM used to place data in partition
     # (LLM failure: declares partition but puts data in regular .data section)
-    has_app_dmem = "K_APP_DMEM" in generated_code
+    has_app_dmem = scoped_contains(generated_code, 'K_APP_DMEM', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_app_dmem_used",
@@ -72,7 +73,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 5: Thread created with K_USER flag for user-mode
     # (LLM failure: creating thread without K_USER — memory domains only apply to user threads)
-    has_k_user = "K_USER" in generated_code
+    has_k_user = scoped_contains(generated_code, 'K_USER', scope='code_only')
     details.append(
         CheckDetail(
             check_name="thread_has_k_user_flag",
@@ -85,7 +86,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: k_mem_domain_add_thread called (thread assigned to domain)
     # (LLM failure: creates domain and partition but never assigns thread)
-    has_add_thread = "k_mem_domain_add_thread" in generated_code
+    has_add_thread = scoped_contains(generated_code, 'k_mem_domain_add_thread', scope='code_only')
     details.append(
         CheckDetail(
             check_name="thread_added_to_domain",

@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -12,10 +13,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: Callback inspects the status parameter (status != 0 check)
     has_status_check = (
-        "status != 0" in generated_code
-        or "status < 0" in generated_code
-        or "if (status)" in generated_code
-        or "if(status)" in generated_code
+        scoped_contains(generated_code, 'status != 0', scope='code_only')
+        or scoped_contains(generated_code, 'status < 0', scope='code_only')
+        or scoped_contains(generated_code, 'if (status)', scope='code_only')
+        or scoped_contains(generated_code, 'if(status)', scope='code_only')
     )
     details.append(
         CheckDetail(

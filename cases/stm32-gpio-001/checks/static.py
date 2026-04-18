@@ -1,6 +1,7 @@
 """Static analysis checks for STM32 HAL GPIO LED + button interrupt application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Correct STM32 HAL header (not Zephyr, not Arduino)
-    has_hal_header = "stm32f4xx_hal.h" in generated_code
+    has_hal_header = scoped_contains(generated_code, 'stm32f4xx_hal.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="stm32_hal_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: GPIO_InitTypeDef used for configuration
-    has_gpio_init_typedef = "GPIO_InitTypeDef" in generated_code
+    has_gpio_init_typedef = scoped_contains(generated_code, 'GPIO_InitTypeDef', scope='code_only')
     details.append(
         CheckDetail(
             check_name="gpio_init_typedef_used",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: HAL_GPIO_Init called
-    has_hal_gpio_init = "HAL_GPIO_Init" in generated_code
+    has_hal_gpio_init = scoped_contains(generated_code, 'HAL_GPIO_Init', scope='code_only')
     details.append(
         CheckDetail(
             check_name="hal_gpio_init_called",
@@ -64,7 +65,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: NVIC configured for interrupt
-    has_nvic = "HAL_NVIC_SetPriority" in generated_code or "HAL_NVIC_EnableIRQ" in generated_code
+    has_nvic = scoped_contains(generated_code, 'HAL_NVIC_SetPriority', scope='code_only') or scoped_contains(generated_code, 'HAL_NVIC_EnableIRQ', scope='code_only')
     details.append(
         CheckDetail(
             check_name="nvic_configured",

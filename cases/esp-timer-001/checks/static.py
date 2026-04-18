@@ -1,5 +1,6 @@
 """Static checks for ESP-IDF high-resolution periodic timer."""
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -7,49 +8,49 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     details.append(CheckDetail(
         check_name="esp_timer_header",
-        passed="esp_timer.h" in generated_code,
+        passed=scoped_contains(generated_code, 'esp_timer.h', scope='code_only'),
         expected="esp_timer.h included",
-        actual="present" if "esp_timer.h" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'esp_timer.h', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="app_main_defined",
-        passed="app_main" in generated_code,
+        passed=scoped_contains(generated_code, 'app_main', scope='code_only'),
         expected="app_main() entry point",
-        actual="present" if "app_main" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'app_main', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="esp_timer_create_called",
-        passed="esp_timer_create" in generated_code,
+        passed=scoped_contains(generated_code, 'esp_timer_create', scope='code_only'),
         expected="esp_timer_create() called",
-        actual="present" if "esp_timer_create" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'esp_timer_create', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="esp_timer_start_periodic_called",
-        passed="esp_timer_start_periodic" in generated_code,
+        passed=scoped_contains(generated_code, 'esp_timer_start_periodic', scope='code_only'),
         expected="esp_timer_start_periodic() called",
-        actual="present" if "esp_timer_start_periodic" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'esp_timer_start_periodic', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="esp_timer_delete_called",
-        passed="esp_timer_delete" in generated_code,
+        passed=scoped_contains(generated_code, 'esp_timer_delete', scope='code_only'),
         expected="esp_timer_delete() called for cleanup",
-        actual="present" if "esp_timer_delete" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'esp_timer_delete', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="callback_defined",
-        passed="esp_timer_create_args_t" in generated_code,
+        passed=scoped_contains(generated_code, 'esp_timer_create_args_t', scope='code_only'),
         expected="esp_timer_create_args_t with .callback field",
-        actual="present" if "esp_timer_create_args_t" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'esp_timer_create_args_t', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 

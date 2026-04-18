@@ -1,6 +1,7 @@
 """Behavioral checks for SPI NOR flash Device Tree overlay."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 _FAKE_DT_PROPERTIES = [
     "pin-config",
@@ -28,8 +29,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 2: Parent SPI bus must be "okay" (LLM failure: enables child but not parent)
     # Check for spi0 with status okay
     has_spi0_okay = (
-        "&spi0" in generated_code
-        and 'status = "okay"' in generated_code
+        scoped_contains(generated_code, '&spi0', scope='code_only')
+        and scoped_contains(generated_code, 'status = "okay"', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -42,7 +43,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Correct compatible string (AI failure: wrong vendor prefix or misspelling)
-    has_jedec_spi_nor = 'compatible = "jedec,spi-nor"' in generated_code
+    has_jedec_spi_nor = scoped_contains(generated_code, 'compatible = "jedec,spi-nor"', scope='code_only')
     details.append(
         CheckDetail(
             check_name="jedec_spi_nor_compatible",
@@ -54,7 +55,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: reg = <0> for chip select 0 (AI failure: uses address like 0x00 or omits reg)
-    has_reg_0 = "reg = <0>" in generated_code
+    has_reg_0 = scoped_contains(generated_code, 'reg = <0>', scope='code_only')
     details.append(
         CheckDetail(
             check_name="reg_chip_select_0",
@@ -66,7 +67,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: spi-max-frequency = <1000000> (AI failure: omits or uses wrong value)
-    has_freq_1mhz = "spi-max-frequency = <1000000>" in generated_code
+    has_freq_1mhz = scoped_contains(generated_code, 'spi-max-frequency = <1000000>', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi_max_frequency_1mhz",
@@ -78,7 +79,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: size = <0x100000> for 1MB (AI failure: uses decimal or wrong size)
-    has_size_1mb = "size = <0x100000>" in generated_code
+    has_size_1mb = scoped_contains(generated_code, 'size = <0x100000>', scope='code_only')
     details.append(
         CheckDetail(
             check_name="size_1mb",
@@ -90,7 +91,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 7: status = "okay" present
-    has_status_okay = 'status = "okay"' in generated_code
+    has_status_okay = scoped_contains(generated_code, 'status = "okay"', scope='code_only')
     details.append(
         CheckDetail(
             check_name="status_okay",

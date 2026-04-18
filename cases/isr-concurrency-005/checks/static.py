@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,7 +11,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: struct k_work declared
-    has_kwork = "struct k_work" in generated_code
+    has_kwork = scoped_contains(generated_code, 'struct k_work', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_work_declared",
@@ -22,7 +23,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: k_work_init called (LLM failure: missing init, or called inside ISR)
-    has_init = "k_work_init" in generated_code
+    has_init = scoped_contains(generated_code, 'k_work_init', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_work_init_called",
@@ -52,7 +53,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: k_work_submit called in ISR (triggers deferred processing)
-    has_submit = "k_work_submit" in generated_code
+    has_submit = scoped_contains(generated_code, 'k_work_submit', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_work_submit_called",

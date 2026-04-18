@@ -1,13 +1,14 @@
 """Static analysis checks for image version check before OTA update."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate image version comparison code structure."""
     details: list[CheckDetail] = []
 
-    has_mcuboot_h = "dfu/mcuboot.h" in generated_code
+    has_mcuboot_h = scoped_contains(generated_code, 'dfu/mcuboot.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mcuboot_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_flash_map = "flash_map.h" in generated_code
+    has_flash_map = scoped_contains(generated_code, 'flash_map.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="flash_map_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_read_header = "boot_read_bank_header" in generated_code
+    has_read_header = scoped_contains(generated_code, 'boot_read_bank_header', scope='code_only')
     details.append(
         CheckDetail(
             check_name="boot_read_bank_header",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_sem_ver = "mcuboot_img_sem_ver" in generated_code
+    has_sem_ver = scoped_contains(generated_code, 'mcuboot_img_sem_ver', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sem_ver_struct",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_img_header = "mcuboot_img_header" in generated_code
+    has_img_header = scoped_contains(generated_code, 'mcuboot_img_header', scope='code_only')
     details.append(
         CheckDetail(
             check_name="img_header_struct",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_slot0 = "slot0_partition" in generated_code
+    has_slot0 = scoped_contains(generated_code, 'slot0_partition', scope='code_only')
     details.append(
         CheckDetail(
             check_name="slot0_partition",

@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -23,8 +24,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Both sampling frequency and full-scale configured
-    has_odr = "SENSOR_ATTR_SAMPLING_FREQUENCY" in generated_code
-    has_fs = "SENSOR_ATTR_FULL_SCALE" in generated_code
+    has_odr = scoped_contains(generated_code, 'SENSOR_ATTR_SAMPLING_FREQUENCY', scope='code_only')
+    has_fs = scoped_contains(generated_code, 'SENSOR_ATTR_FULL_SCALE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="both_attributes_set",
@@ -38,7 +39,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 3: Error handling on sensor_attr_set
     attr_set_count = generated_code.count("sensor_attr_set")
     has_attr_err = attr_set_count >= 1 and (
-        "< 0" in generated_code or "!= 0" in generated_code
+        scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, '!= 0', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -53,8 +54,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 4: sensor_value struct used for attribute values, not raw int
     # (LLM failure: passing integer directly instead of struct sensor_value)
     has_sensor_value_for_attr = (
-        "sensor_value" in generated_code
-        and "val1" in generated_code
+        scoped_contains(generated_code, 'sensor_value', scope='code_only')
+        and scoped_contains(generated_code, 'val1', scope='code_only')
     )
     details.append(
         CheckDetail(

@@ -1,6 +1,7 @@
 """Static analysis checks for PWM LED Device Tree overlay."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -22,7 +23,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: compatible string present and in correct format
-    has_compatible = 'compatible = "' in generated_code
+    has_compatible = scoped_contains(generated_code, 'compatible = "', scope='code_only')
     details.append(
         CheckDetail(
             check_name="compatible_present",
@@ -34,7 +35,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: pwms property present (AI commonly omits or misspells this)
-    has_pwms = "pwms = <" in generated_code
+    has_pwms = scoped_contains(generated_code, 'pwms = <', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pwms_property_present",
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: label property present
-    has_label = "label = " in generated_code
+    has_label = scoped_contains(generated_code, 'label = ', scope='code_only')
     details.append(
         CheckDetail(
             check_name="label_property_present",

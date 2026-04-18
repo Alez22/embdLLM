@@ -1,6 +1,7 @@
 """Static analysis checks for PM device runtime enable/disable."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: PM device runtime header
-    has_runtime_h = "zephyr/pm/device_runtime.h" in generated_code
+    has_runtime_h = scoped_contains(generated_code, 'zephyr/pm/device_runtime.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pm_device_runtime_header",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: pm_device_runtime_enable called
-    has_enable = "pm_device_runtime_enable" in generated_code
+    has_enable = scoped_contains(generated_code, 'pm_device_runtime_enable', scope='code_only')
     details.append(
         CheckDetail(
             check_name="runtime_enable_called",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: pm_device_runtime_get called
-    has_get = "pm_device_runtime_get" in generated_code
+    has_get = scoped_contains(generated_code, 'pm_device_runtime_get', scope='code_only')
     details.append(
         CheckDetail(
             check_name="runtime_get_called",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: pm_device_runtime_put called
-    has_put = "pm_device_runtime_put" in generated_code
+    has_put = scoped_contains(generated_code, 'pm_device_runtime_put', scope='code_only')
     details.append(
         CheckDetail(
             check_name="runtime_put_called",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: pm_device_runtime_disable called
-    has_disable = "pm_device_runtime_disable" in generated_code
+    has_disable = scoped_contains(generated_code, 'pm_device_runtime_disable', scope='code_only')
     details.append(
         CheckDetail(
             check_name="runtime_disable_called",

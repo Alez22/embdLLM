@@ -1,6 +1,7 @@
 """Static analysis checks for PWM LED brightness control application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes zephyr/drivers/pwm.h
-    has_pwm_h = "zephyr/drivers/pwm.h" in generated_code
+    has_pwm_h = scoped_contains(generated_code, 'zephyr/drivers/pwm.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pwm_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Includes zephyr/kernel.h
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Uses PWM DT spec macro to get device
-    has_dt_spec = "PWM_DT_SPEC_GET" in generated_code
+    has_dt_spec = scoped_contains(generated_code, 'PWM_DT_SPEC_GET', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_pwm_dt_spec",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Uses pwm_set_dt (AI failure: using raw pwm_set instead of DT variant)
-    has_pwm_set_dt = "pwm_set_dt" in generated_code
+    has_pwm_set_dt = scoped_contains(generated_code, 'pwm_set_dt', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_pwm_set_dt",

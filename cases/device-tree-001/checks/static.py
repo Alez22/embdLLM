@@ -1,6 +1,7 @@
 """Static analysis checks for Device Tree overlays."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -22,7 +23,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: compatible string present and in correct format
-    has_compatible = 'compatible = "' in generated_code
+    has_compatible = scoped_contains(generated_code, 'compatible = "', scope='code_only')
     details.append(
         CheckDetail(
             check_name="compatible_present",
@@ -34,7 +35,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: reg property present
-    has_reg = "reg = <" in generated_code
+    has_reg = scoped_contains(generated_code, 'reg = <', scope='code_only')
     details.append(
         CheckDetail(
             check_name="reg_property_present",
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: status property present
-    has_status = 'status = "' in generated_code
+    has_status = scoped_contains(generated_code, 'status = "', scope='code_only')
     details.append(
         CheckDetail(
             check_name="status_property_present",

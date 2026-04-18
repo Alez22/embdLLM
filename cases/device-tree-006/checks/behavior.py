@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 _FAKE_DT_PROPERTIES = [
     "pin-config",      # LLM commonly hallucinates this; correct is pinctrl-0
@@ -30,7 +31,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 2 (removed — superseded by regex check 10 below)
 
     # Check 3: pinctrl-0 references a pinctrl phandle (contains &)
-    has_phandle_ref = "pinctrl-0 = <&" in generated_code
+    has_phandle_ref = scoped_contains(generated_code, 'pinctrl-0 = <&', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pinctrl_0_references_phandle",
@@ -42,7 +43,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: pinctrl state definition present
-    has_pinctrl_node = "&pinctrl" in generated_code or "pinctrl {" in generated_code or "_default" in generated_code
+    has_pinctrl_node = scoped_contains(generated_code, '&pinctrl', scope='code_only') or scoped_contains(generated_code, 'pinctrl {', scope='code_only') or scoped_contains(generated_code, '_default', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pinctrl_state_defined",
@@ -54,7 +55,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: status = "okay" on uart0
-    has_status_okay = 'status = "okay"' in generated_code
+    has_status_okay = scoped_contains(generated_code, 'status = "okay"', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uart0_status_okay",
@@ -66,7 +67,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: No Linux kernel-style pin-config usage (cross-platform confusion)
-    has_linux_pinctrl = "PIN_MAP" in generated_code or "PINCTRL_PIN(" in generated_code
+    has_linux_pinctrl = scoped_contains(generated_code, 'PIN_MAP', scope='code_only') or scoped_contains(generated_code, 'PINCTRL_PIN(', scope='code_only')
     no_linux_style = not has_linux_pinctrl
     details.append(
         CheckDetail(
@@ -79,7 +80,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 7: uart0 or uart node referenced (not a made-up node)
-    has_uart0 = "&uart0" in generated_code
+    has_uart0 = scoped_contains(generated_code, '&uart0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uart0_node_referenced",
@@ -92,8 +93,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 8: pinctrl-0 and pinctrl-names appear together (both required)
     has_pinctrl_pair = (
-        "pinctrl-0" in generated_code
-        and "pinctrl-names" in generated_code
+        scoped_contains(generated_code, 'pinctrl-0', scope='code_only')
+        and scoped_contains(generated_code, 'pinctrl-names', scope='code_only')
     )
     details.append(
         CheckDetail(

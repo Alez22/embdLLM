@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -28,8 +29,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         r"K_MSEC\(\s*[1-9A-Z_]|K_SECONDS\(\s*[1-9A-Z_]|K_MINUTES\(\s*[1-9A-Z_]",
         generated_code
     ))
-    has_k_forever = "K_FOREVER" in generated_code
-    has_zero_timeout = "K_MSEC(0)" in generated_code or "K_SECONDS(0)" in generated_code
+    has_k_forever = scoped_contains(generated_code, 'K_FOREVER', scope='code_only')
+    has_zero_timeout = scoped_contains(generated_code, 'K_MSEC(0)', scope='code_only') or scoped_contains(generated_code, 'K_SECONDS(0)', scope='code_only')
     timeout_is_finite = (
         not has_dangerous_forever
         and not has_zero_timeout
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: NXDOMAIN error handled
-    has_nxdomain = "DNS_EAI_NONAME" in generated_code or "NXDOMAIN" in generated_code.upper()
+    has_nxdomain = scoped_contains(generated_code, 'DNS_EAI_NONAME', scope='code_only') or "NXDOMAIN" in generated_code.upper()
     details.append(
         CheckDetail(
             check_name="nxdomain_handled",
@@ -58,7 +59,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: DNS_EAI_ALLDONE handled (signals query complete)
-    has_alldone = "DNS_EAI_ALLDONE" in generated_code
+    has_alldone = scoped_contains(generated_code, 'DNS_EAI_ALLDONE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="alldone_handled",
@@ -70,7 +71,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Error check on dns_resolve_name return value
-    has_err_check = "< 0" in generated_code
+    has_err_check = scoped_contains(generated_code, '< 0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="resolve_error_checked",
@@ -82,7 +83,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: DNS_QUERY_TYPE_A used (correct query type for IPv4)
-    has_query_type_a = "DNS_QUERY_TYPE_A" in generated_code
+    has_query_type_a = scoped_contains(generated_code, 'DNS_QUERY_TYPE_A', scope='code_only')
     details.append(
         CheckDetail(
             check_name="query_type_a_used",

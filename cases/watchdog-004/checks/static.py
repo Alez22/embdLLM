@@ -1,6 +1,7 @@
 """Static analysis checks for dual-channel watchdog application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes watchdog header
-    has_wdt_h = "zephyr/drivers/watchdog.h" in generated_code
+    has_wdt_h = scoped_contains(generated_code, 'zephyr/drivers/watchdog.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="watchdog_header_included",
@@ -33,7 +34,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Uses wdt_setup
-    has_setup = "wdt_setup" in generated_code
+    has_setup = scoped_contains(generated_code, 'wdt_setup', scope='code_only')
     details.append(
         CheckDetail(
             check_name="wdt_setup_called",
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: Two separate channel ID variables (AI failure: using same ID for both)
     has_two_ids = (
-        "ch0_id" in generated_code or "channel_id_0" in generated_code
+        scoped_contains(generated_code, 'ch0_id', scope='code_only') or scoped_contains(generated_code, 'channel_id_0', scope='code_only')
         or generated_code.count("wdt_channel_id") >= 2
         or (
             generated_code.count("wdt_install_timeout") >= 2
@@ -77,7 +78,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: device_is_ready check
-    has_ready = "device_is_ready" in generated_code
+    has_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_ready_check",

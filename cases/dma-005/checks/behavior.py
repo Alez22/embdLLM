@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -77,7 +78,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Buffer alignment specified for destination
-    has_aligned = "__aligned" in generated_code
+    has_aligned = scoped_contains(generated_code, '__aligned', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dst_buffer_cache_line_aligned",
@@ -89,8 +90,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Completion synchronization and verification
-    has_sync = "k_sem_take" in generated_code
-    has_verify = "memcmp" in generated_code or "DMA verify" in generated_code or "DMA OK" in generated_code
+    has_sync = scoped_contains(generated_code, 'k_sem_take', scope='code_only')
+    has_verify = scoped_contains(generated_code, 'memcmp', scope='code_only') or scoped_contains(generated_code, 'DMA verify', scope='code_only') or scoped_contains(generated_code, 'DMA OK', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sync_and_verify",

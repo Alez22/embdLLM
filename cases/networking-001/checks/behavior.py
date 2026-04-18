@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis, has_error_check
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -12,8 +13,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: Both connect and publish present
     # (ordering enforced by program logic — connect in main, publish after)
-    has_connect = "mqtt_connect" in generated_code
-    has_publish = "mqtt_publish" in generated_code
+    has_connect = scoped_contains(generated_code, 'mqtt_connect', scope='code_only')
+    has_publish = scoped_contains(generated_code, 'mqtt_publish', scope='code_only')
     details.append(
         CheckDetail(
             check_name="connect_and_publish_present",
@@ -25,7 +26,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Event handler covers CONNACK
-    has_connack = "MQTT_EVT_CONNACK" in generated_code
+    has_connack = scoped_contains(generated_code, 'MQTT_EVT_CONNACK', scope='code_only')
     details.append(
         CheckDetail(
             check_name="handles_connack",
@@ -38,8 +39,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: mqtt_input/mqtt_live in loop
     # (LLM failure: not calling mqtt_input for protocol processing)
-    has_input = "mqtt_input" in generated_code
-    has_live = "mqtt_live" in generated_code
+    has_input = scoped_contains(generated_code, 'mqtt_input', scope='code_only')
+    has_live = scoped_contains(generated_code, 'mqtt_live', scope='code_only')
     details.append(
         CheckDetail(
             check_name="protocol_loop",
@@ -53,7 +54,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 4: Topic string defined (not empty)
     has_topic = (
         "topic" in generated_code.lower()
-        and ('"test/' in generated_code or "topic" in generated_code)
+        and (scoped_contains(generated_code, '"test/', scope='code_only') or scoped_contains(generated_code, 'topic', scope='code_only'))
     )
     details.append(
         CheckDetail(
@@ -78,7 +79,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Client ID set
-    has_client_id = "client_id" in generated_code
+    has_client_id = scoped_contains(generated_code, 'client_id', scope='code_only')
     details.append(
         CheckDetail(
             check_name="client_id_set",

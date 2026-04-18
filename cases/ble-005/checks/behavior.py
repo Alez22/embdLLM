@@ -2,6 +2,7 @@
 
 from embedeval.check_utils import check_no_cross_platform_apis
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 _BLE_HALLUCINATED_APIS = [
     "BLEDevice.connect",
@@ -71,8 +72,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: Security level L3 or higher (MITM required)
     has_l3_or_higher = (
-        "BT_SECURITY_L3" in generated_code
-        or "BT_SECURITY_L4" in generated_code
+        scoped_contains(generated_code, 'BT_SECURITY_L3', scope='code_only')
+        or scoped_contains(generated_code, 'BT_SECURITY_L4', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -86,9 +87,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 5: passkey_display callback prints passkey
     has_passkey_print = (
-        "passkey_display" in generated_code
-        and "printk" in generated_code
-        and "passkey" in generated_code
+        scoped_contains(generated_code, 'passkey_display', scope='code_only')
+        and scoped_contains(generated_code, 'printk', scope='code_only')
+        and scoped_contains(generated_code, 'passkey', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -121,8 +122,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 7: pairing_complete and pairing_failed callbacks defined
-    has_complete = "pairing_complete" in generated_code
-    has_failed = "pairing_failed" in generated_code
+    has_complete = scoped_contains(generated_code, 'pairing_complete', scope='code_only')
+    has_failed = scoped_contains(generated_code, 'pairing_failed', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pairing_result_callbacks",
@@ -134,8 +135,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 8: bt_conn_unref in disconnected callback if bt_conn_ref is used
-    has_ref = "bt_conn_ref" in generated_code
-    has_unref = "bt_conn_unref" in generated_code
+    has_ref = scoped_contains(generated_code, 'bt_conn_ref', scope='code_only')
+    has_unref = scoped_contains(generated_code, 'bt_conn_unref', scope='code_only')
     no_ref_leak = (not has_ref) or (has_ref and has_unref)
     details.append(
         CheckDetail(

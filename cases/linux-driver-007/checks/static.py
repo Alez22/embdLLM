@@ -1,13 +1,14 @@
 """Static analysis checks for Linux DMA buffer driver."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate DMA buffer driver code structure."""
     details: list[CheckDetail] = []
 
-    has_dma_h = "linux/dma-mapping.h" in generated_code
+    has_dma_h = scoped_contains(generated_code, 'linux/dma-mapping.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_mapping_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_dma_addr = "dma_addr_t" in generated_code
+    has_dma_addr = scoped_contains(generated_code, 'dma_addr_t', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_addr_t_used",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_alloc = "dma_alloc_coherent" in generated_code
+    has_alloc = scoped_contains(generated_code, 'dma_alloc_coherent', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_alloc_coherent_used",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_free = "dma_free_coherent" in generated_code
+    has_free = scoped_contains(generated_code, 'dma_free_coherent', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_free_coherent_in_cleanup",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_gfp = "GFP_KERNEL" in generated_code
+    has_gfp = scoped_contains(generated_code, 'GFP_KERNEL', scope='code_only')
     details.append(
         CheckDetail(
             check_name="gfp_kernel_flags",

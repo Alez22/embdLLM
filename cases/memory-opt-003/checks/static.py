@@ -1,13 +1,14 @@
 """Static analysis checks for K_HEAP vs K_MEM_SLAB selection."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate heap and slab allocator usage code structure."""
     details: list[CheckDetail] = []
 
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_heap_define = "K_HEAP_DEFINE" in generated_code
+    has_heap_define = scoped_contains(generated_code, 'K_HEAP_DEFINE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="heap_defined",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_slab_define = "K_MEM_SLAB_DEFINE" in generated_code
+    has_slab_define = scoped_contains(generated_code, 'K_MEM_SLAB_DEFINE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="slab_defined",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_heap_alloc = "k_heap_alloc" in generated_code
+    has_heap_alloc = scoped_contains(generated_code, 'k_heap_alloc', scope='code_only')
     details.append(
         CheckDetail(
             check_name="heap_alloc_called",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_slab_alloc = "k_mem_slab_alloc" in generated_code
+    has_slab_alloc = scoped_contains(generated_code, 'k_mem_slab_alloc', scope='code_only')
     details.append(
         CheckDetail(
             check_name="slab_alloc_called",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_heap_free = "k_heap_free" in generated_code
+    has_heap_free = scoped_contains(generated_code, 'k_heap_free', scope='code_only')
     details.append(
         CheckDetail(
             check_name="heap_free_called",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_slab_free = "k_mem_slab_free" in generated_code
+    has_slab_free = scoped_contains(generated_code, 'k_mem_slab_free', scope='code_only')
     details.append(
         CheckDetail(
             check_name="slab_free_called",

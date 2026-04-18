@@ -1,6 +1,7 @@
 """Static analysis checks for CAN bus controller Device Tree overlay."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -22,7 +23,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: compatible string present and in correct format
-    has_compatible = 'compatible = "' in generated_code
+    has_compatible = scoped_contains(generated_code, 'compatible = "', scope='code_only')
     details.append(
         CheckDetail(
             check_name="compatible_present",
@@ -34,7 +35,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: status property present
-    has_status = 'status = "' in generated_code
+    has_status = scoped_contains(generated_code, 'status = "', scope='code_only')
     details.append(
         CheckDetail(
             check_name="status_property_present",
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: bus-speed property present (AI commonly omits this)
-    has_bus_speed = "bus-speed" in generated_code
+    has_bus_speed = scoped_contains(generated_code, 'bus-speed', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bus_speed_present",
@@ -58,7 +59,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: can0 node referenced
-    has_can0 = "can0" in generated_code
+    has_can0 = scoped_contains(generated_code, 'can0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="can0_node_referenced",

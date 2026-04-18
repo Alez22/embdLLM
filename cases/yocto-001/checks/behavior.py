@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -11,7 +12,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: LIC_FILES_CHKSUM has md5 hash
     # (LLM failure: LIC_FILES_CHKSUM without md5= or sha256=)
-    has_md5 = "md5=" in generated_code or "sha256=" in generated_code
+    has_md5 = scoped_contains(generated_code, 'md5=', scope='raw') or scoped_contains(generated_code, 'sha256=', scope='raw')
     details.append(
         CheckDetail(
             check_name="lic_chksum_has_hash",
@@ -24,7 +25,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: do_install uses ${D} prefix (staging dir)
     # (LLM failure: installing to absolute paths like /usr/bin)
-    has_d_prefix = "${D}" in generated_code
+    has_d_prefix = scoped_contains(generated_code, '${D}', scope='raw')
     details.append(
         CheckDetail(
             check_name="install_uses_d_prefix",
@@ -37,8 +38,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Uses ${bindir} not hardcoded /usr/bin
     # (LLM failure: hardcoding /usr/bin instead of Yocto variable)
-    has_bindir = "${bindir}" in generated_code
-    has_hardcoded = "/usr/bin" in generated_code
+    has_bindir = scoped_contains(generated_code, '${bindir}', scope='raw')
+    has_hardcoded = scoped_contains(generated_code, '/usr/bin', scope='raw')
     details.append(
         CheckDetail(
             check_name="uses_bindir_variable",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: do_compile uses ${CC} (cross-compiler)
     # (LLM failure: using 'gcc' directly instead of Yocto CC variable)
-    has_cc_var = "${CC}" in generated_code
+    has_cc_var = scoped_contains(generated_code, '${CC}', scope='raw')
     details.append(
         CheckDetail(
             check_name="uses_cc_variable",
@@ -63,7 +64,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: install -d to create directory before installing files
-    has_install_d = "install -d" in generated_code
+    has_install_d = scoped_contains(generated_code, 'install -d', scope='raw')
     details.append(
         CheckDetail(
             check_name="install_creates_dir",
@@ -137,8 +138,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 10: SRC_URI git:// entries have SRCREV
     # (LLM failure: git:// without SRCREV — BitBake fetches HEAD unpredictably)
-    has_git = "git://" in generated_code
-    has_srcrev = "SRCREV" in generated_code
+    has_git = scoped_contains(generated_code, 'git://', scope='raw')
+    has_srcrev = scoped_contains(generated_code, 'SRCREV', scope='raw')
     srcrev_ok = (not has_git) or has_srcrev
     details.append(
         CheckDetail(

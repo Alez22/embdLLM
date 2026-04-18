@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def _strip_comments(code: str) -> str:
@@ -15,7 +16,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
     stripped = _strip_comments(generated_code)
 
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header",
@@ -75,7 +76,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # irq_offload used as ISR trigger
-    has_irq_offload = "irq_offload" in generated_code
+    has_irq_offload = scoped_contains(generated_code, 'irq_offload', scope='code_only')
     details.append(
         CheckDetail(
             check_name="irq_offload_used",

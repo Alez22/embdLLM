@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,7 +11,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: atomic_t used for buffer index tracking
-    has_atomic_t = "atomic_t" in generated_code
+    has_atomic_t = scoped_contains(generated_code, 'atomic_t', scope='code_only')
     details.append(
         CheckDetail(
             check_name="atomic_t_for_index",
@@ -22,7 +23,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: atomic_set used to swap buffer index
-    has_atomic_set = "atomic_set" in generated_code
+    has_atomic_set = scoped_contains(generated_code, 'atomic_set', scope='code_only')
     details.append(
         CheckDetail(
             check_name="atomic_set_for_swap",
@@ -34,7 +35,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: atomic_get used to read buffer index
-    has_atomic_get = "atomic_get" in generated_code
+    has_atomic_get = scoped_contains(generated_code, 'atomic_get', scope='code_only')
     details.append(
         CheckDetail(
             check_name="atomic_get_for_read",
@@ -63,7 +64,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: zephyr/sys/atomic.h included
-    has_atomic_h = "zephyr/sys/atomic.h" in generated_code or "zephyr/kernel.h" in generated_code
+    has_atomic_h = scoped_contains(generated_code, 'zephyr/sys/atomic.h', scope='code_only') or scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="atomic_header_included",
@@ -75,7 +76,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: No mutex or spinlock (wrong primitive for this pattern)
-    has_locking = "k_mutex" in generated_code or "k_spinlock" in generated_code
+    has_locking = scoped_contains(generated_code, 'k_mutex', scope='code_only') or scoped_contains(generated_code, 'k_spinlock', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_locking_primitives",

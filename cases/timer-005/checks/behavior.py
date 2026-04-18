@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -50,7 +51,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: atomic_inc used in timer callbacks, not ++ on shared state
     # AI failure: using counter++ in timer expiry without atomics
-    uses_atomic_inc = "atomic_inc" in generated_code
+    uses_atomic_inc = scoped_contains(generated_code, 'atomic_inc', scope='code_only')
     uses_bare_increment = bool(
         re.search(r"(?:fast|mid|slow|count)\w*\s*\+\+", generated_code)
         and not uses_atomic_inc
@@ -84,8 +85,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Main loop uses k_sleep (not busy-wait between prints)
-    has_sleep_in_loop = "k_sleep" in generated_code and (
-        "while" in generated_code or "for" in generated_code
+    has_sleep_in_loop = scoped_contains(generated_code, 'k_sleep', scope='code_only') and (
+        scoped_contains(generated_code, 'while', scope='code_only') or scoped_contains(generated_code, 'for', scope='code_only')
     )
     details.append(
         CheckDetail(

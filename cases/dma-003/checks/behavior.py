@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -29,9 +30,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: cyclic flag set to 1
     has_cyclic_one = (
-        "cyclic = 1" in generated_code
-        or "cyclic=1" in generated_code
-        or ".cyclic = 1" in generated_code
+        scoped_contains(generated_code, 'cyclic = 1', scope='code_only')
+        or scoped_contains(generated_code, 'cyclic=1', scope='code_only')
+        or scoped_contains(generated_code, '.cyclic = 1', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -45,10 +46,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Ping-pong or alternating buffer used (two destination buffers)
     has_two_bufs = (
-        ("buf_a" in generated_code and "buf_b" in generated_code)
-        or ("ping" in generated_code and "pong" in generated_code)
+        (scoped_contains(generated_code, 'buf_a', scope='code_only') and scoped_contains(generated_code, 'buf_b', scope='code_only'))
+        or (scoped_contains(generated_code, 'ping', scope='code_only') and scoped_contains(generated_code, 'pong', scope='code_only'))
         or generated_code.count("dst_buf") >= 2
-        or ("buf[0]" in generated_code and "buf[1]" in generated_code)
+        or (scoped_contains(generated_code, 'buf[0]', scope='code_only') and scoped_contains(generated_code, 'buf[1]', scope='code_only'))
     )
     details.append(
         CheckDetail(
@@ -61,7 +62,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: dma_stop() called to terminate
-    has_stop = "dma_stop" in generated_code
+    has_stop = scoped_contains(generated_code, 'dma_stop', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_stop_called",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Error handling on dma_config / dma_start
-    has_error_check = "< 0" in generated_code or "!= 0" in generated_code
+    has_error_check = scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, '!= 0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_error_handling",

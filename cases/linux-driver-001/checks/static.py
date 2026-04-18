@@ -1,13 +1,14 @@
 """Static analysis checks for Linux character device driver."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate Linux driver code structure."""
     details: list[CheckDetail] = []
 
-    has_module_h = "linux/module.h" in generated_code
+    has_module_h = scoped_contains(generated_code, 'linux/module.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="module_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_fs_h = "linux/fs.h" in generated_code
+    has_fs_h = scoped_contains(generated_code, 'linux/fs.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="fs_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_license = "MODULE_LICENSE" in generated_code
+    has_license = scoped_contains(generated_code, 'MODULE_LICENSE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="module_license",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_fops = "file_operations" in generated_code
+    has_fops = scoped_contains(generated_code, 'file_operations', scope='code_only')
     details.append(
         CheckDetail(
             check_name="file_operations_struct",
@@ -51,8 +52,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_init = "module_init" in generated_code
-    has_exit = "module_exit" in generated_code
+    has_init = scoped_contains(generated_code, 'module_init', scope='code_only')
+    has_exit = scoped_contains(generated_code, 'module_exit', scope='code_only')
     details.append(
         CheckDetail(
             check_name="init_exit_macros",

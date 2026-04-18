@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -85,7 +86,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: K_FOREVER used as lock timeout (not K_NO_WAIT which could starve)
-    has_forever = "K_FOREVER" in generated_code
+    has_forever = scoped_contains(generated_code, 'K_FOREVER', scope='code_only')
     details.append(
         CheckDetail(
             check_name="lock_with_k_forever",

@@ -1,12 +1,13 @@
 """Behavioral checks for storage-013."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
-    has_init = "settings_subsys_init" in generated_code
+    has_init = scoped_contains(generated_code, 'settings_subsys_init', scope='code_only')
     details.append(
         CheckDetail(
             check_name="settings_subsys_init",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_handler = (
-        "settings_handler" in generated_code or "settings_register" in generated_code
+        scoped_contains(generated_code, 'settings_handler', scope='code_only') or scoped_contains(generated_code, 'settings_register', scope='code_only')
     )
     details.append(
         CheckDetail(

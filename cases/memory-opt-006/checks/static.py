@@ -1,13 +1,14 @@
 """Static analysis checks for Zephyr stack overflow detection."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate stack overflow detection code structure."""
     details: list[CheckDetail] = []
 
-    has_stack_info = "CONFIG_THREAD_STACK_INFO=y" in generated_code
+    has_stack_info = scoped_contains(generated_code, 'CONFIG_THREAD_STACK_INFO=y', scope='code_only')
     details.append(
         CheckDetail(
             check_name="config_thread_stack_info_enabled",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_stack_space_get = "k_thread_stack_space_get" in generated_code
+    has_stack_space_get = scoped_contains(generated_code, 'k_thread_stack_space_get', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_thread_stack_space_get_used",
@@ -42,10 +43,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     has_threshold = (
         "threshold" in generated_code.lower()
-        or "warn_threshold" in generated_code
-        or "< 512" in generated_code
-        or "< 256" in generated_code
-        or "THRESHOLD" in generated_code
+        or scoped_contains(generated_code, 'warn_threshold', scope='code_only')
+        or scoped_contains(generated_code, '< 512', scope='code_only')
+        or scoped_contains(generated_code, '< 256', scope='code_only')
+        or scoped_contains(generated_code, 'THRESHOLD', scope='code_only')
     )
     details.append(
         CheckDetail(

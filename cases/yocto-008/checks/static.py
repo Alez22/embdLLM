@@ -1,13 +1,14 @@
 """Static analysis checks for Yocto multi-license recipe."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate Yocto multi-license recipe structure."""
     details: list[CheckDetail] = []
 
-    has_license = "LICENSE" in generated_code
+    has_license = scoped_contains(generated_code, 'LICENSE', scope='raw')
     details.append(
         CheckDetail(
             check_name="license_defined",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_lic_chksum = "LIC_FILES_CHKSUM" in generated_code
+    has_lic_chksum = scoped_contains(generated_code, 'LIC_FILES_CHKSUM', scope='raw')
     details.append(
         CheckDetail(
             check_name="lic_files_chksum_defined",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_ampersand = " & " in generated_code
+    has_ampersand = scoped_contains(generated_code, ' & ', scope='raw')
     details.append(
         CheckDetail(
             check_name="license_uses_ampersand_separator",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_spdx_mit = '"MIT"' in generated_code or "= \"MIT" in generated_code or "MIT &" in generated_code or "& MIT" in generated_code
+    has_spdx_mit = scoped_contains(generated_code, '"MIT"', scope='raw') or scoped_contains(generated_code, '= "MIT', scope='raw') or scoped_contains(generated_code, 'MIT &', scope='raw') or scoped_contains(generated_code, '& MIT', scope='raw')
     details.append(
         CheckDetail(
             check_name="spdx_mit_identifier",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_spdx_gpl = "GPL-2.0-only" in generated_code
+    has_spdx_gpl = scoped_contains(generated_code, 'GPL-2.0-only', scope='raw')
     details.append(
         CheckDetail(
             check_name="spdx_gpl_identifier",

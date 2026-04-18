@@ -1,6 +1,7 @@
 """Static analysis checks for multi-timer coordination application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes zephyr/kernel.h
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Uses atomic_t for shared counters (AI failure: using plain int or volatile int)
-    has_atomic_t = "atomic_t" in generated_code
+    has_atomic_t = scoped_contains(generated_code, 'atomic_t', scope='code_only')
     details.append(
         CheckDetail(
             check_name="atomic_type_used",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Uses atomic_inc for incrementing (AI failure: using ++ on shared state)
-    has_atomic_inc = "atomic_inc" in generated_code
+    has_atomic_inc = scoped_contains(generated_code, 'atomic_inc', scope='code_only')
     details.append(
         CheckDetail(
             check_name="atomic_inc_used",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Uses atomic_get for reading (AI failure: direct read of atomic_t)
-    has_atomic_get = "atomic_get" in generated_code
+    has_atomic_get = scoped_contains(generated_code, 'atomic_get', scope='code_only')
     details.append(
         CheckDetail(
             check_name="atomic_get_used",
@@ -69,7 +70,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Uses K_MSEC for timer periods
-    has_msec = "K_MSEC" in generated_code
+    has_msec = scoped_contains(generated_code, 'K_MSEC', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_k_msec_for_periods",

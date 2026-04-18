@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -27,7 +28,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         op in generated_code
         for op in ["major", "minor", "revision"]
     ) and (
-        ">" in generated_code or "<" in generated_code or "!=" in generated_code
+        scoped_contains(generated_code, '>', scope='code_only') or scoped_contains(generated_code, '<', scope='code_only') or scoped_contains(generated_code, '!=', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -43,7 +44,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     has_rejection = "reject" in generated_code.lower() or (
         "not newer" in generated_code.lower()
     ) or (
-        "return 0" in generated_code and "version" in generated_code.lower()
+        scoped_contains(generated_code, 'return 0', scope='code_only') and "version" in generated_code.lower()
     )
     details.append(
         CheckDetail(
@@ -56,8 +57,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Error check on boot_read_bank_header return value
-    has_header_err = "boot_read_bank_header" in generated_code and (
-        "< 0" in generated_code or "!= 0" in generated_code
+    has_header_err = scoped_contains(generated_code, 'boot_read_bank_header', scope='code_only') and (
+        scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, '!= 0', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -71,7 +72,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 5: Running version printed at startup
     has_running_print = (
-        "Running version" in generated_code or "running version" in generated_code.lower()
+        scoped_contains(generated_code, 'Running version', scope='code_only') or "running version" in generated_code.lower()
     )
     details.append(
         CheckDetail(
@@ -86,9 +87,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 6: Version comparison function checks all three fields (major, minor, revision)
     # (LLM failure: only comparing major version — misses minor/patch differences)
     checks_all_fields = (
-        "major" in generated_code
-        and "minor" in generated_code
-        and "revision" in generated_code
+        scoped_contains(generated_code, 'major', scope='code_only')
+        and scoped_contains(generated_code, 'minor', scope='code_only')
+        and scoped_contains(generated_code, 'revision', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -103,7 +104,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 7: boot_read_bank_header return value checked before accessing struct fields
     # (LLM failure: accessing header struct fields even when read fails)
     header_err_pos = -1
-    if "boot_read_bank_header" in generated_code:
+    if scoped_contains(generated_code, 'boot_read_bank_header', scope='code_only'):
         header_call_pos = generated_code.find("boot_read_bank_header")
         # Look for error check near the header call (within 300 chars)
         nearby = generated_code[header_call_pos:header_call_pos + 300]

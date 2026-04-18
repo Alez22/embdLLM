@@ -2,8 +2,10 @@
 
 import re
 
-from embedeval.check_utils import (check_no_cross_platform_apis,
+from embedeval.check_utils import (
+    check_no_cross_platform_apis,
     extract_error_blocks,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -16,7 +18,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     stripped = strip_comments(generated_code)
 
     # Check 1: _IOC_TYPE validated (critical security check)
-    has_ioc_type = "_IOC_TYPE" in generated_code
+    has_ioc_type = scoped_contains(generated_code, '_IOC_TYPE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="ioc_type_validated",
@@ -28,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: _IOC_NR range check or equivalent bounds check
-    has_ioc_nr = "_IOC_NR" in generated_code
+    has_ioc_nr = scoped_contains(generated_code, '_IOC_NR', scope='code_only')
     details.append(
         CheckDetail(
             check_name="ioc_nr_range_checked",
@@ -40,7 +42,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: copy_from_user used (NOT direct __user pointer dereference)
-    has_copy_from = "copy_from_user" in generated_code
+    has_copy_from = scoped_contains(generated_code, 'copy_from_user', scope='code_only')
     details.append(
         CheckDetail(
             check_name="copy_from_user_for_ioctl_arg",
@@ -52,7 +54,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: -ENOTTY returned for invalid commands
-    has_enotty = "ENOTTY" in generated_code
+    has_enotty = scoped_contains(generated_code, 'ENOTTY', scope='code_only')
     details.append(
         CheckDetail(
             check_name="enotty_for_invalid_cmd",
@@ -76,7 +78,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: -EFAULT returned on copy failure
-    has_efault = "EFAULT" in generated_code
+    has_efault = scoped_contains(generated_code, 'EFAULT', scope='code_only')
     details.append(
         CheckDetail(
             check_name="efault_on_copy_failure",

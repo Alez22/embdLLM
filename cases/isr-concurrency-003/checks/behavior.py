@@ -6,6 +6,7 @@ from embedeval.check_utils import (
     check_no_cross_platform_apis,
     check_no_isr_forbidden,
     find_isr_bodies,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -55,8 +56,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Consumer/reader thread defined
     has_thread = (
-        "K_THREAD_DEFINE" in generated_code
-        or "k_thread_create" in generated_code
+        scoped_contains(generated_code, 'K_THREAD_DEFINE', scope='code_only')
+        or scoped_contains(generated_code, 'k_thread_create', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -100,7 +101,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: k_sleep present (cooperative scheduling)
-    has_sleep = "k_sleep" in generated_code
+    has_sleep = scoped_contains(generated_code, 'k_sleep', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_sleep_present",

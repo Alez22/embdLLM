@@ -1,6 +1,7 @@
 """Static analysis checks for STM32 HAL SPI master communication application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: STM32 HAL header
-    has_hal_header = "stm32f4xx_hal.h" in generated_code
+    has_hal_header = scoped_contains(generated_code, 'stm32f4xx_hal.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="stm32_hal_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: SPI_HandleTypeDef used
-    has_spi_handle = "SPI_HandleTypeDef" in generated_code
+    has_spi_handle = scoped_contains(generated_code, 'SPI_HandleTypeDef', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi_handle_typedef_used",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: SPI1 instance configured
-    has_spi1 = "SPI1" in generated_code
+    has_spi1 = scoped_contains(generated_code, 'SPI1', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi1_instance_configured",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Manual NSS (software CS) — not hardware NSS
-    has_soft_nss = "SPI_NSS_SOFT" in generated_code
+    has_soft_nss = scoped_contains(generated_code, 'SPI_NSS_SOFT', scope='code_only')
     details.append(
         CheckDetail(
             check_name="software_nss_used",

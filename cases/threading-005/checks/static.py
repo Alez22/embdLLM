@@ -1,6 +1,7 @@
 """Static analysis checks for custom work queue with delayed submission."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: kernel header
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Custom stack defined with K_THREAD_STACK_DEFINE
-    has_stack = "K_THREAD_STACK_DEFINE" in generated_code
+    has_stack = scoped_contains(generated_code, 'K_THREAD_STACK_DEFINE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="thread_stack_defined",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: k_work_q declared
-    has_work_q = "struct k_work_q" in generated_code or "k_work_q" in generated_code
+    has_work_q = scoped_contains(generated_code, 'struct k_work_q', scope='code_only') or scoped_contains(generated_code, 'k_work_q', scope='code_only')
     details.append(
         CheckDetail(
             check_name="work_queue_declared",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: k_work_delayable declared
-    has_dwork = "k_work_delayable" in generated_code
+    has_dwork = scoped_contains(generated_code, 'k_work_delayable', scope='code_only')
     details.append(
         CheckDetail(
             check_name="delayable_work_declared",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: k_work_queue_start called
-    has_wq_start = "k_work_queue_start" in generated_code
+    has_wq_start = scoped_contains(generated_code, 'k_work_queue_start', scope='code_only')
     details.append(
         CheckDetail(
             check_name="work_queue_started",
@@ -68,7 +69,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: k_work_schedule_for_queue called (not just k_work_schedule)
-    has_schedule_for_queue = "k_work_schedule_for_queue" in generated_code
+    has_schedule_for_queue = scoped_contains(generated_code, 'k_work_schedule_for_queue', scope='code_only')
     details.append(
         CheckDetail(
             check_name="schedule_for_custom_queue",

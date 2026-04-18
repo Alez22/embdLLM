@@ -6,6 +6,7 @@ from embedeval.check_utils import (
     check_no_cross_platform_apis,
     check_no_isr_forbidden,
     find_isr_bodies,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -83,7 +84,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         if any(kw in n.lower() for kw in ["thread", "consumer", "recv", "process", "task"])
     ]
     has_consumer_thread = len(consumer_names) > 0 or (
-        "K_THREAD_DEFINE" in generated_code or "k_thread_create" in generated_code
+        scoped_contains(generated_code, 'K_THREAD_DEFINE', scope='code_only') or scoped_contains(generated_code, 'k_thread_create', scope='code_only')
     )
     details.append(
         CheckDetail(

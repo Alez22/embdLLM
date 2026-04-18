@@ -1,5 +1,6 @@
 """Static checks for ESP-IDF I2C master communication."""
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -7,8 +8,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: Must use the new v5.x I2C master header
     has_i2c_master_h = (
-        "driver/i2c_master.h" in generated_code
-        or "i2c_master.h" in generated_code
+        scoped_contains(generated_code, 'driver/i2c_master.h', scope='code_only')
+        or scoped_contains(generated_code, 'i2c_master.h', scope='code_only')
     )
     details.append(CheckDetail(
         check_name="i2c_master_header",
@@ -21,17 +22,17 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 2: app_main entry point
     details.append(CheckDetail(
         check_name="app_main_defined",
-        passed="app_main" in generated_code,
+        passed=scoped_contains(generated_code, 'app_main', scope='code_only'),
         expected="app_main() entry point",
-        actual="present" if "app_main" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'app_main', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     # Check 3: Must use new v5.x I2C master API (not legacy i2c_driver)
     has_new_api = (
-        "i2c_master_bus_add_device" in generated_code
-        or "i2c_new_master_bus" in generated_code
-        or "i2c_master_transmit" in generated_code
+        scoped_contains(generated_code, 'i2c_master_bus_add_device', scope='code_only')
+        or scoped_contains(generated_code, 'i2c_new_master_bus', scope='code_only')
+        or scoped_contains(generated_code, 'i2c_master_transmit', scope='code_only')
     )
     details.append(CheckDetail(
         check_name="i2c_master_new_api",
@@ -43,8 +44,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: Deprecated legacy driver must NOT be used
     uses_legacy = (
-        "i2c_driver_install" in generated_code
-        or "i2c_master_write_to_device" in generated_code
+        scoped_contains(generated_code, 'i2c_driver_install', scope='code_only')
+        or scoped_contains(generated_code, 'i2c_master_write_to_device', scope='code_only')
     )
     details.append(CheckDetail(
         check_name="no_legacy_i2c_driver",

@@ -1,6 +1,7 @@
 """Behavioral checks for PWM LED Device Tree overlay."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 _FAKE_DT_PROPERTIES = [
     "pin-config",
@@ -26,7 +27,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Correct compatible string for pwm-leds (AI failure: uses "gpio-leds" or wrong string)
-    has_pwm_leds = 'compatible = "pwm-leds"' in generated_code
+    has_pwm_leds = scoped_contains(generated_code, 'compatible = "pwm-leds"', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pwm_leds_compatible",
@@ -38,7 +39,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: pwms property references pwm0 (AI failure: omits pwms or uses wrong controller)
-    has_pwm0_ref = "&pwm0" in generated_code
+    has_pwm0_ref = scoped_contains(generated_code, '&pwm0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pwm0_controller_referenced",
@@ -50,7 +51,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Channel 0 specified in pwms cell (AI failure: uses channel 1 or omits channel)
-    has_channel_0 = "pwm0 0 " in generated_code or "pwm0 0>" in generated_code
+    has_channel_0 = scoped_contains(generated_code, 'pwm0 0 ', scope='code_only') or scoped_contains(generated_code, 'pwm0 0>', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pwm_channel_0",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Period value 20000000 ns present (AI failure: omits period or uses wrong unit)
-    has_period = "20000000" in generated_code
+    has_period = scoped_contains(generated_code, '20000000', scope='code_only')
     details.append(
         CheckDetail(
             check_name="period_20ms",
@@ -74,7 +75,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: label = "green-led" (AI failure: omits label or uses wrong string)
-    has_green_led_label = 'label = "green-led"' in generated_code
+    has_green_led_label = scoped_contains(generated_code, 'label = "green-led"', scope='code_only')
     details.append(
         CheckDetail(
             check_name="green_led_label",
@@ -86,7 +87,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 7: pwms property uses angle-bracket cell syntax
-    has_pwms_cell = "pwms = <" in generated_code
+    has_pwms_cell = scoped_contains(generated_code, 'pwms = <', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pwms_cell_syntax",
@@ -100,8 +101,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 8: PWM polarity flag present (AI failure: omits polarity constant)
     # Either PWM_POLARITY_NORMAL or PWM_POLARITY_INVERTED should be specified
     has_polarity = (
-        "PWM_POLARITY_NORMAL" in generated_code
-        or "PWM_POLARITY_INVERTED" in generated_code
+        scoped_contains(generated_code, 'PWM_POLARITY_NORMAL', scope='code_only')
+        or scoped_contains(generated_code, 'PWM_POLARITY_INVERTED', scope='code_only')
     )
     details.append(
         CheckDetail(

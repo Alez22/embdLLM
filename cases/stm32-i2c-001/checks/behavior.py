@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -11,7 +12,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Device ready check before read (HAL_I2C_IsDeviceReady)
-    has_device_ready = "HAL_I2C_IsDeviceReady" in generated_code
+    has_device_ready = scoped_contains(generated_code, 'HAL_I2C_IsDeviceReady', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_ready_check_before_read",
@@ -39,7 +40,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: 8-bit addressing size specified for register read
-    has_8bit_addr = "I2C_MEMADD_SIZE_8BIT" in generated_code
+    has_8bit_addr = scoped_contains(generated_code, 'I2C_MEMADD_SIZE_8BIT', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mem_addr_size_8bit",

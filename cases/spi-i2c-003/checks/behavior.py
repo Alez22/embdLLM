@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -11,7 +12,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: device_is_ready() before I2C operations
-    has_ready = "device_is_ready" in generated_code
+    has_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     burst_pos = max(
         generated_code.find("i2c_burst_read"),
         generated_code.find("i2c_write_read"),
@@ -35,7 +36,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Error handling on burst read return value
-    has_error_check = "< 0" in generated_code or "!= 0" in generated_code
+    has_error_check = scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, '!= 0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="burst_read_error_handling",
@@ -81,7 +82,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 5: All 6 bytes used (three axes)
     has_three_axes = (
         (generated_code.count("raw[") >= 6 or generated_code.count("buf[") >= 6)
-        or ("x" in generated_code and "y" in generated_code and "z" in generated_code)
+        or (scoped_contains(generated_code, 'x', scope='code_only') and scoped_contains(generated_code, 'y', scope='code_only') and scoped_contains(generated_code, 'z', scope='code_only'))
     )
     details.append(
         CheckDetail(

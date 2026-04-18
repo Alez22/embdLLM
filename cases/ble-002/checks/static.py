@@ -1,13 +1,14 @@
 """Static analysis checks for BLE observer (scan)."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate BLE scanner code structure."""
     details: list[CheckDetail] = []
 
-    has_bt_h = "zephyr/bluetooth/bluetooth.h" in generated_code
+    has_bt_h = scoped_contains(generated_code, 'zephyr/bluetooth/bluetooth.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bluetooth_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_bt_enable = "bt_enable" in generated_code
+    has_bt_enable = scoped_contains(generated_code, 'bt_enable', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bt_enable_called",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_scan_start = "bt_le_scan_start" in generated_code
+    has_scan_start = scoped_contains(generated_code, 'bt_le_scan_start', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bt_le_scan_start_called",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_scan_param = "bt_le_scan_param" in generated_code
+    has_scan_param = scoped_contains(generated_code, 'bt_le_scan_param', scope='code_only')
     details.append(
         CheckDetail(
             check_name="scan_param_defined",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_callback = "device_found" in generated_code or "scan_cb" in generated_code or "bt_addr_le_t" in generated_code
+    has_callback = scoped_contains(generated_code, 'device_found', scope='code_only') or scoped_contains(generated_code, 'scan_cb', scope='code_only') or scoped_contains(generated_code, 'bt_addr_le_t', scope='code_only')
     details.append(
         CheckDetail(
             check_name="scan_callback_defined",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_addr_str = "bt_addr_le_to_str" in generated_code
+    has_addr_str = scoped_contains(generated_code, 'bt_addr_le_to_str', scope='code_only')
     details.append(
         CheckDetail(
             check_name="addr_to_str_called",

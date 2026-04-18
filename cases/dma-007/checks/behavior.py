@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -61,7 +62,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: Verification of both destination buffers
     has_verify = generated_code.count("memcmp") >= 1 or (
-        "OK" in generated_code and "DMA" in generated_code
+        scoped_contains(generated_code, 'OK', scope='code_only') and scoped_contains(generated_code, 'DMA', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -74,7 +75,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: device_is_ready check
-    has_ready = "device_is_ready" in generated_code
+    has_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_is_ready_check",

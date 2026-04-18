@@ -1,13 +1,14 @@
 """Static analysis checks for Yocto custom image recipe."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate Yocto image recipe structure."""
     details: list[CheckDetail] = []
 
-    has_inherit = "inherit core-image" in generated_code or "inherit image" in generated_code
+    has_inherit = scoped_contains(generated_code, 'inherit core-image', scope='raw') or scoped_contains(generated_code, 'inherit image', scope='raw')
     details.append(
         CheckDetail(
             check_name="inherits_core_image",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_image_install = "IMAGE_INSTALL" in generated_code
+    has_image_install = scoped_contains(generated_code, 'IMAGE_INSTALL', scope='raw')
     details.append(
         CheckDetail(
             check_name="image_install_defined",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_image_features = "IMAGE_FEATURES" in generated_code
+    has_image_features = scoped_contains(generated_code, 'IMAGE_FEATURES', scope='raw')
     details.append(
         CheckDetail(
             check_name="image_features_defined",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_summary = "SUMMARY" in generated_code
+    has_summary = scoped_contains(generated_code, 'SUMMARY', scope='raw')
     details.append(
         CheckDetail(
             check_name="summary_defined",

@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis, strip_comments
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -12,8 +13,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: heap used for variable-size, slab for fixed-size (not swapped)
     # (LLM failure: using slab for variable-size allocation — impossible, wrong block size)
-    has_heap_alloc = "k_heap_alloc" in generated_code
-    has_slab_alloc = "k_mem_slab_alloc" in generated_code
+    has_heap_alloc = scoped_contains(generated_code, 'k_heap_alloc', scope='code_only')
+    has_slab_alloc = scoped_contains(generated_code, 'k_mem_slab_alloc', scope='code_only')
     details.append(
         CheckDetail(
             check_name="both_allocators_used",
@@ -27,7 +28,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 2: heap allocation checked for NULL
     # (LLM failure: k_heap_alloc returns NULL on failure, not error code)
     heap_alloc_pos = generated_code.find("k_heap_alloc")
-    has_null_check = "!ptr" in generated_code or "== NULL" in generated_code or "!= NULL" in generated_code
+    has_null_check = scoped_contains(generated_code, '!ptr', scope='code_only') or scoped_contains(generated_code, '== NULL', scope='code_only') or scoped_contains(generated_code, '!= NULL', scope='code_only')
     details.append(
         CheckDetail(
             check_name="heap_alloc_null_check",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: slab allocation checked for error code (not NULL)
     # (LLM failure: checking ptr==NULL instead of ret<0 for slab alloc)
-    has_slab_err_check = "< 0" in generated_code or "!= 0" in generated_code
+    has_slab_err_check = scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, '!= 0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="slab_alloc_error_check",

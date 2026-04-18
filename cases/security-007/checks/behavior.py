@@ -2,8 +2,10 @@
 
 import re
 
-from embedeval.check_utils import (check_no_cross_platform_apis,
+from embedeval.check_utils import (
+    check_no_cross_platform_apis,
     extract_error_blocks,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -53,8 +55,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: CA cert is CA type, not client cert type
     has_separate_types = (
-        "TLS_CREDENTIAL_CA_CERTIFICATE" in generated_code
-        and "TLS_CREDENTIAL_SERVER_CERTIFICATE" in generated_code
+        scoped_contains(generated_code, 'TLS_CREDENTIAL_CA_CERTIFICATE', scope='code_only')
+        and scoped_contains(generated_code, 'TLS_CREDENTIAL_SERVER_CERTIFICATE', scope='code_only')
     )
     details.append(
         CheckDetail(

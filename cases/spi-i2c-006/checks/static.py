@@ -1,6 +1,7 @@
 """Static analysis checks for I2C clock stretching timeout."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: I2C header included
-    has_i2c_h = "zephyr/drivers/i2c.h" in generated_code
+    has_i2c_h = scoped_contains(generated_code, 'zephyr/drivers/i2c.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="i2c_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Device obtained via DT
-    has_dev_get = "DEVICE_DT_GET" in generated_code
+    has_dev_get = scoped_contains(generated_code, 'DEVICE_DT_GET', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_dt_get_used",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: i2c_read used
-    has_i2c_read = "i2c_read" in generated_code
+    has_i2c_read = scoped_contains(generated_code, 'i2c_read', scope='code_only')
     details.append(
         CheckDetail(
             check_name="i2c_read_used",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: device_is_ready check present
-    has_ready = "device_is_ready" in generated_code
+    has_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_is_ready_check",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: No non-existent i2c_set_timeout() (hallucination guard)
-    has_fake_api = "i2c_set_timeout" in generated_code
+    has_fake_api = scoped_contains(generated_code, 'i2c_set_timeout', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_fake_i2c_set_timeout",

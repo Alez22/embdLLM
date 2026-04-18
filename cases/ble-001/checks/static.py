@@ -1,13 +1,14 @@
 """Static analysis checks for BLE GATT custom service."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate BLE GATT code structure."""
     details: list[CheckDetail] = []
 
-    has_bt_h = "zephyr/bluetooth/bluetooth.h" in generated_code
+    has_bt_h = scoped_contains(generated_code, 'zephyr/bluetooth/bluetooth.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bluetooth_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_gatt_h = "zephyr/bluetooth/gatt.h" in generated_code
+    has_gatt_h = scoped_contains(generated_code, 'zephyr/bluetooth/gatt.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="gatt_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_svc_def = "BT_GATT_SERVICE_DEFINE" in generated_code
+    has_svc_def = scoped_contains(generated_code, 'BT_GATT_SERVICE_DEFINE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="gatt_service_defined",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_bt_enable = "bt_enable" in generated_code
+    has_bt_enable = scoped_contains(generated_code, 'bt_enable', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bt_enable_called",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_adv = "bt_le_adv_start" in generated_code
+    has_adv = scoped_contains(generated_code, 'bt_le_adv_start', scope='code_only')
     details.append(
         CheckDetail(
             check_name="advertising_started",

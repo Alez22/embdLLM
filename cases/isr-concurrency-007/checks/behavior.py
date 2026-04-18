@@ -6,6 +6,7 @@ from embedeval.check_utils import (
     check_no_cross_platform_apis,
     check_no_isr_forbidden,
     find_isr_bodies,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -66,7 +67,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: IRQ_CONNECT or irq_connect_dynamic used (not raw function pointer assignment)
-    has_irq_connect = "IRQ_CONNECT" in generated_code or "irq_connect_dynamic" in generated_code
+    has_irq_connect = scoped_contains(generated_code, 'IRQ_CONNECT', scope='code_only') or scoped_contains(generated_code, 'irq_connect_dynamic', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_irq_connect",

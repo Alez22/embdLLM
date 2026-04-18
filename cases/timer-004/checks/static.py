@@ -1,6 +1,7 @@
 """Static analysis checks for delayed work item application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes zephyr/kernel.h
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -21,8 +22,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: Uses K_WORK_DELAYABLE_DEFINE or k_work_init_delayable
     has_delayable = (
-        "K_WORK_DELAYABLE_DEFINE" in generated_code
-        or "k_work_init_delayable" in generated_code
+        scoped_contains(generated_code, 'K_WORK_DELAYABLE_DEFINE', scope='code_only')
+        or scoped_contains(generated_code, 'k_work_init_delayable', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -35,7 +36,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Uses k_work_schedule (not k_work_submit which ignores delay)
-    has_schedule = "k_work_schedule" in generated_code
+    has_schedule = scoped_contains(generated_code, 'k_work_schedule', scope='code_only')
     details.append(
         CheckDetail(
             check_name="work_scheduled_not_submitted",
@@ -47,7 +48,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Uses K_MSEC for delay (AI failure: using raw integers or wrong macro)
-    has_msec = "K_MSEC" in generated_code
+    has_msec = scoped_contains(generated_code, 'K_MSEC', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_k_msec_macro",
@@ -59,7 +60,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Does NOT use k_work_submit (AI failure: submitting instead of scheduling)
-    uses_bare_submit = "k_work_submit" in generated_code and "k_work_schedule" not in generated_code
+    uses_bare_submit = scoped_contains(generated_code, 'k_work_submit', scope='code_only') and "k_work_schedule" not in generated_code
     details.append(
         CheckDetail(
             check_name="no_bare_submit_for_delayed",

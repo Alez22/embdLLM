@@ -1,6 +1,7 @@
 """Static analysis checks for watchdog with thread health monitoring application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes watchdog header
-    has_wdt_h = "zephyr/drivers/watchdog.h" in generated_code
+    has_wdt_h = scoped_contains(generated_code, 'zephyr/drivers/watchdog.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="watchdog_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Includes kernel header
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -32,8 +33,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: worker_alive flag is declared volatile (AI failure: non-volatile shared flag)
-    has_volatile_flag = "volatile" in generated_code and (
-        "worker_alive" in generated_code or "alive" in generated_code.lower()
+    has_volatile_flag = scoped_contains(generated_code, 'volatile', scope='code_only') and (
+        scoped_contains(generated_code, 'worker_alive', scope='code_only') or "alive" in generated_code.lower()
     )
     details.append(
         CheckDetail(
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Uses wdt_install_timeout
-    has_install = "wdt_install_timeout" in generated_code
+    has_install = scoped_contains(generated_code, 'wdt_install_timeout', scope='code_only')
     details.append(
         CheckDetail(
             check_name="wdt_install_timeout_called",
@@ -58,7 +59,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Uses wdt_setup
-    has_setup = "wdt_setup" in generated_code
+    has_setup = scoped_contains(generated_code, 'wdt_setup', scope='code_only')
     details.append(
         CheckDetail(
             check_name="wdt_setup_called",
@@ -71,7 +72,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: Uses worker thread (k_thread_create or K_THREAD_DEFINE)
     has_thread = (
-        "k_thread_create" in generated_code or "K_THREAD_DEFINE" in generated_code
+        scoped_contains(generated_code, 'k_thread_create', scope='code_only') or scoped_contains(generated_code, 'K_THREAD_DEFINE', scope='code_only')
     )
     details.append(
         CheckDetail(

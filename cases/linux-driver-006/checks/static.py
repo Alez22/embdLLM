@@ -1,13 +1,14 @@
 """Static analysis checks for Linux ioctl driver."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate ioctl driver code structure."""
     details: list[CheckDetail] = []
 
-    has_ioctl_h = "linux/ioctl.h" in generated_code
+    has_ioctl_h = scoped_contains(generated_code, 'linux/ioctl.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="ioctl_header_included",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_uaccess = "linux/uaccess.h" in generated_code
+    has_uaccess = scoped_contains(generated_code, 'linux/uaccess.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uaccess_header_included",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_magic = "_IOW(" in generated_code or "_IOR(" in generated_code or "_IO(" in generated_code or "_IOWR(" in generated_code
+    has_magic = scoped_contains(generated_code, '_IOW(', scope='code_only') or scoped_contains(generated_code, '_IOR(', scope='code_only') or scoped_contains(generated_code, '_IO(', scope='code_only') or scoped_contains(generated_code, '_IOWR(', scope='code_only')
     details.append(
         CheckDetail(
             check_name="ioctl_command_defined",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_unlocked_ioctl = "unlocked_ioctl" in generated_code
+    has_unlocked_ioctl = scoped_contains(generated_code, 'unlocked_ioctl', scope='code_only')
     details.append(
         CheckDetail(
             check_name="unlocked_ioctl_in_fops",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_license = "MODULE_LICENSE" in generated_code
+    has_license = scoped_contains(generated_code, 'MODULE_LICENSE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="module_license",

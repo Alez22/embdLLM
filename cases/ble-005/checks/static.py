@@ -1,13 +1,14 @@
 """Static analysis checks for BLE pairing with security."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate BLE pairing/security code structure."""
     details: list[CheckDetail] = []
 
-    has_bt_h = "zephyr/bluetooth/bluetooth.h" in generated_code
+    has_bt_h = scoped_contains(generated_code, 'zephyr/bluetooth/bluetooth.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bluetooth_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_conn_h = "zephyr/bluetooth/conn.h" in generated_code
+    has_conn_h = scoped_contains(generated_code, 'zephyr/bluetooth/conn.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="conn_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_auth_cb = "bt_conn_auth_cb" in generated_code
+    has_auth_cb = scoped_contains(generated_code, 'bt_conn_auth_cb', scope='code_only')
     details.append(
         CheckDetail(
             check_name="auth_cb_struct_defined",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_auth_register = "bt_conn_auth_cb_register" in generated_code
+    has_auth_register = scoped_contains(generated_code, 'bt_conn_auth_cb_register', scope='code_only')
     details.append(
         CheckDetail(
             check_name="auth_cb_registered",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_passkey_display = "passkey_display" in generated_code
+    has_passkey_display = scoped_contains(generated_code, 'passkey_display', scope='code_only')
     details.append(
         CheckDetail(
             check_name="passkey_display_cb",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_set_security = "bt_conn_set_security" in generated_code
+    has_set_security = scoped_contains(generated_code, 'bt_conn_set_security', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bt_conn_set_security_called",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_security_l3 = "BT_SECURITY_L3" in generated_code or "BT_SECURITY_L4" in generated_code
+    has_security_l3 = scoped_contains(generated_code, 'BT_SECURITY_L3', scope='code_only') or scoped_contains(generated_code, 'BT_SECURITY_L4', scope='code_only')
     details.append(
         CheckDetail(
             check_name="security_level_mitm",

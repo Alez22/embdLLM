@@ -2,8 +2,10 @@
 
 import re
 
-from embedeval.check_utils import (check_no_cross_platform_apis,
+from embedeval.check_utils import (
+    check_no_cross_platform_apis,
     extract_error_blocks,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -43,12 +45,12 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Cleanup in exit matches init resources
     has_register = (
-        "alloc_chrdev_region" in generated_code
-        or "register_chrdev" in generated_code
+        scoped_contains(generated_code, 'alloc_chrdev_region', scope='code_only')
+        or scoped_contains(generated_code, 'register_chrdev', scope='code_only')
     )
     has_unregister = (
-        "unregister_chrdev_region" in generated_code
-        or "unregister_chrdev" in generated_code
+        scoped_contains(generated_code, 'unregister_chrdev_region', scope='code_only')
+        or scoped_contains(generated_code, 'unregister_chrdev', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -61,8 +63,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: file_operations has .read and .write
-    has_dot_read = ".read" in generated_code
-    has_dot_write = ".write" in generated_code
+    has_dot_read = scoped_contains(generated_code, '.read', scope='code_only')
+    has_dot_write = scoped_contains(generated_code, '.write', scope='code_only')
     details.append(
         CheckDetail(
             check_name="fops_read_write",
@@ -74,7 +76,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: .owner = THIS_MODULE (prevents module unload while in use)
-    has_owner = "THIS_MODULE" in generated_code
+    has_owner = scoped_contains(generated_code, 'THIS_MODULE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="this_module_owner",
@@ -87,7 +89,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: Error handling in init (rollback on failure)
     has_err_init = (
-        "< 0" in generated_code or "IS_ERR" in generated_code
+        scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, 'IS_ERR', scope='code_only')
     )
     details.append(
         CheckDetail(

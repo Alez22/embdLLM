@@ -1,6 +1,7 @@
 """Static analysis checks for Device Tree pinctrl overlay."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -22,7 +23,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: uart0 node referenced
-    has_uart0 = "&uart0" in generated_code
+    has_uart0 = scoped_contains(generated_code, '&uart0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uart0_node_referenced",
@@ -34,7 +35,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: pinctrl-names property present
-    has_pinctrl_names = "pinctrl-names" in generated_code
+    has_pinctrl_names = scoped_contains(generated_code, 'pinctrl-names', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pinctrl_names_present",
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: pinctrl-0 property present
-    has_pinctrl_0 = "pinctrl-0" in generated_code
+    has_pinctrl_0 = scoped_contains(generated_code, 'pinctrl-0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pinctrl_0_present",
@@ -58,8 +59,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: No fake pin-config or mux-config properties (hallucination guards)
-    has_fake_pin_config = "pin-config" in generated_code
-    has_fake_mux_config = "mux-config" in generated_code
+    has_fake_pin_config = scoped_contains(generated_code, 'pin-config', scope='code_only')
+    has_fake_mux_config = scoped_contains(generated_code, 'mux-config', scope='code_only')
     no_hallucination = not has_fake_pin_config and not has_fake_mux_config
     details.append(
         CheckDetail(

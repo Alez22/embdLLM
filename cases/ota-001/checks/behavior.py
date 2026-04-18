@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -51,8 +52,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 3: Rollback path exists (non-confirmation on failure)
     # (LLM failure: always confirming, no rollback possible)
     has_conditional = (
-        "if" in generated_code
-        and "boot_write_img_confirmed" in generated_code
+        scoped_contains(generated_code, 'if', scope='code_only')
+        and scoped_contains(generated_code, 'boot_write_img_confirmed', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -67,10 +68,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 4: Error handling for boot_write_img_confirmed return value
     # (LLM failure: ignoring return value — silent confirm failure)
     # Accept < 0, != 0, or == 0 only when paired with else (error branch)
-    has_err_pattern = "< 0" in generated_code or "!= 0" in generated_code
-    has_success_with_else = "== 0" in generated_code and "else" in generated_code
+    has_err_pattern = scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, '!= 0', scope='code_only')
+    has_success_with_else = scoped_contains(generated_code, '== 0', scope='code_only') and scoped_contains(generated_code, 'else', scope='code_only')
     write_ret_handled = (
-        "boot_write_img_confirmed" in generated_code
+        scoped_contains(generated_code, 'boot_write_img_confirmed', scope='code_only')
         and (has_err_pattern or has_success_with_else)
     )
     details.append(
@@ -86,7 +87,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 5: boot_write_img_confirmed NOT called unconditionally at top-level
     # (LLM failure: always confirming every boot without checking if image is unconfirmed)
     # The confirm must be inside an if block that guards it
-    has_guard = "if" in generated_code and "boot_is_img_confirmed" in generated_code
+    has_guard = scoped_contains(generated_code, 'if', scope='code_only') and scoped_contains(generated_code, 'boot_is_img_confirmed', scope='code_only')
     details.append(
         CheckDetail(
             check_name="confirm_guarded_by_check",

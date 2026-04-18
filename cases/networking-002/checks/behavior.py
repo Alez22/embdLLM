@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -9,8 +10,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: AF_INET + SOCK_DGRAM together (not SOCK_STREAM for UDP)
-    has_af_inet = "AF_INET" in generated_code
-    has_sock_dgram = "SOCK_DGRAM" in generated_code
+    has_af_inet = scoped_contains(generated_code, 'AF_INET', scope='code_only')
+    has_sock_dgram = scoped_contains(generated_code, 'SOCK_DGRAM', scope='code_only')
     details.append(
         CheckDetail(
             check_name="udp_socket_type",
@@ -22,7 +23,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Port converted with htons (common LLM failure: raw integer)
-    has_htons = "htons" in generated_code
+    has_htons = scoped_contains(generated_code, 'htons', scope='code_only')
     details.append(
         CheckDetail(
             check_name="port_byte_order",
@@ -34,7 +35,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Socket error check (sock < 0)
-    has_sock_check = "< 0" in generated_code
+    has_sock_check = scoped_contains(generated_code, '< 0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="socket_error_handling",
@@ -46,8 +47,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Both send and receive present
-    has_sendto = "zsock_sendto" in generated_code
-    has_recvfrom = "zsock_recvfrom" in generated_code
+    has_sendto = scoped_contains(generated_code, 'zsock_sendto', scope='code_only')
+    has_recvfrom = scoped_contains(generated_code, 'zsock_recvfrom', scope='code_only')
     details.append(
         CheckDetail(
             check_name="send_and_receive",
@@ -59,7 +60,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Socket closed after use (resource cleanup)
-    has_close = "zsock_close" in generated_code
+    has_close = scoped_contains(generated_code, 'zsock_close', scope='code_only')
     details.append(
         CheckDetail(
             check_name="socket_closed",
@@ -71,7 +72,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: sockaddr_in used for IPv4 address
-    has_sockaddr_in = "sockaddr_in" in generated_code
+    has_sockaddr_in = scoped_contains(generated_code, 'sockaddr_in', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sockaddr_in_used",

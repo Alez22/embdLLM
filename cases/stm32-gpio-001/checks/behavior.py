@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -65,7 +66,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: HAL_GPIO_EXTI_Callback defined (not just IRQHandler alone)
-    has_exti_callback = "HAL_GPIO_EXTI_Callback" in generated_code
+    has_exti_callback = scoped_contains(generated_code, 'HAL_GPIO_EXTI_Callback', scope='code_only')
     details.append(
         CheckDetail(
             check_name="exti_callback_defined",
@@ -77,7 +78,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: LED toggle done via HAL (not busy-wait polling button in loop)
-    has_toggle = "HAL_GPIO_TogglePin" in generated_code
+    has_toggle = scoped_contains(generated_code, 'HAL_GPIO_TogglePin', scope='code_only')
     details.append(
         CheckDetail(
             check_name="led_toggled_via_hal",
@@ -90,7 +91,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: No busy-wait polling of button pin in main loop
     # (LLM failure: while(1) { if(HAL_GPIO_ReadPin...) toggle } instead of using interrupt)
-    has_read_in_loop = "HAL_GPIO_ReadPin" in generated_code
+    has_read_in_loop = scoped_contains(generated_code, 'HAL_GPIO_ReadPin', scope='code_only')
     # If ReadPin is present, check it's not the primary mechanism (callback must also exist)
     no_polling_only = not has_read_in_loop or has_exti_callback
     details.append(

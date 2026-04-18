@@ -1,13 +1,14 @@
 """Static analysis checks for DNS resolution with timeout."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate DNS resolution code structure."""
     details: list[CheckDetail] = []
 
-    has_dns_h = "zephyr/net/dns_resolve.h" in generated_code
+    has_dns_h = scoped_contains(generated_code, 'zephyr/net/dns_resolve.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dns_resolve_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_dns_resolve_name = "dns_resolve_name" in generated_code
+    has_dns_resolve_name = scoped_contains(generated_code, 'dns_resolve_name', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dns_resolve_name_called",
@@ -30,7 +31,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Hallucination check: gethostbyname is POSIX, not Zephyr
-    uses_gethostbyname = "gethostbyname" in generated_code
+    uses_gethostbyname = scoped_contains(generated_code, 'gethostbyname', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_gethostbyname",
@@ -42,7 +43,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Hallucination check: dns_lookup does not exist in Zephyr
-    uses_dns_lookup = "dns_lookup" in generated_code
+    uses_dns_lookup = scoped_contains(generated_code, 'dns_lookup', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_dns_lookup",
@@ -53,7 +54,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_callback = "dns_result_cb" in generated_code or "dns_cb" in generated_code or "dns_resolve_status" in generated_code
+    has_callback = scoped_contains(generated_code, 'dns_result_cb', scope='code_only') or scoped_contains(generated_code, 'dns_cb', scope='code_only') or scoped_contains(generated_code, 'dns_resolve_status', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dns_callback_registered",
@@ -64,7 +65,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_default_ctx = "dns_get_default_context" in generated_code
+    has_default_ctx = scoped_contains(generated_code, 'dns_get_default_context', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_default_context",

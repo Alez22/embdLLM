@@ -1,6 +1,7 @@
 """Behavioral checks for ESP-IDF I2C master communication."""
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,8 +9,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: Error handling on bus/device init
     has_error_check = (
-        "ESP_OK" in generated_code
-        and ("!= ESP_OK" in generated_code or "ESP_ERROR_CHECK" in generated_code)
+        scoped_contains(generated_code, 'ESP_OK', scope='code_only')
+        and (scoped_contains(generated_code, '!= ESP_OK', scope='code_only') or scoped_contains(generated_code, 'ESP_ERROR_CHECK', scope='code_only'))
     )
     details.append(CheckDetail(
         check_name="error_handling_present",
@@ -21,8 +22,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: Bus cleanup — device removed before bus deleted
     has_dev_cleanup = (
-        "i2c_master_bus_rm_device" in generated_code
-        or "i2c_del_master_bus" in generated_code
+        scoped_contains(generated_code, 'i2c_master_bus_rm_device', scope='code_only')
+        or scoped_contains(generated_code, 'i2c_del_master_bus', scope='code_only')
     )
     details.append(CheckDetail(
         check_name="i2c_bus_cleanup",
@@ -33,7 +34,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Check 3: transmit_receive used for combined write-then-read
-    has_tx_rx = "i2c_master_transmit_receive" in generated_code
+    has_tx_rx = scoped_contains(generated_code, 'i2c_master_transmit_receive', scope='code_only')
     details.append(CheckDetail(
         check_name="transmit_receive_used",
         passed=has_tx_rx,
@@ -54,7 +55,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Check 5: Sensor address 0x68 referenced
-    has_sensor_addr = "0x68" in generated_code
+    has_sensor_addr = scoped_contains(generated_code, '0x68', scope='code_only')
     details.append(CheckDetail(
         check_name="sensor_address_0x68",
         passed=has_sensor_addr,

@@ -1,13 +1,14 @@
 """Static analysis checks for ISR stack protection."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate ISR data collection code structure."""
     details: list[CheckDetail] = []
 
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_semaphore = "k_sem" in generated_code
+    has_semaphore = scoped_contains(generated_code, 'k_sem', scope='code_only')
     details.append(
         CheckDetail(
             check_name="semaphore_used",

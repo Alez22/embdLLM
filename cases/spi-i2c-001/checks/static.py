@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,7 +11,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: I2C header included
-    has_i2c_h = "zephyr/drivers/i2c.h" in generated_code
+    has_i2c_h = scoped_contains(generated_code, 'zephyr/drivers/i2c.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="i2c_header_included",
@@ -23,8 +24,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: Uses DEVICE_DT_GET or device_get_binding
     has_dev_get = (
-        "DEVICE_DT_GET" in generated_code
-        or "device_get_binding" in generated_code
+        scoped_contains(generated_code, 'DEVICE_DT_GET', scope='code_only')
+        or scoped_contains(generated_code, 'device_get_binding', scope='code_only')
     )
     details.append(
         CheckDetail(

@@ -2,7 +2,9 @@
 
 import re
 
-from embedeval.check_utils import (check_no_cross_platform_apis,
+from embedeval.check_utils import (
+    check_no_cross_platform_apis,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -68,7 +70,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: MAC operation initialized (PSA_MAC_OPERATION_INIT)
-    has_op_init = "PSA_MAC_OPERATION_INIT" in generated_code
+    has_op_init = scoped_contains(generated_code, 'PSA_MAC_OPERATION_INIT', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mac_operation_initialized",
@@ -80,7 +82,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: PSA_KEY_TYPE_HMAC used for the key
-    has_hmac_key_type = "PSA_KEY_TYPE_HMAC" in generated_code
+    has_hmac_key_type = scoped_contains(generated_code, 'PSA_KEY_TYPE_HMAC', scope='code_only')
     details.append(
         CheckDetail(
             check_name="hmac_key_type",
@@ -92,7 +94,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Key destroyed after use
-    has_destroy = "psa_destroy_key" in generated_code
+    has_destroy = scoped_contains(generated_code, 'psa_destroy_key', scope='code_only')
     details.append(
         CheckDetail(
             check_name="key_destroyed",
@@ -104,7 +106,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Result printed
-    has_print = "printk" in generated_code or "printf" in generated_code
+    has_print = scoped_contains(generated_code, 'printk', scope='code_only') or scoped_contains(generated_code, 'printf', scope='code_only')
     details.append(
         CheckDetail(
             check_name="result_printed",

@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,7 +11,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: PM header included
-    has_pm_h = "zephyr/pm/pm.h" in generated_code or "zephyr/pm/device.h" in generated_code
+    has_pm_h = scoped_contains(generated_code, 'zephyr/pm/pm.h', scope='code_only') or scoped_contains(generated_code, 'zephyr/pm/device.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pm_header_included",
@@ -22,7 +23,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: k_timer used for wakeup
-    has_timer = "k_timer" in generated_code
+    has_timer = scoped_contains(generated_code, 'k_timer', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_timer_declared",
@@ -34,7 +35,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: pm_state_force used (not k_sleep)
-    has_pm_force = "pm_state_force" in generated_code
+    has_pm_force = scoped_contains(generated_code, 'pm_state_force', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pm_state_force_used",
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: PM_STATE_SUSPEND_TO_RAM used
-    has_state = "PM_STATE_SUSPEND_TO_RAM" in generated_code
+    has_state = scoped_contains(generated_code, 'PM_STATE_SUSPEND_TO_RAM', scope='code_only')
     details.append(
         CheckDetail(
             check_name="suspend_to_ram_state",

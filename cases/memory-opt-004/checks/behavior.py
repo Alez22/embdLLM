@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -12,11 +13,11 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: thread_analyzer_print called (not thread_analyze or other wrong API)
     # (LLM failure: calling wrong function like thread_analyze() or stack_analyzer_print())
-    has_correct_api = "thread_analyzer_print" in generated_code
+    has_correct_api = scoped_contains(generated_code, 'thread_analyzer_print', scope='code_only')
     has_wrong_api = (
-        "thread_analyze(" in generated_code
-        or "stack_analyzer_print" in generated_code
-        or "thread_stack_dump" in generated_code
+        scoped_contains(generated_code, 'thread_analyze(', scope='code_only')
+        or scoped_contains(generated_code, 'stack_analyzer_print', scope='code_only')
+        or scoped_contains(generated_code, 'thread_stack_dump', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: k_thread_create called (secondary thread exists to analyze)
-    has_thread_create = "k_thread_create" in generated_code
+    has_thread_create = scoped_contains(generated_code, 'k_thread_create', scope='code_only')
     details.append(
         CheckDetail(
             check_name="secondary_thread_created",
@@ -58,7 +59,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: CONFIG_THREAD_ANALYZER referenced (in comment or prj.conf)
-    has_config = "CONFIG_THREAD_ANALYZER" in generated_code
+    # Intentional raw scope — expected is "in comment or prj.conf"; the
+    # reference stashes the CONFIG in a /* */ header comment.
+    has_config = scoped_contains(generated_code, 'CONFIG_THREAD_ANALYZER', scope='raw')
     details.append(
         CheckDetail(
             check_name="config_thread_analyzer_referenced",
@@ -70,7 +73,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: K_THREAD_STACK_DEFINE used for thread stack
-    has_stack_define = "K_THREAD_STACK_DEFINE" in generated_code
+    has_stack_define = scoped_contains(generated_code, 'K_THREAD_STACK_DEFINE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="thread_stack_define_used",
@@ -83,7 +86,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: CONFIG_THREAD_ANALYZER_USE_PRINTK referenced
     # (LLM failure: enabling analyzer but not printk backend = silent output)
-    has_printk_config = "CONFIG_THREAD_ANALYZER_USE_PRINTK" in generated_code
+    # Intentional raw scope — stored in prj.conf-style header comment.
+    has_printk_config = scoped_contains(generated_code, 'CONFIG_THREAD_ANALYZER_USE_PRINTK', scope='raw')
     details.append(
         CheckDetail(
             check_name="thread_analyzer_printk_backend",
@@ -137,8 +141,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         heap_config_ok = True
         heap_actual = "no malloc used"
     else:
-        has_heap_define = "K_HEAP_DEFINE" in generated_code
-        has_heap_config = "CONFIG_HEAP_MEM_POOL_SIZE" in generated_code
+        has_heap_define = scoped_contains(generated_code, 'K_HEAP_DEFINE', scope='code_only')
+        has_heap_config = scoped_contains(generated_code, 'CONFIG_HEAP_MEM_POOL_SIZE', scope='code_only')
         heap_config_ok = has_heap_define or has_heap_config
         heap_actual = (
             "K_HEAP_DEFINE or CONFIG_HEAP_MEM_POOL_SIZE present"

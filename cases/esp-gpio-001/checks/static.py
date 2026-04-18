@@ -1,5 +1,6 @@
 """Static checks for ESP-IDF GPIO blink."""
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -7,33 +8,33 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     details.append(CheckDetail(
         check_name="gpio_header",
-        passed="driver/gpio.h" in generated_code,
+        passed=scoped_contains(generated_code, 'driver/gpio.h', scope='code_only'),
         expected="driver/gpio.h included",
-        actual="present" if "driver/gpio.h" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'driver/gpio.h', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="app_main_defined",
-        passed="app_main" in generated_code,
+        passed=scoped_contains(generated_code, 'app_main', scope='code_only'),
         expected="app_main() entry point",
-        actual="present" if "app_main" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'app_main', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="gpio_config_used",
-        passed="gpio_config" in generated_code,
+        passed=scoped_contains(generated_code, 'gpio_config', scope='code_only'),
         expected="gpio_config() or gpio_set_direction()",
-        actual="present" if "gpio_config" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'gpio_config', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="gpio_set_level_used",
-        passed="gpio_set_level" in generated_code,
+        passed=scoped_contains(generated_code, 'gpio_set_level', scope='code_only'),
         expected="gpio_set_level() called",
-        actual="present" if "gpio_set_level" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'gpio_set_level', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 

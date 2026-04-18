@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,7 +11,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: atomic.h or kernel.h included
-    has_atomic_h = "zephyr/sys/atomic.h" in generated_code or "zephyr/kernel.h" in generated_code
+    has_atomic_h = scoped_contains(generated_code, 'zephyr/sys/atomic.h', scope='code_only') or scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="atomic_header_included",
@@ -35,7 +36,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: atomic_t used for indices
-    has_atomic_t = "atomic_t" in generated_code
+    has_atomic_t = scoped_contains(generated_code, 'atomic_t', scope='code_only')
     details.append(
         CheckDetail(
             check_name="atomic_t_for_indices",
@@ -47,7 +48,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: atomic_get and atomic_set used
-    has_atomic_ops = "atomic_get" in generated_code and "atomic_set" in generated_code
+    has_atomic_ops = scoped_contains(generated_code, 'atomic_get', scope='code_only') and scoped_contains(generated_code, 'atomic_set', scope='code_only')
     details.append(
         CheckDetail(
             check_name="atomic_get_set_used",

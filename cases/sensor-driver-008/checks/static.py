@@ -1,13 +1,14 @@
 """Static analysis checks for sensor fusion (accel + gyro)."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate sensor fusion code structure."""
     details: list[CheckDetail] = []
 
-    has_sensor_h = "zephyr/drivers/sensor.h" in generated_code
+    has_sensor_h = scoped_contains(generated_code, 'zephyr/drivers/sensor.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_header",
@@ -19,8 +20,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_accel_chan = (
-        "SENSOR_CHAN_ACCEL_X" in generated_code
-        or "SENSOR_CHAN_ACCEL_XYZ" in generated_code
+        scoped_contains(generated_code, 'SENSOR_CHAN_ACCEL_X', scope='code_only')
+        or scoped_contains(generated_code, 'SENSOR_CHAN_ACCEL_XYZ', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -33,8 +34,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_gyro_chan = (
-        "SENSOR_CHAN_GYRO_X" in generated_code
-        or "SENSOR_CHAN_GYRO_XYZ" in generated_code
+        scoped_contains(generated_code, 'SENSOR_CHAN_GYRO_X', scope='code_only')
+        or scoped_contains(generated_code, 'SENSOR_CHAN_GYRO_XYZ', scope='code_only')
     )
     details.append(
         CheckDetail(

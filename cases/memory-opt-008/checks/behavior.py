@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -9,8 +10,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: CONFIG_FPU=n (not =y which would increase footprint)
-    has_fpu_n = "CONFIG_FPU=n" in generated_code
-    has_fpu_y = "CONFIG_FPU=y" in generated_code
+    has_fpu_n = scoped_contains(generated_code, 'CONFIG_FPU=n', scope='code_only')
+    has_fpu_y = scoped_contains(generated_code, 'CONFIG_FPU=y', scope='code_only')
     details.append(
         CheckDetail(
             check_name="fpu_correctly_disabled",
@@ -22,8 +23,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: No conflicting enables (NEWLIB and MINIMAL_LIBC conflict)
-    has_newlib = "CONFIG_NEWLIB_LIBC=y" in generated_code
-    has_minimal = "CONFIG_MINIMAL_LIBC=y" in generated_code
+    has_newlib = scoped_contains(generated_code, 'CONFIG_NEWLIB_LIBC=y', scope='code_only')
+    has_minimal = scoped_contains(generated_code, 'CONFIG_MINIMAL_LIBC=y', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_conflicting_libc",
@@ -53,7 +54,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: No CONFIG_DEBUG=y (size-increasing)
-    has_debug = "CONFIG_DEBUG=y" in generated_code
+    has_debug = scoped_contains(generated_code, 'CONFIG_DEBUG=y', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_debug_enabled",

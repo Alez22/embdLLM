@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -11,10 +12,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: No manual git apply or patch in do_compile
     # (LLM hallucination: Yocto handles patches automatically via SRC_URI)
-    has_git_apply = "git apply" in generated_code
+    has_git_apply = scoped_contains(generated_code, 'git apply', scope='raw')
     has_patch_cmd = (
-        "patch -p" in generated_code
-        or "patch -i" in generated_code
+        scoped_contains(generated_code, 'patch -p', scope='raw')
+        or scoped_contains(generated_code, 'patch -i', scope='raw')
     )
     details.append(
         CheckDetail(
@@ -27,7 +28,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: patch file listed with file:// scheme in SRC_URI
-    has_file_patch = "file://" in generated_code and ".patch" in generated_code
+    has_file_patch = scoped_contains(generated_code, 'file://', scope='raw') and scoped_contains(generated_code, '.patch', scope='raw')
     details.append(
         CheckDetail(
             check_name="patch_uses_file_scheme",
@@ -39,7 +40,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: FILESEXTRAPATHS uses :prepend (correct BitBake syntax)
-    has_prepend = "FILESEXTRAPATHS:prepend" in generated_code or "FILESEXTRAPATHS_prepend" in generated_code
+    has_prepend = scoped_contains(generated_code, 'FILESEXTRAPATHS:prepend', scope='raw') or scoped_contains(generated_code, 'FILESEXTRAPATHS_prepend', scope='raw')
     details.append(
         CheckDetail(
             check_name="filesextrapaths_prepend_syntax",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: ${D}${bindir} used in do_install (not hardcoded path)
-    has_d_bindir = "${D}${bindir}" in generated_code
+    has_d_bindir = scoped_contains(generated_code, '${D}${bindir}', scope='raw')
     details.append(
         CheckDetail(
             check_name="d_bindir_in_install",
@@ -63,7 +64,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: ${CC} used for cross-compilation
-    has_cc = "${CC}" in generated_code
+    has_cc = scoped_contains(generated_code, '${CC}', scope='raw')
     details.append(
         CheckDetail(
             check_name="cc_variable_used",
@@ -75,7 +76,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: LIC_FILES_CHKSUM has md5 or sha256
-    has_hash = "md5=" in generated_code or "sha256=" in generated_code
+    has_hash = scoped_contains(generated_code, 'md5=', scope='raw') or scoped_contains(generated_code, 'sha256=', scope='raw')
     details.append(
         CheckDetail(
             check_name="lic_chksum_has_hash",
@@ -119,8 +120,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 9: FILESEXTRAPATHS uses := (immediate assignment) not just =
     # (LLM failure: "FILESEXTRAPATHS:prepend = ..." instead of ":= ..." — late binding causes wrong path)
-    has_immediate_assign = "FILESEXTRAPATHS:prepend :=" in generated_code
-    has_filesextrapaths = "FILESEXTRAPATHS" in generated_code
+    has_immediate_assign = scoped_contains(generated_code, 'FILESEXTRAPATHS:prepend :=', scope='raw')
+    has_filesextrapaths = scoped_contains(generated_code, 'FILESEXTRAPATHS', scope='raw')
     filesextrapaths_ok = (not has_filesextrapaths) or has_immediate_assign
     details.append(
         CheckDetail(

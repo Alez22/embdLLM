@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -41,7 +42,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: K_THREAD_DEFINE or k_thread_create used for worker threads
-    has_threads = "K_THREAD_DEFINE" in generated_code or "k_thread_create" in generated_code
+    has_threads = scoped_contains(generated_code, 'K_THREAD_DEFINE', scope='code_only') or scoped_contains(generated_code, 'k_thread_create', scope='code_only')
     details.append(
         CheckDetail(
             check_name="threads_defined",
@@ -55,7 +56,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 4: Supervisor checks ALL flags before feeding (conditional on all)
     # Check that the code has some && or conditional that covers all 3 flags
     has_all_check = (
-        "&&" in generated_code
+        scoped_contains(generated_code, '&&', scope='code_only')
         or (generated_code.count("atomic_get") >= 3)
     )
     details.append(
@@ -69,7 +70,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: device_is_ready check present
-    has_ready = "device_is_ready" in generated_code
+    has_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_ready_check",

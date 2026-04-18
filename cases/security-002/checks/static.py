@@ -1,6 +1,7 @@
 """Static analysis checks for PSA Crypto SHA-256 hash."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: psa/crypto.h included
-    has_psa_h = "psa/crypto.h" in generated_code
+    has_psa_h = scoped_contains(generated_code, 'psa/crypto.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_crypto_header",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: psa_crypto_init called (common LLM failure: omitted entirely)
-    has_init = "psa_crypto_init" in generated_code
+    has_init = scoped_contains(generated_code, 'psa_crypto_init', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_crypto_init_called",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: SHA-256 algorithm constant used (not SHA_512, MD5, etc.)
-    has_sha256_alg = "PSA_ALG_SHA_256" in generated_code
+    has_sha256_alg = scoped_contains(generated_code, 'PSA_ALG_SHA_256', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sha256_algorithm_constant",
@@ -49,9 +50,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     buf_sizes = re.findall(r'\b(\d+)\b', generated_code)
     has_32_or_macro = (
         "32" in buf_sizes
-        or "SHA256_DIGEST_SIZE" in generated_code
-        or "PSA_HASH_LENGTH" in generated_code
-        or "PSA_HASH_MAX_SIZE" in generated_code
+        or scoped_contains(generated_code, 'SHA256_DIGEST_SIZE', scope='code_only')
+        or scoped_contains(generated_code, 'PSA_HASH_LENGTH', scope='code_only')
+        or scoped_contains(generated_code, 'PSA_HASH_MAX_SIZE', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -64,7 +65,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: PSA_SUCCESS checked
-    has_psa_success = "PSA_SUCCESS" in generated_code
+    has_psa_success = scoped_contains(generated_code, 'PSA_SUCCESS', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_success_checked",

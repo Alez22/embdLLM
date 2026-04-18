@@ -1,6 +1,7 @@
 """Static analysis checks for NVS wear-leveling awareness."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: NVS header included
-    has_nvs_h = "zephyr/fs/nvs.h" in generated_code
+    has_nvs_h = scoped_contains(generated_code, 'zephyr/fs/nvs.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="nvs_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: nvs_mount called
-    has_mount = "nvs_mount" in generated_code
+    has_mount = scoped_contains(generated_code, 'nvs_mount', scope='code_only')
     details.append(
         CheckDetail(
             check_name="nvs_mount_called",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: nvs_calc_free_space called
-    has_free_space = "nvs_calc_free_space" in generated_code
+    has_free_space = scoped_contains(generated_code, 'nvs_calc_free_space', scope='code_only')
     details.append(
         CheckDetail(
             check_name="nvs_calc_free_space_called",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: nvs_delete called
-    has_delete = "nvs_delete" in generated_code
+    has_delete = scoped_contains(generated_code, 'nvs_delete', scope='code_only')
     details.append(
         CheckDetail(
             check_name="nvs_delete_called",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: ENOSPC referenced
-    has_enospc = "ENOSPC" in generated_code
+    has_enospc = scoped_contains(generated_code, 'ENOSPC', scope='code_only')
     details.append(
         CheckDetail(
             check_name="enospc_handled",

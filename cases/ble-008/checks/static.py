@@ -1,13 +1,14 @@
 """Static analysis checks for BLE central (scanner + connect)."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate BLE central code structure."""
     details: list[CheckDetail] = []
 
-    has_bt_h = "zephyr/bluetooth/bluetooth.h" in generated_code
+    has_bt_h = scoped_contains(generated_code, 'zephyr/bluetooth/bluetooth.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bluetooth_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_conn_h = "zephyr/bluetooth/conn.h" in generated_code
+    has_conn_h = scoped_contains(generated_code, 'zephyr/bluetooth/conn.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="conn_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_scan_start = "bt_le_scan_start" in generated_code
+    has_scan_start = scoped_contains(generated_code, 'bt_le_scan_start', scope='code_only')
     details.append(
         CheckDetail(
             check_name="scan_started",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_conn_create = "bt_conn_le_create" in generated_code
+    has_conn_create = scoped_contains(generated_code, 'bt_conn_le_create', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bt_conn_le_create_called",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_gatt_discover = "bt_gatt_discover" in generated_code
+    has_gatt_discover = scoped_contains(generated_code, 'bt_gatt_discover', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bt_gatt_discover_called",
@@ -63,7 +64,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Hallucination: BLEDevice.connect() is Python/bleak, not Zephyr C
-    uses_bledevice = "BLEDevice" in generated_code or "BLEDevice.connect" in generated_code
+    uses_bledevice = scoped_contains(generated_code, 'BLEDevice', scope='code_only') or scoped_contains(generated_code, 'BLEDevice.connect', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_bledevice_connect",
@@ -75,7 +76,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Hallucination: gap_connect does not exist in Zephyr
-    uses_gap_connect = "gap_connect" in generated_code
+    uses_gap_connect = scoped_contains(generated_code, 'gap_connect', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_gap_connect",

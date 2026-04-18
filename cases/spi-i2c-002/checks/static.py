@@ -1,6 +1,7 @@
 """Static analysis checks for SPI loopback test."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: SPI header included
-    has_spi_h = "zephyr/drivers/spi.h" in generated_code
+    has_spi_h = scoped_contains(generated_code, 'zephyr/drivers/spi.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi_header_included",
@@ -21,8 +22,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: Device obtained via DT
     has_dev_get = (
-        "DEVICE_DT_GET" in generated_code
-        or "device_get_binding" in generated_code
+        scoped_contains(generated_code, 'DEVICE_DT_GET', scope='code_only')
+        or scoped_contains(generated_code, 'device_get_binding', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -35,7 +36,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: spi_transceive called
-    has_transceive = "spi_transceive" in generated_code
+    has_transceive = scoped_contains(generated_code, 'spi_transceive', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi_transceive_called",
@@ -47,7 +48,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: spi_buf_set structures used
-    has_buf_set = "spi_buf_set" in generated_code
+    has_buf_set = scoped_contains(generated_code, 'spi_buf_set', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi_buf_set_used",
@@ -59,7 +60,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: spi_config struct used
-    has_spi_cfg = "spi_config" in generated_code
+    has_spi_cfg = scoped_contains(generated_code, 'spi_config', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi_config_used",

@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis, has_error_check
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -59,7 +60,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: flash_area_close called (resource cleanup)
-    has_close = "flash_area_close" in generated_code
+    has_close = scoped_contains(generated_code, 'flash_area_close', scope='code_only')
     details.append(
         CheckDetail(
             check_name="flash_area_close_called",

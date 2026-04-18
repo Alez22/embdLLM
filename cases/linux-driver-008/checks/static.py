@@ -1,13 +1,14 @@
 """Static analysis checks for Linux proc file driver."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate proc file driver code structure."""
     details: list[CheckDetail] = []
 
-    has_proc_h = "linux/proc_fs.h" in generated_code
+    has_proc_h = scoped_contains(generated_code, 'linux/proc_fs.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="proc_fs_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_seq_h = "linux/seq_file.h" in generated_code
+    has_seq_h = scoped_contains(generated_code, 'linux/seq_file.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="seq_file_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_proc_ops = "proc_ops" in generated_code
+    has_proc_ops = scoped_contains(generated_code, 'proc_ops', scope='code_only')
     details.append(
         CheckDetail(
             check_name="proc_ops_struct_used",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_proc_create = "proc_create" in generated_code
+    has_proc_create = scoped_contains(generated_code, 'proc_create', scope='code_only')
     details.append(
         CheckDetail(
             check_name="proc_create_called",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_seq_printf = "seq_printf" in generated_code
+    has_seq_printf = scoped_contains(generated_code, 'seq_printf', scope='code_only')
     details.append(
         CheckDetail(
             check_name="seq_printf_used",

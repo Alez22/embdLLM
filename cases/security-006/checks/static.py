@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,7 +11,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: psa/crypto.h included
-    has_psa_h = "psa/crypto.h" in generated_code
+    has_psa_h = scoped_contains(generated_code, 'psa/crypto.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_crypto_header",
@@ -22,7 +23,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: psa_crypto_init called
-    has_init = "psa_crypto_init" in generated_code
+    has_init = scoped_contains(generated_code, 'psa_crypto_init', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_crypto_init_called",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: psa_import_key called
-    has_import = "psa_import_key" in generated_code
+    has_import = scoped_contains(generated_code, 'psa_import_key', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_import_key_called",
@@ -63,7 +64,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 7: PSA_SUCCESS checked
-    has_psa_success = "PSA_SUCCESS" in generated_code
+    has_psa_success = scoped_contains(generated_code, 'PSA_SUCCESS', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_success_checked",

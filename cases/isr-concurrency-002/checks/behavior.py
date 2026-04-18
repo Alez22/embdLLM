@@ -8,6 +8,7 @@ from embedeval.check_utils import (
     extract_numeric,
     find_isr_bodies,
     has_sleep_call,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -47,7 +48,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: k_msgq_put called (ISR produces data)
-    has_put = "k_msgq_put" in generated_code
+    has_put = scoped_contains(generated_code, 'k_msgq_put', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_msgq_put_called",
@@ -59,7 +60,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: k_msgq_get called (thread consumes data)
-    has_get = "k_msgq_get" in generated_code
+    has_get = scoped_contains(generated_code, 'k_msgq_get', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_msgq_get_called",

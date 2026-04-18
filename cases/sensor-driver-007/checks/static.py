@@ -1,13 +1,14 @@
 """Static analysis checks for sensor FIFO batch read."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate sensor FIFO batch read code structure."""
     details: list[CheckDetail] = []
 
-    has_sensor_h = "zephyr/drivers/sensor.h" in generated_code
+    has_sensor_h = scoped_contains(generated_code, 'zephyr/drivers/sensor.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_header",
@@ -19,7 +20,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_watermark = (
-        "SENSOR_ATTR_FIFO_WATERMARK" in generated_code
+        scoped_contains(generated_code, 'SENSOR_ATTR_FIFO_WATERMARK', scope='code_only')
         or "watermark" in generated_code.lower()
         or "fifo_watermark" in generated_code.lower()
     )
@@ -33,7 +34,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_sensor_attr_get = "sensor_attr_get" in generated_code
+    has_sensor_attr_get = scoped_contains(generated_code, 'sensor_attr_get', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_attr_get_called",
@@ -45,8 +46,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_accel_chan = (
-        "SENSOR_CHAN_ACCEL_X" in generated_code
-        or "SENSOR_CHAN_ACCEL_XYZ" in generated_code
+        scoped_contains(generated_code, 'SENSOR_CHAN_ACCEL_X', scope='code_only')
+        or scoped_contains(generated_code, 'SENSOR_CHAN_ACCEL_XYZ', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -59,8 +60,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_fifo_max = (
-        "FIFO_MAX_DEPTH" in generated_code
-        or "FIFO_SIZE" in generated_code
+        scoped_contains(generated_code, 'FIFO_MAX_DEPTH', scope='code_only')
+        or scoped_contains(generated_code, 'FIFO_SIZE', scope='code_only')
         or "fifo_max" in generated_code.lower()
     )
     details.append(
@@ -74,9 +75,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_buffer_guard = (
-        "FIFO_MAX_DEPTH" in generated_code
-        and ("> FIFO_MAX_DEPTH" in generated_code or ">= FIFO_MAX_DEPTH" in generated_code
-             or "count > " in generated_code or "count >= " in generated_code)
+        scoped_contains(generated_code, 'FIFO_MAX_DEPTH', scope='code_only')
+        and (scoped_contains(generated_code, '> FIFO_MAX_DEPTH', scope='code_only') or scoped_contains(generated_code, '>= FIFO_MAX_DEPTH', scope='code_only')
+             or scoped_contains(generated_code, 'count > ', scope='code_only') or scoped_contains(generated_code, 'count >= ', scope='code_only'))
     )
     details.append(
         CheckDetail(

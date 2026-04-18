@@ -1,6 +1,7 @@
 """Static analysis checks for DMA with buffer alignment requirements."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: DMA header included
-    has_dma_h = "zephyr/drivers/dma.h" in generated_code
+    has_dma_h = scoped_contains(generated_code, 'zephyr/drivers/dma.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: __aligned attribute used
-    has_aligned = "__aligned" in generated_code
+    has_aligned = scoped_contains(generated_code, '__aligned', scope='code_only')
     details.append(
         CheckDetail(
             check_name="aligned_attribute_present",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: No memalign() (not available in Zephyr RTOS)
-    has_memalign = "memalign(" in generated_code
+    has_memalign = scoped_contains(generated_code, 'memalign(', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_memalign",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: No posix_memalign() (POSIX, not Zephyr)
-    has_posix_memalign = "posix_memalign" in generated_code
+    has_posix_memalign = scoped_contains(generated_code, 'posix_memalign', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_posix_memalign",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: dma_config and dma_start present
-    has_dma_api = "dma_config" in generated_code and "dma_start" in generated_code
+    has_dma_api = scoped_contains(generated_code, 'dma_config', scope='code_only') and scoped_contains(generated_code, 'dma_start', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_config_and_start_present",

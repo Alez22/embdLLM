@@ -2,6 +2,7 @@
 
 from embedeval.check_utils import has_any_api_call
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -9,7 +10,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: DMA header included
-    has_dma_h = "zephyr/drivers/dma.h" in generated_code
+    has_dma_h = scoped_contains(generated_code, 'zephyr/drivers/dma.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_header_included",
@@ -21,7 +22,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: PERIPHERAL_TO_MEMORY direction set
-    has_p2m = "PERIPHERAL_TO_MEMORY" in generated_code
+    has_p2m = scoped_contains(generated_code, 'PERIPHERAL_TO_MEMORY', scope='code_only')
     details.append(
         CheckDetail(
             check_name="peripheral_to_memory_direction",
@@ -33,7 +34,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: dma_config struct used
-    has_dma_cfg = "struct dma_config" in generated_code
+    has_dma_cfg = scoped_contains(generated_code, 'struct dma_config', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_config_struct",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: dma_start() API called
-    has_dma_start = "dma_start(" in generated_code
+    has_dma_start = scoped_contains(generated_code, 'dma_start(', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_start_called",

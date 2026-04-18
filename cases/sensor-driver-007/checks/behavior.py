@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -30,8 +31,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 2: Buffer declared with FIFO_MAX_DEPTH capacity (not undersized)
     # (LLM failure: declaring buffer smaller than FIFO depth, e.g., samples[8] for 32-deep FIFO)
     has_fifo_max_in_buffer = (
-        "FIFO_MAX_DEPTH" in generated_code
-        and "sensor_sample" in generated_code
+        scoped_contains(generated_code, 'FIFO_MAX_DEPTH', scope='code_only')
+        and scoped_contains(generated_code, 'sensor_sample', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -47,8 +48,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 3: Burst read count matches watermark count (not fixed)
     # (LLM failure: always reading FIFO_MAX_DEPTH samples regardless of watermark)
     has_dynamic_count = (
-        "count" in generated_code
-        and "sensor_sample_fetch" in generated_code
+        scoped_contains(generated_code, 'count', scope='code_only')
+        and scoped_contains(generated_code, 'sensor_sample_fetch', scope='code_only')
         and "watermark" in generated_code.lower()
     )
     details.append(
@@ -65,8 +66,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 4: Buffer overflow guard (count > FIFO_MAX_DEPTH rejected)
     # (LLM failure: no guard, reading past buffer end if FIFO reports > max)
     has_overflow_guard = (
-        ("count > " in generated_code or "count >= " in generated_code)
-        and "FIFO_MAX_DEPTH" in generated_code
+        (scoped_contains(generated_code, 'count > ', scope='code_only') or scoped_contains(generated_code, 'count >= ', scope='code_only'))
+        and scoped_contains(generated_code, 'FIFO_MAX_DEPTH', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -80,7 +81,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: device_is_ready checked before use
-    has_device_ready = "device_is_ready" in generated_code
+    has_device_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_ready_check",

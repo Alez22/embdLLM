@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,7 +11,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: flash.h included
-    has_flash_h = "zephyr/drivers/flash.h" in generated_code
+    has_flash_h = scoped_contains(generated_code, 'zephyr/drivers/flash.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="flash_header_included",
@@ -54,7 +55,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Modulo used for sector wrap-around
-    has_modulo = "%" in generated_code and "NUM_SECTORS" in generated_code or (
+    has_modulo = scoped_contains(generated_code, '%', scope='code_only') and scoped_contains(generated_code, 'NUM_SECTORS', scope='code_only') or (
         bool(re.search(r'\w+\s*%\s*\w*[Ss]ector', generated_code))
         or bool(re.search(r'\w*[Ss]ector\w*\s*%\s*\w+', generated_code))
         or bool(re.search(r'current_sector\s*=.*%', generated_code))
@@ -70,7 +71,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: flash_erase called before write on new sector
-    has_erase = "flash_erase" in generated_code
+    has_erase = scoped_contains(generated_code, 'flash_erase', scope='code_only')
     details.append(
         CheckDetail(
             check_name="flash_erase_called",
@@ -82,7 +83,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: flash_write called
-    has_write = "flash_write" in generated_code
+    has_write = scoped_contains(generated_code, 'flash_write', scope='code_only')
     details.append(
         CheckDetail(
             check_name="flash_write_called",

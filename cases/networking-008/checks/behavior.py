@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis, strip_comments
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -30,9 +31,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: Will topic is not empty (non-trivial string)
     has_nonempty_will_topic = (
-        '"devices/' in generated_code
-        or '"status"' in generated_code
-        or 'WILL_TOPIC' in generated_code
+        scoped_contains(generated_code, '"devices/', scope='code_only')
+        or scoped_contains(generated_code, '"status"', scope='code_only')
+        or scoped_contains(generated_code, 'WILL_TOPIC', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -45,7 +46,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: MQTT_EVT_CONNACK handled in event callback
-    has_connack = "MQTT_EVT_CONNACK" in generated_code
+    has_connack = scoped_contains(generated_code, 'MQTT_EVT_CONNACK', scope='code_only')
     details.append(
         CheckDetail(
             check_name="connack_handled",
@@ -57,7 +58,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: MQTT_EVT_DISCONNECT handled
-    has_disconnect = "MQTT_EVT_DISCONNECT" in generated_code
+    has_disconnect = scoped_contains(generated_code, 'MQTT_EVT_DISCONNECT', scope='code_only')
     details.append(
         CheckDetail(
             check_name="disconnect_handled",
@@ -69,8 +70,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: mqtt_input and mqtt_live in main loop
-    has_input = "mqtt_input" in generated_code
-    has_live = "mqtt_live" in generated_code
+    has_input = scoped_contains(generated_code, 'mqtt_input', scope='code_only')
+    has_live = scoped_contains(generated_code, 'mqtt_live', scope='code_only')
     details.append(
         CheckDetail(
             check_name="protocol_loop",
@@ -82,7 +83,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Error handling on mqtt_connect
-    has_conn_err = "< 0" in generated_code
+    has_conn_err = scoped_contains(generated_code, '< 0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="connect_error_handling",

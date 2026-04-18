@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -12,8 +13,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: Retry loop exists (for or while loop with connect inside)
     has_loop = (
-        ("for" in generated_code or "while" in generated_code)
-        and "zsock_connect" in generated_code
+        (scoped_contains(generated_code, 'for', scope='code_only') or scoped_contains(generated_code, 'while', scope='code_only'))
+        and scoped_contains(generated_code, 'zsock_connect', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -27,14 +28,14 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: Bounded retry (not infinite) — MAX_RETRIES or numeric bound
     has_bound = (
-        "MAX_RETRIES" in generated_code
-        or "max_retries" in generated_code
-        or "<= 3" in generated_code
-        or "< 3" in generated_code
-        or "<= MAX" in generated_code
-        or "attempt <" in generated_code
-        or "retries <" in generated_code
-        or "retry <" in generated_code
+        scoped_contains(generated_code, 'MAX_RETRIES', scope='code_only')
+        or scoped_contains(generated_code, 'max_retries', scope='code_only')
+        or scoped_contains(generated_code, '<= 3', scope='code_only')
+        or scoped_contains(generated_code, '< 3', scope='code_only')
+        or scoped_contains(generated_code, '<= MAX', scope='code_only')
+        or scoped_contains(generated_code, 'attempt <', scope='code_only')
+        or scoped_contains(generated_code, 'retries <', scope='code_only')
+        or scoped_contains(generated_code, 'retry <', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -48,10 +49,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Exponential backoff (delay doubles: *2 or <<1 or 2* pattern)
     has_backoff = (
-        "delay *= 2" in generated_code
-        or "delay = delay * 2" in generated_code
-        or "delay << 1" in generated_code
-        or "delay * 2" in generated_code
+        scoped_contains(generated_code, 'delay *= 2', scope='code_only')
+        or scoped_contains(generated_code, 'delay = delay * 2', scope='code_only')
+        or scoped_contains(generated_code, 'delay << 1', scope='code_only')
+        or scoped_contains(generated_code, 'delay * 2', scope='code_only')
         or "backoff" in generated_code.lower()
     )
     details.append(
@@ -65,7 +66,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: k_sleep used for delay (not busy-wait)
-    has_sleep = "k_sleep" in generated_code
+    has_sleep = scoped_contains(generated_code, 'k_sleep', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sleep_between_retries",
@@ -77,8 +78,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: TCP socket type (SOCK_STREAM not SOCK_DGRAM)
-    has_stream = "SOCK_STREAM" in generated_code
-    has_dgram = "SOCK_DGRAM" in generated_code
+    has_stream = scoped_contains(generated_code, 'SOCK_STREAM', scope='code_only')
+    has_dgram = scoped_contains(generated_code, 'SOCK_DGRAM', scope='code_only')
     details.append(
         CheckDetail(
             check_name="tcp_socket_type",
@@ -90,8 +91,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Connect return value checked
-    has_connect_check = "zsock_connect" in generated_code and (
-        "== 0" in generated_code or "< 0" in generated_code or "!= 0" in generated_code
+    has_connect_check = scoped_contains(generated_code, 'zsock_connect', scope='code_only') and (
+        scoped_contains(generated_code, '== 0', scope='code_only') or scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, '!= 0', scope='code_only')
     )
     details.append(
         CheckDetail(

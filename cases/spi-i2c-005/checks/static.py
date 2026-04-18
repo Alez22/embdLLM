@@ -1,6 +1,7 @@
 """Static analysis checks for I2C bus scan."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: I2C header included
-    has_i2c_h = "zephyr/drivers/i2c.h" in generated_code
+    has_i2c_h = scoped_contains(generated_code, 'zephyr/drivers/i2c.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="i2c_header_included",
@@ -21,8 +22,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: Device obtained via DT
     has_dev_get = (
-        "DEVICE_DT_GET" in generated_code
-        or "device_get_binding" in generated_code
+        scoped_contains(generated_code, 'DEVICE_DT_GET', scope='code_only')
+        or scoped_contains(generated_code, 'device_get_binding', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -36,8 +37,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: i2c_write used for probing
     has_i2c_write = (
-        "i2c_write" in generated_code
-        or "i2c_transfer" in generated_code
+        scoped_contains(generated_code, 'i2c_write', scope='code_only')
+        or scoped_contains(generated_code, 'i2c_transfer', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -50,7 +51,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: A loop over address range exists
-    has_loop = "for" in generated_code or "while" in generated_code
+    has_loop = scoped_contains(generated_code, 'for', scope='code_only') or scoped_contains(generated_code, 'while', scope='code_only')
     details.append(
         CheckDetail(
             check_name="scan_loop_present",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Lower scan bound 0x08 referenced
-    has_lower = "0x08" in generated_code or "0x07" in generated_code
+    has_lower = scoped_contains(generated_code, '0x08', scope='code_only') or scoped_contains(generated_code, '0x07', scope='code_only')
     details.append(
         CheckDetail(
             check_name="lower_bound_referenced",

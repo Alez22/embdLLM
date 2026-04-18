@@ -1,6 +1,7 @@
 """Static analysis checks for peripheral power gating."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: PM device header
-    has_pm_h = "zephyr/pm/device.h" in generated_code
+    has_pm_h = scoped_contains(generated_code, 'zephyr/pm/device.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pm_device_header",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: pm_device_action_run used (correct Zephyr API)
-    has_action_run = "pm_device_action_run" in generated_code
+    has_action_run = scoped_contains(generated_code, 'pm_device_action_run', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pm_device_action_run_used",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: PM_DEVICE_ACTION_SUSPEND used (gate peripheral)
-    has_suspend = "PM_DEVICE_ACTION_SUSPEND" in generated_code
+    has_suspend = scoped_contains(generated_code, 'PM_DEVICE_ACTION_SUSPEND', scope='code_only')
     details.append(
         CheckDetail(
             check_name="suspend_action_used",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: PM_DEVICE_ACTION_RESUME used (enable peripheral before use)
-    has_resume = "PM_DEVICE_ACTION_RESUME" in generated_code
+    has_resume = scoped_contains(generated_code, 'PM_DEVICE_ACTION_RESUME', scope='code_only')
     details.append(
         CheckDetail(
             check_name="resume_action_used",
@@ -75,10 +76,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: State tracking present
     has_state = (
-        "peripheral_active" in generated_code
-        or "active" in generated_code
-        or "suspended" in generated_code
-        or "state" in generated_code
+        scoped_contains(generated_code, 'peripheral_active', scope='code_only')
+        or scoped_contains(generated_code, 'active', scope='code_only')
+        or scoped_contains(generated_code, 'suspended', scope='code_only')
+        or scoped_contains(generated_code, 'state', scope='code_only')
     )
     details.append(
         CheckDetail(

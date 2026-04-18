@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -30,8 +31,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Uses switch or if-else (not just printing a number)
-    has_branch = "switch" in generated_code or (
-        "if" in generated_code and "BOOT_SWAP_TYPE" in generated_code
+    has_branch = scoped_contains(generated_code, 'switch', scope='code_only') or (
+        scoped_contains(generated_code, 'if', scope='code_only') and scoped_contains(generated_code, 'BOOT_SWAP_TYPE', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -87,7 +88,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: default case handled in switch (or else clause for unrecognized type)
     # (LLM failure: no default case — unrecognized swap types silently ignored)
-    has_default = "default" in generated_code or "UNKNOWN" in generated_code or "unknown" in generated_code.lower()
+    has_default = scoped_contains(generated_code, 'default', scope='code_only') or scoped_contains(generated_code, 'UNKNOWN', scope='code_only') or "unknown" in generated_code.lower()
     details.append(
         CheckDetail(
             check_name="default_case_handled",
@@ -101,8 +102,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 7: mcuboot_swap_type() return value stored before use
     # (LLM failure: calling mcuboot_swap_type() multiple times in switch arms)
     stored_before_use = (
-        "swap_type" in generated_code
-        and "mcuboot_swap_type()" in generated_code
+        scoped_contains(generated_code, 'swap_type', scope='code_only')
+        and scoped_contains(generated_code, 'mcuboot_swap_type()', scope='code_only')
         and generated_code.count("mcuboot_swap_type()") == 1
     )
     details.append(

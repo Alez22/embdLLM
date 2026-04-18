@@ -1,13 +1,14 @@
 """Static analysis checks for OTA image hash verification."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate OTA hash verification code structure."""
     details: list[CheckDetail] = []
 
-    has_psa_crypto = "psa/crypto.h" in generated_code
+    has_psa_crypto = scoped_contains(generated_code, 'psa/crypto.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_crypto_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_dfu_target = "dfu/dfu_target.h" in generated_code
+    has_dfu_target = scoped_contains(generated_code, 'dfu/dfu_target.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dfu_target_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_psa_hash = "psa_hash_compute" in generated_code
+    has_psa_hash = scoped_contains(generated_code, 'psa_hash_compute', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_hash_compute_used",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_sha256_alg = "PSA_ALG_SHA_256" in generated_code
+    has_sha256_alg = scoped_contains(generated_code, 'PSA_ALG_SHA_256', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sha256_algorithm_constant",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_memcmp = "memcmp" in generated_code
+    has_memcmp = scoped_contains(generated_code, 'memcmp', scope='code_only')
     details.append(
         CheckDetail(
             check_name="hash_comparison_memcmp",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_dfu_write = "dfu_target_write" in generated_code
+    has_dfu_write = scoped_contains(generated_code, 'dfu_target_write', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dfu_target_write_present",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_expected_hash = "expected_hash" in generated_code
+    has_expected_hash = scoped_contains(generated_code, 'expected_hash', scope='code_only')
     details.append(
         CheckDetail(
             check_name="expected_hash_defined",

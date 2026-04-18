@@ -1,13 +1,14 @@
 """Static analysis checks for MQTT with Last Will and Testament."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate MQTT LWT code structure."""
     details: list[CheckDetail] = []
 
-    has_mqtt_h = "zephyr/net/mqtt.h" in generated_code
+    has_mqtt_h = scoped_contains(generated_code, 'zephyr/net/mqtt.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mqtt_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_will_topic = "will_topic" in generated_code
+    has_will_topic = scoped_contains(generated_code, 'will_topic', scope='code_only')
     details.append(
         CheckDetail(
             check_name="will_topic_configured",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_will_message = "will_message" in generated_code
+    has_will_message = scoped_contains(generated_code, 'will_message', scope='code_only')
     details.append(
         CheckDetail(
             check_name="will_message_configured",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_will_qos = "will_message.topic.qos" in generated_code or "MQTT_QOS" in generated_code
+    has_will_qos = scoped_contains(generated_code, 'will_message.topic.qos', scope='code_only') or scoped_contains(generated_code, 'MQTT_QOS', scope='code_only')
     details.append(
         CheckDetail(
             check_name="will_qos_set",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_mqtt_connect = "mqtt_connect" in generated_code
+    has_mqtt_connect = scoped_contains(generated_code, 'mqtt_connect', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mqtt_connect_called",
@@ -63,7 +64,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Hallucination: mosquitto_* APIs are not Zephyr
-    uses_mosquitto = "mosquitto_" in generated_code
+    uses_mosquitto = scoped_contains(generated_code, 'mosquitto_', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_mosquitto_api",

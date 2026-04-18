@@ -1,6 +1,7 @@
 """Behavioral checks for ESP-IDF GPIO blink."""
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Check 2: vTaskDelay used (not busy-wait)
-    has_delay = "vTaskDelay" in generated_code
+    has_delay = scoped_contains(generated_code, 'vTaskDelay', scope='code_only')
     details.append(CheckDetail(
         check_name="vtaskdelay_used",
         passed=has_delay,
@@ -31,8 +32,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: pdMS_TO_TICKS or portTICK_PERIOD_MS used (not raw tick count)
     has_tick_macro = (
-        "pdMS_TO_TICKS" in generated_code
-        or "portTICK_PERIOD_MS" in generated_code
+        scoped_contains(generated_code, 'pdMS_TO_TICKS', scope='code_only')
+        or scoped_contains(generated_code, 'portTICK_PERIOD_MS', scope='code_only')
     )
     details.append(CheckDetail(
         check_name="tick_conversion_macro",
@@ -43,7 +44,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Check 4: gpio_config_t struct used (not deprecated individual calls)
-    has_config_struct = "gpio_config_t" in generated_code
+    has_config_struct = scoped_contains(generated_code, 'gpio_config_t', scope='code_only')
     details.append(CheckDetail(
         check_name="gpio_config_struct",
         passed=has_config_struct,

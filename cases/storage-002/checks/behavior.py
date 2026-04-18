@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -59,7 +60,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: error handling present
-    has_error = "< 0" in generated_code
+    has_error = scoped_contains(generated_code, '< 0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="error_handling",
@@ -71,7 +72,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: handler struct defined (settings_handler)
-    has_handler = "settings_handler" in generated_code
+    has_handler = scoped_contains(generated_code, 'settings_handler', scope='code_only')
     details.append(
         CheckDetail(
             check_name="settings_handler_defined",

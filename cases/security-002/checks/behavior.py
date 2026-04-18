@@ -2,8 +2,10 @@
 
 import re
 
-from embedeval.check_utils import (check_no_cross_platform_apis,
+from embedeval.check_utils import (
+    check_no_cross_platform_apis,
     extract_error_blocks,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -31,11 +33,11 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: psa_hash_compute or equivalent multi-step API used
-    has_hash_compute = "psa_hash_compute" in generated_code
+    has_hash_compute = scoped_contains(generated_code, 'psa_hash_compute', scope='code_only')
     has_hash_multipart = (
-        "psa_hash_setup" in generated_code
-        and "psa_hash_update" in generated_code
-        and "psa_hash_finish" in generated_code
+        scoped_contains(generated_code, 'psa_hash_setup', scope='code_only')
+        and scoped_contains(generated_code, 'psa_hash_update', scope='code_only')
+        and scoped_contains(generated_code, 'psa_hash_finish', scope='code_only')
     )
     has_hash_api = has_hash_compute or has_hash_multipart
     details.append(
@@ -49,7 +51,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Result compared to expected value (verification step)
-    has_memcmp = "memcmp" in generated_code
+    has_memcmp = scoped_contains(generated_code, 'memcmp', scope='code_only')
     details.append(
         CheckDetail(
             check_name="hash_result_verified",
@@ -73,7 +75,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Success or failure printed
-    has_print = "printk" in generated_code or "printf" in generated_code
+    has_print = scoped_contains(generated_code, 'printk', scope='code_only') or scoped_contains(generated_code, 'printf', scope='code_only')
     details.append(
         CheckDetail(
             check_name="result_printed",

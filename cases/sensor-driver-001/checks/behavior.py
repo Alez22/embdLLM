@@ -7,6 +7,7 @@ from embedeval.check_utils import (
     check_no_cross_platform_apis,
     has_error_check,
     has_sleep_call,
+    scoped_contains,
     strip_comments,
 )
 
@@ -30,7 +31,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: device_is_ready check
-    has_ready = "device_is_ready" in generated_code
+    has_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_ready_check",
@@ -42,7 +43,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Uses SENSOR_CHAN_AMBIENT_TEMP (correct channel)
-    has_temp_chan = "SENSOR_CHAN_AMBIENT_TEMP" in generated_code
+    has_temp_chan = scoped_contains(generated_code, 'SENSOR_CHAN_AMBIENT_TEMP', scope='code_only')
     details.append(
         CheckDetail(
             check_name="correct_temp_channel",

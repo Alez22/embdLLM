@@ -1,6 +1,7 @@
 """Static analysis checks for periodic kernel timer application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes zephyr/kernel.h
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -21,7 +22,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: Uses K_TIMER_DEFINE or k_timer_init
     has_timer_def = (
-        "K_TIMER_DEFINE" in generated_code or "k_timer_init" in generated_code
+        scoped_contains(generated_code, 'K_TIMER_DEFINE', scope='code_only') or scoped_contains(generated_code, 'k_timer_init', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -34,7 +35,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Uses k_timer_start
-    has_timer_start = "k_timer_start" in generated_code
+    has_timer_start = scoped_contains(generated_code, 'k_timer_start', scope='code_only')
     details.append(
         CheckDetail(
             check_name="timer_started",
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Uses K_MSEC or K_SECONDS for duration
-    has_duration = "K_MSEC" in generated_code or "K_SECONDS" in generated_code
+    has_duration = scoped_contains(generated_code, 'K_MSEC', scope='code_only') or scoped_contains(generated_code, 'K_SECONDS', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_duration_macro",

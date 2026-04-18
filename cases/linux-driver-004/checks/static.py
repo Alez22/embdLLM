@@ -1,13 +1,14 @@
 """Static analysis checks for interrupt-driven character device driver."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate IRQ char device code structure."""
     details: list[CheckDetail] = []
 
-    has_module_h = "linux/module.h" in generated_code
+    has_module_h = scoped_contains(generated_code, 'linux/module.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="module_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_interrupt_h = "linux/interrupt.h" in generated_code
+    has_interrupt_h = scoped_contains(generated_code, 'linux/interrupt.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="interrupt_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_wait_h = "linux/wait.h" in generated_code
+    has_wait_h = scoped_contains(generated_code, 'linux/wait.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="wait_header",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_spinlock_h = "linux/spinlock.h" in generated_code
+    has_spinlock_h = scoped_contains(generated_code, 'linux/spinlock.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spinlock_header",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_request_irq = "request_irq" in generated_code
+    has_request_irq = scoped_contains(generated_code, 'request_irq', scope='code_only')
     details.append(
         CheckDetail(
             check_name="request_irq_called",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_irq_handler = "irqreturn_t" in generated_code
+    has_irq_handler = scoped_contains(generated_code, 'irqreturn_t', scope='code_only')
     details.append(
         CheckDetail(
             check_name="irq_handler_defined",
@@ -74,9 +75,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_wait_queue = (
-        "wait_queue_head_t" in generated_code
-        or "DECLARE_WAIT_QUEUE_HEAD" in generated_code
-        or "init_waitqueue_head" in generated_code
+        scoped_contains(generated_code, 'wait_queue_head_t', scope='code_only')
+        or scoped_contains(generated_code, 'DECLARE_WAIT_QUEUE_HEAD', scope='code_only')
+        or scoped_contains(generated_code, 'init_waitqueue_head', scope='code_only')
     )
     details.append(
         CheckDetail(

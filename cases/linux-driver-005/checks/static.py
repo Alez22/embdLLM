@@ -1,13 +1,14 @@
 """Static analysis checks for Linux sysfs attribute driver."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate sysfs attribute driver code structure."""
     details: list[CheckDetail] = []
 
-    has_module_h = "linux/module.h" in generated_code
+    has_module_h = scoped_contains(generated_code, 'linux/module.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="module_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_sysfs_h = "linux/sysfs.h" in generated_code
+    has_sysfs_h = scoped_contains(generated_code, 'linux/sysfs.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sysfs_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_license = "MODULE_LICENSE" in generated_code
+    has_license = scoped_contains(generated_code, 'MODULE_LICENSE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="module_license",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_device_attr_rw = "DEVICE_ATTR_RW" in generated_code
+    has_device_attr_rw = scoped_contains(generated_code, 'DEVICE_ATTR_RW', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_attr_rw_macro",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_show = "_show" in generated_code
+    has_show = scoped_contains(generated_code, '_show', scope='code_only')
     details.append(
         CheckDetail(
             check_name="show_function",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_store = "_store" in generated_code
+    has_store = scoped_contains(generated_code, '_store', scope='code_only')
     details.append(
         CheckDetail(
             check_name="store_function",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_attr_group = "attribute_group" in generated_code
+    has_attr_group = scoped_contains(generated_code, 'attribute_group', scope='code_only')
     details.append(
         CheckDetail(
             check_name="attribute_group_defined",
@@ -84,7 +85,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_create_group = "sysfs_create_group" in generated_code
+    has_create_group = scoped_contains(generated_code, 'sysfs_create_group', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sysfs_create_group_called",

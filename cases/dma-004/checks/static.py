@@ -1,6 +1,7 @@
 """Static analysis checks for DMA scatter-gather multi-block transfer."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: DMA header included
-    has_dma_h = "zephyr/drivers/dma.h" in generated_code
+    has_dma_h = scoped_contains(generated_code, 'zephyr/drivers/dma.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: next_block pointer used
-    has_next_block = "next_block" in generated_code
+    has_next_block = scoped_contains(generated_code, 'next_block', scope='code_only')
     details.append(
         CheckDetail(
             check_name="next_block_pointer_used",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: block_count set in dma_config
-    has_block_count = "block_count" in generated_code
+    has_block_count = scoped_contains(generated_code, 'block_count', scope='code_only')
     details.append(
         CheckDetail(
             check_name="block_count_set",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: head_block set
-    has_head_block = "head_block" in generated_code
+    has_head_block = scoped_contains(generated_code, 'head_block', scope='code_only')
     details.append(
         CheckDetail(
             check_name="head_block_set",

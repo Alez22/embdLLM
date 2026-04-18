@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 # Map C type names to byte widths for accurate RAM estimation
 _TYPE_WIDTHS = {
@@ -105,8 +106,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Uses printk (not printf — embedded target)
-    has_printk = "printk(" in generated_code
-    has_only_printf = "printf(" in generated_code and "printk(" not in generated_code
+    has_printk = scoped_contains(generated_code, 'printk(', scope='code_only')
+    has_only_printf = scoped_contains(generated_code, 'printf(', scope='code_only') and "printk(" not in generated_code
     details.append(
         CheckDetail(
             check_name="uses_printk_not_printf",

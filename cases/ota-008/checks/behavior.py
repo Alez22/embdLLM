@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -49,8 +50,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
             break
     # Also reject obvious zero-timeout
     has_zero_timeout = (
-        "CONFIRM_TIMEOUT_MS 0" in generated_code
-        or "TIMEOUT_MS 0" in generated_code
+        scoped_contains(generated_code, 'CONFIRM_TIMEOUT_MS 0', scope='code_only')
+        or scoped_contains(generated_code, 'TIMEOUT_MS 0', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -81,9 +82,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 5: boot_is_img_confirmed checked first (conditional confirmation)
     # (LLM failure: unconditionally calling boot_write_img_confirmed every boot)
     has_conditional = (
-        "boot_is_img_confirmed" in generated_code
-        and "if" in generated_code
-        and "boot_write_img_confirmed" in generated_code
+        scoped_contains(generated_code, 'boot_is_img_confirmed', scope='code_only')
+        and scoped_contains(generated_code, 'if', scope='code_only')
+        and scoped_contains(generated_code, 'boot_write_img_confirmed', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -99,9 +100,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 6: self_test return value checked before confirming
     # (LLM failure: calling self_test() but ignoring its return, always confirming)
     self_test_ret_checked = (
-        "self_test" in generated_code
-        and "boot_write_img_confirmed" in generated_code
-        and ("!= 0" in generated_code or "if (ret" in generated_code or "< 0" in generated_code)
+        scoped_contains(generated_code, 'self_test', scope='code_only')
+        and scoped_contains(generated_code, 'boot_write_img_confirmed', scope='code_only')
+        and (scoped_contains(generated_code, '!= 0', scope='code_only') or scoped_contains(generated_code, 'if (ret', scope='code_only') or scoped_contains(generated_code, '< 0', scope='code_only'))
     )
     details.append(
         CheckDetail(
@@ -116,8 +117,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 7: sys_reboot on self-test failure (not just return) — triggers MCUboot rollback
     # (LLM failure: returning from main on failure — doesn't trigger MCUboot rollback)
     reboot_on_fail = (
-        "self_test" in generated_code
-        and "sys_reboot" in generated_code
+        scoped_contains(generated_code, 'self_test', scope='code_only')
+        and scoped_contains(generated_code, 'sys_reboot', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -132,8 +133,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 8: boot_write_img_confirmed return value checked
     # (LLM failure: ignoring confirm failure — image not actually confirmed)
     confirm_err_checked = (
-        "boot_write_img_confirmed" in generated_code
-        and ("< 0" in generated_code or "!= 0" in generated_code)
+        scoped_contains(generated_code, 'boot_write_img_confirmed', scope='code_only')
+        and (scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, '!= 0', scope='code_only'))
     )
     details.append(
         CheckDetail(

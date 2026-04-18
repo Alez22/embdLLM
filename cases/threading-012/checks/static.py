@@ -1,13 +1,14 @@
 """Static analysis checks for sensor-filter-UART task architecture."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate sensor-filter-UART task architecture code structure."""
     details: list[CheckDetail] = []
 
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -19,8 +20,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     has_thread = (
-        "K_THREAD_DEFINE" in generated_code
-        or "k_thread_create" in generated_code
+        scoped_contains(generated_code, 'K_THREAD_DEFINE', scope='code_only')
+        or scoped_contains(generated_code, 'k_thread_create', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -50,7 +51,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_main = "int main(" in generated_code or "void main(" in generated_code
+    has_main = scoped_contains(generated_code, 'int main(', scope='code_only') or scoped_contains(generated_code, 'void main(', scope='code_only')
     details.append(
         CheckDetail(
             check_name="has_main_function",

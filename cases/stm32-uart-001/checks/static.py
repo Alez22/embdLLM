@@ -1,6 +1,7 @@
 """Static analysis checks for STM32 HAL UART interrupt receive application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: STM32 HAL header (not Zephyr/Arduino)
-    has_hal_header = "stm32f4xx_hal.h" in generated_code
+    has_hal_header = scoped_contains(generated_code, 'stm32f4xx_hal.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="stm32_hal_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: UART_HandleTypeDef used
-    has_uart_handle = "UART_HandleTypeDef" in generated_code
+    has_uart_handle = scoped_contains(generated_code, 'UART_HandleTypeDef', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uart_handle_typedef_used",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Interrupt receive used (not polling HAL_UART_Receive)
-    has_receive_it = "HAL_UART_Receive_IT" in generated_code
+    has_receive_it = scoped_contains(generated_code, 'HAL_UART_Receive_IT', scope='code_only')
     details.append(
         CheckDetail(
             check_name="interrupt_receive_used",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: USART2 instance configured
-    has_usart2 = "USART2" in generated_code
+    has_usart2 = scoped_contains(generated_code, 'USART2', scope='code_only')
     details.append(
         CheckDetail(
             check_name="usart2_instance_configured",

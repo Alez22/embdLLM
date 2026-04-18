@@ -1,6 +1,7 @@
 """Static analysis checks for hardware counter with alarm application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes counter header
-    has_counter_h = "zephyr/drivers/counter.h" in generated_code
+    has_counter_h = scoped_contains(generated_code, 'zephyr/drivers/counter.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="counter_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Includes kernel header
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Uses counter_start
-    has_start = "counter_start" in generated_code
+    has_start = scoped_contains(generated_code, 'counter_start', scope='code_only')
     details.append(
         CheckDetail(
             check_name="counter_started",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Uses counter_set_channel_alarm
-    has_alarm = "counter_set_channel_alarm" in generated_code
+    has_alarm = scoped_contains(generated_code, 'counter_set_channel_alarm', scope='code_only')
     details.append(
         CheckDetail(
             check_name="channel_alarm_set",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Has an alarm callback function defined
-    has_callback = ".callback" in generated_code or "alarm_callback" in generated_code
+    has_callback = scoped_contains(generated_code, '.callback', scope='code_only') or scoped_contains(generated_code, 'alarm_callback', scope='code_only')
     details.append(
         CheckDetail(
             check_name="alarm_callback_defined",
@@ -68,7 +69,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Uses device_is_ready check (AI failure: missing readiness check)
-    has_ready = "device_is_ready" in generated_code
+    has_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_ready_check",

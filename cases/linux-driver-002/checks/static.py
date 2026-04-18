@@ -1,13 +1,14 @@
 """Static analysis checks for Linux platform driver with Device Tree binding."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate platform driver code structure."""
     details: list[CheckDetail] = []
 
-    has_module_h = "linux/module.h" in generated_code
+    has_module_h = scoped_contains(generated_code, 'linux/module.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="module_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_platform_h = "linux/platform_device.h" in generated_code
+    has_platform_h = scoped_contains(generated_code, 'linux/platform_device.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="platform_device_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_license = "MODULE_LICENSE" in generated_code
+    has_license = scoped_contains(generated_code, 'MODULE_LICENSE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="module_license",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_of_match = "of_device_id" in generated_code
+    has_of_match = scoped_contains(generated_code, 'of_device_id', scope='code_only')
     details.append(
         CheckDetail(
             check_name="of_device_id_table",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_compatible = ".compatible" in generated_code
+    has_compatible = scoped_contains(generated_code, '.compatible', scope='code_only')
     details.append(
         CheckDetail(
             check_name="compatible_string",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_module_device_table = "MODULE_DEVICE_TABLE" in generated_code
+    has_module_device_table = scoped_contains(generated_code, 'MODULE_DEVICE_TABLE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="module_device_table",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_platform_driver = "platform_driver" in generated_code
+    has_platform_driver = scoped_contains(generated_code, 'platform_driver', scope='code_only')
     details.append(
         CheckDetail(
             check_name="platform_driver_struct",

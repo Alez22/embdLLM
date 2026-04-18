@@ -5,6 +5,7 @@ from collections import Counter
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -13,9 +14,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: k_mutex used, not k_sem (only k_mutex has priority inheritance)
     # (LLM failure: using k_sem which has no priority inheritance, defeats the purpose)
-    uses_mutex = "k_mutex_lock" in generated_code
-    uses_sem_give = "k_sem_give" in generated_code
-    uses_sem_take = "k_sem_take" in generated_code
+    uses_mutex = scoped_contains(generated_code, 'k_mutex_lock', scope='code_only')
+    uses_sem_give = scoped_contains(generated_code, 'k_sem_give', scope='code_only')
+    uses_sem_take = scoped_contains(generated_code, 'k_sem_take', scope='code_only')
     correct_primitive = uses_mutex and not (uses_sem_give or uses_sem_take)
     details.append(
         CheckDetail(
@@ -58,7 +59,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Low priority thread holds mutex (locks before sleeping)
     # (LLM failure: high priority thread is the one holding the mutex)
-    has_lock = "k_mutex_lock" in generated_code
+    has_lock = scoped_contains(generated_code, 'k_mutex_lock', scope='code_only')
     has_sleep_after_lock = False
     if has_lock:
         lock_pos = generated_code.find("k_mutex_lock")

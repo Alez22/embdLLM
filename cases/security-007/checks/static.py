@@ -1,6 +1,7 @@
 """Static analysis checks for TLS Mutual Authentication credentials."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: tls_credentials.h included (not OpenSSL header)
-    has_tls_creds_h = "tls_credentials.h" in generated_code
+    has_tls_creds_h = scoped_contains(generated_code, 'tls_credentials.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="tls_credentials_header",
@@ -52,7 +53,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: CA certificate type used
-    has_ca_type = "TLS_CREDENTIAL_CA_CERTIFICATE" in generated_code
+    has_ca_type = scoped_contains(generated_code, 'TLS_CREDENTIAL_CA_CERTIFICATE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="ca_certificate_type",
@@ -64,7 +65,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Private key type used
-    has_key_type = "TLS_CREDENTIAL_PRIVATE_KEY" in generated_code
+    has_key_type = scoped_contains(generated_code, 'TLS_CREDENTIAL_PRIVATE_KEY', scope='code_only')
     details.append(
         CheckDetail(
             check_name="private_key_type",
@@ -76,7 +77,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Return value checked (not ignoring tls_credential_add result)
-    has_ret_check = "!= 0" in generated_code or "< 0" in generated_code or "== 0" in generated_code
+    has_ret_check = scoped_contains(generated_code, '!= 0', scope='code_only') or scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, '== 0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="return_value_checked",

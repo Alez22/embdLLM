@@ -1,6 +1,7 @@
 """Static analysis checks for watchdog with callback application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes watchdog header
-    has_wdt_h = "zephyr/drivers/watchdog.h" in generated_code
+    has_wdt_h = scoped_contains(generated_code, 'zephyr/drivers/watchdog.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="watchdog_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Includes kernel header
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Uses wdt_install_timeout
-    has_install = "wdt_install_timeout" in generated_code
+    has_install = scoped_contains(generated_code, 'wdt_install_timeout', scope='code_only')
     details.append(
         CheckDetail(
             check_name="wdt_install_timeout_called",
@@ -45,9 +46,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: Assigns a non-NULL callback in wdt_timeout_cfg (AI failure: callback=NULL)
     has_callback_assigned = (
-        ".callback" in generated_code
+        scoped_contains(generated_code, '.callback', scope='code_only')
         and "NULL" not in generated_code.split(".callback")[1].split(",")[0].split(";")[0]
-        if ".callback" in generated_code else False
+        if scoped_contains(generated_code, '.callback', scope='code_only') else False
     )
     details.append(
         CheckDetail(
@@ -60,7 +61,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Uses wdt_setup
-    has_setup = "wdt_setup" in generated_code
+    has_setup = scoped_contains(generated_code, 'wdt_setup', scope='code_only')
     details.append(
         CheckDetail(
             check_name="wdt_setup_called",
@@ -72,7 +73,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Uses wdt_feed in a loop before stopping
-    has_feed = "wdt_feed" in generated_code
+    has_feed = scoped_contains(generated_code, 'wdt_feed', scope='code_only')
     details.append(
         CheckDetail(
             check_name="wdt_feed_called",

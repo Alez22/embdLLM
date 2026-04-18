@@ -1,13 +1,14 @@
 """Static analysis checks for BLE secure OTA / DFU service."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate BLE DFU service code structure."""
     details: list[CheckDetail] = []
 
-    has_bt_h = "zephyr/bluetooth/bluetooth.h" in generated_code
+    has_bt_h = scoped_contains(generated_code, 'zephyr/bluetooth/bluetooth.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bluetooth_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_gatt_h = "zephyr/bluetooth/gatt.h" in generated_code
+    has_gatt_h = scoped_contains(generated_code, 'zephyr/bluetooth/gatt.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="gatt_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_gatt_svc = "BT_GATT_SERVICE_DEFINE" in generated_code
+    has_gatt_svc = scoped_contains(generated_code, 'BT_GATT_SERVICE_DEFINE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="gatt_service_defined",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_bt_set_security = "bt_conn_set_security" in generated_code
+    has_bt_set_security = scoped_contains(generated_code, 'bt_conn_set_security', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bt_conn_set_security_called",
@@ -52,7 +53,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Hallucination check: ble_dfu_start() does not exist in Zephyr
-    uses_ble_dfu_start = "ble_dfu_start" in generated_code
+    uses_ble_dfu_start = scoped_contains(generated_code, 'ble_dfu_start', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_ble_dfu_start",
@@ -64,7 +65,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Hallucination check: ota_update() does not exist in Zephyr
-    uses_ota_update = "ota_update" in generated_code
+    uses_ota_update = scoped_contains(generated_code, 'ota_update', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_ota_update",

@@ -1,13 +1,14 @@
 """Static analysis checks for Yocto systemd service recipe."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate systemd BitBake recipe structure."""
     details: list[CheckDetail] = []
 
-    has_summary = "SUMMARY" in generated_code
+    has_summary = scoped_contains(generated_code, 'SUMMARY', scope='raw')
     details.append(
         CheckDetail(
             check_name="summary_defined",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_license = "LICENSE" in generated_code
+    has_license = scoped_contains(generated_code, 'LICENSE', scope='raw')
     details.append(
         CheckDetail(
             check_name="license_defined",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_inherit_systemd = "inherit systemd" in generated_code
+    has_inherit_systemd = scoped_contains(generated_code, 'inherit systemd', scope='raw')
     details.append(
         CheckDetail(
             check_name="inherit_systemd",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_service_var = "SYSTEMD_SERVICE" in generated_code
+    has_service_var = scoped_contains(generated_code, 'SYSTEMD_SERVICE', scope='raw')
     details.append(
         CheckDetail(
             check_name="systemd_service_var",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_service_in_src_uri = ".service" in generated_code and "SRC_URI" in generated_code
+    has_service_in_src_uri = scoped_contains(generated_code, '.service', scope='raw') and scoped_contains(generated_code, 'SRC_URI', scope='raw')
     details.append(
         CheckDetail(
             check_name="service_in_src_uri",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_do_install = "do_install" in generated_code
+    has_do_install = scoped_contains(generated_code, 'do_install', scope='raw')
     details.append(
         CheckDetail(
             check_name="do_install_defined",

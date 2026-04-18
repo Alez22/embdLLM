@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 # Fake DT properties that LLMs commonly invent
 _FAKE_DT_PROPERTIES = [
@@ -50,7 +51,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: No clock-speed (should be clock-frequency)
-    has_clock_speed = "clock-speed" in generated_code
+    has_clock_speed = scoped_contains(generated_code, 'clock-speed', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_clock_speed_property",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Sensor node with correct compatible
-    has_bme280 = 'compatible = "bosch,bme280"' in generated_code
+    has_bme280 = scoped_contains(generated_code, 'compatible = "bosch,bme280"', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_compatible",
@@ -74,7 +75,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: reg matches 0x76
-    has_reg_76 = "reg = <0x76>" in generated_code
+    has_reg_76 = scoped_contains(generated_code, 'reg = <0x76>', scope='code_only')
     details.append(
         CheckDetail(
             check_name="reg_address_0x76",
@@ -99,7 +100,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: GPIO active low polarity
-    has_active_low = "GPIO_ACTIVE_LOW" in generated_code
+    has_active_low = scoped_contains(generated_code, 'GPIO_ACTIVE_LOW', scope='code_only')
     details.append(
         CheckDetail(
             check_name="gpio_active_low",
@@ -111,7 +112,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 7: status = "okay"
-    has_status_okay = 'status = "okay"' in generated_code
+    has_status_okay = scoped_contains(generated_code, 'status = "okay"', scope='code_only')
     details.append(
         CheckDetail(
             check_name="status_okay",
@@ -123,7 +124,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 8: Node is child of i2c bus (i2c0 reference)
-    has_i2c_bus = "i2c0" in generated_code
+    has_i2c_bus = scoped_contains(generated_code, 'i2c0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="i2c_bus_parent",
@@ -136,7 +137,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 9: Node address format — sensor node uses @76 (node-name@addr format)
     # LLM failure: uses bme280 { instead of bme280@76 {
-    has_at_addr = "bme280@76" in generated_code or "bme280@0x76" in generated_code
+    has_at_addr = scoped_contains(generated_code, 'bme280@76', scope='code_only') or scoped_contains(generated_code, 'bme280@0x76', scope='code_only')
     details.append(
         CheckDetail(
             check_name="node_at_address_format",

@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,12 +11,12 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: State machine structure (loop with state dispatch)
     # (LLM failure: linear flow without state machine)
-    has_while = "while" in generated_code
+    has_while = scoped_contains(generated_code, 'while', scope='code_only')
     has_switch_or_if_states = (
-        "switch" in generated_code and "OTA_" in generated_code
+        scoped_contains(generated_code, 'switch', scope='code_only') and scoped_contains(generated_code, 'OTA_', scope='code_only')
     ) or (
-        "OTA_DOWNLOADING" in generated_code and "OTA_VERIFYING" in generated_code
-        and "if" in generated_code
+        scoped_contains(generated_code, 'OTA_DOWNLOADING', scope='code_only') and scoped_contains(generated_code, 'OTA_VERIFYING', scope='code_only')
+        and scoped_contains(generated_code, 'if', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -43,7 +44,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Self-test before confirmation
     # (LLM failure: calling boot_write_img_confirmed without self-test)
-    has_self_test = "self_test" in generated_code or "selftest" in generated_code
+    has_self_test = scoped_contains(generated_code, 'self_test', scope='code_only') or scoped_contains(generated_code, 'selftest', scope='code_only')
     self_test_pos = generated_code.find("self_test")
     confirm_pos = generated_code.find("boot_write_img_confirmed")
     details.append(
@@ -87,7 +88,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Error path returns to IDLE rather than hanging
-    has_idle_on_error = "OTA_IDLE" in generated_code and (
+    has_idle_on_error = scoped_contains(generated_code, 'OTA_IDLE', scope='code_only') and (
         "failed" in generated_code.lower() or "error" in generated_code.lower()
     )
     details.append(
@@ -122,7 +123,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 8: Rollback path — dfu_target_done(false) on download error
     # (LLM failure: only happy path — no abort if download chunk fails)
-    has_rollback_abort = "dfu_target_done(false)" in generated_code
+    has_rollback_abort = scoped_contains(generated_code, 'dfu_target_done(false)', scope='code_only')
     details.append(
         CheckDetail(
             check_name="rollback_abort_on_download_error",
@@ -137,9 +138,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # (LLM failure: calling self_test() but ignoring its return value, always confirming)
     import re as _re
     self_test_ret_checked = (
-        "self_test" in generated_code
-        and "boot_write_img_confirmed" in generated_code
-        and ("!= 0" in generated_code or "< 0" in generated_code
+        scoped_contains(generated_code, 'self_test', scope='code_only')
+        and scoped_contains(generated_code, 'boot_write_img_confirmed', scope='code_only')
+        and (scoped_contains(generated_code, '!= 0', scope='code_only') or scoped_contains(generated_code, '< 0', scope='code_only')
              or bool(_re.search(r'if\s*\(\s*(?:ret|rc|result|err|status)\b', generated_code)))
     )
     details.append(
@@ -155,10 +156,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 10: Rollback on error path — Factor E7 OTA pipeline
     # Accepts MCUboot (dfu_target_done false / boot_write_img_invalid) or ESP-IDF rollback API
     has_rollback = (
-        "boot_write_img_invalid" in generated_code
-        or "mark_app_invalid" in generated_code
-        or "esp_ota_mark_app_invalid" in generated_code
-        or "dfu_target_done(false)" in generated_code
+        scoped_contains(generated_code, 'boot_write_img_invalid', scope='code_only')
+        or scoped_contains(generated_code, 'mark_app_invalid', scope='code_only')
+        or scoped_contains(generated_code, 'esp_ota_mark_app_invalid', scope='code_only')
+        or scoped_contains(generated_code, 'dfu_target_done(false)', scope='code_only')
     )
     details.append(CheckDetail(
         check_name="rollback_on_error",

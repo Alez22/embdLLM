@@ -1,13 +1,14 @@
 """Static analysis checks for BLE peripheral with notifications."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate BLE notify peripheral code structure."""
     details: list[CheckDetail] = []
 
-    has_bt_h = "zephyr/bluetooth/bluetooth.h" in generated_code
+    has_bt_h = scoped_contains(generated_code, 'zephyr/bluetooth/bluetooth.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bluetooth_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_gatt_h = "zephyr/bluetooth/gatt.h" in generated_code
+    has_gatt_h = scoped_contains(generated_code, 'zephyr/bluetooth/gatt.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="gatt_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_notify_flag = "BT_GATT_CHRC_NOTIFY" in generated_code
+    has_notify_flag = scoped_contains(generated_code, 'BT_GATT_CHRC_NOTIFY', scope='code_only')
     details.append(
         CheckDetail(
             check_name="chrc_notify_flag",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_ccc = "BT_GATT_CCC" in generated_code
+    has_ccc = scoped_contains(generated_code, 'BT_GATT_CCC', scope='code_only')
     details.append(
         CheckDetail(
             check_name="ccc_descriptor",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_notify = "bt_gatt_notify" in generated_code
+    has_notify = scoped_contains(generated_code, 'bt_gatt_notify', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bt_gatt_notify_called",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_svc_define = "BT_GATT_SERVICE_DEFINE" in generated_code
+    has_svc_define = scoped_contains(generated_code, 'BT_GATT_SERVICE_DEFINE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="gatt_service_defined",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_conn_ref = "bt_conn_ref" in generated_code
+    has_conn_ref = scoped_contains(generated_code, 'bt_conn_ref', scope='code_only')
     details.append(
         CheckDetail(
             check_name="conn_ref_called",

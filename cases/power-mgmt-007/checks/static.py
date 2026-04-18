@@ -1,6 +1,7 @@
 """Static analysis checks for system PM policy override."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: PM policy header
-    has_pm_policy_h = "zephyr/pm/policy.h" in generated_code or "zephyr/pm/device.h" in generated_code
+    has_pm_policy_h = scoped_contains(generated_code, 'zephyr/pm/policy.h', scope='code_only') or scoped_contains(generated_code, 'zephyr/pm/device.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="pm_policy_header",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: pm_policy_state_lock_get called
-    has_lock_get = "pm_policy_state_lock_get" in generated_code
+    has_lock_get = scoped_contains(generated_code, 'pm_policy_state_lock_get', scope='code_only')
     details.append(
         CheckDetail(
             check_name="lock_get_called",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: pm_policy_state_lock_put called (no leak)
-    has_lock_put = "pm_policy_state_lock_put" in generated_code
+    has_lock_put = scoped_contains(generated_code, 'pm_policy_state_lock_put', scope='code_only')
     details.append(
         CheckDetail(
             check_name="lock_put_called",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: PM_STATE_SUSPEND_TO_RAM referenced
-    has_state = "PM_STATE_SUSPEND_TO_RAM" in generated_code
+    has_state = scoped_contains(generated_code, 'PM_STATE_SUSPEND_TO_RAM', scope='code_only')
     details.append(
         CheckDetail(
             check_name="suspend_to_ram_state",

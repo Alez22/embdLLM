@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis, has_output_call
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,7 +11,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: k_thread_stack_space_get API used (not custom canary)
     # (LLM hallucination: implementing custom stack probe instead of using Zephyr API)
-    has_api = "k_thread_stack_space_get" in generated_code
+    has_api = scoped_contains(generated_code, 'k_thread_stack_space_get', scope='code_only')
     details.append(
         CheckDetail(
             check_name="zephyr_stack_api_used",
@@ -36,7 +37,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 3: Threshold comparison before emitting warning
     import re
     has_compare = bool(re.search(r'unused\s*[<>]=?\s*\w+|remaining\s*[<>]=?\s*\w+|space\s*[<>]=?\s*\w+', generated_code))
-    has_threshold_kw = "threshold" in generated_code.lower() or "THRESHOLD" in generated_code
+    has_threshold_kw = "threshold" in generated_code.lower() or scoped_contains(generated_code, 'THRESHOLD', scope='code_only')
     details.append(
         CheckDetail(
             check_name="threshold_used_for_comparison",
@@ -48,7 +49,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: CONFIG_THREAD_STACK_INFO enabled (enables the API)
-    has_config = "CONFIG_THREAD_STACK_INFO=y" in generated_code
+    has_config = scoped_contains(generated_code, 'CONFIG_THREAD_STACK_INFO=y', scope='code_only')
     details.append(
         CheckDetail(
             check_name="config_enables_stack_info_api",
@@ -60,7 +61,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: k_current_get() used to get current thread handle
-    has_current = "k_current_get" in generated_code
+    has_current = scoped_contains(generated_code, 'k_current_get', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_current_get_for_thread_handle",

@@ -2,7 +2,9 @@
 
 import re
 
-from embedeval.check_utils import (check_no_cross_platform_apis,
+from embedeval.check_utils import (
+    check_no_cross_platform_apis,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -15,7 +17,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     stripped = strip_comments(generated_code)
 
     # Check 1: No malloc() — C userspace function in kernel code is wrong
-    has_malloc = "malloc(" in generated_code and "dma_alloc" not in generated_code
+    has_malloc = scoped_contains(generated_code, 'malloc(', scope='code_only') and "dma_alloc" not in generated_code
     details.append(
         CheckDetail(
             check_name="no_userspace_malloc",
@@ -27,7 +29,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: No vmalloc() for DMA — not physically contiguous
-    has_vmalloc = "vmalloc(" in generated_code
+    has_vmalloc = scoped_contains(generated_code, 'vmalloc(', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_vmalloc_for_dma",
@@ -40,7 +42,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: No plain kmalloc() as the DMA allocation method
     has_kmalloc_only = (
-        "kmalloc(" in generated_code and "dma_alloc_coherent" not in generated_code
+        scoped_contains(generated_code, 'kmalloc(', scope='code_only') and "dma_alloc_coherent" not in generated_code
     )
     details.append(
         CheckDetail(
@@ -53,7 +55,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Allocation failure handled with -ENOMEM
-    has_enomem = "ENOMEM" in generated_code
+    has_enomem = scoped_contains(generated_code, 'ENOMEM', scope='code_only')
     details.append(
         CheckDetail(
             check_name="enomem_on_alloc_failure",
@@ -65,8 +67,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: alloc and free are both present (balanced)
-    has_alloc = "dma_alloc_coherent" in generated_code
-    has_free = "dma_free_coherent" in generated_code
+    has_alloc = scoped_contains(generated_code, 'dma_alloc_coherent', scope='code_only')
+    has_free = scoped_contains(generated_code, 'dma_free_coherent', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dma_alloc_free_balanced",
@@ -78,7 +80,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: dev_set_drvdata used to store per-device state
-    has_drvdata = "dev_set_drvdata" in generated_code or "devm_" in generated_code
+    has_drvdata = scoped_contains(generated_code, 'dev_set_drvdata', scope='code_only') or scoped_contains(generated_code, 'devm_', scope='code_only')
     details.append(
         CheckDetail(
             check_name="per_device_data_stored",
@@ -98,7 +100,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
             generated_code,
         )
     ) or (
-        "ENOMEM" in generated_code
+        scoped_contains(generated_code, 'ENOMEM', scope='code_only')
         and bool(re.search(r'dma_alloc_coherent[^;]+;[^}]*if\s*\(\s*!', generated_code, re.DOTALL))
     )
     details.append(

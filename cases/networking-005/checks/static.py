@@ -1,13 +1,14 @@
 """Static analysis checks for HTTP client with TLS."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate HTTPS client code structure."""
     details: list[CheckDetail] = []
 
-    has_http_h = "zephyr/net/http/client.h" in generated_code
+    has_http_h = scoped_contains(generated_code, 'zephyr/net/http/client.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="http_client_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_tls_cred_h = "zephyr/net/tls_credentials.h" in generated_code
+    has_tls_cred_h = scoped_contains(generated_code, 'zephyr/net/tls_credentials.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="tls_credentials_header",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_tls_cred_add = "tls_credential_add" in generated_code
+    has_tls_cred_add = scoped_contains(generated_code, 'tls_credential_add', scope='code_only')
     details.append(
         CheckDetail(
             check_name="tls_credential_add_called",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_tls_socket = "IPPROTO_TLS_1_2" in generated_code or "IPPROTO_TLS_1_3" in generated_code
+    has_tls_socket = scoped_contains(generated_code, 'IPPROTO_TLS_1_2', scope='code_only') or scoped_contains(generated_code, 'IPPROTO_TLS_1_3', scope='code_only')
     details.append(
         CheckDetail(
             check_name="tls_socket_protocol",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_sec_tag_list = "TLS_SEC_TAG_LIST" in generated_code
+    has_sec_tag_list = scoped_contains(generated_code, 'TLS_SEC_TAG_LIST', scope='code_only')
     details.append(
         CheckDetail(
             check_name="tls_sec_tag_list_set",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_hostname = "TLS_HOSTNAME" in generated_code
+    has_hostname = scoped_contains(generated_code, 'TLS_HOSTNAME', scope='code_only')
     details.append(
         CheckDetail(
             check_name="tls_hostname_set",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_http_req = "http_client_req" in generated_code
+    has_http_req = scoped_contains(generated_code, 'http_client_req', scope='code_only')
     details.append(
         CheckDetail(
             check_name="http_client_req_called",
@@ -84,7 +85,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_ca_cert = "TLS_CREDENTIAL_CA_CERTIFICATE" in generated_code
+    has_ca_cert = scoped_contains(generated_code, 'TLS_CREDENTIAL_CA_CERTIFICATE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="ca_certificate_type",

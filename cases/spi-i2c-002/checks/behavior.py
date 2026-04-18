@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -11,7 +12,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: device_is_ready() called before SPI operations
-    has_ready = "device_is_ready" in generated_code
+    has_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     transceive_pos = generated_code.find("spi_transceive")
     ready_pos = generated_code.find("device_is_ready")
     order_ok = (
@@ -47,7 +48,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Error return value checked after spi_transceive
-    has_error_check = "< 0" in generated_code or "!= 0" in generated_code
+    has_error_check = scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, '!= 0', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi_error_handling",
@@ -60,12 +61,12 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: Loopback comparison performed (memcmp or manual loop)
     has_compare = (
-        "memcmp" in generated_code
-        or "strcmp" in generated_code
+        scoped_contains(generated_code, 'memcmp', scope='code_only')
+        or scoped_contains(generated_code, 'strcmp', scope='code_only')
         or (
-            "tx_buf" in generated_code
-            and "rx_buf" in generated_code
-            and ("==" in generated_code or "!=" in generated_code)
+            scoped_contains(generated_code, 'tx_buf', scope='code_only')
+            and scoped_contains(generated_code, 'rx_buf', scope='code_only')
+            and (scoped_contains(generated_code, '==', scope='code_only') or scoped_contains(generated_code, '!=', scope='code_only'))
         )
     )
     details.append(
@@ -81,9 +82,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 5: SPI frequency configured (not zero or missing)
     has_freq = bool(
         re.search(r"frequency\s*=\s*[1-9]\d+", generated_code)
-        or "1000000" in generated_code
-        or "KHZ" in generated_code
-        or "MHZ" in generated_code
+        or scoped_contains(generated_code, '1000000', scope='code_only')
+        or scoped_contains(generated_code, 'KHZ', scope='code_only')
+        or scoped_contains(generated_code, 'MHZ', scope='code_only')
     )
     details.append(
         CheckDetail(

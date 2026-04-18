@@ -1,13 +1,14 @@
 """Static analysis checks for DFU target flash write."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate DFU target code structure."""
     details: list[CheckDetail] = []
 
-    has_dfu_target_h = "dfu/dfu_target.h" in generated_code
+    has_dfu_target_h = scoped_contains(generated_code, 'dfu/dfu_target.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dfu_target_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_init = "dfu_target_init" in generated_code
+    has_init = scoped_contains(generated_code, 'dfu_target_init', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dfu_target_init",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_write = "dfu_target_write" in generated_code
+    has_write = scoped_contains(generated_code, 'dfu_target_write', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dfu_target_write",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_done = "dfu_target_done" in generated_code
+    has_done = scoped_contains(generated_code, 'dfu_target_done', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dfu_target_done",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_mcuboot_type = "DFU_TARGET_IMAGE_TYPE_MCUBOOT" in generated_code
+    has_mcuboot_type = scoped_contains(generated_code, 'DFU_TARGET_IMAGE_TYPE_MCUBOOT', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mcuboot_image_type",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_reboot = "sys_reboot" in generated_code
+    has_reboot = scoped_contains(generated_code, 'sys_reboot', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sys_reboot_after_dfu",

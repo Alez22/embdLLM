@@ -1,6 +1,7 @@
 """Static analysis checks for SPI full-duplex transfer."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: SPI header included
-    has_spi_h = "zephyr/drivers/spi.h" in generated_code
+    has_spi_h = scoped_contains(generated_code, 'zephyr/drivers/spi.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: spi_transceive used (full-duplex API)
-    has_transceive = "spi_transceive" in generated_code
+    has_transceive = scoped_contains(generated_code, 'spi_transceive', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi_transceive_used",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: spi_config with frequency
-    has_config_freq = "frequency" in generated_code and "spi_config" in generated_code
+    has_config_freq = scoped_contains(generated_code, 'frequency', scope='code_only') and scoped_contains(generated_code, 'spi_config', scope='code_only')
     details.append(
         CheckDetail(
             check_name="spi_config_with_frequency",
@@ -44,8 +45,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: No cross-platform APIs (hallucination guards)
-    has_hal_spi = "HAL_SPI_TransmitReceive" in generated_code
-    has_arduino_spi = "SPI.transfer" in generated_code
+    has_hal_spi = scoped_contains(generated_code, 'HAL_SPI_TransmitReceive', scope='code_only')
+    has_arduino_spi = scoped_contains(generated_code, 'SPI.transfer', scope='code_only')
     no_cross_platform = not has_hal_spi and not has_arduino_spi
     details.append(
         CheckDetail(
@@ -58,7 +59,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: DEVICE_DT_GET used
-    has_dev_get = "DEVICE_DT_GET" in generated_code
+    has_dev_get = scoped_contains(generated_code, 'DEVICE_DT_GET', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_dt_get_used",

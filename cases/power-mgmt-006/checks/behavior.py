@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -45,7 +46,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Peripheral not accessed while suspended (no use after suspend without resume)
     # Heuristic: if printk "Using peripheral" appears, it should be between RESUME and SUSPEND
-    has_use_msg = "Using peripheral" in generated_code or "peripheral" in generated_code.lower()
+    has_use_msg = scoped_contains(generated_code, 'Using peripheral', scope='code_only') or "peripheral" in generated_code.lower()
     details.append(
         CheckDetail(
             check_name="peripheral_used_while_active",

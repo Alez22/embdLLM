@@ -1,13 +1,14 @@
 """Static analysis checks for MQTT client."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate MQTT code structure."""
     details: list[CheckDetail] = []
 
-    has_mqtt_h = "zephyr/net/mqtt.h" in generated_code
+    has_mqtt_h = scoped_contains(generated_code, 'zephyr/net/mqtt.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mqtt_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_init = "mqtt_client_init" in generated_code
+    has_init = scoped_contains(generated_code, 'mqtt_client_init', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mqtt_client_init",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_connect = "mqtt_connect" in generated_code
+    has_connect = scoped_contains(generated_code, 'mqtt_connect', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mqtt_connect_called",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_publish = "mqtt_publish" in generated_code
+    has_publish = scoped_contains(generated_code, 'mqtt_publish', scope='code_only')
     details.append(
         CheckDetail(
             check_name="mqtt_publish_called",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_evt_handler = "mqtt_evt" in generated_code or "evt_cb" in generated_code
+    has_evt_handler = scoped_contains(generated_code, 'mqtt_evt', scope='code_only') or scoped_contains(generated_code, 'evt_cb', scope='code_only')
     details.append(
         CheckDetail(
             check_name="event_handler_defined",

@@ -1,6 +1,7 @@
 """Static analysis checks for ISR-safe FIFO with k_fifo."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: kernel header included
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: k_fifo used (not FreeRTOS xQueue)
-    has_kfifo = "k_fifo" in generated_code
+    has_kfifo = scoped_contains(generated_code, 'k_fifo', scope='code_only')
     details.append(
         CheckDetail(
             check_name="uses_k_fifo",
@@ -45,7 +46,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: k_fifo_put present (ISR side)
-    has_put = "k_fifo_put" in generated_code
+    has_put = scoped_contains(generated_code, 'k_fifo_put', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_fifo_put_present",
@@ -57,7 +58,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: k_fifo_get present (thread side)
-    has_get = "k_fifo_get" in generated_code
+    has_get = scoped_contains(generated_code, 'k_fifo_get', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_fifo_get_present",
@@ -85,7 +86,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 7: fifo_reserved field present (required by k_fifo linked list)
-    has_reserved = "fifo_reserved" in generated_code
+    has_reserved = scoped_contains(generated_code, 'fifo_reserved', scope='code_only')
     details.append(
         CheckDetail(
             check_name="fifo_reserved_field",

@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -26,7 +27,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: channel_get handles unsupported channels with -ENOTSUP
     # (LLM failure: returning 0 for all channels, no error for unsupported)
-    has_enotsup = "ENOTSUP" in generated_code
+    has_enotsup = scoped_contains(generated_code, 'ENOTSUP', scope='code_only')
     details.append(
         CheckDetail(
             check_name="unsupported_channel_returns_enotsup",
@@ -40,8 +41,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 3: data->last_sample or similar field read in channel_get
     # (LLM failure: channel_get that ignores the fetched data)
     has_data_read = (
-        "last_sample" in generated_code or
-        "data->" in generated_code
+        scoped_contains(generated_code, 'last_sample', scope='code_only') or
+        scoped_contains(generated_code, 'data->', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -56,8 +57,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 4: sample_fetch writes to driver data struct
     # (LLM failure: sample_fetch that returns 0 without storing anything)
     has_data_write = (
-        "last_sample" in generated_code and
-        "=" in generated_code
+        scoped_contains(generated_code, 'last_sample', scope='code_only') and
+        scoped_contains(generated_code, '=', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -71,8 +72,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 5: Init function returns 0
     has_init_return_zero = (
-        "my_sensor_init" in generated_code and
-        "return 0" in generated_code
+        scoped_contains(generated_code, 'my_sensor_init', scope='code_only') and
+        scoped_contains(generated_code, 'return 0', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -86,7 +87,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: val->val1 set in channel_get (correct sensor_value population)
     # (LLM failure: setting val = data->sample directly without val->val1)
-    has_val1 = "val->val1" in generated_code or "val1" in generated_code
+    has_val1 = scoped_contains(generated_code, 'val->val1', scope='code_only') or scoped_contains(generated_code, 'val1', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_value_val1_set",

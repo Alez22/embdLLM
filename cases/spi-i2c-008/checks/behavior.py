@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -11,7 +12,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: write_requested callback implemented
-    has_write_requested = "write_requested" in generated_code
+    has_write_requested = scoped_contains(generated_code, 'write_requested', scope='code_only')
     details.append(
         CheckDetail(
             check_name="write_requested_callback",
@@ -23,7 +24,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: read_requested callback implemented
-    has_read_requested = "read_requested" in generated_code
+    has_read_requested = scoped_contains(generated_code, 'read_requested', scope='code_only')
     details.append(
         CheckDetail(
             check_name="read_requested_callback",
@@ -35,7 +36,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: write_received callback implemented
-    has_write_received = "write_received" in generated_code
+    has_write_received = scoped_contains(generated_code, 'write_received', scope='code_only')
     details.append(
         CheckDetail(
             check_name="write_received_callback",
@@ -47,7 +48,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: read_processed callback implemented
-    has_read_processed = "read_processed" in generated_code
+    has_read_processed = scoped_contains(generated_code, 'read_processed', scope='code_only')
     details.append(
         CheckDetail(
             check_name="read_processed_callback",
@@ -76,7 +77,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Target registered with valid address (0x55 or any 7-bit address)
-    has_address = "0x55" in generated_code or "TARGET_ADDR" in generated_code or ".address" in generated_code
+    has_address = scoped_contains(generated_code, '0x55', scope='code_only') or scoped_contains(generated_code, 'TARGET_ADDR', scope='code_only') or scoped_contains(generated_code, '.address', scope='code_only')
     details.append(
         CheckDetail(
             check_name="target_address_set",

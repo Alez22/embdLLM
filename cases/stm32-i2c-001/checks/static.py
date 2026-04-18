@@ -1,6 +1,7 @@
 """Static analysis checks for STM32 HAL I2C sensor read application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: STM32 HAL header
-    has_hal_header = "stm32f4xx_hal.h" in generated_code
+    has_hal_header = scoped_contains(generated_code, 'stm32f4xx_hal.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="stm32_hal_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: I2C_HandleTypeDef used
-    has_i2c_handle = "I2C_HandleTypeDef" in generated_code
+    has_i2c_handle = scoped_contains(generated_code, 'I2C_HandleTypeDef', scope='code_only')
     details.append(
         CheckDetail(
             check_name="i2c_handle_typedef_used",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: I2C1 instance configured
-    has_i2c1 = "I2C1" in generated_code
+    has_i2c1 = scoped_contains(generated_code, 'I2C1', scope='code_only')
     details.append(
         CheckDetail(
             check_name="i2c1_instance_configured",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Register read via HAL_I2C_Mem_Read (not raw byte read)
-    has_mem_read = "HAL_I2C_Mem_Read" in generated_code
+    has_mem_read = scoped_contains(generated_code, 'HAL_I2C_Mem_Read', scope='code_only')
     details.append(
         CheckDetail(
             check_name="hal_i2c_mem_read_used",

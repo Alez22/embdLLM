@@ -1,6 +1,7 @@
 """Static analysis checks for hardware counter precise timing application."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: Includes zephyr/drivers/counter.h
-    has_counter_h = "zephyr/drivers/counter.h" in generated_code
+    has_counter_h = scoped_contains(generated_code, 'zephyr/drivers/counter.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="counter_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Includes zephyr/kernel.h
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: counter_start called before alarm
-    has_counter_start = "counter_start" in generated_code
+    has_counter_start = scoped_contains(generated_code, 'counter_start', scope='code_only')
     details.append(
         CheckDetail(
             check_name="counter_start_called",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: counter_get_value used for measurement
-    has_get_value = "counter_get_value" in generated_code
+    has_get_value = scoped_contains(generated_code, 'counter_get_value', scope='code_only')
     details.append(
         CheckDetail(
             check_name="counter_get_value_used",
@@ -70,7 +71,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Cross-platform — no Linux timerfd
-    has_linux_timer = "timerfd_create" in generated_code or "timerfd_settime" in generated_code
+    has_linux_timer = scoped_contains(generated_code, 'timerfd_create', scope='code_only') or scoped_contains(generated_code, 'timerfd_settime', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_linux_timerfd",
@@ -82,7 +83,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 7: counter_set_channel_alarm used (correct Zephyr counter alarm API)
-    has_alarm = "counter_set_channel_alarm" in generated_code
+    has_alarm = scoped_contains(generated_code, 'counter_set_channel_alarm', scope='code_only')
     details.append(
         CheckDetail(
             check_name="counter_set_channel_alarm_called",

@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis, check_return_after_error
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -38,7 +39,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Error path calls dfu_target_done(false) to abort
     # (LLM failure: leaving DFU in partially initialized state on error)
-    has_abort = "dfu_target_done(false)" in generated_code
+    has_abort = scoped_contains(generated_code, 'dfu_target_done(false)', scope='code_only')
     details.append(
         CheckDetail(
             check_name="abort_on_error",
@@ -50,8 +51,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Error handling on init return value
-    has_init_err = "dfu_target_init" in generated_code and (
-        "< 0" in generated_code or "!= 0" in generated_code
+    has_init_err = scoped_contains(generated_code, 'dfu_target_init', scope='code_only') and (
+        scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, '!= 0', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -79,8 +80,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 6: Error handling on dfu_target_write return value
     # (LLM failure: ignoring write errors — partial flash writes go undetected)
     write_err_handled = (
-        "dfu_target_write" in generated_code
-        and ("< 0" in generated_code or "!= 0" in generated_code)
+        scoped_contains(generated_code, 'dfu_target_write', scope='code_only')
+        and (scoped_contains(generated_code, '< 0', scope='code_only') or scoped_contains(generated_code, '!= 0', scope='code_only'))
     )
     details.append(
         CheckDetail(
@@ -97,7 +98,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Note: "return" in generated_code is always true for any C code — use
     # check_return_after_error to verify that error-handling blocks contain returns.
     abort_returns = (
-        "dfu_target_done(false)" in generated_code
+        scoped_contains(generated_code, 'dfu_target_done(false)', scope='code_only')
         and check_return_after_error(generated_code)
     )
     details.append(

@@ -1,6 +1,7 @@
 """Static analysis checks for LittleFS file read/write."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: LittleFS header included
-    has_littlefs_h = "zephyr/fs/littlefs.h" in generated_code
+    has_littlefs_h = scoped_contains(generated_code, 'zephyr/fs/littlefs.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="littlefs_header_included",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: fs.h included
-    has_fs_h = "zephyr/fs/fs.h" in generated_code
+    has_fs_h = scoped_contains(generated_code, 'zephyr/fs/fs.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="fs_header_included",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: fs_mount called
-    has_mount = "fs_mount" in generated_code
+    has_mount = scoped_contains(generated_code, 'fs_mount', scope='code_only')
     details.append(
         CheckDetail(
             check_name="fs_mount_called",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: FS_O_CREATE flag used
-    has_create = "FS_O_CREATE" in generated_code
+    has_create = scoped_contains(generated_code, 'FS_O_CREATE', scope='code_only')
     details.append(
         CheckDetail(
             check_name="fs_o_create_flag",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: fs_close called
-    has_close = "fs_close" in generated_code
+    has_close = scoped_contains(generated_code, 'fs_close', scope='code_only')
     details.append(
         CheckDetail(
             check_name="fs_close_called",

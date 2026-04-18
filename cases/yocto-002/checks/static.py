@@ -1,13 +1,14 @@
 """Static analysis checks for Yocto CMake recipe."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate CMake BitBake recipe structure."""
     details: list[CheckDetail] = []
 
-    has_summary = "SUMMARY" in generated_code
+    has_summary = scoped_contains(generated_code, 'SUMMARY', scope='raw')
     details.append(
         CheckDetail(
             check_name="summary_defined",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_license = "LICENSE" in generated_code
+    has_license = scoped_contains(generated_code, 'LICENSE', scope='raw')
     details.append(
         CheckDetail(
             check_name="license_defined",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_lic_chksum = "LIC_FILES_CHKSUM" in generated_code
+    has_lic_chksum = scoped_contains(generated_code, 'LIC_FILES_CHKSUM', scope='raw')
     details.append(
         CheckDetail(
             check_name="lic_files_chksum",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_inherit_cmake = "inherit cmake" in generated_code
+    has_inherit_cmake = scoped_contains(generated_code, 'inherit cmake', scope='raw')
     details.append(
         CheckDetail(
             check_name="inherit_cmake",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_src_uri = "SRC_URI" in generated_code
+    has_src_uri = scoped_contains(generated_code, 'SRC_URI', scope='raw')
     details.append(
         CheckDetail(
             check_name="src_uri_defined",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_srcrev = "SRCREV" in generated_code
+    has_srcrev = scoped_contains(generated_code, 'SRCREV', scope='raw')
     details.append(
         CheckDetail(
             check_name="srcrev_defined",
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_do_install = "do_install" in generated_code
+    has_do_install = scoped_contains(generated_code, 'do_install', scope='raw')
     details.append(
         CheckDetail(
             check_name="do_install_defined",

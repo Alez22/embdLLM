@@ -1,13 +1,14 @@
 """Static analysis checks for BLE advertising with manufacturer data."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate BLE manufacturer data advertising structure."""
     details: list[CheckDetail] = []
 
-    has_bt_h = "zephyr/bluetooth/bluetooth.h" in generated_code
+    has_bt_h = scoped_contains(generated_code, 'zephyr/bluetooth/bluetooth.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bluetooth_header",
@@ -18,7 +19,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_manufacturer_data = "BT_DATA_MANUFACTURER_DATA" in generated_code
+    has_manufacturer_data = scoped_contains(generated_code, 'BT_DATA_MANUFACTURER_DATA', scope='code_only')
     details.append(
         CheckDetail(
             check_name="manufacturer_data_type_used",
@@ -29,7 +30,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_bt_data_bytes = "BT_DATA_BYTES" in generated_code
+    has_bt_data_bytes = scoped_contains(generated_code, 'BT_DATA_BYTES', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bt_data_bytes_macro_used",
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_bt_enable = "bt_enable" in generated_code
+    has_bt_enable = scoped_contains(generated_code, 'bt_enable', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bt_enable_called",
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         )
     )
 
-    has_adv_start = "bt_le_adv_start" in generated_code
+    has_adv_start = scoped_contains(generated_code, 'bt_le_adv_start', scope='code_only')
     details.append(
         CheckDetail(
             check_name="bt_le_adv_start_called",

@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -28,8 +29,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 2: -ENODEV returned on WHO_AM_I mismatch (not silently passing)
     # (LLM failure: printing a warning but returning 0 — driver binds to wrong hardware)
     has_enodev_on_mismatch = (
-        "ENODEV" in generated_code
-        and ("!=" in generated_code or "!=" in generated_code)
+        scoped_contains(generated_code, 'ENODEV', scope='code_only')
+        and (scoped_contains(generated_code, '!=', scope='code_only') or scoped_contains(generated_code, '!=', scope='code_only'))
     )
     details.append(
         CheckDetail(
@@ -45,12 +46,12 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 3: sample_fetch AND channel_get both wired into sensor_driver_api
     # (LLM failure: defining functions but forgetting to assign them in api struct)
     has_fetch_in_api = (
-        "sample_fetch" in generated_code
-        and "sensor_driver_api" in generated_code
+        scoped_contains(generated_code, 'sample_fetch', scope='code_only')
+        and scoped_contains(generated_code, 'sensor_driver_api', scope='code_only')
     )
     has_get_in_api = (
-        "channel_get" in generated_code
-        and "sensor_driver_api" in generated_code
+        scoped_contains(generated_code, 'channel_get', scope='code_only')
+        and scoped_contains(generated_code, 'sensor_driver_api', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -65,7 +66,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: dev->config used to get i2c_dev and i2c_addr
     # (LLM failure: hardcoding I2C device name or address instead of using device config)
-    has_dev_config = "dev->config" in generated_code or "cfg->i2c" in generated_code
+    has_dev_config = scoped_contains(generated_code, 'dev->config', scope='code_only') or scoped_contains(generated_code, 'cfg->i2c', scope='code_only')
     details.append(
         CheckDetail(
             check_name="config_from_device_struct",
@@ -78,7 +79,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: channel_get returns -ENOTSUP for unsupported channels
-    has_enotsup = "ENOTSUP" in generated_code
+    has_enotsup = scoped_contains(generated_code, 'ENOTSUP', scope='code_only')
     details.append(
         CheckDetail(
             check_name="enotsup_for_unsupported_channel",

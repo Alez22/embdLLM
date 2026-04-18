@@ -5,6 +5,7 @@ import re
 from embedeval.check_utils import (
     check_no_cross_platform_apis,
     extract_function_body,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -107,7 +108,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: k_sleep in main to allow work queue to drain
-    has_sleep = "k_sleep" in generated_code
+    has_sleep = scoped_contains(generated_code, 'k_sleep', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_sleep_for_drain",

@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -26,8 +27,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: TLS socket (not plain TCP)
     has_tls = (
-        "IPPROTO_TLS_1_2" in generated_code
-        or "IPPROTO_TLS_1_3" in generated_code
+        scoped_contains(generated_code, 'IPPROTO_TLS_1_2', scope='code_only')
+        or scoped_contains(generated_code, 'IPPROTO_TLS_1_3', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -40,7 +41,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: Security tag set on socket (links cert to socket)
-    has_sec_tag = "TLS_SEC_TAG_LIST" in generated_code
+    has_sec_tag = scoped_contains(generated_code, 'TLS_SEC_TAG_LIST', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sec_tag_set_on_socket",
@@ -53,9 +54,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: Response callback defined and assigned
     has_response_cb = (
-        "response" in generated_code
-        and ("HTTP_DATA_FINAL" in generated_code or "data_len" in generated_code
-             or "http_status" in generated_code or "response_cb" in generated_code)
+        scoped_contains(generated_code, 'response', scope='code_only')
+        and (scoped_contains(generated_code, 'HTTP_DATA_FINAL', scope='code_only') or scoped_contains(generated_code, 'data_len', scope='code_only')
+             or scoped_contains(generated_code, 'http_status', scope='code_only') or scoped_contains(generated_code, 'response_cb', scope='code_only'))
     )
     details.append(
         CheckDetail(
@@ -68,9 +69,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Timeout specified in http_client_req (not 0 or negative)
-    has_timeout = "http_client_req" in generated_code and (
-        "5000" in generated_code
-        or "K_SECONDS" in generated_code
+    has_timeout = scoped_contains(generated_code, 'http_client_req', scope='code_only') and (
+        scoped_contains(generated_code, '5000', scope='code_only')
+        or scoped_contains(generated_code, 'K_SECONDS', scope='code_only')
         or "timeout" in generated_code.lower()
     )
     details.append(
@@ -84,7 +85,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: Port 443 used (HTTPS standard port)
-    has_port_443 = "443" in generated_code
+    has_port_443 = scoped_contains(generated_code, '443', scope='code_only')
     details.append(
         CheckDetail(
             check_name="https_port_443",

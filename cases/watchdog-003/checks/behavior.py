@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -46,7 +47,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: WDT_FLAG_RESET_SOC used
-    has_reset_flag = "WDT_FLAG_RESET_SOC" in generated_code
+    has_reset_flag = scoped_contains(generated_code, 'WDT_FLAG_RESET_SOC', scope='code_only')
     details.append(
         CheckDetail(
             check_name="reset_soc_flag",
@@ -92,7 +93,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: device_is_ready check present
-    has_ready = "device_is_ready" in generated_code
+    has_ready = scoped_contains(generated_code, 'device_is_ready', scope='code_only')
     details.append(
         CheckDetail(
             check_name="device_ready_check",

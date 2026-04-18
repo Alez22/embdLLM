@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -93,7 +94,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: wdt_setup called
-    has_wdt_setup = "wdt_setup" in generated_code
+    has_wdt_setup = scoped_contains(generated_code, 'wdt_setup', scope='code_only')
     details.append(
         CheckDetail(
             check_name="wdt_setup_called",
@@ -105,7 +106,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: wdt_feed called
-    has_wdt_feed = "wdt_feed" in generated_code
+    has_wdt_feed = scoped_contains(generated_code, 'wdt_feed', scope='code_only')
     details.append(
         CheckDetail(
             check_name="wdt_feed_called",
@@ -138,7 +139,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 8: wdt_install_timeout called
-    has_install_timeout = "wdt_install_timeout" in generated_code
+    has_install_timeout = scoped_contains(generated_code, 'wdt_install_timeout', scope='code_only')
     details.append(
         CheckDetail(
             check_name="wdt_install_timeout_called",

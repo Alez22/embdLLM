@@ -2,6 +2,7 @@
 
 from embedeval.check_utils import check_no_cross_platform_apis, has_error_check
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Buffer referenced in sequence struct (AI failure: wrong resolution / no buffer)
-    has_buffer_in_sequence = ".buffer" in generated_code and "buf" in generated_code
+    has_buffer_in_sequence = scoped_contains(generated_code, '.buffer', scope='code_only') and scoped_contains(generated_code, 'buf', scope='code_only')
     details.append(
         CheckDetail(
             check_name="buffer_linked_to_sequence",

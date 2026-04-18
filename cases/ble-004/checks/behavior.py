@@ -2,6 +2,7 @@
 
 from embedeval.check_utils import check_no_cross_platform_apis
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 _BLE_HALLUCINATED_APIS = [
     "BLEDevice.connect",
@@ -56,8 +57,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: conn_callbacks struct is static (common LLM failure: non-static struct)
     has_static_cb = (
-        "static struct bt_conn_cb" in generated_code
-        or "BT_CONN_CB_DEFINE" in generated_code
+        scoped_contains(generated_code, 'static struct bt_conn_cb', scope='code_only')
+        or scoped_contains(generated_code, 'BT_CONN_CB_DEFINE', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -73,7 +74,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     register_pos = generated_code.find("bt_conn_cb_register")
     if register_pos == -1:
         # BT_CONN_CB_DEFINE is static registration, order doesn't matter
-        register_order_ok = "BT_CONN_CB_DEFINE" in generated_code
+        register_order_ok = scoped_contains(generated_code, 'BT_CONN_CB_DEFINE', scope='code_only')
     else:
         register_order_ok = enable_pos != -1 and enable_pos < register_pos
     details.append(
@@ -87,7 +88,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Disconnect reason printed
-    has_reason = "reason" in generated_code
+    has_reason = scoped_contains(generated_code, 'reason', scope='code_only')
     details.append(
         CheckDetail(
             check_name="disconnect_reason_printed",
@@ -100,11 +101,11 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: Connection state tracked (connected_flag or equivalent)
     has_state_track = (
-        "connected_flag" in generated_code
-        or "is_connected" in generated_code
-        or "conn_state" in generated_code
-        or ("connected" in generated_code and "= true" in generated_code)
-        or ("connected" in generated_code and "= false" in generated_code)
+        scoped_contains(generated_code, 'connected_flag', scope='code_only')
+        or scoped_contains(generated_code, 'is_connected', scope='code_only')
+        or scoped_contains(generated_code, 'conn_state', scope='code_only')
+        or (scoped_contains(generated_code, 'connected', scope='code_only') and scoped_contains(generated_code, '= true', scope='code_only'))
+        or (scoped_contains(generated_code, 'connected', scope='code_only') and scoped_contains(generated_code, '= false', scope='code_only'))
     )
     details.append(
         CheckDetail(
@@ -134,9 +135,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 8: Connection error param checked in connected callback
     has_conn_err_check = (
-        "if (err)" in generated_code
-        or "if (err " in generated_code
-        or "if (err\n" in generated_code
+        scoped_contains(generated_code, 'if (err)', scope='code_only')
+        or scoped_contains(generated_code, 'if (err ', scope='code_only')
+        or scoped_contains(generated_code, 'if (err\n', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -158,8 +159,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
     # For this case the reference does NOT use bt_conn_ref/unref (uses connected_flag only)
     # so we only check if the LLM uses bt_conn_ref that it also uses bt_conn_unref
-    has_ref = "bt_conn_ref" in generated_code
-    has_unref = "bt_conn_unref" in generated_code
+    has_ref = scoped_contains(generated_code, 'bt_conn_ref', scope='code_only')
+    has_unref = scoped_contains(generated_code, 'bt_conn_unref', scope='code_only')
     # If ref is used, unref must also appear (no leak)
     no_ref_leak = (not has_ref) or (has_ref and has_unref)
     details.append(

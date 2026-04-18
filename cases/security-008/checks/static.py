@@ -1,6 +1,7 @@
 """Static analysis checks for HMAC-SHA256 Message Authentication."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -8,7 +9,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: psa/crypto.h included
-    has_psa_h = "psa/crypto.h" in generated_code
+    has_psa_h = scoped_contains(generated_code, 'psa/crypto.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_crypto_header",
@@ -20,7 +21,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: psa_crypto_init called
-    has_init = "psa_crypto_init" in generated_code
+    has_init = scoped_contains(generated_code, 'psa_crypto_init', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_crypto_init_called",
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 3: psa_mac_sign_setup called (NOT psa_hash_setup — LLM failure)
-    has_mac_setup = "psa_mac_sign_setup" in generated_code
+    has_mac_setup = scoped_contains(generated_code, 'psa_mac_sign_setup', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_mac_sign_setup_called",
@@ -44,7 +45,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: psa_mac_update called
-    has_mac_update = "psa_mac_update" in generated_code
+    has_mac_update = scoped_contains(generated_code, 'psa_mac_update', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_mac_update_called",
@@ -56,7 +57,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: psa_mac_sign_finish called
-    has_mac_finish = "psa_mac_sign_finish" in generated_code
+    has_mac_finish = scoped_contains(generated_code, 'psa_mac_sign_finish', scope='code_only')
     details.append(
         CheckDetail(
             check_name="psa_mac_sign_finish_called",
@@ -69,7 +70,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: Correct algorithm PSA_ALG_HMAC(PSA_ALG_SHA_256)
     has_hmac_sha256 = (
-        "PSA_ALG_HMAC" in generated_code and "PSA_ALG_SHA_256" in generated_code
+        scoped_contains(generated_code, 'PSA_ALG_HMAC', scope='code_only') and scoped_contains(generated_code, 'PSA_ALG_SHA_256', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -83,9 +84,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 7: Not using psa_hash_* instead of psa_mac_* (LLM failure pattern)
     uses_hash_instead = (
-        "psa_hash_setup" in generated_code
-        or "psa_hash_update" in generated_code
-        or "psa_hash_finish" in generated_code
+        scoped_contains(generated_code, 'psa_hash_setup', scope='code_only')
+        or scoped_contains(generated_code, 'psa_hash_update', scope='code_only')
+        or scoped_contains(generated_code, 'psa_hash_finish', scope='code_only')
     )
     details.append(
         CheckDetail(

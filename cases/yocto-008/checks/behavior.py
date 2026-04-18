@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -11,7 +12,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: & separator used (NOT comma)
     # (LLM failure: "MIT, GPL-2.0-only" — comma is wrong in BitBake)
-    has_comma_sep = '"MIT,' in generated_code or 'MIT, GPL' in generated_code
+    has_comma_sep = scoped_contains(generated_code, '"MIT,', scope='raw') or scoped_contains(generated_code, 'MIT, GPL', scope='raw')
     details.append(
         CheckDetail(
             check_name="no_comma_license_separator",
@@ -37,7 +38,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: No wrong SPDX like "GPLv2" or bare "GPL-2.0" (must be "GPL-2.0-only")
     # (LLM failure: using non-SPDX names)
-    has_gplv2 = "GPLv2" in generated_code
+    has_gplv2 = scoped_contains(generated_code, 'GPLv2', scope='raw')
     has_gpl20 = bool(re.search(r'"GPL-2\.0"[^-]', generated_code)) or generated_code.endswith('"GPL-2.0"')
     details.append(
         CheckDetail(
@@ -50,7 +51,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: LIC_FILES_CHKSUM has file:// entries
-    has_file_lic = "file://" in generated_code and "LIC_FILES_CHKSUM" in generated_code
+    has_file_lic = scoped_contains(generated_code, 'file://', scope='raw') and scoped_contains(generated_code, 'LIC_FILES_CHKSUM', scope='raw')
     details.append(
         CheckDetail(
             check_name="lic_chksum_has_file_entries",
@@ -62,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: ${D}${bindir} in do_install
-    has_d_bindir = "${D}${bindir}" in generated_code
+    has_d_bindir = scoped_contains(generated_code, '${D}${bindir}', scope='raw')
     details.append(
         CheckDetail(
             check_name="d_bindir_in_install",
@@ -74,7 +75,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 6: ${CC} used for cross-compilation
-    has_cc = "${CC}" in generated_code
+    has_cc = scoped_contains(generated_code, '${CC}', scope='raw')
     details.append(
         CheckDetail(
             check_name="cc_variable_used",
@@ -102,7 +103,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 8: No hardcoded /usr/lib or /usr/bin paths
     has_hardcoded_lib = bool(re.search(r'(?<!\$\{D\})/usr/lib\b', generated_code))
-    has_hardcoded_bin = "/usr/bin" in generated_code
+    has_hardcoded_bin = scoped_contains(generated_code, '/usr/bin', scope='raw')
     details.append(
         CheckDetail(
             check_name="no_hardcoded_paths",

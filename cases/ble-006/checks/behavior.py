@@ -2,6 +2,7 @@
 
 from embedeval.check_utils import check_no_cross_platform_apis
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 _BLE_HALLUCINATED_APIS = [
     "BLEDevice.connect",
@@ -75,7 +76,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Authentication check before writing firmware data
-    auth_check = "is_authenticated" in generated_code or "authenticated" in generated_code
+    auth_check = scoped_contains(generated_code, 'is_authenticated', scope='code_only') or scoped_contains(generated_code, 'authenticated', scope='code_only')
     details.append(
         CheckDetail(
             check_name="auth_check_before_dfu_data",
@@ -87,7 +88,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: BT_ATT_ERR_AUTHORIZATION returned when not authenticated
-    has_auth_err = "BT_ATT_ERR_AUTHORIZATION" in generated_code
+    has_auth_err = scoped_contains(generated_code, 'BT_ATT_ERR_AUTHORIZATION', scope='code_only')
     details.append(
         CheckDetail(
             check_name="authorization_error_returned",
@@ -101,8 +102,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 6: Image validation before confirming (blank flash / header check)
     has_validation = (
         "validation" in generated_code.lower()
-        or "0xFF" in generated_code
-        or "0xff" in generated_code
+        or scoped_contains(generated_code, '0xFF', scope='code_only')
+        or scoped_contains(generated_code, '0xff', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -116,9 +117,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 7: Bounds check on firmware buffer write (buffer overflow guard)
     has_bounds_check = (
-        "sizeof(firmware_buf)" in generated_code
-        or "offset + len" in generated_code
-        or "BT_ATT_ERR_INVALID_OFFSET" in generated_code
+        scoped_contains(generated_code, 'sizeof(firmware_buf)', scope='code_only')
+        or scoped_contains(generated_code, 'offset + len', scope='code_only')
+        or scoped_contains(generated_code, 'BT_ATT_ERR_INVALID_OFFSET', scope='code_only')
     )
     details.append(
         CheckDetail(

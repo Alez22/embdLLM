@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,7 +11,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: kernel header
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -22,7 +23,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: k_cycle_get_32 used for timing
-    has_cycle_get = "k_cycle_get_32" in generated_code
+    has_cycle_get = scoped_contains(generated_code, 'k_cycle_get_32', scope='code_only')
     details.append(
         CheckDetail(
             check_name="k_cycle_get_32_used",
@@ -35,10 +36,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Cycle-to-time conversion present
     has_conversion = (
-        "k_cyc_to_us_near32" in generated_code
-        or "k_cyc_to_ns_near64" in generated_code
-        or "k_cyc_to_ms_near32" in generated_code
-        or "k_cyc_to_us_floor32" in generated_code
+        scoped_contains(generated_code, 'k_cyc_to_us_near32', scope='code_only')
+        or scoped_contains(generated_code, 'k_cyc_to_ns_near64', scope='code_only')
+        or scoped_contains(generated_code, 'k_cyc_to_ms_near32', scope='code_only')
+        or scoped_contains(generated_code, 'k_cyc_to_us_floor32', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -51,7 +52,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Deadline threshold referenced (10000 us or 10 ms)
-    has_deadline = "10000" in generated_code or "10 * 1000" in generated_code
+    has_deadline = scoped_contains(generated_code, '10000', scope='code_only') or scoped_contains(generated_code, '10 * 1000', scope='code_only')
     details.append(
         CheckDetail(
             check_name="deadline_threshold_defined",

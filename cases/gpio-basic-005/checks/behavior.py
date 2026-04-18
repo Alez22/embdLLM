@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,7 +11,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: All LED pins configured as output before the main loop
     # (AI failure: calling gpio_pin_set_dt on unconfigured pins)
-    has_output_config = "GPIO_OUTPUT" in generated_code
+    has_output_config = scoped_contains(generated_code, 'GPIO_OUTPUT', scope='code_only')
     config_pos = generated_code.find("gpio_pin_configure")
     set_pos = generated_code.find("gpio_pin_set_dt")
     toggle_pos = generated_code.find("gpio_pin_toggle_dt")
@@ -66,9 +67,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Look for both set(1) and set(0) or toggle pattern
     has_on = any(p in generated_code for p in ["gpio_pin_set_dt", "gpio_pin_toggle_dt"])
     has_off_or_toggle = (
-        "gpio_pin_set_dt" in generated_code
-        and (", 0)" in generated_code or ",0)" in generated_code)
-    ) or "gpio_pin_toggle_dt" in generated_code
+        scoped_contains(generated_code, 'gpio_pin_set_dt', scope='code_only')
+        and (scoped_contains(generated_code, ', 0)', scope='code_only') or scoped_contains(generated_code, ',0)', scope='code_only'))
+    ) or scoped_contains(generated_code, 'gpio_pin_toggle_dt', scope='code_only')
     details.append(
         CheckDetail(
             check_name="leds_turned_on_and_off",
@@ -95,8 +96,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # (AI failure: only wiring up led0 and forgetting led1..led3)
     covers_multiple_leds = (
         generated_code.count("led") >= 4
-        or "NUM_LEDS" in generated_code
-        or "ARRAY_SIZE" in generated_code
+        or scoped_contains(generated_code, 'NUM_LEDS', scope='code_only')
+        or scoped_contains(generated_code, 'ARRAY_SIZE', scope='code_only')
         or all(f"led{i}" in generated_code for i in range(1, 4))
     )
     details.append(

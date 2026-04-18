@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -89,8 +90,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 5: Main sleeps after starting timer (not busy-wait)
     # Accept k_msleep as equivalent to k_sleep
     has_sleep_after_start = (
-        ("k_sleep" in generated_code or "k_msleep" in generated_code)
-        and "k_timer_start" in generated_code
+        (scoped_contains(generated_code, 'k_sleep', scope='code_only') or scoped_contains(generated_code, 'k_msleep', scope='code_only'))
+        and scoped_contains(generated_code, 'k_timer_start', scope='code_only')
     )
     details.append(
         CheckDetail(

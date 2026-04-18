@@ -3,6 +3,7 @@
 import re
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,7 +11,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Check 1: kernel.h included
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_h_included",
@@ -23,10 +24,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: NVS or settings header included
     has_nvs_h = (
-        "zephyr/fs/nvs.h" in generated_code
-        or "zephyr/settings/settings.h" in generated_code
-        or "nvs.h" in generated_code
-        or "settings.h" in generated_code
+        scoped_contains(generated_code, 'zephyr/fs/nvs.h', scope='code_only')
+        or scoped_contains(generated_code, 'zephyr/settings/settings.h', scope='code_only')
+        or scoped_contains(generated_code, 'nvs.h', scope='code_only')
+        or scoped_contains(generated_code, 'settings.h', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -67,7 +68,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: No stdio.h (use printk, not printf)
-    has_stdio = "#include <stdio.h>" in generated_code
+    has_stdio = scoped_contains(generated_code, '#include <stdio.h>', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_stdio_h",

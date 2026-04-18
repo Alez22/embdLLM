@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -40,9 +41,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: k_work_schedule used (not k_work_submit which doesn't support delay)
     # AI failure: calling k_work_submit for a delayed work item
-    uses_schedule = "k_work_schedule" in generated_code
+    uses_schedule = scoped_contains(generated_code, 'k_work_schedule', scope='code_only')
     uses_submit_instead = (
-        "k_work_submit" in generated_code and not uses_schedule
+        scoped_contains(generated_code, 'k_work_submit', scope='code_only') and not uses_schedule
     )
     details.append(
         CheckDetail(
@@ -60,8 +61,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 4: K_WORK_DELAYABLE_DEFINE or k_work_init_delayable used (not K_WORK_DEFINE)
     # AI failure: defining work with K_WORK_DEFINE then trying to schedule with delay
     uses_delayable_define = (
-        "K_WORK_DELAYABLE_DEFINE" in generated_code
-        or "k_work_init_delayable" in generated_code
+        scoped_contains(generated_code, 'K_WORK_DELAYABLE_DEFINE', scope='code_only')
+        or scoped_contains(generated_code, 'k_work_init_delayable', scope='code_only')
     )
     details.append(
         CheckDetail(

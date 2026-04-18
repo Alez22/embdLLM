@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -32,7 +33,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 2: -EALREADY returned for duplicate suspend
     # (LLM failure: accepting duplicate suspend and returning 0)
-    has_ealready = "EALREADY" in generated_code
+    has_ealready = scoped_contains(generated_code, 'EALREADY', scope='code_only')
     details.append(
         CheckDetail(
             check_name="ealready_returned_for_duplicate",
@@ -72,7 +73,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: -ENOTSUP returned for unknown actions
     # (LLM failure: no default case, unknown actions silently return 0)
-    has_enotsup = "ENOTSUP" in generated_code
+    has_enotsup = scoped_contains(generated_code, 'ENOTSUP', scope='code_only')
     details.append(
         CheckDetail(
             check_name="enotsup_for_unknown_actions",

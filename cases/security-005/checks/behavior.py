@@ -2,7 +2,9 @@
 
 import re
 
-from embedeval.check_utils import (check_no_cross_platform_apis,
+from embedeval.check_utils import (
+    check_no_cross_platform_apis,
+    scoped_contains,
     strip_comments,
 )
 from embedeval.models import CheckDetail
@@ -76,7 +78,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Retrieved data verified against original (memcmp)
-    has_memcmp = "memcmp" in generated_code
+    has_memcmp = scoped_contains(generated_code, 'memcmp', scope='code_only')
     details.append(
         CheckDetail(
             check_name="data_verified_after_get",
@@ -88,7 +90,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Result printed
-    has_print = "printk" in generated_code or "printf" in generated_code
+    has_print = scoped_contains(generated_code, 'printk', scope='code_only') or scoped_contains(generated_code, 'printf', scope='code_only')
     details.append(
         CheckDetail(
             check_name="result_printed",
@@ -101,8 +103,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: PSA_STORAGE_FLAG_NONE used (or a valid flag constant)
     has_storage_flag = (
-        "PSA_STORAGE_FLAG_NONE" in generated_code
-        or "PSA_STORAGE_FLAG_" in generated_code
+        scoped_contains(generated_code, 'PSA_STORAGE_FLAG_NONE', scope='code_only')
+        or scoped_contains(generated_code, 'PSA_STORAGE_FLAG_', scope='code_only')
     )
     details.append(
         CheckDetail(

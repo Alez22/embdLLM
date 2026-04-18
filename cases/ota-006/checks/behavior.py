@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis, check_return_after_error
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -47,7 +48,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         "mismatch" in generated_code.lower()
         or "hash failed" in generated_code.lower()
         or "aborting" in generated_code.lower()
-        or ("memcmp" in generated_code and check_return_after_error(generated_code))
+        or (scoped_contains(generated_code, 'memcmp', scope='code_only') and check_return_after_error(generated_code))
     )
     details.append(
         CheckDetail(
@@ -61,7 +62,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 4: psa_hash_compute used — NOT a custom SHA-256 implementation
     # (LLM failure: hand-rolling SHA-256 instead of using PSA API)
-    has_psa_api = "psa_hash_compute" in generated_code
+    has_psa_api = scoped_contains(generated_code, 'psa_hash_compute', scope='code_only')
     has_custom_sha = (
         "sha256_init" in generated_code.lower()
         or "sha256_update" in generated_code.lower()
@@ -80,7 +81,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: dfu_target_done called to finalize (or abort) flash write
-    has_dfu_done = "dfu_target_done" in generated_code
+    has_dfu_done = scoped_contains(generated_code, 'dfu_target_done', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dfu_target_done_called",
@@ -94,8 +95,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 6: psa_hash_compute return value checked (PSA_SUCCESS)
     # (LLM failure: calling psa_hash_compute but not checking if it succeeded)
     psa_ret_checked = (
-        "psa_hash_compute" in generated_code
-        and ("PSA_SUCCESS" in generated_code or "!= 0" in generated_code or "status" in generated_code)
+        scoped_contains(generated_code, 'psa_hash_compute', scope='code_only')
+        and (scoped_contains(generated_code, 'PSA_SUCCESS', scope='code_only') or scoped_contains(generated_code, '!= 0', scope='code_only') or scoped_contains(generated_code, 'status', scope='code_only'))
     )
     details.append(
         CheckDetail(
@@ -109,7 +110,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 7: dfu_target_done(false) on hash mismatch — rollback path
     # (LLM failure: only happy path — no abort if hash verification fails)
-    has_done_false = "dfu_target_done(false)" in generated_code
+    has_done_false = scoped_contains(generated_code, 'dfu_target_done(false)', scope='code_only')
     details.append(
         CheckDetail(
             check_name="dfu_done_false_on_mismatch",
@@ -123,9 +124,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 8: Hash length verified (output length matches 32 bytes for SHA-256)
     # (LLM failure: not checking that hash_len == 32 after psa_hash_compute)
     has_len_check = (
-        "hash_len" in generated_code
-        or "32" in generated_code
-        or "PSA_HASH_LENGTH" in generated_code
+        scoped_contains(generated_code, 'hash_len', scope='code_only')
+        or scoped_contains(generated_code, '32', scope='code_only')
+        or scoped_contains(generated_code, 'PSA_HASH_LENGTH', scope='code_only')
     )
     details.append(
         CheckDetail(

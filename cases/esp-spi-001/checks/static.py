@@ -1,5 +1,6 @@
 """Static checks for ESP-IDF SPI master half-duplex write."""
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -7,49 +8,49 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     details.append(CheckDetail(
         check_name="spi_master_header",
-        passed="driver/spi_master.h" in generated_code,
+        passed=scoped_contains(generated_code, 'driver/spi_master.h', scope='code_only'),
         expected="driver/spi_master.h included",
-        actual="present" if "driver/spi_master.h" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'driver/spi_master.h', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="app_main_defined",
-        passed="app_main" in generated_code,
+        passed=scoped_contains(generated_code, 'app_main', scope='code_only'),
         expected="app_main() entry point",
-        actual="present" if "app_main" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'app_main', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="spi_bus_initialize_called",
-        passed="spi_bus_initialize" in generated_code,
+        passed=scoped_contains(generated_code, 'spi_bus_initialize', scope='code_only'),
         expected="spi_bus_initialize() called",
-        actual="present" if "spi_bus_initialize" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'spi_bus_initialize', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="spi_bus_add_device_called",
-        passed="spi_bus_add_device" in generated_code,
+        passed=scoped_contains(generated_code, 'spi_bus_add_device', scope='code_only'),
         expected="spi_bus_add_device() called",
-        actual="present" if "spi_bus_add_device" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'spi_bus_add_device', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="spi_device_transmit_called",
-        passed="spi_device_transmit" in generated_code,
+        passed=scoped_contains(generated_code, 'spi_device_transmit', scope='code_only'),
         expected="spi_device_transmit() called",
-        actual="present" if "spi_device_transmit" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'spi_device_transmit', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="spi_bus_config_struct",
-        passed="spi_bus_config_t" in generated_code,
+        passed=scoped_contains(generated_code, 'spi_bus_config_t', scope='code_only'),
         expected="spi_bus_config_t struct for bus configuration",
-        actual="present" if "spi_bus_config_t" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'spi_bus_config_t', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 

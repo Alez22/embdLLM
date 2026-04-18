@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,9 +11,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: Last block's next_block is NULL
     has_null_termination = (
-        "next_block = NULL" in generated_code
-        or ".next_block = NULL" in generated_code
-        or "next_block = 0" in generated_code
+        scoped_contains(generated_code, 'next_block = NULL', scope='code_only')
+        or scoped_contains(generated_code, '.next_block = NULL', scope='code_only')
+        or scoped_contains(generated_code, 'next_block = 0', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -29,12 +30,12 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     block_struct_count = generated_code.count("dma_block_config")
     # block_struct_count includes the struct keyword usage; at least 3 struct definitions + 1 typedef = 4+
     has_matching_count = (
-        "block_count" in generated_code
+        scoped_contains(generated_code, 'block_count', scope='code_only')
         and (
-            "block_count = 3" in generated_code
-            or "block_count=3" in generated_code
-            or ".block_count = 3" in generated_code
-            or "NUM_BLOCKS" in generated_code
+            scoped_contains(generated_code, 'block_count = 3', scope='code_only')
+            or scoped_contains(generated_code, 'block_count=3', scope='code_only')
+            or scoped_contains(generated_code, '.block_count = 3', scope='code_only')
+            or scoped_contains(generated_code, 'NUM_BLOCKS', scope='code_only')
         )
     )
     details.append(
@@ -50,11 +51,11 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 3: Destination segments non-overlapping (offsets differ by block_size)
     # Heuristic: destination addresses contain stride increments (BLOCK_SIZE, 16, 32, etc.)
     has_stride = (
-        "BLOCK_SIZE" in generated_code
-        or "+ 16" in generated_code
-        or "+16" in generated_code
-        or "* 2" in generated_code
-        or "32" in generated_code
+        scoped_contains(generated_code, 'BLOCK_SIZE', scope='code_only')
+        or scoped_contains(generated_code, '+ 16', scope='code_only')
+        or scoped_contains(generated_code, '+16', scope='code_only')
+        or scoped_contains(generated_code, '* 2', scope='code_only')
+        or scoped_contains(generated_code, '32', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -97,10 +98,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 6: Verification of destination content after transfer
     has_verify = (
-        "memcmp" in generated_code
-        or ("==" in generated_code and ("0xAA" in generated_code or "0xBB" in generated_code))
+        scoped_contains(generated_code, 'memcmp', scope='code_only')
+        or (scoped_contains(generated_code, '==', scope='code_only') and (scoped_contains(generated_code, '0xAA', scope='code_only') or scoped_contains(generated_code, '0xBB', scope='code_only')))
         or "verify" in generated_code.lower()
-        or "OK" in generated_code
+        or scoped_contains(generated_code, 'OK', scope='code_only')
     )
     details.append(
         CheckDetail(

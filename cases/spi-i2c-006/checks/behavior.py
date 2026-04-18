@@ -2,6 +2,7 @@
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis, has_output_call
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -10,10 +11,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 1: Error handling on timeout (negative return value checked)
     has_error_check = (
-        "< 0" in generated_code
-        or "!= 0" in generated_code
-        or "ret ==" in generated_code
-        or "ETIMEDOUT" in generated_code
+        scoped_contains(generated_code, '< 0', scope='code_only')
+        or scoped_contains(generated_code, '!= 0', scope='code_only')
+        or scoped_contains(generated_code, 'ret ==', scope='code_only')
+        or scoped_contains(generated_code, 'ETIMEDOUT', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -26,7 +27,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 2: Not using K_FOREVER for timeout (dangerous with clock stretching)
-    has_k_forever = "K_FOREVER" in generated_code
+    has_k_forever = scoped_contains(generated_code, 'K_FOREVER', scope='code_only')
     details.append(
         CheckDetail(
             check_name="no_k_forever_timeout",
@@ -39,9 +40,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Check 3: Finite timeout mechanism present (K_MSEC or similar)
     has_finite_timeout = (
-        "K_MSEC" in generated_code
-        or "K_SECONDS" in generated_code
-        or "TIMEOUT" in generated_code
+        scoped_contains(generated_code, 'K_MSEC', scope='code_only')
+        or scoped_contains(generated_code, 'K_SECONDS', scope='code_only')
+        or scoped_contains(generated_code, 'TIMEOUT', scope='code_only')
         or "timeout" in generated_code.lower()
     )
     details.append(
@@ -55,7 +56,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 4: Sensor address 0x48 referenced
-    has_sensor_addr = "0x48" in generated_code
+    has_sensor_addr = scoped_contains(generated_code, '0x48', scope='code_only')
     details.append(
         CheckDetail(
             check_name="sensor_address_0x48",

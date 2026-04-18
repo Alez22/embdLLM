@@ -4,6 +4,7 @@ import re
 
 from embedeval.models import CheckDetail
 from embedeval.check_utils import check_no_cross_platform_apis
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -47,8 +48,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # Check 3: Consumer uses K_FOREVER (blocking wait, not polling)
     # (LLM failure: using K_NO_WAIT — busy-polls instead of blocking)
     consumer_blocks = (
-        "K_FOREVER" in generated_code
-        and "k_sem_take" in generated_code
+        scoped_contains(generated_code, 'K_FOREVER', scope='code_only')
+        and scoped_contains(generated_code, 'k_sem_take', scope='code_only')
     )
     details.append(
         CheckDetail(
@@ -79,14 +80,14 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Check 5: Both give and take are present (not just one direction)
-    has_both = "k_sem_give" in generated_code and "k_sem_take" in generated_code
+    has_both = scoped_contains(generated_code, 'k_sem_give', scope='code_only') and scoped_contains(generated_code, 'k_sem_take', scope='code_only')
     details.append(
         CheckDetail(
             check_name="both_give_and_take_present",
             passed=has_both,
             expected="Both k_sem_give and k_sem_take present",
-            actual=f"give={'present' if 'k_sem_give' in generated_code else 'missing'}, "
-                   f"take={'present' if 'k_sem_take' in generated_code else 'missing'}",
+            actual=f"give={'present' if scoped_contains(generated_code, 'k_sem_give', scope='code_only') else 'missing'}, "
+                   f"take={'present' if scoped_contains(generated_code, 'k_sem_take', scope='code_only') else 'missing'}",
             check_type="exact_match",
         )
     )

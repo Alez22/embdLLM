@@ -1,5 +1,6 @@
 """Static checks for ESP-IDF WiFi station mode connect."""
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
@@ -7,57 +8,57 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     details.append(CheckDetail(
         check_name="esp_wifi_header",
-        passed="esp_wifi.h" in generated_code,
+        passed=scoped_contains(generated_code, 'esp_wifi.h', scope='code_only'),
         expected="esp_wifi.h included",
-        actual="present" if "esp_wifi.h" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'esp_wifi.h', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="nvs_flash_header",
-        passed="nvs_flash.h" in generated_code,
+        passed=scoped_contains(generated_code, 'nvs_flash.h', scope='code_only'),
         expected="nvs_flash.h included (NVS required before WiFi)",
-        actual="present" if "nvs_flash.h" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'nvs_flash.h', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="esp_event_header",
-        passed="esp_event.h" in generated_code,
+        passed=scoped_contains(generated_code, 'esp_event.h', scope='code_only'),
         expected="esp_event.h included",
-        actual="present" if "esp_event.h" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'esp_event.h', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="app_main_defined",
-        passed="app_main" in generated_code,
+        passed=scoped_contains(generated_code, 'app_main', scope='code_only'),
         expected="app_main() entry point",
-        actual="present" if "app_main" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'app_main', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="esp_wifi_init_called",
-        passed="esp_wifi_init" in generated_code,
+        passed=scoped_contains(generated_code, 'esp_wifi_init', scope='code_only'),
         expected="esp_wifi_init() called",
-        actual="present" if "esp_wifi_init" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'esp_wifi_init', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="wifi_mode_sta",
-        passed="WIFI_MODE_STA" in generated_code,
+        passed=scoped_contains(generated_code, 'WIFI_MODE_STA', scope='code_only'),
         expected="WIFI_MODE_STA set",
-        actual="present" if "WIFI_MODE_STA" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'WIFI_MODE_STA', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 
     details.append(CheckDetail(
         check_name="event_handler_registered",
-        passed="esp_event_handler_register" in generated_code,
+        passed=scoped_contains(generated_code, 'esp_event_handler_register', scope='code_only'),
         expected="esp_event_handler_register() used",
-        actual="present" if "esp_event_handler_register" in generated_code else "missing",
+        actual="present" if scoped_contains(generated_code, 'esp_event_handler_register', scope='code_only') else "missing",
         check_type="exact_match",
     ))
 

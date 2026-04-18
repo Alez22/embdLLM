@@ -1,13 +1,14 @@
 """Static analysis checks for shared memory IPC with producer-consumer handshake."""
 
 from embedeval.models import CheckDetail
+from embedeval.check_utils import scoped_contains
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate shared memory IPC code structure."""
     details: list[CheckDetail] = []
 
-    has_kernel_h = "zephyr/kernel.h" in generated_code
+    has_kernel_h = scoped_contains(generated_code, 'zephyr/kernel.h', scope='code_only')
     details.append(
         CheckDetail(
             check_name="kernel_header_included",
@@ -35,7 +36,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Has main function
-    has_main = "int main(" in generated_code or "void main(" in generated_code
+    has_main = scoped_contains(generated_code, 'int main(', scope='code_only') or scoped_contains(generated_code, 'void main(', scope='code_only')
     details.append(
         CheckDetail(
             check_name="main_function_present",
@@ -47,7 +48,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # Has struct definition (shared memory layout)
-    has_struct = "struct " in generated_code and "{" in generated_code
+    has_struct = scoped_contains(generated_code, 'struct ', scope='code_only') and scoped_contains(generated_code, '{', scope='code_only')
     details.append(
         CheckDetail(
             check_name="struct_definition_present",
