@@ -14,7 +14,7 @@ EmbedEval is a benchmark for evaluating LLM capability in embedded firmware code
 | **Difficulty** | 29 easy, 98 medium, 106 hard |
 | **Private held-out** | 48 cases (20%) for contamination prevention |
 | **Evaluation scenarios** | 2 (generation, bugfix) |
-| **Negatives (mutation tests)** | 31 cases, 62 must_fail mutations |
+| **Negatives (mutation tests)** | 32 cases, 67 must_fail mutations |
 
 ### Platform Distribution
 

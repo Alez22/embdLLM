@@ -7,10 +7,18 @@ from embedeval.models import (
     BenchmarkReport,
     CaseCategory,
     CategoryScore,
+    CheckDetail,
+    EvalResult,
+    LayerResult,
     ModelScore,
     OverallScore,
+    TokenUsage,
 )
-from embedeval.reporter import generate_json, generate_leaderboard
+from embedeval.reporter import (
+    generate_json,
+    generate_leaderboard,
+    generate_per_check_metrics,
+)
 
 
 def _make_report() -> BenchmarkReport:
@@ -131,6 +139,31 @@ class TestGenerateLeaderboard:
 
         content = output.read_text(encoding="utf-8")
         assert "# EmbedEval Leaderboard" in content
+
+    def test_contains_schema_version_comment(self, tmp_path: Path) -> None:
+        """REQ-05: SCHEMA_VERSION marker must be present for consumers."""
+        from embedeval.reporter import LEADERBOARD_SCHEMA_VERSION
+
+        report = _make_report()
+        output = tmp_path / "LEADERBOARD.md"
+        generate_leaderboard([report], output)
+
+        content = output.read_text(encoding="utf-8")
+        assert f"<!-- SCHEMA_VERSION: {LEADERBOARD_SCHEMA_VERSION} -->" in content
+
+    def test_schema_version_precedes_sections(self, tmp_path: Path) -> None:
+        """Schema version comment must appear before any table header so
+        consumers that parse the first N lines see it."""
+        report = _make_report()
+        output = tmp_path / "LEADERBOARD.md"
+        generate_leaderboard([report], output)
+
+        content = output.read_text(encoding="utf-8")
+        version_idx = content.find("SCHEMA_VERSION:")
+        first_section_idx = content.find("## ")
+        assert version_idx != -1
+        assert first_section_idx != -1
+        assert version_idx < first_section_idx
 
     def test_contains_model_table(self, tmp_path: Path) -> None:
         report = _make_report()
@@ -376,3 +409,147 @@ class TestComparabilityWarning:
         assert "Common" in content
         assert "60.0%" in content
         assert "179" in content
+
+
+def _make_result(
+    case_id: str,
+    category: CaseCategory,
+    model: str,
+    details: list[CheckDetail],
+    passed: bool = True,
+) -> EvalResult:
+    return EvalResult(
+        case_id=case_id,
+        category=category,
+        model=model,
+        attempt=1,
+        generated_code="int main(){return 0;}",
+        layers=[
+            LayerResult(
+                layer=0,
+                name="static_analysis",
+                passed=all(d.passed for d in details),
+                details=details,
+                duration_seconds=0.01,
+            )
+        ],
+        passed=passed,
+        duration_seconds=0.1,
+        token_usage=TokenUsage(input_tokens=10, output_tokens=10, total_tokens=20),
+        cost_usd=0.0,
+    )
+
+
+def _cd(name: str, passed: bool) -> CheckDetail:
+    return CheckDetail(
+        check_name=name,
+        passed=passed,
+        expected="x",
+        actual="x" if passed else "y",
+        check_type="exact_match",
+    )
+
+
+class TestGeneratePerCheckMetrics:
+    """REQ-04: per-(TC, check_name, model) metrics emission."""
+
+    def test_requires_at_least_one_output(self, tmp_path: Path) -> None:
+        import pytest
+
+        with pytest.raises(ValueError):
+            generate_per_check_metrics({"m": []}, output_json=None, output_md=None)
+
+    def test_rows_grouped_by_tc_check_model(self, tmp_path: Path) -> None:
+        results = {
+            "sonnet": [
+                _make_result("a-1", CaseCategory.KCONFIG, "sonnet", [_cd("c1", True)]),
+                _make_result("a-1", CaseCategory.KCONFIG, "sonnet", [_cd("c1", False)]),
+                _make_result("a-2", CaseCategory.KCONFIG, "sonnet", [_cd("c1", True)]),
+            ],
+            "haiku": [
+                _make_result("a-1", CaseCategory.KCONFIG, "haiku", [_cd("c1", False)]),
+            ],
+        }
+        rows = generate_per_check_metrics(results, output_json=tmp_path / "m.json")
+        # 3 distinct (case, check, model) combos: (a-1,c1,sonnet), (a-2,c1,sonnet), (a-1,c1,haiku)
+        assert len(rows) == 3
+        keys = {(r["case_id"], r["check_name"], r["model"]) for r in rows}
+        assert keys == {("a-1", "c1", "sonnet"), ("a-2", "c1", "sonnet"), ("a-1", "c1", "haiku")}
+        sonnet_a1 = next(
+            r for r in rows
+            if r["case_id"] == "a-1" and r["model"] == "sonnet"
+        )
+        assert sonnet_a1["samples"] == 2
+        assert sonnet_a1["passed"] == 1
+        assert sonnet_a1["pass_rate"] == 0.5
+
+    def test_sort_order_worst_first(self, tmp_path: Path) -> None:
+        results = {
+            "sonnet": [
+                _make_result("a-1", CaseCategory.KCONFIG, "sonnet", [_cd("strict", False)]),
+                _make_result("a-2", CaseCategory.KCONFIG, "sonnet", [_cd("easy", True)]),
+            ],
+        }
+        rows = generate_per_check_metrics(results, output_json=tmp_path / "m.json")
+        # strict (0.0 pass_rate) must come before easy (1.0 pass_rate).
+        assert rows[0]["check_name"] == "strict"
+        assert rows[-1]["check_name"] == "easy"
+
+    def test_skips_l4_mutation_checks(self, tmp_path: Path) -> None:
+        """L4 synthetic mutation_* checks measure benchmark self-test,
+        not model behavior — must not pollute per-check metrics."""
+        details = [
+            _cd("real_check", True),
+            CheckDetail(
+                check_name="mutation_missing_volatile",
+                passed=True,
+                expected="x",
+                actual="x",
+                check_type="mutation",
+            ),
+        ]
+        results = {
+            "sonnet": [_make_result("a-1", CaseCategory.KCONFIG, "sonnet", details)],
+        }
+        rows = generate_per_check_metrics(results, output_json=tmp_path / "m.json")
+        assert len(rows) == 1
+        assert rows[0]["check_name"] == "real_check"
+
+    def test_json_schema_version(self, tmp_path: Path) -> None:
+        import json as _json
+
+        from embedeval.reporter import PER_CHECK_METRICS_SCHEMA_VERSION
+
+        out = tmp_path / "m.json"
+        generate_per_check_metrics(
+            {"sonnet": [_make_result("a", CaseCategory.KCONFIG, "sonnet", [_cd("c", True)])]},
+            output_json=out,
+        )
+        data = _json.loads(out.read_text())
+        assert data["schema_version"] == PER_CHECK_METRICS_SCHEMA_VERSION
+        assert "rows" in data and "generated" in data
+
+    def test_markdown_contains_schema_version(self, tmp_path: Path) -> None:
+        out = tmp_path / "m.md"
+        generate_per_check_metrics(
+            {"sonnet": [_make_result("a", CaseCategory.KCONFIG, "sonnet", [_cd("c", True)])]},
+            output_md=out,
+        )
+        content = out.read_text()
+        assert "<!-- SCHEMA_VERSION:" in content
+        assert "a" in content and "c" in content and "sonnet" in content
+
+    def test_empty_results(self, tmp_path: Path) -> None:
+        import json as _json
+
+        out = tmp_path / "empty.json"
+        rows = generate_per_check_metrics({"sonnet": []}, output_json=out)
+        assert rows == []
+        # Hiloop contract: the file must be written even when rows is
+        # empty — a consumer walking runs/*/per_check_metrics.json should
+        # not silently skip empty runs.
+        assert out.exists(), "JSON must be written even when rows is empty"
+        data = _json.loads(out.read_text())
+        assert data["rows"] == []
+        assert data["schema_version"] == 1
+        assert "generated" in data

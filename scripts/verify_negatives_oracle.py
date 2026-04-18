@@ -35,6 +35,36 @@ class OracleResult:
     negatives_attempted: int = 0
     missed: list[dict[str, Any]] = field(default_factory=list)
     error: str | None = None
+    # REQ-02 per-check coverage — populated by compute_coverage().
+    coverage: float | None = None
+    emitted_checks: list[str] = field(default_factory=list)
+    labeled_checks: list[str] = field(default_factory=list)
+    uncovered_checks: list[str] = field(default_factory=list)
+    stale_labels: list[str] = field(default_factory=list)
+
+
+# REQ-02: minimum per-check coverage fraction the /negatives gate enforces
+# on newly-authored or revisited TCs. Matches the Hiloop REQ-02 ask (≥80%).
+COVERAGE_MIN_DEFAULT = 0.8
+
+# Allowlist: TCs authored before the coverage gate existed. When
+# --strict-coverage is set, these are reported but do NOT cause a non-zero
+# exit. New TCs (authored via /negatives after 2026-04-19) are NOT
+# grandfathered.
+COVERAGE_GRANDFATHER_PATH = (
+    Path(__file__).parent.parent / "plans" / "coverage-grandfather.txt"
+)
+
+
+def _load_grandfather() -> frozenset[str]:
+    if not COVERAGE_GRANDFATHER_PATH.is_file():
+        return frozenset()
+    entries = [
+        line.strip()
+        for line in COVERAGE_GRANDFATHER_PATH.read_text().splitlines()
+        if line.strip() and not line.strip().startswith("#")
+    ]
+    return frozenset(entries)
 
 
 def _load_module(path: Path, alias: str) -> Any:
@@ -89,9 +119,7 @@ def verify_case(case_dir: Path) -> OracleResult:
         )
 
     static_mod = (
-        _load_module(static_path, f"st_{case_id}")
-        if static_path.is_file()
-        else None
+        _load_module(static_path, f"st_{case_id}") if static_path.is_file() else None
     )
     behavior_mod = (
         _load_module(behavior_path, f"bh_{case_id}")
@@ -164,6 +192,64 @@ def verify_case(case_dir: Path) -> OracleResult:
     return result
 
 
+def compute_coverage(case_dir: Path, result: OracleResult) -> None:
+    """REQ-02: populate per-check coverage fields on *result*.
+
+    Emitted checks = union of check_names returned by static.py.run_checks
+    and behavior.py.run_checks on the reference.
+    Labeled checks = union of must_fail + should_fail across NEGATIVES.
+
+    coverage = |labeled ∩ emitted| / |emitted|     (1.0 if no emitted)
+    uncovered_checks = emitted - labeled          (checks with no mutation)
+    stale_labels = labeled - emitted              (labels naming checks that
+                                                   never run — likely typo or
+                                                   post-rename drift; REQ-06).
+    """
+    checks_dir = case_dir / "checks"
+    neg_path = checks_dir / "negatives.py"
+    if not neg_path.is_file():
+        return
+    reference = _read_reference(case_dir)
+    if reference is None:
+        return
+
+    try:
+        neg_mod = _load_module(neg_path, f"cov_neg_{case_dir.name}")
+    except Exception:
+        return
+    negatives: list[dict[str, Any]] = getattr(neg_mod, "NEGATIVES", []) or []
+
+    emitted: set[str] = set()
+    for name, path in (
+        ("static", checks_dir / "static.py"),
+        ("behavior", checks_dir / "behavior.py"),
+    ):
+        if not path.is_file():
+            continue
+        try:
+            mod = _load_module(path, f"cov_{name}_{case_dir.name}")
+        except Exception:
+            continue
+        if not hasattr(mod, "run_checks"):
+            continue
+        try:
+            emitted |= {c.check_name for c in mod.run_checks(reference)}
+        except Exception:
+            continue
+
+    labeled: set[str] = set()
+    for n in negatives:
+        labeled |= set(n.get("must_fail", []) or [])
+        labeled |= set(n.get("should_fail", []) or [])
+
+    covered = labeled & emitted
+    result.emitted_checks = sorted(emitted)
+    result.labeled_checks = sorted(labeled)
+    result.uncovered_checks = sorted(emitted - labeled)
+    result.stale_labels = sorted(labeled - emitted)
+    result.coverage = (len(covered) / len(emitted)) if emitted else 1.0
+
+
 def iter_cases(
     cases_root: Path,
     case_filter: str | None,
@@ -188,6 +274,22 @@ def main() -> int:
     parser.add_argument("--category", help="filter by category prefix")
     parser.add_argument("--json", help="write report as JSON to this path")
     parser.add_argument("--quiet", action="store_true")
+    parser.add_argument(
+        "--coverage",
+        action="store_true",
+        help="REQ-02: compute and report per-check coverage (warn-only)",
+    )
+    parser.add_argument(
+        "--strict-coverage",
+        action="store_true",
+        help="REQ-02: exit 1 if any non-grandfathered TC has coverage < threshold",
+    )
+    parser.add_argument(
+        "--coverage-min",
+        type=float,
+        default=COVERAGE_MIN_DEFAULT,
+        help=f"REQ-02: coverage threshold (default {COVERAGE_MIN_DEFAULT})",
+    )
     args = parser.parse_args()
 
     cases_root = Path(args.cases).resolve()
@@ -195,14 +297,29 @@ def main() -> int:
         print(f"ERROR: cases dir not found: {cases_root}", file=sys.stderr)
         return 2
 
+    want_coverage = args.coverage or args.strict_coverage
+    grandfather = _load_grandfather() if args.strict_coverage else frozenset()
+
     results: list[OracleResult] = []
     for case_dir in iter_cases(cases_root, args.case, args.category):
-        results.append(verify_case(case_dir))
+        r = verify_case(case_dir)
+        if want_coverage:
+            compute_coverage(case_dir, r)
+        results.append(r)
 
     # Text report
     passed = sum(1 for r in results if r.status == "pass")
     failed = sum(1 for r in results if r.status == "fail")
     skipped = sum(1 for r in results if r.status == "skip")
+
+    # Coverage findings — only surfaced when requested.
+    coverage_below: list[OracleResult] = []
+    if want_coverage:
+        coverage_below = [
+            r
+            for r in results
+            if r.coverage is not None and r.coverage < args.coverage_min
+        ]
 
     if not args.quiet:
         for r in results:
@@ -215,12 +332,48 @@ def main() -> int:
 
         print(f"\nTotal: {len(results)} | PASS={passed} FAIL={failed} SKIP={skipped}")
 
-    if args.json:
-        Path(args.json).write_text(
-            json.dumps([asdict(r) for r in results], indent=2)
-        )
+        if want_coverage:
+            measured = [r for r in results if r.coverage is not None]
+            ok = [r for r in measured if r.coverage >= args.coverage_min]
+            print()
+            print(
+                f"Coverage (threshold {args.coverage_min:.0%}):"
+                f" {len(ok)} ok,"
+                f" {len(coverage_below)} below,"
+                f" {len(results) - len(measured)} not measured (no negatives.py)"
+            )
+            for r in coverage_below:
+                gf = " [grandfathered]" if r.case_id in grandfather else ""
+                pct = f"{r.coverage:.0%}" if r.coverage is not None else "n/a"
+                covered_n = len(set(r.labeled_checks) & set(r.emitted_checks))
+                total_n = len(r.emitted_checks)
+                print(
+                    f"  COV {r.case_id}: {pct}"
+                    f" ({covered_n}/{total_n} checks covered,"
+                    f" uncovered={r.uncovered_checks}){gf}"
+                )
+                if r.stale_labels:
+                    print(f"    stale labels: {r.stale_labels}")
 
-    return 1 if failed > 0 else 0
+    if args.json:
+        Path(args.json).write_text(json.dumps([asdict(r) for r in results], indent=2))
+
+    # Compute exit code with both conditions visible; do NOT early-return
+    # on coverage alone or the oracle failure message gets masked when
+    # both trip in the same run.
+    exit_code = 1 if failed > 0 else 0
+
+    if args.strict_coverage:
+        blocking = [r for r in coverage_below if r.case_id not in grandfather]
+        if blocking:
+            if not args.quiet:
+                print(
+                    f"\nSTRICT COVERAGE: {len(blocking)} non-grandfathered TC(s) below threshold",
+                    file=sys.stderr,
+                )
+            exit_code = 1
+
+    return exit_code
 
 
 if __name__ == "__main__":

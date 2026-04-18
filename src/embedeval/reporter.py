@@ -29,6 +29,133 @@ LAYER_ORDER: list[str] = [
     "test_quality_proof",
 ]
 
+# Schema version for LEADERBOARD.md.
+#
+# Bump when columns, section headers, or cell formats change.
+# Do NOT bump for new rows (new TC, new model, new category) or whitespace.
+# External consumers (e.g., Hiloop `interop.leaderboard`) assert against
+# this version and fail loudly on unknown versions.
+LEADERBOARD_SCHEMA_VERSION: int = 1
+
+# Schema version for per_check_metrics.json / LEADERBOARD_PER_CHECK.md.
+# Separate from LEADERBOARD_SCHEMA_VERSION because the two artifacts
+# evolve independently.
+PER_CHECK_METRICS_SCHEMA_VERSION: int = 1
+
+
+def _aggregate_per_check_rows(
+    results_by_model: dict[str, list[EvalResult]],
+) -> list[dict[str, Any]]:
+    """Compute per-(tc_id, check_name, model) pass_rate rows from raw results.
+
+    REQ-04: Hiloop's `interop.leaderboard` consumes these rows to set
+    per-rule `aggregate_failure_rate` with TC-level scope, replacing the
+    category-aggregated signal that collapsed different rules onto one
+    number.
+
+    Skips L4 synthetic `mutation_*` checks (they measure benchmark self-
+    test quality, not model behavior). Groups by (case_id, check_name,
+    model) so a check that appears in multiple TCs gets distinct rows.
+    """
+    buckets: dict[tuple[str, str, str], dict[str, Any]] = {}
+
+    for model, results in results_by_model.items():
+        for r in results:
+            category = r.category.value if r.category else None
+            for layer in r.layers:
+                for d in layer.details:
+                    if d.check_type == "mutation":
+                        continue
+                    key = (r.case_id, d.check_name, model)
+                    bucket = buckets.setdefault(
+                        key,
+                        {
+                            "case_id": r.case_id,
+                            "category": category,
+                            "check_name": d.check_name,
+                            "model": model,
+                            "samples": 0,
+                            "passed": 0,
+                        },
+                    )
+                    bucket["samples"] += 1
+                    if d.passed:
+                        bucket["passed"] += 1
+
+    rows: list[dict[str, Any]] = []
+    for bucket in buckets.values():
+        samples = bucket["samples"]
+        bucket["pass_rate"] = bucket["passed"] / samples if samples else 0.0
+        rows.append(bucket)
+
+    # Sort by pass_rate ascending (most-failed first) then case_id, check_name
+    # for deterministic output across runs.
+    rows.sort(key=lambda x: (x["pass_rate"], x["case_id"], x["check_name"], x["model"]))
+    return rows
+
+
+def generate_per_check_metrics(
+    results_by_model: dict[str, list[EvalResult]],
+    output_json: Path | None = None,
+    output_md: Path | None = None,
+    run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    """REQ-04: emit per-(tc, check_name, model) metrics in JSON and/or MD.
+
+    Returns the computed rows. At least one of output_json / output_md
+    must be provided.
+    """
+    if output_json is None and output_md is None:
+        raise ValueError("at least one output path (json or md) must be provided")
+
+    rows = _aggregate_per_check_rows(results_by_model)
+
+    if output_json is not None:
+        output_json.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "schema_version": PER_CHECK_METRICS_SCHEMA_VERSION,
+            "run_id": run_id,
+            "generated": datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "rows": rows,
+        }
+        output_json.write_text(
+            json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+        logger.info("Per-check metrics JSON written to %s", output_json)
+
+    if output_md is not None:
+        output_md.parent.mkdir(parents=True, exist_ok=True)
+        lines: list[str] = [
+            "# EmbedEval Per-Check Metrics",
+            "",
+            f"<!-- SCHEMA_VERSION: {PER_CHECK_METRICS_SCHEMA_VERSION} -->",
+            "",
+        ]
+        if run_id:
+            lines.extend([f"**Run ID:** `{run_id}`", ""])
+        lines.extend([
+            "Per-(TC, check_name, model) pass_rate. Sorted by pass_rate"
+            " ascending — the most-failed checks are at the top.",
+            "",
+            "| TC ID | Category | Check | Model | pass_rate | passed/samples |",
+            "|-------|----------|-------|-------|-----------|----------------|",
+        ])
+        for row in rows:
+            category_display = row["category"] or "-"
+            lines.append(
+                f"| {row['case_id']}"
+                f" | {category_display}"
+                f" | {row['check_name']}"
+                f" | {row['model']}"
+                f" | {row['pass_rate']:.3f}"
+                f" | {row['passed']}/{row['samples']} |"
+            )
+        output_md.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        logger.info("Per-check metrics markdown written to %s", output_md)
+
+    return rows
+
 
 def generate_json(report: BenchmarkReport, output: Path) -> None:
     """Write a benchmark report as JSON.
@@ -60,6 +187,8 @@ def generate_leaderboard(
 
     lines: list[str] = [
         "# EmbedEval Leaderboard",
+        "",
+        f"<!-- SCHEMA_VERSION: {LEADERBOARD_SCHEMA_VERSION} -->",
         "",
     ]
 

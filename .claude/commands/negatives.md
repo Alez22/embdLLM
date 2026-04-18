@@ -232,18 +232,26 @@ NEGATIVES = [
 ]
 ```
 
-6b. Run oracle:
+6b. Run oracle **with coverage (REQ-02)**:
 ```bash
-uv run python scripts/verify_negatives_oracle.py --case {TC_ID}
+uv run python scripts/verify_negatives_oracle.py --case {TC_ID} --coverage
 ```
 
 6c. Handle oracle outcome:
-- **PASS**: mark TC done in progress file, print commit-suggested message, go to Step 7.
-- **FAIL**: show the `missed` entries. For each missed negative, **AskUserQuestion**:
+- **Oracle PASS AND coverage ≥ 80%**: mark TC done, print commit-suggested message, go to Step 7.
+- **Oracle PASS BUT coverage < 80%**: surface the uncovered `check_name`s. **AskUserQuestion**:
+  - `add more mutations` — return to Step 4 to pick additional checks (preferred path).
+  - `mark done anyway` — accept below-threshold coverage; record uncovered list in `plans/negatives-progress.json` `notes` field. Only use when remaining checks genuinely have no meaningful mutation (e.g., pure `#include` checks).
+  - `abort TC` — keep status `in-progress`; resume next session.
+- **Oracle FAIL**: show the `missed` entries. For each missed negative, **AskUserQuestion**:
   - `revise` — LLM re-drafts that specific mutation (return to Step 5a for that check)
   - `downgrade to should_fail` — move from `must_fail` to `should_fail` (subtle negative, not oracle-gated)
   - `remove` — drop this negative from the file
   - `abort TC` — save current state with status "in-progress", continue next session
+
+**Coverage policy (REQ-02, 2026-04-19):**
+- New TCs (authored via `/negatives` after 2026-04-19) MUST meet ≥80% coverage.
+- Pre-gate TCs listed in `plans/coverage-grandfather.txt` are reported but not enforced. When `/negatives` revisits a grandfathered TC and raises it to ≥80%, remove the entry from the grandfather file.
 
 Never loop more than 3 revision attempts per mutation. After 3, force downgrade/remove decision.
 

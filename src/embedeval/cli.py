@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Annotated, Optional
 import typer
 
 from embedeval.context_diagnose import DEFAULT_GAP_THRESHOLD_PP
-from embedeval.models import CaseCategory, DifficultyTier, Visibility
+from embedeval.models import CaseCategory, DifficultyTier, EvalResult, Visibility
 
 if TYPE_CHECKING:
     from embedeval.models import CaseMetadata, EvalResult
@@ -455,6 +455,7 @@ def run(
         generate_failure_report,
         generate_json,
         generate_leaderboard,
+        generate_per_check_metrics,
         generate_run_archive,
         generate_safe_guide,
     )
@@ -466,6 +467,8 @@ def run(
     # Leaderboard needs every known model, not just the one that just ran,
     # otherwise a Sonnet-only invocation wipes Haiku off the page.
     leaderboard_reports = [report]
+    # Raw EvalResults per model — REQ-04 per-check metrics need them.
+    results_by_model: dict[str, list[EvalResult]] = {model: comprehensive_results}
     for other_model in sorted(prior_tracker.results.keys()):
         if other_model == model or other_model == "mock":
             continue
@@ -477,12 +480,26 @@ def run(
         other_report = score_results(other_merged)
         other_report.scenario = scenario
         leaderboard_reports.append(other_report)
+        results_by_model[other_model] = other_merged
 
     leaderboard_path = output_dir / "LEADERBOARD.md"
     generate_leaderboard(leaderboard_reports, leaderboard_path)
 
     run_dir = generate_run_archive(
         comprehensive_results, report, output_dir, model, run_id=run_id
+    )
+
+    # REQ-04: emit per-(TC, check, model) metrics for external consumers
+    # (Hiloop's interop.leaderboard, per-rule severity auto-assignment).
+    # JSON goes into the run-scoped archive so n=3 invocations produce
+    # three artifacts rather than silently overwriting each other; the
+    # markdown summary stays at the flat root for human browsing and
+    # mirrors LEADERBOARD.md's placement.
+    generate_per_check_metrics(
+        results_by_model,
+        output_json=run_dir / "per_check_metrics.json",
+        output_md=output_dir / "LEADERBOARD_PER_CHECK.md",
+        run_id=run_id,
     )
     # Failure report still lists just this run's failures — the archive
     # has the full picture, but the one-page report is most useful as

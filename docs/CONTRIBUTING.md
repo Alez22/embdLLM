@@ -175,6 +175,49 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 - Test value constraints (buffer size must be power of 2)
 - Behavioral checks should catch "compiles but wrong" bugs
 
+## `CheckDetail.check_name` is an External Contract
+
+Once a TC is merged into a tagged release, its `check_name` values MUST NOT be renamed or removed.
+
+External consumers stamp these names into their own artifacts and cannot follow silent renames. Known external consumers today include:
+
+- Hiloop's `scripts/verify_transpile.py` (mutation-oracle gate) — uses `check_name` to scope evaluation.
+- Hiloop landed rule YAMLs — stamp the EmbedEval `check_name` into `metadata.source_check_name`.
+
+Adding new `check_name` entries is always fine. Removing or renaming them breaks downstream reproducibility.
+
+### If a Rename is Unavoidable
+
+If a rename is the only correct fix (e.g., the original name misleads readers or collides with a semantic neighbor), emit `cases/<tc>/checks/check_name_migrations.yaml`:
+
+```yaml
+# cases/<tc>/checks/check_name_migrations.yaml
+renames:
+  - from: old_check_name
+    to:   new_check_name
+    since: "YYYY-MM-DD"    # release date or merge commit date
+    reason: "one-line explanation"
+```
+
+**Rules:**
+
+- Never remove an entry from this file once added — it is an append-only audit log.
+- `since` MUST be ≤ the release tag date; consumers pin to this field.
+- Multiple renames per file are fine; each is a separate `renames:` entry.
+- Deletions (not renames) must be flagged in the PR description; no migration file can repair an orphan reference that has no successor.
+
+### Template
+
+A blank template lives at `docs/check_name_migrations.yaml.template`. Copy to `cases/<tc>/checks/check_name_migrations.yaml` and fill only when a rename is actually needed; most TCs will never need this file.
+
+### Consumer Expectations
+
+External tools consuming `check_name`:
+
+- MUST walk all `cases/*/checks/check_name_migrations.yaml` files on load.
+- MUST treat `from → to` as authoritative: an artifact referencing `from` is semantically the same as one referencing `to`.
+- SHOULD fail loudly on a reference that matches neither a live `check_name` nor any `from:` entry.
+
 ## PR Checklist
 
 Before submitting a pull request for a new case, verify:
