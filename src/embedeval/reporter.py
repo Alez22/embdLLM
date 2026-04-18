@@ -149,13 +149,15 @@ def generate_per_check_metrics(
         ]
         if run_id:
             lines.extend([f"**Run ID:** `{run_id}`", ""])
-        lines.extend([
-            "Per-(TC, check_name, model) pass_rate. Sorted by pass_rate"
-            " ascending — the most-failed checks are at the top.",
-            "",
-            "| TC ID | Category | Check | Model | pass_rate | passed/samples |",
-            "|-------|----------|-------|-------|-----------|----------------|",
-        ])
+        lines.extend(
+            [
+                "Per-(TC, check_name, model) pass_rate. Sorted by pass_rate"
+                " ascending — the most-failed checks are at the top.",
+                "",
+                "| TC ID | Category | Check | Model | pass_rate | passed/samples |",
+                "|-------|----------|-------|-------|-----------|----------------|",
+            ]
+        )
         for row in rows:
             category_display = row["category"] or "-"
             lines.append(

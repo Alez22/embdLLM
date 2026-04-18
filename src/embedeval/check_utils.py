@@ -140,6 +140,7 @@ ZEPHYR_DEPRECATED = [
     "gpio_pin_configure(",  # without _dt suffix
 ]
 
+
 @lru_cache(maxsize=1)
 def _load_forbidden_apis() -> dict[str, list[str]]:
     """Load cross-platform forbidden API blacklist from packaged YAML.
