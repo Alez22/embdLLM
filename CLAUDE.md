@@ -120,6 +120,19 @@ Platform-specific: `yocto`, `linux-driver`, `memory-opt`
 3. **Check function signatures before calling** — Read the function definition before using it.
    Don't assume what it returns. Don't wrap it in "defensive" double-processing.
 
+## Pre-commit Hook (one-time setup per clone)
+
+CI's Lint job (`ruff format --check src/` + `ruff check src/`) is mirrored in
+`.githooks/pre-commit`. Activate it once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+`core.hooksPath` is a local-only git config, so it is **not** inherited on clone
+— every fresh clone must run the command above, or CI will keep catching
+format drift after push.
+
 ## Learned Corrections
 
 ### 2026
