@@ -789,9 +789,9 @@
       "case_id": "linux-driver-003",
       "category": "linux-driver",
       "priority": 6,
-      "status": "pending",
-      "started_at": null,
-      "completed_at": null,
+      "status": "done",
+      "started_at": "2026-04-19",
+      "completed_at": "2026-04-19",
       "notes": null
     },
     {
