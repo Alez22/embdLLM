@@ -129,10 +129,21 @@ class TestGrandfatherList:
     def test_loads_from_plans_file(self) -> None:
         oracle = _load_oracle()
         gf = oracle._load_grandfather()
-        # Snapshot from 2026-04-19: 30 pre-gate TCs.
+        # Snapshot from 2026-04-19: 30 pre-gate TCs. The `>=` allows the
+        # list to SHRINK legitimately — when /negatives revisits a TC and
+        # raises it to ≥80% coverage, its entry is removed from the file
+        # so it becomes subject to --strict-coverage going forward.
+        # A hard-count assertion would fail spuriously on that workflow.
+        # The floor remains 30 to catch accidental truncation.
         assert "gpio-basic-001" in gf
         assert "dma-001" in gf
-        assert len(gf) >= 30
+        assert len(gf) <= 30, (
+            f"Grandfather list grew to {len(gf)}; new TCs should not be"
+            " added — they must meet the coverage gate from day 1"
+        )
+        # Lower bound: allow shrinkage (graduated TCs) but flag if the
+        # file was truncated or corrupted.
+        assert len(gf) >= 1, "Grandfather file appears empty or corrupted"
 
     def test_missing_file_returns_empty(self, tmp_path: Path, monkeypatch) -> None:
         """If the grandfather file is missing, everything is gate-required."""

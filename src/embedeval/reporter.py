@@ -78,6 +78,21 @@ def _aggregate_per_check_rows(
                             "passed": 0,
                         },
                     )
+                    # Category should be stable per case_id. A mismatch
+                    # indicates upstream result synthesis bug (e.g., a TC
+                    # got reassigned mid-run). Log once per key — the row
+                    # keeps the first-seen category but downstream
+                    # analytics could be misleading.
+                    if bucket["category"] != category:
+                        logger.warning(
+                            "per_check_metrics: inconsistent category for"
+                            " (%s, %s, %s): first-seen=%s now=%s (keeping first-seen)",
+                            r.case_id,
+                            d.check_name,
+                            model,
+                            bucket["category"],
+                            category,
+                        )
                     bucket["samples"] += 1
                     if d.passed:
                         bucket["passed"] += 1

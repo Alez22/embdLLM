@@ -22,10 +22,13 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import logging
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -198,12 +201,22 @@ def compute_coverage(case_dir: Path, result: OracleResult) -> None:
     Emitted checks = union of check_names returned by static.py.run_checks
     and behavior.py.run_checks on the reference.
     Labeled checks = union of must_fail + should_fail across NEGATIVES.
+    Note: should_fail entries intentionally count toward the labeled set.
+    REQ-02 defines coverage = (must_fail ∪ should_fail) ∩ emitted / emitted.
+    Subtle negatives (should_fail-only) are valid mutation witnesses even
+    though they don't gate the oracle exit code.
 
     coverage = |labeled ∩ emitted| / |emitted|     (1.0 if no emitted)
     uncovered_checks = emitted - labeled          (checks with no mutation)
     stale_labels = labeled - emitted              (labels naming checks that
                                                    never run — likely typo or
                                                    post-rename drift; REQ-06).
+
+    Exceptions from module loading or run_checks() are LOGGED, not raised.
+    Coverage computation continues with whatever checks were collected so
+    a single broken static.py doesn't block the oracle gate entirely.
+    Inflated coverage from swallowed errors is a known risk — inspect
+    stderr for WARNING lines after each run.
     """
     checks_dir = case_dir / "checks"
     neg_path = checks_dir / "negatives.py"
@@ -215,7 +228,10 @@ def compute_coverage(case_dir: Path, result: OracleResult) -> None:
 
     try:
         neg_mod = _load_module(neg_path, f"cov_neg_{case_dir.name}")
-    except Exception:
+    except Exception as exc:
+        logger.warning(
+            "coverage: cannot load negatives.py for %s: %s", case_dir.name, exc
+        )
         return
     negatives: list[dict[str, Any]] = getattr(neg_mod, "NEGATIVES", []) or []
 
@@ -228,13 +244,26 @@ def compute_coverage(case_dir: Path, result: OracleResult) -> None:
             continue
         try:
             mod = _load_module(path, f"cov_{name}_{case_dir.name}")
-        except Exception:
+        except Exception as exc:
+            logger.warning(
+                "coverage: cannot load %s.py for %s: %s",
+                name,
+                case_dir.name,
+                exc,
+            )
             continue
         if not hasattr(mod, "run_checks"):
             continue
         try:
             emitted |= {c.check_name for c in mod.run_checks(reference)}
-        except Exception:
+        except Exception as exc:
+            logger.warning(
+                "coverage: %s.run_checks raised on %s: %s — coverage may be"
+                " inflated (failed checks not counted in emitted set)",
+                name,
+                case_dir.name,
+                exc,
+            )
             continue
 
     labeled: set[str] = set()
