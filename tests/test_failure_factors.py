@@ -50,6 +50,8 @@ def test_parse_check_category_map_covers_known_checks() -> None:
 
     `volatile_error_flag` is D-category. `dma_config_called` is A.
     `init_error_path_cleanup` is E. `k_sleep_with_k_msec` is F.
+    Phase A/B additions (v1.6) extend the spot-check into D (ISR
+    context), E (devm / IS_ERR cleanup), and F (systemd directive).
     """
     mapping = load_check_category_map()
     assert mapping["volatile_error_flag"] == "D"
@@ -58,6 +60,11 @@ def test_parse_check_category_map_covers_known_checks() -> None:
     assert mapping["k_sleep_with_k_msec"] == "F"
     assert mapping["deadline_miss_detected"] == "B"
     assert mapping["stack_overflow_protection_configured"] == "C"
+    # Phase A/B representatives — added by v1.6 trailer sync.
+    assert mapping["isr_uses_spin_lock_irqsave"] == "D"
+    assert mapping["devm_kzalloc_used_in_probe"] == "E"
+    assert mapping["bbfile_priority_is_numeric"] == "F"
+    assert mapping["tx_rx_buf_cast_to_unsigned_long"] == "A"
 
 
 def test_parse_check_category_map_first_category_wins_for_duplicates() -> None:
@@ -127,6 +134,77 @@ def test_parse_factors_and_map_agree_on_categories() -> None:
             f"check {check} mapped to category {letter} "
             f"which parse_factors does not know about"
         )
+
+
+def test_phase_a_b_checks_mapped() -> None:
+    """v1.6 trailer sync: every Phase A/B check name appears in exactly
+    one A–F trailer and resolves to the category letter its TC's
+    dominant `factor_id` implies. Representative set covers all six
+    categories so a regression (dropped trailer, typo, or section
+    boundary slip) surfaces loudly.
+
+    The list intentionally spans Phase A (linux-driver-009..016,
+    yocto-009..012, boot-uboot-002..004) and Phase B
+    (linux-userspace-001..008) so either phase's trailer going missing
+    trips the assertion. Keep the list tight — this is a spot-check,
+    not a full inventory; the full inventory is the doc itself.
+    """
+    mapping = load_check_category_map()
+    expected: dict[str, str] = {
+        # A — hardware/protocol details
+        "tx_rx_buf_cast_to_unsigned_long": "A",
+        "spi_ioc_wr_mode_used": "A",
+        "bpf_core_read_used": "A",
+        "direction_set_output": "A",
+        # B — temporal / periodic
+        "wait_has_finite_timeout": "B",
+        "watchdog_sec_matches_30s_requirement": "B",
+        "persistent_true": "B",
+        # C — memory/allocation context
+        "probe_uses_gfp_kernel": "C",
+        # D — concurrency / ISR context
+        "isr_uses_spin_lock_irqsave": "D",
+        "isr_no_sleepable_calls": "D",
+        "spinlock_t_declared": "D",
+        "irqf_oneshot_flag_used": "D",
+        # E — error / cleanup / resource lifecycle
+        "devm_kzalloc_used_in_probe": "E",
+        "is_err_guards_kthread_start": "E",
+        "ptr_err_propagated": "E",
+        "remove_releases_all_resources": "E",
+        "sigterm_handler_registered": "E",
+        "type_notify_set": "E",
+        # F — toolchain / directive grammar / build integration
+        "bbfile_priority_is_numeric": "F",
+        "filesextrapaths_colon_prepend": "F",
+        "subsystem_match_usb": "F",
+        "service_type_oneshot": "F",
+        "sec_kprobe_macro_used": "F",
+        "kernel_load_and_entry_addresses": "F",
+        "no_libgpiod_v1_api": "F",
+        "signature_uses_rsa4096": "E",  # hash+signature integrity → E
+    }
+    missing = [name for name in expected if name not in mapping]
+    assert not missing, f"Phase A/B checks missing from trailer: {missing}"
+    mismatches = [
+        (name, expected[name], mapping[name])
+        for name in expected
+        if mapping[name] != expected[name]
+    ]
+    assert not mismatches, (
+        "Phase A/B checks mapped to unexpected letter "
+        "(name, expected, got): " + repr(mismatches)
+    )
+
+
+def test_mapping_has_at_least_v1_6_size() -> None:
+    """v1.6 sync brought the total from 137 (pre-Phase-A) to ~359.
+    Allow growth, flag shrinkage — the trailer is additive-only."""
+    mapping = load_check_category_map()
+    assert len(mapping) >= 350, (
+        f"mapping has only {len(mapping)} entries; "
+        f"v1.6 expected ≥350 after Phase A/B sync"
+    )
 
 
 def test_parse_factors_accepts_raw_markdown() -> None:
