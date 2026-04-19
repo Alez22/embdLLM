@@ -1300,3 +1300,131 @@ def rauc_image_slots(text: str) -> list[str]:
         body,
         re.MULTILINE,
     )
+
+
+# ---------------------------------------------------------------------------
+# Linux networking-kernel helpers (Phase C-2).
+#
+# Shared by cases/embedded-linux/networking-kernel-001..005 TCs covering
+# netfilter hooks, sk_buff lifecycle, netlink kernel sockets, generic
+# netlink families, and netdevice notifiers. Targets linux-imx 5.15 LTS.
+#
+# Design notes:
+#   - Each helper accepts raw or stripped code; callers pre-strip when
+#     they care about string literals (the ``strip_comments`` call here
+#     preserves strings but removes ``//`` and ``/* */`` which would
+#     otherwise cause false positives on commented-out examples).
+#   - ``has_nf_register_call`` accepts both the plural (``nf_register_net_hooks``)
+#     and singular (``nf_register_net_hook``) forms — both are valid
+#     on 5.15 even though the plural is preferred.
+#   - ``has_netlink_kernel_api`` returns a list of detected symbols so
+#     callers can assert specific endpoint-creation APIs without
+#     over-matching generic netlink accessors.
+# ---------------------------------------------------------------------------
+
+
+def has_nf_hook_ops_struct(code: str) -> bool:
+    """Detect a ``struct nf_hook_ops`` declaration (scalar or array).
+
+    Matches:
+      - ``struct nf_hook_ops ops = { ... };``
+      - ``static struct nf_hook_ops ops[] = { ... };``
+      - ``struct nf_hook_ops my_ops = { .hook = ... };``
+
+    Ignores forward declarations without initialisers and ignores
+    ``#include <linux/netfilter.h>`` where the identifier doesn't
+    precede a variable name.
+    """
+    stripped = strip_comments(code)
+    # Declaration with optional array brackets and optional initialiser.
+    pat = re.compile(
+        r"\bstruct\s+nf_hook_ops\s+\w+\s*(\[[^\]]*\])?\s*(=|;)",
+    )
+    return bool(pat.search(stripped))
+
+
+def has_nf_register_call(code: str) -> bool:
+    """Detect a netfilter hook registration call.
+
+    Accepts BOTH ``nf_register_net_hooks`` (plural, 3-arg, preferred on
+    5.15) and ``nf_register_net_hook`` (singular, legacy but still
+    present). Also accepts per-namespace ``nf_register_hook`` /
+    ``nf_register_hooks`` which are pre-namespace variants some
+    older-style modules still use.
+    """
+    stripped = strip_comments(code)
+    pat = re.compile(
+        r"\bnf_register_(net_)?hooks?\s*\(",
+    )
+    return bool(pat.search(stripped))
+
+
+_NETLINK_KERNEL_APIS = (
+    "netlink_kernel_create",
+    "netlink_kernel_release",
+    "netlink_unicast",
+    "netlink_broadcast",
+    "nlmsg_parse",
+    "nlmsg_hdr",
+    "nlmsg_data",
+    "nlmsg_put",
+    "nlmsg_new",
+    "nla_put",
+    "nla_put_string",
+    "nla_put_u32",
+    "nla_put_u16",
+    "nla_put_u8",
+    "nla_get_string",
+    "nla_get_u32",
+)
+
+
+def has_netlink_kernel_api(code: str) -> list[str]:
+    """Return the list of netlink kernel-side APIs used in the code.
+
+    Preserves call-order of first appearance in the source — not tuple
+    order — so a prompt that reads "detect the first netlink API
+    invoked" can assert on the returned list head. Matches identifier
+    + ``(`` so struct fields named ``.input`` / ``.cfg`` don't
+    false-positive. ``nla_put`` matches the prefix form — callers that
+    need to distinguish ``nla_put`` vs ``nla_put_u32`` should grep the
+    returned list.
+    """
+    stripped = strip_comments(code)
+    # Scan the source left-to-right; emit each API on its first call site.
+    pat = re.compile(
+        r"\b(" + "|".join(re.escape(a) for a in _NETLINK_KERNEL_APIS) + r")\s*\(",
+    )
+    found: list[str] = []
+    seen: set[str] = set()
+    for m in pat.finditer(stripped):
+        name = m.group(1)
+        if name not in seen:
+            found.append(name)
+            seen.add(name)
+    return found
+
+
+def has_genl_family_struct(code: str) -> bool:
+    """Detect a ``struct genl_family`` declaration with 5.15-era fields.
+
+    Requires at least one of ``.ops`` / ``.small_ops`` / ``.n_ops`` to
+    appear INSIDE the genl_family initializer body — this is what
+    distinguishes the modern (>= 4.10) form from the deprecated
+    pre-4.10 form that used ``genl_register_family_with_ops`` and
+    didn't embed the ops pointer.
+
+    Scopes the field-membership search to the ``{ ... }`` initializer
+    of the genl_family declaration; a separate ``struct genl_ops`` array
+    elsewhere in the file does not count.
+    """
+    stripped = strip_comments(code)
+    m = re.search(
+        r"\bstruct\s+genl_family\s+\w+\s*=\s*\{([^}]*)\}",
+        stripped,
+        flags=re.DOTALL,
+    )
+    if not m:
+        return False
+    body = m.group(1)
+    return bool(re.search(r"\.(n_ops|ops|small_ops)\s*=", body))

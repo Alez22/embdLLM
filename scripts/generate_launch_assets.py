@@ -43,6 +43,10 @@ CATEGORIES = [
     ("kconfig", 90, 60),
     ("linux-driver", 70, 70),
     ("memory-opt", 67, 33),
+    # NOTE: stale after Phase C-2 expansion (2026-04-19) — networking
+    # category grew 10 → 15 TCs (added networking-kernel-001..005).
+    # Refresh after the pending Phase C-2 benchmark run completes;
+    # see docs/BENCHMARK-networking-kernel-phase-c.md.
     ("networking", 75, 75),
     ("ota", 67, 58),
     ("power-mgmt", 75, 67),

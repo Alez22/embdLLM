@@ -230,6 +230,16 @@ cases:
     sdk: zephyr
   networking-008:
     sdk: zephyr
+  networking-kernel-001:
+    sdk: embedded-linux
+  networking-kernel-002:
+    sdk: embedded-linux
+  networking-kernel-003:
+    sdk: embedded-linux
+  networking-kernel-004:
+    sdk: embedded-linux
+  networking-kernel-005:
+    sdk: embedded-linux
   ota-001:
     sdk: zephyr
   ota-002:
