@@ -182,6 +182,18 @@ cases:
     sdk: embedded-linux
   linux-userspace-008:
     sdk: embedded-linux
+  ota-rauc-001:
+    sdk: embedded-linux
+  ota-rauc-002:
+    sdk: embedded-linux
+  ota-swupdate-001:
+    sdk: embedded-linux
+  ota-swupdate-002:
+    sdk: embedded-linux
+  ota-swupdate-003:
+    sdk: embedded-linux
+  ota-swupdate-004:
+    sdk: embedded-linux
   memory-opt-001:
     sdk: zephyr
   memory-opt-002:

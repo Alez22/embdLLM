@@ -1076,3 +1076,227 @@ def has_bpf_core_read(code: str) -> bool:
             "BPF_CORE_READ_USER_STR_INTO",
         )
     )
+
+
+# ---------------------------------------------------------------------------
+# OTA helpers (Phase C-1).
+#
+# Shared by cases/embedded-linux/ota-swupdate-* and ota-rauc-* TCs.
+# SWUpdate uses libconfig (``key = value;`` + ``section = { ... };`` +
+# ``list: ( item, item );`` with ``#`` line comments). RAUC uses INI
+# (``[section]`` + ``key=value`` with ``#`` line comments and dotted
+# section names like ``[image.rootfs.0]``).
+#
+# Both share ``#`` line-comment semantics with systemd / Yocto, so
+# ``strip_systemd_comments`` is reused as the canonical stripper.
+# ---------------------------------------------------------------------------
+
+
+def libconfig_section_body(text: str, section_path: str) -> str | None:
+    """Return the brace-body of a libconfig section (possibly nested).
+
+    ``section_path`` is a dot-separated path such as ``"software"`` or
+    ``"software.stable"`` or ``"stable.copy-1"``. Walks into nested
+    ``name = { ... };`` blocks.
+
+    Returns the text inside the innermost matching ``{ ... }`` (exclusive
+    of braces), or None if any path component is missing. Comments are
+    stripped via ``strip_systemd_comments`` before matching.
+    """
+    body = strip_systemd_comments(text)
+    remaining = body
+    for name in section_path.split("."):
+        # Find ``<name>\s*=\s*{``. Dashes are allowed in libconfig section
+        # names (e.g. ``copy-1``).
+        pat = re.compile(rf"\b{re.escape(name)}\s*=\s*\{{", re.MULTILINE)
+        m = pat.search(remaining)
+        if not m:
+            return None
+        # Brace-count to find the matching close.
+        depth = 1
+        i = m.end()
+        while i < len(remaining) and depth:
+            c = remaining[i]
+            if c == "{":
+                depth += 1
+            elif c == "}":
+                depth -= 1
+            i += 1
+        if depth:
+            return None  # Unbalanced — treat as absent.
+        remaining = remaining[m.end() : i - 1]
+    return remaining
+
+
+def swupdate_libconfig_has(
+    text: str,
+    section_path: str,
+    key: str,
+) -> str | None:
+    """Return the RHS value of ``<key> = <value>;`` inside a libconfig section.
+
+    Args:
+        text: sw-description contents.
+        section_path: dot-separated path, e.g. ``"software"`` or
+            ``"software.stable.copy-1"``.
+        key: directive key (e.g. ``version``, ``description``, ``format``).
+
+    Returns:
+        Trimmed RHS with outer quotes stripped and trailing ``;`` removed,
+        or None if the section or key is absent. Accepts bool-ish values
+        (``true``, ``1``, ``"true"``) and preserves case for comparison.
+    """
+    section = libconfig_section_body(text, section_path)
+    if section is None:
+        return None
+    # Match ``key = <rhs>;`` where <rhs> is either a quoted string, an
+    # array ``[ ... ]``, a bool/number literal, or anything up to ``;``.
+    pat = re.compile(
+        rf'^\s*{re.escape(key)}\s*=\s*(".*?"|\[.*?\]|.+?);',
+        re.MULTILINE | re.DOTALL,
+    )
+    m = pat.search(section)
+    if not m:
+        return None
+    val = m.group(1).strip()
+    # Strip outer matched quotes only — leaves inner arrays / bool / int alone.
+    if len(val) >= 2 and val[0] == '"' and val[-1] == '"':
+        val = val[1:-1]
+    return val
+
+
+# Matches a single `{ ... }` entry inside a libconfig list ``( ... )``.
+# Used to enumerate image / file / script dict entries without parsing the
+# full grammar. Brace-counting keeps nested structures intact.
+def libconfig_list_entries(list_body: str) -> list[str]:
+    entries: list[str] = []
+    i = 0
+    while i < len(list_body):
+        if list_body[i] != "{":
+            i += 1
+            continue
+        depth = 1
+        start = i + 1
+        j = i + 1
+        while j < len(list_body) and depth:
+            if list_body[j] == "{":
+                depth += 1
+            elif list_body[j] == "}":
+                depth -= 1
+            j += 1
+        if depth == 0:
+            entries.append(list_body[start : j - 1])
+        i = j
+    return entries
+
+
+def libconfig_list_body(text: str, list_name: str) -> str | None:
+    """Return the body of ``<list_name>: ( ... );`` or None."""
+    body = strip_systemd_comments(text)
+    pat = re.compile(rf"\b{re.escape(list_name)}\s*:\s*\(", re.MULTILINE)
+    m = pat.search(body)
+    if not m:
+        return None
+    # Paren-count to find matching close.
+    depth = 1
+    start = m.end()
+    i = start
+    while i < len(body) and depth:
+        c = body[i]
+        if c == "(":
+            depth += 1
+        elif c == ")":
+            depth -= 1
+        i += 1
+    if depth:
+        return None
+    return body[start : i - 1]
+
+
+def swupdate_images_has_sha256(text: str) -> bool:
+    """Return True iff every entry in ``images: ( ... );`` has a ``sha256``
+    field. Returns False if no ``images`` list is declared at all.
+    """
+    list_body = libconfig_list_body(text, "images")
+    if list_body is None:
+        return False
+    entries = libconfig_list_entries(list_body)
+    if not entries:
+        return False
+    sha_pat = re.compile(r"\bsha256\s*=\s*", re.MULTILINE)
+    return all(sha_pat.search(e) for e in entries)
+
+
+def swupdate_hardware_compatibility_list(text: str) -> list[str]:
+    """Parse the top-level ``hardware-compatibility = [ "1.0", "1.2" ];``
+    array and return the string values. Returns [] if the directive is
+    missing or malformed.
+    """
+    body = strip_systemd_comments(text)
+    m = re.search(
+        r"\bhardware-compatibility\s*=\s*\[(.*?)\]\s*;",
+        body,
+        re.DOTALL,
+    )
+    if not m:
+        return []
+    # Extract double-quoted strings only; ignore anything else.
+    return re.findall(r'"([^"]*)"', m.group(1))
+
+
+def rauc_manifest_section_has(
+    text: str,
+    section: str,
+    key: str,
+) -> str | None:
+    """Return the RHS of ``key=value`` inside ``[section]`` in a RAUC manifest.
+
+    RAUC manifests use INI grammar with dotted section names such as
+    ``[image.rootfs]`` or ``[image.rootfs.0]``. Python's ``configparser``
+    treats dots as regular characters, but we implement a minimal parser
+    here to avoid taking a configparser dependency on the check path.
+
+    Args:
+        text: manifest.raucm contents.
+        section: full section name as written between brackets
+            (e.g. ``"update"``, ``"image.rootfs"``, ``"image.rootfs.0"``).
+        key: directive key (e.g. ``compatible``, ``version``, ``filename``).
+
+    Returns:
+        Trimmed RHS string (no surrounding quotes, no trailing whitespace),
+        or None if section/key is absent. Last occurrence wins (matches
+        INI convention).
+    """
+    body = strip_systemd_comments(text)
+    # Allow leading whitespace before ``[section]`` — test fixtures and
+    # real-world manifests are often indented.
+    sec_pat = re.compile(rf"^\s*\[{re.escape(section)}\]\s*$", re.MULTILINE)
+    m = sec_pat.search(body)
+    if not m:
+        return None
+    start = m.end()
+    # Next ``[...]`` header or EOF bounds the section.
+    next_hdr = re.search(r"^\s*\[[^\]]+\]\s*$", body[start:], re.MULTILINE)
+    end = start + next_hdr.start() if next_hdr else len(body)
+    section_body = body[start:end]
+    key_pat = re.compile(
+        rf"^\s*{re.escape(key)}\s*=\s*(.*?)\s*$",
+        re.MULTILINE,
+    )
+    matches = key_pat.findall(section_body)
+    return matches[-1] if matches else None
+
+
+def rauc_image_slots(text: str) -> list[str]:
+    """Enumerate all ``[image.<slot>]`` sections in a RAUC manifest.
+
+    Returns the slot suffix after ``image.`` — e.g. for ``[image.rootfs]``
+    returns ``"rootfs"``; for ``[image.rootfs.0]`` returns ``"rootfs.0"``.
+    Preserves declaration order.
+    """
+    body = strip_systemd_comments(text)
+    return re.findall(
+        r"^\s*\[image\.([^\]]+)\]\s*$",
+        body,
+        re.MULTILINE,
+    )
