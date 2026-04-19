@@ -26,6 +26,12 @@ cases:
   boot-002:
     rename_to: boot-uboot-001
     sdk: embedded-linux
+  boot-uboot-002:
+    sdk: embedded-linux
+  boot-uboot-003:
+    sdk: embedded-linux
+  boot-uboot-004:
+    sdk: embedded-linux
   boot-003:
     sdk: zephyr
   boot-004:
@@ -144,7 +150,21 @@ cases:
     sdk: embedded-linux
   linux-driver-008:
     sdk: embedded-linux
+  linux-driver-009:
+    sdk: embedded-linux
+  linux-driver-010:
+    sdk: embedded-linux
+  linux-driver-011:
+    sdk: embedded-linux
+  linux-driver-012:
+    sdk: embedded-linux
   linux-driver-013:
+    sdk: embedded-linux
+  linux-driver-014:
+    sdk: embedded-linux
+  linux-driver-015:
+    sdk: embedded-linux
+  linux-driver-016:
     sdk: embedded-linux
   memory-opt-001:
     sdk: zephyr
@@ -373,5 +393,13 @@ cases:
   yocto-007:
     sdk: embedded-linux
   yocto-008:
+    sdk: embedded-linux
+  yocto-009:
+    sdk: embedded-linux
+  yocto-010:
+    sdk: embedded-linux
+  yocto-011:
+    sdk: embedded-linux
+  yocto-012:
     sdk: embedded-linux
 version: 1

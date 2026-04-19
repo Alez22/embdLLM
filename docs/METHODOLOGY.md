@@ -8,13 +8,13 @@ EmbedEval is a benchmark for evaluating LLM capability in embedded firmware code
 
 | Metric | Value |
 |--------|-------|
-| **Total cases** | 234 |
+| **Total cases** | 248 |
 | **Categories** | 23 |
 | **Platforms** | 6 (docker_only, esp_idf, native_sim, qemu_arm, stm32_hal, yocto_build) |
-| **Difficulty** | 29 easy, 98 medium, 107 hard |
-| **Private held-out** | 48 cases (20%) for contamination prevention |
+| **Difficulty** | 29 easy, 103 medium, 116 hard |
+| **Private held-out** | 48 cases (19%) for contamination prevention |
 | **Evaluation scenarios** | 2 (generation, bugfix) |
-| **Negatives (mutation tests)** | 45 cases, 242 must_fail mutations |
+| **Negatives (mutation tests)** | 59 cases, 410 must_fail mutations |
 
 ### Platform Distribution
 
@@ -33,13 +33,13 @@ EmbedEval is a benchmark for evaluating LLM capability in embedded firmware code
 |----------|------|--------|------|-------|
 | adc | 0 | 1 | 1 | 2 |
 | ble | 1 | 4 | 6 | 11 |
-| boot | 2 | 5 | 3 | 10 |
+| boot | 2 | 6 | 5 | 13 |
 | device-tree | 2 | 4 | 4 | 10 |
 | dma | 1 | 3 | 9 | 13 |
 | gpio-basic | 2 | 2 | 2 | 6 |
 | isr-concurrency | 0 | 3 | 10 | 13 |
 | kconfig | 2 | 4 | 4 | 10 |
-| linux-driver | 0 | 4 | 7 | 11 |
+| linux-driver | 0 | 6 | 12 | 18 |
 | memory-opt | 1 | 5 | 6 | 12 |
 | networking | 1 | 7 | 4 | 12 |
 | ota | 1 | 4 | 7 | 12 |
@@ -53,7 +53,7 @@ EmbedEval is a benchmark for evaluating LLM capability in embedded firmware code
 | timer | 3 | 6 | 3 | 12 |
 | uart | 1 | 2 | 0 | 3 |
 | watchdog | 2 | 4 | 4 | 10 |
-| yocto | 1 | 5 | 4 | 10 |
+| yocto | 1 | 7 | 6 | 14 |
 
 ---
 

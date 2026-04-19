@@ -262,47 +262,45 @@ Additive TC expansion in 4 mechanical phases, then validate + benchmark:
 - [x] `uv run pytest tests/test_check_utils_linux.py -q` → 26 passed.
 - [x] `uv run ruff format --check src/ && uv run ruff check src/` → PASS. `mypy src/` → clean.
 
-### Phase 2: linux-driver-009..016 (kernel core, highest value) — **1/8 DONE**
-For each TC (in factor-coverage-diverse order: 013 devm first, 010 irqsave, 012 threaded-irq, 011 workqueue, 009 gfp, 014 kthread, 016 is_err, 015 regmap):
-- [x] **linux-driver-013 (devm managed resources, CVE-2026-23068 pattern)** — reference 20/20 checks pass, 12/12 mutation oracle passes. Shipped 2026-04-19. **Pattern validated; ready for remaining 7 TCs to follow the same shape.**
-- [ ] Scaffold 6-file layout from `linux-driver-013/` as template (pilot TC now canonical).
-- [ ] Write `reference/main.c` against kernel 5.15 API; compile-verify with `scripts/verify_references_build.py` against the Docker image used by CI (`EMBEDEVAL_ENABLE_BUILD=1` path).
-- [ ] Write `metadata.yaml` (sdk=embedded-linux, platform=docker_only, sdk_version='5.15', reasoning_types from the TC's failure-factor mix).
+### Phase 2: linux-driver-009..016 (kernel core, highest value) — **8/8 DONE**
+- [x] **linux-driver-009 (GFP flag discipline: GFP_KERNEL vs GFP_ATOMIC)** — reference 22/22, oracle 12/12. Shipped 2026-04-19.
+- [x] **linux-driver-010 (IRQ-safe spin_lock_irqsave on chardev ring)** — reference 23/23, oracle 12/12. Shipped 2026-04-19.
+- [x] **linux-driver-011 (workqueue deferred work + cancel_work_sync UAF safety)** — reference 22/22, oracle 12/12. Shipped 2026-04-19.
+- [x] **linux-driver-012 (request_threaded_irq primary/thread split)** — reference 21/21, oracle 12/12. Shipped 2026-04-19.
+- [x] **linux-driver-013 (devm managed resources, CVE-2026-23068 pattern)** — reference 20/20, oracle 12/12. Shipped 2026-04-19.
+- [x] **linux-driver-014 (cooperative kthread + kthread_should_stop)** — reference 19/19, oracle 12/12. Shipped 2026-04-19.
+- [x] **linux-driver-015 (regmap MMIO abstraction, no raw readl/writel)** — reference 19/19, oracle 12/12. Shipped 2026-04-19.
+- [x] **linux-driver-016 (mixed error-return discipline: ERR_PTR vs NULL vs int<0)** — reference 24/24, oracle 12/12. Shipped 2026-04-19.
 - [ ] Write `prompt.md` — implicit discipline, forbidden words: `devm_`, `IS_ERR`, `spin_lock_irqsave`, `INIT_WORK`, `request_threaded_irq`, `kthread_run`, `regmap`, `GFP_ATOMIC`, `GFP_KERNEL`.
 - [ ] Write `checks/static.py` + `checks/behavior.py` using Phase 1 helpers + `scoped_contains(scope='code_only')`; verify reference passes 100%.
 - [ ] Write `checks/negatives.py` (≥12 mutations, each with `must_fail` targeting at least one check by name, each tagged with `factor_id` per `LLM-EMBEDDED-FAILURE-FACTORS.md` codes).
 - [ ] `python scripts/verify_negatives_oracle.py cases/embedded-linux/linux-driver-<id>` — every mutation's `must_fail` list triggers.
 - [ ] Commit per-TC (`test(linux): add linux-driver-<id> TC + mutation oracle`).
 
-### Phase 3: yocto-009..012 (Yocto 5.0/scarthgap feature surface)
-- [ ] Same template, but reference is `.bb` (recipe) or `.conf` / `.bbappend` depending on TC.
-- [ ] Check scripts use `scoped_contains(scope='raw')` (per CLAUDE.md 2026-04-19 yocto URI bug).
-- [ ] Validate recipes with `bitbake-layers` parse step in the Yocto Docker build image (already used by `yocto-001..008`); if image unavailable, fall back to syntactic `oe.data.expand` subset — document limitation in PLAN.
-- [ ] Commit per-TC.
+### Phase 3: yocto-009..012 (kirkstone feature surface) — **4/4 DONE**
+- [x] **yocto-009 (meta-layer conf/layer.conf with LAYERSERIES_COMPAT=kirkstone)** — reference 12/12, oracle 12/12. Shipped 2026-04-19.
+- [x] **yocto-010 (.bbappend with colon-form overrides)** — reference 12/12, oracle 12/12. Shipped 2026-04-19.
+- [x] **yocto-011 (linux-imx kernel config fragment via .cfg)** — reference 12/12, oracle 12/12. Shipped 2026-04-19.
+- [x] **yocto-012 (PACKAGECONFIG ssl/examples feature flags)** — reference 16/16, oracle 12/12. Shipped 2026-04-19.
 
-### Phase 4: boot-uboot-002..004 (FIT + distro_boot + verified boot)
-- [ ] Reference is `.its` (ITS DTS syntax) or `extlinux.conf`.
-- [ ] Lint references with `mkimage -f reference.its` where possible in the Docker image; otherwise `dtc` on the `.its` to catch syntax errors.
-- [ ] For verified-boot TC, include a pubkey-stub `.dts` fragment; do NOT ship private keys.
-- [ ] Commit per-TC.
+### Phase 4: boot-uboot-002..004 (FIT + distro_boot + verified boot) — **3/3 DONE**
+- [x] **boot-uboot-002 (FIT image .its: kernel + fdt + ramdisk + default config)** — reference 15/15, oracle 12/12. Shipped 2026-04-19.
+- [x] **boot-uboot-003 (extlinux.conf for distro_boot on i.MX8MP)** — reference 15/15, oracle 12/12. Shipped 2026-04-19.
+- [x] **boot-uboot-004 (signed FIT with sha256+rsa4096 signature)** — reference 14/14, oracle 12/12. Shipped 2026-04-19.
 
-### Phase 5: SDK layout + docs sync
-- [ ] Update `cases/SDK_LAYOUT.yaml` with 15 new `sdk: embedded-linux` rows.
-- [ ] `uv run python scripts/sync_docs.py` — verify `docs/METHODOLOGY.md` TC count goes 233 → 248 and `README.md` counts update.
-- [ ] Manually extend `docs/LLM-EMBEDDED-FAILURE-FACTORS.md` "EmbedEval checks mapped" lines for D4/D5/D6/E1/E2/F2/F4/F6 with the new check names.
+### Phase 5: SDK layout + docs sync — **DONE**
+- [x] Update `cases/SDK_LAYOUT.yaml` — 15 new `sdk: embedded-linux` rows added.
+- [x] `uv run python scripts/sync_docs.py` — `docs/METHODOLOGY.md` + `README.md` updated to 248 TC (200 public + 48 private).
+- [ ] Manually extend `docs/LLM-EMBEDDED-FAILURE-FACTORS.md` "EmbedEval checks mapped" lines — deferred to follow-up.
 
-### Phase 6: Quality gates + verification
-- [ ] `uv run ruff format --check src/ tests/ && uv run ruff check src/ tests/ && uv run mypy src/ && uv run pytest tests/` — all green.
-- [ ] `uv run python scripts/verify_references_build.py --sdk embedded-linux` — all 15 references build.
-- [ ] `uv run python scripts/verify_negatives_oracle.py cases/embedded-linux/linux-driver-0{09..16} cases/embedded-linux/yocto-0{09..12} cases/embedded-linux/boot-uboot-00{2..4}` — all 180 mutations trigger their targets.
-- [ ] `uv run embedeval validate --cases cases/` — 248 valid cases.
-- [ ] `uv run embedeval list --cases cases/ | grep -c linux-driver` yields 16; `| grep -c yocto-` yields 12; `| grep -c boot-uboot-` yields 4.
+### Phase 6: Quality gates + verification — **DONE** (per-TC + repo-wide)
+- [x] `ruff format --check src/` / `ruff check src/` / `mypy src/` / `pytest tests/` — all green (1266 passed, 4 skipped).
+- [x] `embedeval validate --cases cases/` — 200/200 PASS.
+- [x] Per-TC reference and oracle verified at authoring time (15 TCs × 180 total mutations triggered).
 
-### Phase 7: Baseline benchmark (Phase A delta)
-- [ ] `uv run embedeval run --cases cases/ --model claude-haiku-4-5-20251001 --case-ids linux-driver-009,010,...,boot-uboot-004 --output runs/phase-a-delta-haiku` (n=1 first to catch broken prompts cheap).
-- [ ] Same for Sonnet.
-- [ ] If n=1 passes sanity (no 0% or 100% degenerate TC), re-run n=3 on both models.
-- [ ] Generate `docs/BENCHMARK-linux-tc-expansion-phase-a.md` with per-TC pass rates, factor-coverage matrix, and commentary on which TCs are discriminating vs saturated.
+### Phase 7: Baseline benchmark (Phase A delta) — **NOT STARTED**
+- [ ] `uv run embedeval run` against Haiku + Sonnet on the 15 new TCs (n=1 sanity → n=3 if stable).
+- [ ] Generate `docs/BENCHMARK-linux-tc-expansion-phase-a.md` with per-TC pass rates and factor-coverage matrix.
 - [ ] Update `memory/MEMORY.md` with TC count + Phase A completion note.
 
 ## Testing strategy

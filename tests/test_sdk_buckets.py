@@ -88,7 +88,7 @@ def test_discover_is_recursive() -> None:
     "sdk,min_count",
     [
         (Sdk.ZEPHYR, 100),
-        (Sdk.EMBEDDED_LINUX, 15),
+        (Sdk.EMBEDDED_LINUX, 30),
         (Sdk.FREERTOS, 1),
         (Sdk.ESP_IDF, 5),
         (Sdk.STM32_HAL, 4),
