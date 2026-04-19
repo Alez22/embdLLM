@@ -133,11 +133,22 @@ def _scope_for_case(path: Path) -> str:
     that "behavior.py's strip_comments idiom" was meant to approximate
     but subtly got wrong on non-C references.
 
+    Same reasoning applies to udev `.rules` syntax (`linux-userspace-005`):
+    comments use `#`, not `//`, and rules embed quoted tokens like
+    `ATTRS{idVendor}=="1d6b"` that `strip_comments` would not mis-handle
+    but `strip_string_literals` (the default `stripped` scope) would empty
+    out — breaking checks that verify the literal is present. `raw`
+    preserves the existing semantics exactly.
+
     Default is `code_only` (matches behavior.py idiom on C code).
     """
     case_id = path.parent.parent.name
     url_prefixed_prefixes = ("yocto-",)
-    if case_id.startswith(url_prefixed_prefixes):
+    # udev rule TCs — extend this tuple as more land (linux-userspace-*-udev,
+    # linux-userspace-014+, ...). Keeping explicit IDs rather than a
+    # category lookup avoids a premature abstraction; n=1 today.
+    udev_case_ids = ("linux-userspace-005",)
+    if case_id.startswith(url_prefixed_prefixes) or case_id in udev_case_ids:
         return "raw"
     return "code_only"
 

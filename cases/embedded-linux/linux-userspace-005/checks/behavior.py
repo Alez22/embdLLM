@@ -1,6 +1,7 @@
 """Behavioral checks for linux-userspace-005 (udev match/assign discipline)."""
 
 from embedeval.check_utils import (
+    scoped_contains,
     udev_match_key_used_as_assign,
     udev_rule_assigns,
     udev_rule_matches,
@@ -38,9 +39,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # 3. idVendor match (hex 1d6b — Linux Foundation public VID).
     vendor = udev_rule_matches(generated_code, "ATTRS")
     # udev_rule_matches returns first ATTRS{*} — may be either; check both.
-    has_vendor = "1d6b" in generated_code and (
-        'ATTRS{idVendor}=="1d6b"' in generated_code
-        or 'ATTRS{idVendor} == "1d6b"' in generated_code
+    has_vendor = scoped_contains(generated_code, "1d6b", scope="raw") and (
+        scoped_contains(generated_code, 'ATTRS{idVendor}=="1d6b"', scope="raw")
+        or scoped_contains(generated_code, 'ATTRS{idVendor} == "1d6b"', scope="raw")
     )
     details.append(
         CheckDetail(
@@ -53,10 +54,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
 
     # 4. idProduct match (hex 0002).
-    has_product = (
-        'ATTRS{idProduct}=="0002"' in generated_code
-        or 'ATTRS{idProduct} == "0002"' in generated_code
-    )
+    has_product = scoped_contains(
+        generated_code, 'ATTRS{idProduct}=="0002"', scope="raw"
+    ) or scoped_contains(generated_code, 'ATTRS{idProduct} == "0002"', scope="raw")
     details.append(
         CheckDetail(
             check_name="idproduct_match_0002",
@@ -85,7 +85,15 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # 6. ENV{SYSTEMD_WANTS}="<service name>" — coupling between udev and
     # systemd that replaces old-style RUN+="/bin/systemctl ...".
-    has_systemd_wants = 'ENV{SYSTEMD_WANTS}="vendor-example-daemon.service"' in generated_code or 'ENV{SYSTEMD_WANTS} = "vendor-example-daemon.service"' in generated_code
+    has_systemd_wants = scoped_contains(
+        generated_code,
+        'ENV{SYSTEMD_WANTS}="vendor-example-daemon.service"',
+        scope="raw",
+    ) or scoped_contains(
+        generated_code,
+        'ENV{SYSTEMD_WANTS} = "vendor-example-daemon.service"',
+        scope="raw",
+    )
     details.append(
         CheckDetail(
             check_name="systemd_wants_env_set_to_service",
@@ -103,7 +111,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
             check_name="no_match_only_key_assigned",
             passed=len(offenders) == 0,
             expected="Match-only keys (SUBSYSTEM, ACTION, ATTRS, KERNEL, ...) use ==, not =",
-            actual="clean" if not offenders else f"assigned instead of matched: {offenders}",
+            actual="clean"
+            if not offenders
+            else f"assigned instead of matched: {offenders}",
             check_type="constraint",
         )
     )
@@ -111,15 +121,15 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # 8. No legacy RUN+="/bin/systemctl ..." pattern. Modern udev should
     # use SYSTEMD_WANTS not shell-out. Reject RUN entirely here because
     # it's the anti-pattern being tested.
-    has_run_systemctl = "RUN" in generated_code and "systemctl" in generated_code
+    has_run_systemctl = scoped_contains(
+        generated_code, "RUN", scope="raw"
+    ) and scoped_contains(generated_code, "systemctl", scope="raw")
     details.append(
         CheckDetail(
             check_name="no_run_systemctl_antipattern",
             passed=not has_run_systemctl,
             expected="No RUN+=/bin/systemctl — use SYSTEMD_WANTS instead",
-            actual=(
-                "WRONG: RUN with systemctl" if has_run_systemctl else "clean"
-            ),
+            actual=("WRONG: RUN with systemctl" if has_run_systemctl else "clean"),
             check_type="constraint",
         )
     )

@@ -70,3 +70,27 @@ If a benchmark re-run surfaces unacceptable drift:
 git revert <this-commit>
 # OR selectively re-edit offending check files to scope='raw'.
 ```
+
+## Follow-up — `linux-userspace-005` (2026-04-19, PLAN-hiloop-handoff-finalize)
+
+Nine unscoped substring sites in `cases/embedded-linux/linux-userspace-005/checks/behavior.py` were authored in Phase B (commit `8423040`) *after* the main REQ-03 migration landed. They were migrated to `scoped_contains(..., scope='raw')` via `scripts/apply_scope_migration.py` with `_scope_for_case` extended to recognize udev rule TCs. `raw` scope matches the Yocto `.bb` precedent — udev `.rules` format uses `#` comments (not C-style) and the references embed quoted tokens like `ATTRS{idVendor}=="1d6b"` that the default `stripped` scope would empty out.
+
+**Post-fix verification:**
+
+```
+uv run python scripts/audit_check_scope.py --strict
+Total unscoped substring checks: 0 across 0 files
+
+uv run embedeval validate --cases cases/
+Validation: 219 passed, 0 failed
+
+uv run embedeval validate --cases ../embedeval-private/cases/
+Validation: 48 passed, 0 failed
+
+uv run python scripts/verify_negatives_oracle.py
+Total: 219 | PASS=77 FAIL=0 SKIP=142
+```
+
+**Verdict flips:** 0. `scope='raw'` is semantically identical to `"needle" in code`; the only change is the call-site form, which is why no reference regressed and no oracle count shifted.
+
+**CI gate:** `.github/workflows/validate-cases.yml` now runs `audit_check_scope.py --strict` after `embedeval validate`, so the "0 unscoped sites" invariant is frozen — future TCs that regress will fail CI.
