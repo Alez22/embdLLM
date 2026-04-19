@@ -13,6 +13,7 @@ from embedeval.models import (
     EvalResult,
     LayerResult,
     ReasoningType,
+    Sdk,
     TokenUsage,
     Visibility,
 )
@@ -30,6 +31,7 @@ def _meta(case_id: str, category: str = "kconfig") -> CaseMetadata:
         description="desc",
         tags=[],
         platform=EvalPlatform.NATIVE_SIM,
+        sdk=Sdk.ZEPHYR,
         estimated_tokens=100,
         sdk_version="4.1.0",
         visibility=Visibility.PUBLIC,
@@ -106,11 +108,13 @@ def test_new_results_override_tracker_entries():
 def test_unchanged_tracker_entries_are_carried_forward():
     """The key anti-stomp property: running 1 case shouldn't drop 2 others."""
     new = [_result("kconfig-001", False)]
-    tracker = _tracker(**{
-        "kconfig-001": True,   # will be overridden by new
-        "kconfig-002": True,
-        "kconfig-003": False,
-    })
+    tracker = _tracker(
+        **{
+            "kconfig-001": True,  # will be overridden by new
+            "kconfig-002": True,
+            "kconfig-003": False,
+        }
+    )
     metas = {
         m.id: m
         for m in (_meta(c) for c in ("kconfig-001", "kconfig-002", "kconfig-003"))
@@ -134,10 +138,12 @@ def test_orphan_tracker_entries_are_dropped():
     """An entry in the tracker without matching CaseMetadata (e.g., deleted
     TC) must not contaminate the aggregate."""
     new = [_result("kconfig-001", True)]
-    tracker = _tracker(**{
-        "kconfig-001": True,
-        "zombie-999": False,  # no meta for this one
-    })
+    tracker = _tracker(
+        **{
+            "kconfig-001": True,
+            "zombie-999": False,  # no meta for this one
+        }
+    )
     metas = {"kconfig-001": _meta("kconfig-001")}
     merged = _build_comprehensive_results(new, tracker, MODEL, metas)
     assert {r.case_id for r in merged} == {"kconfig-001"}
@@ -263,12 +269,14 @@ def test_score_aggregation_matches_comprehensive_not_new_only():
     from embedeval.scorer import score
 
     new = [_result("kconfig-001", True)]  # 1 pass
-    tracker = _tracker(**{
-        "kconfig-001": False,  # tracker stale — will be overridden
-        "kconfig-002": True,
-        "kconfig-003": True,
-        "kconfig-004": False,
-    })
+    tracker = _tracker(
+        **{
+            "kconfig-001": False,  # tracker stale — will be overridden
+            "kconfig-002": True,
+            "kconfig-003": True,
+            "kconfig-004": False,
+        }
+    )
     metas = {m.id: m for m in [_meta(f"kconfig-00{i}") for i in range(1, 5)]}
     merged = _build_comprehensive_results(new, tracker, MODEL, metas)
     report = score(merged)

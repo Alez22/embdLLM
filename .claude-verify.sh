@@ -81,17 +81,17 @@ verify_phase_2() {
 verify_phase_3() {
     echo "=== Phase 3: Test Case Framework & Pilot Cases ==="
 
-    # Pilot cases exist
-    test -d cases/kconfig-001 || fail "kconfig-001 missing"
-    test -d cases/device-tree-001 || fail "device-tree-001 missing"
-    test -d cases/isr-concurrency-001 || fail "isr-concurrency-001 missing"
+    # Pilot cases exist (post-SDK-bucket-split layout)
+    test -d cases/zephyr/kconfig-001 || fail "kconfig-001 missing"
+    test -d cases/zephyr/device-tree-001 || fail "device-tree-001 missing"
+    test -d cases/zephyr/isr-concurrency-001 || fail "isr-concurrency-001 missing"
     pass "pilot case directories"
 
     # Each case has required files
     for case in kconfig-001 device-tree-001 isr-concurrency-001; do
-        test -f "cases/$case/prompt.md" || fail "$case/prompt.md missing"
-        test -f "cases/$case/metadata.yaml" || fail "$case/metadata.yaml missing"
-        test -d "cases/$case/reference" || fail "$case/reference/ missing"
+        test -f "cases/zephyr/$case/prompt.md" || fail "$case/prompt.md missing"
+        test -f "cases/zephyr/$case/metadata.yaml" || fail "$case/metadata.yaml missing"
+        test -d "cases/zephyr/$case/reference" || fail "$case/reference/ missing"
         test -f "cases/$case/test_validate.py" || fail "$case/test_validate.py missing"
     done
     pass "case file structure"

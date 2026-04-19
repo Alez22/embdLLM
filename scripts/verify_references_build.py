@@ -204,12 +204,16 @@ def main():
         print(f"Error: cases directory not found: {cases_dir}", file=sys.stderr)
         sys.exit(1)
 
+    import sys as _sys
+
+    _src = str(Path(__file__).parent.parent / "src")
+    if _src not in _sys.path:
+        _sys.path.insert(0, _src)
+    from embedeval.runner import iter_case_dirs as _iter_case_dirs  # noqa: E402
+
     # Collect compilable cases with reference solutions
     cases_to_check = []
-    for case_dir in sorted(cases_dir.iterdir()):
-        if not case_dir.is_dir():
-            continue
-
+    for case_dir in _iter_case_dirs(cases_dir):
         case_id = case_dir.name
 
         # Filter by category if specified

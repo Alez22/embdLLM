@@ -27,14 +27,23 @@ KNOWN_EASY_CATEGORIES = {"kconfig", "boot"}
 # Only truly trivial TCs become Sanity
 
 
+def _iter_case_dirs_safe(cases_dir: Path):
+    import sys as _sys
+
+    _src = str(Path(__file__).parent.parent / "src")
+    if _src not in _sys.path:
+        _sys.path.insert(0, _src)
+    from embedeval.runner import iter_case_dirs  # noqa: E402
+
+    return iter_case_dirs(cases_dir)
+
+
 def classify_by_difficulty(cases_dir: Path) -> dict[str, str]:
     """Classify tiers based on difficulty labels (no benchmark data needed)."""
     tiers: dict[str, str] = {}
 
-    for case_dir in sorted(cases_dir.iterdir()):
+    for case_dir in _iter_case_dirs_safe(cases_dir):
         meta_file = case_dir / "metadata.yaml"
-        if not case_dir.is_dir() or not meta_file.is_file():
-            continue
 
         content = meta_file.read_text(encoding="utf-8")
         case_id = _yaml_value(content, "id") or case_dir.name
@@ -56,7 +65,9 @@ def classify_by_difficulty(cases_dir: Path) -> dict[str, str]:
 def classify_by_results(results_dir: Path, cases_dir: Path) -> dict[str, str]:
     """Classify tiers based on benchmark results (IRT-like)."""
     # Load all result JSONs
-    pass_counts: dict[str, dict[str, int]] = defaultdict(lambda: {"pass": 0, "total": 0})
+    pass_counts: dict[str, dict[str, int]] = defaultdict(
+        lambda: {"pass": 0, "total": 0}
+    )
 
     for json_file in results_dir.glob("*.json"):
         try:
@@ -88,10 +99,8 @@ def classify_by_results(results_dir: Path, cases_dir: Path) -> dict[str, str]:
 def apply_tiers(cases_dir: Path, tiers: dict[str, str], dry_run: bool = False) -> int:
     """Write tier field to metadata.yaml files."""
     updated = 0
-    for case_dir in sorted(cases_dir.iterdir()):
+    for case_dir in _iter_case_dirs_safe(cases_dir):
         meta_file = case_dir / "metadata.yaml"
-        if not case_dir.is_dir() or not meta_file.is_file():
-            continue
 
         content = meta_file.read_text(encoding="utf-8")
         case_id = _yaml_value(content, "id") or case_dir.name
@@ -102,7 +111,9 @@ def apply_tiers(cases_dir: Path, tiers: dict[str, str], dry_run: bool = False) -
             continue
 
         if existing_tier:
-            new_content = re.sub(r"^tier:.*$", f"tier: {tier}", content, flags=re.MULTILINE)
+            new_content = re.sub(
+                r"^tier:.*$", f"tier: {tier}", content, flags=re.MULTILINE
+            )
         else:
             new_content = content.rstrip() + f"\ntier: {tier}\n"
 
@@ -122,8 +133,12 @@ def _yaml_value(content: str, key: str) -> str | None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Classify TCs into tiers")
-    parser.add_argument("--results", type=Path, help="Results directory for IRT-based classification")
-    parser.add_argument("--dry-run", action="store_true", help="Preview without writing")
+    parser.add_argument(
+        "--results", type=Path, help="Results directory for IRT-based classification"
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Preview without writing"
+    )
     args = parser.parse_args()
 
     print("Classifying TC tiers...")
@@ -135,6 +150,7 @@ def main() -> None:
 
     # Stats
     from collections import Counter
+
     counts = Counter(tiers.values())
     print(f"\n  Sanity:    {counts.get('sanity', 0)}")
     print(f"  Core:      {counts.get('core', 0)}")

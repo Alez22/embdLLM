@@ -14,6 +14,8 @@ from embedeval.models import (
     OverallScore,
     PerCheckStat,
     ReasoningScore,
+    Sdk,
+    SdkScore,
     TierScore,
 )
 
@@ -55,6 +57,7 @@ def score(results: list[EvalResult]) -> BenchmarkReport:
     category_scores = _calculate_category_scores(results)
     tier_scores = _calculate_tier_scores(results)
     reasoning_scores = _calculate_reasoning_scores(results)
+    sdk_scores = _calculate_sdk_scores(results)
     overall = _calculate_overall(model_scores)
 
     return BenchmarkReport(
@@ -64,6 +67,7 @@ def score(results: list[EvalResult]) -> BenchmarkReport:
         categories=category_scores,
         tier_scores=tier_scores,
         reasoning_scores=reasoning_scores,
+        sdk_scores=sdk_scores,
         overall=overall,
     )
 
@@ -439,6 +443,41 @@ def _calculate_reasoning_scores(results: list[EvalResult]) -> list[ReasoningScor
         scores.append(
             ReasoningScore(
                 reasoning_type=rt_name,
+                pass_at_1=passed / total if total > 0 else 0.0,
+                total_cases=total,
+                passed_cases=passed,
+            )
+        )
+    return scores
+
+
+def _calculate_sdk_scores(results: list[EvalResult]) -> list[SdkScore]:
+    """Aggregate pass@1 per SDK bucket.
+
+    Results without an ``sdk`` (e.g. historical entries reconstructed from
+    the tracker before the migration) are silently skipped so old-format
+    data doesn't poison the per-SDK breakdown with a bogus 'unknown' row.
+    """
+    by_sdk: dict[Sdk, dict[str, list[EvalResult]]] = defaultdict(
+        lambda: defaultdict(list)
+    )
+    for r in results:
+        if r.sdk is None:
+            continue
+        by_sdk[r.sdk][r.case_id].append(r)
+
+    scores: list[SdkScore] = []
+    for sdk in Sdk:
+        if sdk not in by_sdk:
+            continue
+        cases = by_sdk[sdk]
+        total = len(cases)
+        passed = sum(
+            1 for case_results in cases.values() if any(r.passed for r in case_results)
+        )
+        scores.append(
+            SdkScore(
+                sdk=sdk,
                 pass_at_1=passed / total if total > 0 else 0.0,
                 total_cases=total,
                 passed_cases=passed,

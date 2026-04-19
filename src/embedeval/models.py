@@ -88,6 +88,20 @@ class EvalPlatform(str, Enum):
     YOCTO_BUILD = "yocto_build"
 
 
+class Sdk(str, Enum):
+    """SDK / platform family for case classification.
+
+    Each TC lives under cases/<sdk>/<case-id>/ and declares its SDK in
+    metadata.yaml. The bucket drives filtering (--sdk) and per-SDK reporting.
+    """
+
+    ZEPHYR = "zephyr"
+    EMBEDDED_LINUX = "embedded-linux"
+    FREERTOS = "freertos"
+    ESP_IDF = "esp-idf"
+    STM32_HAL = "stm32-hal"
+
+
 class TokenUsage(BaseModel):
     """Token usage statistics for a single LLM call."""
 
@@ -115,6 +129,7 @@ class CaseMetadata(BaseModel):
     description: str
     tags: list[str]
     platform: EvalPlatform
+    sdk: Sdk
     estimated_tokens: int
     sdk_version: str
     visibility: Visibility = Visibility.PUBLIC
@@ -173,6 +188,7 @@ class EvalResult(BaseModel):
 
     case_id: str
     category: CaseCategory | None = None
+    sdk: Sdk | None = None
     model: str
     attempt: int
     generated_code: str
@@ -272,6 +288,15 @@ class ReasoningScore(BaseModel):
     passed_cases: int = Field(ge=0)
 
 
+class SdkScore(BaseModel):
+    """Pass rate breakdown by SDK bucket."""
+
+    sdk: Sdk
+    pass_at_1: float = Field(ge=0.0, le=1.0)
+    total_cases: int = Field(ge=0)
+    passed_cases: int = Field(ge=0)
+
+
 class OverallScore(BaseModel):
     """Overall benchmark scoring summary."""
 
@@ -299,6 +324,7 @@ class BenchmarkReport(BaseModel):
     categories: list[CategoryScore]
     tier_scores: list[TierScore] = Field(default_factory=list)
     reasoning_scores: list[ReasoningScore] = Field(default_factory=list)
+    sdk_scores: list[SdkScore] = Field(default_factory=list)
     overall: OverallScore
     scenario: str = "generation"
     temperature: float = Field(default=0.0, ge=0.0)

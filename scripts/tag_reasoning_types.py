@@ -36,7 +36,6 @@ CHECK_REASONING_MAP: dict[str, str] = {
     "different_thread_priorities": "api_recall",
     "all_required_configs_enabled": "api_recall",
     "flash_dependency": "api_recall",
-
     # L2: Rule Application — known embedded rules
     "no_forbidden_apis_in_isr": "rule_application",
     "no_cross_platform_apis": "rule_application",
@@ -55,7 +54,6 @@ CHECK_REASONING_MAP: dict[str, str] = {
     "no_single_slot": "rule_application",
     "write_offset_bounds_check": "rule_application",
     "write_attribute_len_validated": "rule_application",
-
     # L3: Cross-Domain — combining C + RTOS + HW knowledge
     "spinlock_balanced": "cross_domain",
     "key_passed_to_unlock": "cross_domain",
@@ -75,7 +73,6 @@ CHECK_REASONING_MAP: dict[str, str] = {
     "callback_before_sleep": "cross_domain",
     "timer_period_less_than_wdt_timeout": "cross_domain",
     "reset_soc_flag": "cross_domain",
-
     # L4: System Reasoning — backward/whole-system thinking
     "init_error_handling": "system_reasoning",
     "init_error_path_cleanup": "system_reasoning",
@@ -98,9 +95,35 @@ CHECK_REASONING_MAP: dict[str, str] = {
 
 # Keyword fallback for unmapped check names
 KEYWORD_REASONING: list[tuple[list[str], str]] = [
-    (["error", "cleanup", "rollback", "free", "unregister", "stop", "release"], "system_reasoning"),
-    (["volatile", "barrier", "align", "cache", "spinlock", "atomic", "cyclic", "copy_to", "copy_from"], "cross_domain"),
-    (["no_", "forbidden", "deprecated", "hallucin", "cross_platform", "device_ready"], "rule_application"),
+    (
+        ["error", "cleanup", "rollback", "free", "unregister", "stop", "release"],
+        "system_reasoning",
+    ),
+    (
+        [
+            "volatile",
+            "barrier",
+            "align",
+            "cache",
+            "spinlock",
+            "atomic",
+            "cyclic",
+            "copy_to",
+            "copy_from",
+        ],
+        "cross_domain",
+    ),
+    (
+        [
+            "no_",
+            "forbidden",
+            "deprecated",
+            "hallucin",
+            "cross_platform",
+            "device_ready",
+        ],
+        "rule_application",
+    ),
     (["configured", "present", "defined", "enabled", "dependency"], "api_recall"),
 ]
 
@@ -140,14 +163,23 @@ def tag_case(case_dir: Path) -> list[str]:
     return [t for t in order if t in types_found]
 
 
+def _iter_case_dirs_safe(cases_dir: Path):
+    import sys as _sys
+
+    _src = str(Path(__file__).parent.parent / "src")
+    if _src not in _sys.path:
+        _sys.path.insert(0, _src)
+    from embedeval.runner import iter_case_dirs  # noqa: E402
+
+    return iter_case_dirs(cases_dir)
+
+
 def apply_reasoning_types(cases_dir: Path, dry_run: bool = False) -> int:
     """Tag all cases with reasoning_types in metadata.yaml."""
     updated = 0
 
-    for case_dir in sorted(cases_dir.iterdir()):
+    for case_dir in _iter_case_dirs_safe(cases_dir):
         meta_file = case_dir / "metadata.yaml"
-        if not case_dir.is_dir() or not meta_file.is_file():
-            continue
 
         types = tag_case(case_dir)
         if not types:
@@ -185,10 +217,9 @@ def main() -> None:
 
     # Stats
     from collections import Counter
+
     type_counts: Counter[str] = Counter()
-    for case_dir in sorted(CASES_DIR.iterdir()):
-        if not case_dir.is_dir():
-            continue
+    for case_dir in _iter_case_dirs_safe(CASES_DIR):
         types = tag_case(case_dir)
         for t in types:
             type_counts[t] += 1

@@ -35,6 +35,7 @@ def _create_case(
         "description": f"Description for {case_id}",
         "tags": tags or ["test"],
         "platform": "native_sim",
+        "sdk": "zephyr",
         "estimated_tokens": 500,
         "sdk_version": "3.6.0",
     }
@@ -314,9 +315,7 @@ class TestPrivateHeldOutSet:
         mock_result.failed_at_layer = None
         mock_evaluate.return_value = mock_result  # type: ignore[union-attr]
 
-        results = run_benchmark(
-            cases_dir=tmp_path, model="mock", include_private=True
-        )
+        results = run_benchmark(cases_dir=tmp_path, model="mock", include_private=True)
         assert len(results) == 2  # both cases
 
 
@@ -334,13 +333,12 @@ class TestMetadataNewFields:
             "description": "ADC test case",
             "tags": ["zephyr", "adc"],
             "platform": "native_sim",
+            "sdk": "zephyr",
             "estimated_tokens": 400,
             "sdk_version": "4.1.0",
             "build_board": "nrf52840dk/nrf52840",
         }
-        (case_dir / "metadata.yaml").write_text(
-            yaml.dump(metadata), encoding="utf-8"
-        )
+        (case_dir / "metadata.yaml").write_text(yaml.dump(metadata), encoding="utf-8")
         (case_dir / "prompt.md").write_text("test", encoding="utf-8")
         meta = load_case_metadata(case_dir)
         assert meta is not None
@@ -357,13 +355,12 @@ class TestMetadataNewFields:
             "description": "L1 skip test case",
             "tags": ["zephyr"],
             "platform": "native_sim",
+            "sdk": "zephyr",
             "estimated_tokens": 400,
             "sdk_version": "4.1.0",
             "l1_skip": True,
         }
-        (case_dir / "metadata.yaml").write_text(
-            yaml.dump(metadata), encoding="utf-8"
-        )
+        (case_dir / "metadata.yaml").write_text(yaml.dump(metadata), encoding="utf-8")
         (case_dir / "prompt.md").write_text("test", encoding="utf-8")
         meta = load_case_metadata(case_dir)
         assert meta is not None
@@ -381,13 +378,12 @@ class TestMetadataNewFields:
             "description": "L2 skip test case",
             "tags": ["zephyr", "ble"],
             "platform": "native_sim",
+            "sdk": "zephyr",
             "estimated_tokens": 600,
             "sdk_version": "4.1.0",
             "l2_skip": True,
         }
-        (case_dir / "metadata.yaml").write_text(
-            yaml.dump(metadata), encoding="utf-8"
-        )
+        (case_dir / "metadata.yaml").write_text(yaml.dump(metadata), encoding="utf-8")
         (case_dir / "prompt.md").write_text("test", encoding="utf-8")
         meta = load_case_metadata(case_dir)
         assert meta is not None
@@ -405,13 +401,12 @@ class TestMetadataNewFields:
             "description": "ADC test case",
             "tags": ["zephyr", "adc"],
             "platform": "native_sim",
+            "sdk": "zephyr",
             "estimated_tokens": 400,
             "sdk_version": "4.1.0",
             "build_board": "nrf52840dk/nrf52840",
         }
-        (case_dir / "metadata.yaml").write_text(
-            yaml.dump(metadata), encoding="utf-8"
-        )
+        (case_dir / "metadata.yaml").write_text(yaml.dump(metadata), encoding="utf-8")
         meta = load_case_metadata(case_dir)
         assert meta is not None
         result = _inject_board_target("Write ADC code.", meta)

@@ -47,7 +47,7 @@
 | # | Case ID | Difficulty | Title | What It Tests | Why Included | Checks |
 |---|---------|-----------|-------|--------------|-------------|--------|
 | 1 | `boot-001` | 🟡 medium | MCUboot Image Confirmation Kconfig | Kconfig fragment enabling MCUboot with image confirmation an... | API ordering/dependencies needed — common LLM blind spot | S:4 B:4 |
-| 2 | `boot-002` | 🟢 easy | U-Boot Environment Kconfig | Kconfig fragment configuring U-Boot with boot delay and envi... | Baseline — LLM should pass this reliably | S:4 B:4 |
+| 2 | `boot-uboot-001` | 🟢 easy | U-Boot Environment Kconfig | Kconfig fragment configuring U-Boot with boot delay and envi... | Baseline — LLM should pass this reliably | S:4 B:4 |
 | 3 | `boot-003` | 🟡 medium | Secure Boot with Signing Kconfig | Kconfig fragment enabling MCUboot with RSA signing and slot0... | API ordering/dependencies needed — common LLM blind spot | S:5 B:5 |
 | 4 | `boot-004` | 🟡 medium | MCUboot Swap with Revert Kconfig | Kconfig fragment enabling MCUboot swap-move mode with automa... | API ordering/dependencies needed — common LLM blind spot | S:5 B:5 |
 | 5 | `boot-005` | 🔴 hard | Multi-image Boot Configuration Kconfig | Kconfig fragment for MCUboot dual-core setup: main app and n... | Concurrency/security/hallucination trap — LLM frontier | S:5 B:5 |

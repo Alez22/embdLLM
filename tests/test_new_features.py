@@ -2,13 +2,14 @@
 
 from pathlib import Path
 
-from embedeval.models import CaseCategory, CaseMetadata, DifficultyTier
+from embedeval.models import CaseCategory, CaseMetadata, DifficultyTier, Sdk
 from embedeval.runner import Filters, filter_cases
 
 
 # ============================================================
 # Feature 2: after_date filter
 # ============================================================
+
 
 class TestAfterDateFilter:
     """Tests for --after-date temporal filtering."""
@@ -22,6 +23,7 @@ class TestAfterDateFilter:
             description="test",
             tags=[],
             platform="native_sim",
+            sdk=Sdk.ZEPHYR,
             estimated_tokens=100,
             sdk_version="4.1.0",
             created_date=created_date,
@@ -76,6 +78,7 @@ class TestAfterDateFilter:
 # Feature 3: Feedback loop (unit test for error detail formatting)
 # ============================================================
 
+
 class TestFeedbackErrorFormatting:
     """Tests for compiler feedback error message construction."""
 
@@ -111,9 +114,12 @@ class TestFeedbackErrorFormatting:
         error_msg = layer.error or ""
         failed_details = "\n".join(
             f"- {d.check_name}: expected={d.expected}, actual={d.actual}"
-            for d in layer.details if not d.passed
+            for d in layer.details
+            if not d.passed
         )
-        error_info = "\n".join(filter(None, [error_msg, failed_details])) or "Check failed"
+        error_info = (
+            "\n".join(filter(None, [error_msg, failed_details])) or "Check failed"
+        )
 
         assert "volatile_present" in error_info
         assert "missing" in error_info
@@ -144,9 +150,12 @@ class TestFeedbackErrorFormatting:
         error_msg = layer.error or ""
         failed_details = "\n".join(
             f"- {d.check_name}: expected={d.expected}, actual={d.actual}"
-            for d in layer.details if not d.passed
+            for d in layer.details
+            if not d.passed
         )
-        error_info = "\n".join(filter(None, [error_msg, failed_details])) or "Check failed"
+        error_info = (
+            "\n".join(filter(None, [error_msg, failed_details])) or "Check failed"
+        )
 
         assert "k_sleep" in error_info
         assert "undeclared" in error_info
@@ -156,16 +165,23 @@ class TestFeedbackErrorFormatting:
         from embedeval.models import LayerResult
 
         layer = LayerResult(
-            layer=0, name="static_analysis", passed=False,
-            details=[], error=None, duration_seconds=0.0,
+            layer=0,
+            name="static_analysis",
+            passed=False,
+            details=[],
+            error=None,
+            duration_seconds=0.0,
         )
 
         error_msg = layer.error or ""
         failed_details = "\n".join(
             f"- {d.check_name}: expected={d.expected}, actual={d.actual}"
-            for d in layer.details if not d.passed
+            for d in layer.details
+            if not d.passed
         )
-        error_info = "\n".join(filter(None, [error_msg, failed_details])) or "Check failed"
+        error_info = (
+            "\n".join(filter(None, [error_msg, failed_details])) or "Check failed"
+        )
 
         assert error_info == "Check failed"
 
@@ -173,6 +189,7 @@ class TestFeedbackErrorFormatting:
 # ============================================================
 # Feature 5: Agent mode
 # ============================================================
+
 
 class TestAgentResult:
     """Tests for AgentResult dataclass."""

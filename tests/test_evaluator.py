@@ -681,13 +681,12 @@ def _write_full_metadata(case_dir: Path, **overrides: object) -> None:
         "description": "Test case description",
         "tags": ["test"],
         "platform": "native_sim",
+        "sdk": "zephyr",
         "estimated_tokens": 200,
         "sdk_version": "4.1.0",
     }
     meta.update(overrides)
-    (case_dir / "metadata.yaml").write_text(
-        yaml.dump(meta), encoding="utf-8"
-    )
+    (case_dir / "metadata.yaml").write_text(yaml.dump(meta), encoding="utf-8")
 
 
 class TestL1SkipFlag:

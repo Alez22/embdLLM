@@ -26,10 +26,26 @@ PRINT_PATTERNS = [
 
 # Words that indicate error/failure messages — these should be deprioritized
 ERROR_INDICATORS = [
-    "failed", "fail:", "fail ", "error", "err:", "fault", "invalid",
-    "could not", "unable to", "cannot", "not found", "not ready",
-    "not supported", "rejected", "timed out", "timeout",
-    "critical", "warn:", "warning", "mismatch",
+    "failed",
+    "fail:",
+    "fail ",
+    "error",
+    "err:",
+    "fault",
+    "invalid",
+    "could not",
+    "unable to",
+    "cannot",
+    "not found",
+    "not ready",
+    "not supported",
+    "rejected",
+    "timed out",
+    "timeout",
+    "critical",
+    "warn:",
+    "warning",
+    "mismatch",
 ]
 
 
@@ -58,7 +74,7 @@ def extract_print_string(line: str) -> str | None:
 def string_to_keyword(fmt_string: str) -> str | None:
     """Convert a format string to a keyword (prefix before first %)."""
     # Extract prefix before first format specifier (including width/precision)
-    prefix = re.split(r'%[-+0 #]*\d*\.?\d*[dusxXlfcpzh]', fmt_string)[0]
+    prefix = re.split(r"%[-+0 #]*\d*\.?\d*[dusxXlfcpzh]", fmt_string)[0]
     # Clean escape sequences and trailing whitespace
     prefix = prefix.replace("\\n", "").replace("\\t", "")
     prefix = prefix.replace('\\"', "").rstrip().rstrip("\\")
@@ -79,13 +95,13 @@ def is_in_error_block(lines: list[str], line_idx: int) -> bool:
     for i in range(max(0, line_idx - 2), line_idx):
         ln = lines[i].strip()
         if re.match(
-            r'if\s*\(\s*(?:err|ret|rc|result|status|!dev|!device|!wdt|'
-            r'!sock|!fd|\w+\s*==\s*NULL|\w+\s*<\s*0|'
-            r'\w+\s*!=\s*\w+)',
+            r"if\s*\(\s*(?:err|ret|rc|result|status|!dev|!device|!wdt|"
+            r"!sock|!fd|\w+\s*==\s*NULL|\w+\s*<\s*0|"
+            r"\w+\s*!=\s*\w+)",
             ln,
         ):
             return True
-        if re.match(r'if\s*\(\s*(?:err|ret|rc|status)\s*\)', ln):
+        if re.match(r"if\s*\(\s*(?:err|ret|rc|status)\s*\)", ln):
             return True
     return False
 
@@ -120,6 +136,7 @@ def extract_keywords(code: str) -> list[str]:
 
     # Select up to 3 non-overlapping keywords from happy path
     selected: list[str] = []
+
     # Sort by length descending for distinctiveness
     # Prefer prefix-style keywords (ending with : = ( ) over full sentences
     # — more robust to LLM wording variations
@@ -164,10 +181,14 @@ def main() -> None:
     skipped_no_printk = 0
     skipped_exists = 0
 
-    for case_dir in sorted(CASES_DIR.iterdir()):
-        if not case_dir.is_dir():
-            continue
+    import sys as _sys
 
+    _src = str(Path(__file__).parent.parent / "src")
+    if _src not in _sys.path:
+        _sys.path.insert(0, _src)
+    from embedeval.runner import iter_case_dirs as _iter_case_dirs  # noqa: E402
+
+    for case_dir in _iter_case_dirs(CASES_DIR):
         platform = get_platform(case_dir)
         if platform != "native_sim":
             skipped_platform += 1

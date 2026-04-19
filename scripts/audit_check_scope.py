@@ -71,7 +71,7 @@ class _UnscopedMatchFinder(ast.NodeVisitor):
     def _record(self, node: ast.AST, needle: str, target: str) -> None:
         lineno = getattr(node, "lineno", 0)
         src = self.source_lines[lineno - 1].strip() if lineno else ""
-        suggestion = f'scoped_contains({target}, {needle!r})'
+        suggestion = f"scoped_contains({target}, {needle!r})"
         self.findings.append(
             Finding(
                 file=self.filename,
@@ -92,10 +92,15 @@ def audit_file(path: Path) -> list[Finding]:
 
 
 def iter_check_files(cases_root: Path, category: str | None) -> list[Path]:
+    import sys as _sys
+
+    _src = str(Path(__file__).parent.parent / "src")
+    if _src not in _sys.path:
+        _sys.path.insert(0, _src)
+    from embedeval.runner import iter_case_dirs  # noqa: E402
+
     files: list[Path] = []
-    for case_dir in sorted(cases_root.iterdir()):
-        if not case_dir.is_dir():
-            continue
+    for case_dir in iter_case_dirs(cases_root):
         if category and not case_dir.name.startswith(category):
             continue
         for name in ("static.py", "behavior.py"):

@@ -217,6 +217,8 @@ def generate_leaderboard(
     lines.append("")
     lines.extend(_reasoning_breakdown(reports))
     lines.append("")
+    lines.extend(_sdk_breakdown(reports))
+    lines.append("")
     lines.extend(_category_heatmap(reports))
     lines.append("")
     lines.extend(_layer_heatmap(reports))
@@ -414,6 +416,33 @@ def _reasoning_breakdown(reports: list[BenchmarkReport]) -> list[str]:
                 reliability = "Expert review required"
             lines.append(
                 f"| {label} | {rs.pass_at_1:.1%} | {rs.total_cases} | {reliability} |"
+            )
+    return lines
+
+
+def _sdk_breakdown(reports: list[BenchmarkReport]) -> list[str]:
+    """Per-SDK pass@1 breakdown.
+
+    Thin buckets (n_cases < 8) get a caveat marker — the score is reported
+    but should not be compared head-to-head with full buckets without a
+    wider confidence interval.
+    """
+    has_sdks = any(r.sdk_scores for r in reports)
+    if not has_sdks:
+        return []
+
+    lines: list[str] = [
+        "## SDK Breakdown",
+        "",
+        "| SDK | pass@1 | Passed | Total | Notes |",
+        "|-----|--------|--------|-------|-------|",
+    ]
+    for report in reports:
+        for ss in report.sdk_scores:
+            note = "thin bucket (n<8)" if ss.total_cases < 8 else ""
+            lines.append(
+                f"| {ss.sdk.value} | {ss.pass_at_1:.1%} "
+                f"| {ss.passed_cases} | {ss.total_cases} | {note} |"
             )
     return lines
 

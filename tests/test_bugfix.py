@@ -10,6 +10,7 @@ def strip_ansi(text: str) -> str:
     """Remove ANSI escape codes from text (e.g. color codes added by rich/typer in CI)."""
     return re.sub(r"\x1b\[[0-9;]*m", "", text)
 
+
 from typer.testing import CliRunner
 
 from embedeval.bugfix import (
@@ -27,6 +28,7 @@ from embedeval.models import (
     EvalPlatform,
     EvalResult,
     LLMResponse,
+    Sdk,
     TokenUsage,
 )
 
@@ -120,6 +122,7 @@ class TestGenerateBugfixPrompt:
             description="Test case",
             tags=["test"],
             platform=EvalPlatform.NATIVE_SIM,
+            sdk=Sdk.ZEPHYR,
             estimated_tokens=300,
             sdk_version="4.1.0",
         )
@@ -150,6 +153,7 @@ class TestGenerateBugfixPrompt:
             description="ISR test",
             tags=["isr"],
             platform=EvalPlatform.NATIVE_SIM,
+            sdk=Sdk.ZEPHYR,
             estimated_tokens=400,
             sdk_version="4.1.0",
         )
@@ -239,7 +243,7 @@ class TestRunBugfixBenchmark:
     @patch("embedeval.bugfix.call_model")
     def test_mock_pipeline_e2e(self, mock_call: MagicMock) -> None:
         """Full bugfix pipeline with mock LLM."""
-        ref_path = CASES_DIR / "gpio-basic-001" / "reference" / "main.c"
+        ref_path = CASES_DIR / "zephyr" / "gpio-basic-001" / "reference" / "main.c"
         ref_code = ref_path.read_text(encoding="utf-8")
         mock_call.return_value = LLMResponse(
             model="mock",

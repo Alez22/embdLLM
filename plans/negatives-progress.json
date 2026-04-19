@@ -489,7 +489,7 @@
       "notes": "pre-existing negatives.py discovered on first sync"
     },
     {
-      "case_id": "boot-002",
+      "case_id": "boot-uboot-001",
       "category": "boot",
       "priority": 6,
       "status": "pending",

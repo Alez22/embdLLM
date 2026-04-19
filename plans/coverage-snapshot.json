@@ -190,7 +190,7 @@
     "stale_labels": []
   },
   {
-    "case_id": "boot-002",
+    "case_id": "boot-uboot-001",
     "status": "skip",
     "negatives_attempted": 0,
     "missed": [],

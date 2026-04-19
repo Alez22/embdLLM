@@ -284,10 +284,15 @@ def iter_cases(
     case_filter: str | None,
     category_filter: str | None,
 ) -> list[Path]:
+    import sys as _sys
+
+    _src = str(Path(__file__).parent.parent / "src")
+    if _src not in _sys.path:
+        _sys.path.insert(0, _src)
+    from embedeval.runner import iter_case_dirs  # noqa: E402
+
     out: list[Path] = []
-    for case_dir in sorted(cases_root.iterdir()):
-        if not case_dir.is_dir():
-            continue
+    for case_dir in iter_case_dirs(cases_root):
         if case_filter and case_dir.name != case_filter:
             continue
         if category_filter and not case_dir.name.startswith(category_filter):

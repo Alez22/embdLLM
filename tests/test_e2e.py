@@ -16,11 +16,10 @@ from embedeval.scorer import score
 cli_runner = CliRunner()
 
 CASES_DIR = Path(__file__).parent.parent / "cases"
-PILOT_CASE_IDS = sorted(
-    d.name
-    for d in CASES_DIR.iterdir()
-    if d.is_dir() and (d / "metadata.yaml").exists()
-)
+from embedeval.runner import iter_case_dirs as _iter_case_dirs  # noqa: E402
+
+_CASE_DIRS = {d.name: d for d in _iter_case_dirs(CASES_DIR)}
+PILOT_CASE_IDS = sorted(_CASE_DIRS.keys())
 
 
 @pytest.fixture()
@@ -113,7 +112,7 @@ class TestPilotCaseValidation:
         """Each pilot case reference solution passes Layer 0 static checks."""
         from embedeval.evaluator import evaluate
 
-        case_dir = CASES_DIR / case_id
+        case_dir = _CASE_DIRS[case_id]
         ref_file = case_dir / "reference" / "main.c"
         ref_code = ref_file.read_text(encoding="utf-8")
 
@@ -132,7 +131,7 @@ class TestPilotCaseValidation:
         """Each pilot case reference solution passes Layer 3 behavioral checks."""
         from embedeval.evaluator import evaluate
 
-        case_dir = CASES_DIR / case_id
+        case_dir = _CASE_DIRS[case_id]
         ref_file = case_dir / "reference" / "main.c"
         ref_code = ref_file.read_text(encoding="utf-8")
 
@@ -151,7 +150,7 @@ class TestPilotCaseValidation:
         """Each pilot case reference solution passes the full evaluation."""
         from embedeval.evaluator import evaluate
 
-        case_dir = CASES_DIR / case_id
+        case_dir = _CASE_DIRS[case_id]
         ref_file = case_dir / "reference" / "main.c"
         ref_code = ref_file.read_text(encoding="utf-8")
 

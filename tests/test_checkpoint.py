@@ -13,6 +13,7 @@ from embedeval.models import (
     EvalPlatform,
     EvalResult,
     LayerResult,
+    Sdk,
     TokenUsage,
     Visibility,
 )
@@ -32,6 +33,7 @@ def _meta(case_id: str) -> CaseMetadata:
         description="desc",
         tags=[],
         platform=EvalPlatform.NATIVE_SIM,
+        sdk=Sdk.ZEPHYR,
         estimated_tokens=100,
         sdk_version="4.1.0",
         visibility=Visibility.PUBLIC,
@@ -155,9 +157,7 @@ def test_run_single_case_unicode_error_caught(tmp_path: Path):
 
     # _run_single_case calls call_model which we mock to raise
     with patch("embedeval.runner.call_model") as mock_call:
-        mock_call.side_effect = UnicodeDecodeError(
-            "utf-8", b"\xe2", 0, 1, "test"
-        )
+        mock_call.side_effect = UnicodeDecodeError("utf-8", b"\xe2", 0, 1, "test")
         try:
             _run_single_case(
                 meta=meta,

@@ -11,6 +11,7 @@ def strip_ansi(text: str) -> str:
     """Remove ANSI escape codes from text (e.g. color codes added by rich/typer in CI)."""
     return re.sub(r"\x1b\[[0-9;]*m", "", text)
 
+
 from embedeval.cli import app
 from embedeval.models import (
     CaseTier,
@@ -35,15 +36,22 @@ def _make_result(
     reasoning_types: list[ReasoningType] | None = None,
 ) -> EvalResult:
     layers = [
-        LayerResult(layer=i, name=f"layer_{i}", passed=passed,
-                    details=[], duration_seconds=0.0)
+        LayerResult(
+            layer=i, name=f"layer_{i}", passed=passed, details=[], duration_seconds=0.0
+        )
         for i in range(5)
     ]
     return EvalResult(
-        case_id=case_id, model=model, attempt=1, generated_code="",
-        layers=layers, passed=passed, duration_seconds=0.1,
+        case_id=case_id,
+        model=model,
+        attempt=1,
+        generated_code="",
+        layers=layers,
+        passed=passed,
+        duration_seconds=0.1,
         token_usage=TokenUsage(input_tokens=0, output_tokens=0, total_tokens=0),
-        cost_usd=0.0, tier=tier,
+        cost_usd=0.0,
+        tier=tier,
         reasoning_types=reasoning_types or [],
     )
 
@@ -87,11 +95,12 @@ class TestTierClassification:
     def test_tier_distribution(self) -> None:
         """Verify expected tier distribution."""
         from collections import Counter
+
+        from embedeval.runner import iter_case_dirs
+
         counts: Counter[str] = Counter()
-        for case_dir in sorted(CASES_DIR.iterdir()):
+        for case_dir in iter_case_dirs(CASES_DIR):
             meta_file = case_dir / "metadata.yaml"
-            if not case_dir.is_dir() or not meta_file.is_file():
-                continue
             data = yaml.safe_load(meta_file.read_text())
             counts[data.get("tier", "core")] += 1
 
@@ -152,17 +161,24 @@ class TestTierScoring:
 
     def test_reasoning_scores_calculated(self) -> None:
         results = [
-            _make_result("c1", passed=True,
-                        reasoning_types=[ReasoningType.API_RECALL]),
-            _make_result("c2", passed=True,
-                        reasoning_types=[ReasoningType.API_RECALL, ReasoningType.CROSS_DOMAIN]),
-            _make_result("c3", passed=False,
-                        reasoning_types=[ReasoningType.CROSS_DOMAIN]),
+            _make_result("c1", passed=True, reasoning_types=[ReasoningType.API_RECALL]),
+            _make_result(
+                "c2",
+                passed=True,
+                reasoning_types=[ReasoningType.API_RECALL, ReasoningType.CROSS_DOMAIN],
+            ),
+            _make_result(
+                "c3", passed=False, reasoning_types=[ReasoningType.CROSS_DOMAIN]
+            ),
         ]
         report = score(results)
 
-        api = next(r for r in report.reasoning_scores if r.reasoning_type == "api_recall")
-        cross = next(r for r in report.reasoning_scores if r.reasoning_type == "cross_domain")
+        api = next(
+            r for r in report.reasoning_scores if r.reasoning_type == "api_recall"
+        )
+        cross = next(
+            r for r in report.reasoning_scores if r.reasoning_type == "cross_domain"
+        )
 
         assert api.pass_at_1 == 1.0  # c1, c2 both pass
         assert api.total_cases == 2

@@ -74,19 +74,60 @@ def _load_progress(path: Path) -> dict[str, Any]:
     return data
 
 
+def _sdk_bucket_names() -> frozenset[str]:
+    """Single source of truth: derive bucket names from ``Sdk`` enum.
+
+    Falls back to a hardcoded literal if the embedeval package isn't
+    importable (e.g. script executed standalone without src/ on path).
+    """
+    import sys as _sys
+
+    _src = str(Path(__file__).parent.parent / "src")
+    if _src not in _sys.path:
+        _sys.path.insert(0, _src)
+    try:
+        from embedeval.runner import _SDK_BUCKET_DIRS  # noqa: E402
+
+        return _SDK_BUCKET_DIRS
+    except ImportError:
+        return frozenset(
+            {"zephyr", "embedded-linux", "freertos", "esp-idf", "stm32-hal"}
+        )
+
+
+_SDK_BUCKETS = _sdk_bucket_names()
+
+
 def _scan_cases(cases_root: Path) -> dict[str, dict[str, bool]]:
-    """Return {case_id: {'has_static': bool, 'has_negatives': bool}}."""
+    """Return {case_id: {'has_static': bool, 'has_negatives': bool}}.
+
+    Walks both the legacy flat layout (``cases/<id>/``) and the post-migration
+    SDK-bucket layout (``cases/<sdk>/<id>/``). A case is any dir containing a
+    ``checks/`` subdir; metadata.yaml is intentionally not required here so
+    TCs still bootstrapping negatives are visible.
+    """
     out: dict[str, dict[str, bool]] = {}
-    for case_dir in sorted(cases_root.iterdir()):
-        if not case_dir.is_dir():
-            continue
+    if not cases_root.is_dir():
+        return out
+
+    def _record(case_dir: Path) -> None:
         checks = case_dir / "checks"
         if not checks.is_dir():
-            continue
+            return
         out[case_dir.name] = {
             "has_static": (checks / "static.py").is_file(),
             "has_negatives": (checks / "negatives.py").is_file(),
         }
+
+    for entry in sorted(cases_root.iterdir()):
+        if not entry.is_dir():
+            continue
+        if entry.name in _SDK_BUCKETS:
+            for sub in sorted(entry.iterdir()):
+                if sub.is_dir():
+                    _record(sub)
+        else:
+            _record(entry)
     return out
 
 
@@ -140,9 +181,9 @@ def reconcile(
                 entry["status"] = "pending"
                 entry["completed_at"] = None
                 note = entry.get("notes") or ""
-                entry["notes"] = (
-                    note + " | regression: negatives.py removed"
-                ).strip(" |")
+                entry["notes"] = (note + " | regression: negatives.py removed").strip(
+                    " |"
+                )
                 stats.regressed.append(case_id)
             elif entry.get("status") == "orphaned":
                 # Case came back — demote orphaned to pending (or done if neg exists)

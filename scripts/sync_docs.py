@@ -9,6 +9,7 @@ Called automatically by /wrapup workflow.
 
 import re
 import subprocess
+import sys
 from collections import Counter
 from pathlib import Path
 
@@ -19,6 +20,9 @@ SRC_DIR = ROOT / "src" / "embedeval"
 TESTS_DIR = ROOT / "tests"
 METHODOLOGY = ROOT / "docs" / "METHODOLOGY.md"
 README = ROOT / "README.md"
+
+sys.path.insert(0, str(ROOT / "src"))
+from embedeval.runner import iter_case_dirs  # noqa: E402
 
 
 def count_cases() -> dict:
@@ -31,6 +35,7 @@ def count_cases() -> dict:
         "total": 0,
         "categories": Counter(),
         "platforms": Counter(),
+        "sdks": Counter(),
         "difficulties": Counter(),
         "visibility": {"public": 0, "private": 0},
         "negatives": 0,
@@ -45,11 +50,8 @@ def count_cases() -> dict:
 
     for cases_root in case_dirs_to_scan:
         is_private_dir = cases_root == PRIVATE_CASES_DIR
-        for case_dir in sorted(cases_root.iterdir()):
+        for case_dir in iter_case_dirs(cases_root):
             meta_file = case_dir / "metadata.yaml"
-            if not case_dir.is_dir() or not meta_file.is_file():
-                continue
-
             stats["total"] += 1
             content = meta_file.read_text(encoding="utf-8")
 
@@ -57,6 +59,7 @@ def count_cases() -> dict:
             cat = _yaml_value(content, "category")
             diff = _yaml_value(content, "difficulty")
             plat = _yaml_value(content, "platform")
+            sdk = _yaml_value(content, "sdk")
             vis = _yaml_value(content, "visibility") or "public"
             # Cases in private repo are always private regardless of field
             if is_private_dir:
@@ -68,6 +71,8 @@ def count_cases() -> dict:
                 stats["difficulties"][diff] += 1
             if plat:
                 stats["platforms"][plat] += 1
+            if sdk:
+                stats["sdks"][sdk] += 1
 
             stats["visibility"][vis] += 1
 
@@ -92,7 +97,9 @@ def count_tests() -> int:
     try:
         result = subprocess.run(
             ["uv", "run", "pytest", "tests/", "--co", "-q"],
-            capture_output=True, text=True, timeout=30,
+            capture_output=True,
+            text=True,
+            timeout=30,
             cwd=str(ROOT),
         )
         # Last line: "945 tests collected in 1.80s"
@@ -113,7 +120,6 @@ def count_tests() -> int:
 def count_modules() -> int:
     """Count Python modules in src/embedeval/."""
     return len(list(SRC_DIR.glob("*.py"))) - 1  # exclude __init__.py if present
-
 
 
 def update_methodology(stats: dict) -> bool:
@@ -247,11 +253,17 @@ def main() -> None:
     stats = count_cases()
     n_tests = count_tests()
 
-    print(f"\n  Cases: {stats['total']} ({stats['visibility']['public']} public, {stats['visibility']['private']} private)")
+    print(
+        f"\n  Cases: {stats['total']} ({stats['visibility']['public']} public, {stats['visibility']['private']} private)"
+    )
     print(f"  Categories: {len(stats['categories'])}")
     print(f"  Platforms: {len(stats['platforms'])}")
-    print(f"  Difficulty: {stats['difficulties'].get('easy', 0)}e / {stats['difficulties'].get('medium', 0)}m / {stats['difficulties'].get('hard', 0)}h")
-    print(f"  Negatives: {stats['negatives']} TCs, {stats['must_fail_mutations']} mutations")
+    print(
+        f"  Difficulty: {stats['difficulties'].get('easy', 0)}e / {stats['difficulties'].get('medium', 0)}m / {stats['difficulties'].get('hard', 0)}h"
+    )
+    print(
+        f"  Negatives: {stats['negatives']} TCs, {stats['must_fail_mutations']} mutations"
+    )
     print(f"  Tests: {n_tests}")
     print(f"  Modules: {count_modules()}")
     print()

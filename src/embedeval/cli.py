@@ -8,7 +8,32 @@ from typing import TYPE_CHECKING, Annotated, Optional
 import typer
 
 from embedeval.context_diagnose import DEFAULT_GAP_THRESHOLD_PP
-from embedeval.models import CaseCategory, DifficultyTier, EvalResult, Visibility
+from embedeval.models import CaseCategory, DifficultyTier, EvalResult, Sdk, Visibility
+
+
+def _parse_sdk_filter(raw: str | None) -> list[Sdk]:
+    """Parse a comma-separated --sdk string into a list of Sdk enum values.
+
+    Empty/None returns an empty list (no filter). Unknown values raise a
+    typer.Exit with a readable error listing the valid buckets.
+    """
+    if not raw:
+        return []
+    result: list[Sdk] = []
+    for token in raw.split(","):
+        token = token.strip()
+        if not token:
+            continue
+        try:
+            result.append(Sdk(token))
+        except ValueError as exc:
+            valid = ", ".join(s.value for s in Sdk)
+            typer.echo(
+                f"Error: unknown --sdk value '{token}'. Valid: {valid}", err=True
+            )
+            raise typer.Exit(code=1) from exc
+    return result
+
 
 if TYPE_CHECKING:
     from embedeval.models import CaseMetadata, EvalResult
@@ -97,6 +122,7 @@ def _build_comprehensive_results(
             EvalResult(
                 case_id=case_id,
                 category=meta.category,
+                sdk=meta.sdk,
                 model=model,
                 attempt=1,
                 generated_code="",
@@ -168,6 +194,16 @@ def run(
         typer.Option(
             "--tier",
             help="Filter by tier: sanity, core, challenge (comma-separated)",
+        ),
+    ] = None,
+    sdk: Annotated[
+        Optional[str],
+        typer.Option(
+            "--sdk",
+            help=(
+                "Filter by SDK bucket (comma-separated): zephyr, "
+                "embedded-linux, freertos, esp-idf, stm32-hal"
+            ),
         ),
     ] = None,
     visibility: Annotated[
@@ -283,6 +319,8 @@ def run(
         filters.difficulties = [DifficultyTier(difficulty)]
     if tier:
         filters.tiers = [CaseTier(t.strip()) for t in tier.split(",")]
+    if sdk:
+        filters.sdks = _parse_sdk_filter(sdk)
     if visibility:
         filters.visibility = Visibility(visibility)
     if after_date:
@@ -317,6 +355,7 @@ def run(
             categories=filters.categories,
             difficulties=filters.difficulties,
             tiers=filters.tiers,
+            sdks=filters.sdks,
             tags=filters.tags,
             visibility=filters.visibility
             if filters.visibility is not None
@@ -782,6 +821,16 @@ def validate(
         Optional[str],
         typer.Option("--category", "-c", help="Filter by category"),
     ] = None,
+    sdk: Annotated[
+        Optional[str],
+        typer.Option(
+            "--sdk",
+            help=(
+                "Filter by SDK bucket (comma-separated): zephyr, "
+                "embedded-linux, freertos, esp-idf, stm32-hal"
+            ),
+        ),
+    ] = None,
     verbose: Annotated[
         bool,
         typer.Option("--verbose", "-v", help="Enable verbose logging"),
@@ -794,8 +843,13 @@ def validate(
     from embedeval.runner import Filters, discover_cases, filter_cases
 
     cases = discover_cases(cases_dir)
+    _filters = Filters()
     if category:
-        cases = filter_cases(cases, Filters(categories=[CaseCategory(category)]))
+        _filters.categories = [CaseCategory(category)]
+    if sdk:
+        _filters.sdks = _parse_sdk_filter(sdk)
+    if _filters.categories or _filters.sdks:
+        cases = filter_cases(cases, _filters)
 
     if not cases:
         typer.echo("No cases found.")
@@ -1012,6 +1066,16 @@ def agent(
         Optional[list[str]],
         typer.Option("--category", "-c", help="Filter by category (repeatable)"),
     ] = None,
+    sdk: Annotated[
+        Optional[str],
+        typer.Option(
+            "--sdk",
+            help=(
+                "Filter by SDK bucket (comma-separated): zephyr, "
+                "embedded-linux, freertos, esp-idf, stm32-hal"
+            ),
+        ),
+    ] = None,
     context_pack: Annotated[
         Optional[str],
         typer.Option(
@@ -1059,6 +1123,8 @@ def agent(
     filters = Filters()
     if category:
         filters.categories = [CaseCategory(c) for c in category]
+    if sdk:
+        filters.sdks = _parse_sdk_filter(sdk)
     cases = filter_cases(cases, filters)
 
     if not cases:
@@ -1251,6 +1317,16 @@ def list_cases(
         Optional[str],
         typer.Option("--difficulty", "-d", help="Filter by difficulty"),
     ] = None,
+    sdk: Annotated[
+        Optional[str],
+        typer.Option(
+            "--sdk",
+            help=(
+                "Filter by SDK bucket (comma-separated): zephyr, "
+                "embedded-linux, freertos, esp-idf, stm32-hal"
+            ),
+        ),
+    ] = None,
     verbose: Annotated[
         bool,
         typer.Option("--verbose", "-v", help="Enable verbose logging"),
@@ -1268,6 +1344,8 @@ def list_cases(
         filters.categories = [CaseCategory(category)]
     if difficulty:
         filters.difficulties = [DifficultyTier(difficulty)]
+    if sdk:
+        filters.sdks = _parse_sdk_filter(sdk)
 
     cases = filter_cases(cases, filters)
 
@@ -1279,5 +1357,5 @@ def list_cases(
     for _case_dir, meta in cases:
         typer.echo(
             f"  [{meta.difficulty.value:6s}] {meta.id:20s} "
-            f"{meta.category.value:15s} — {meta.title}"
+            f"{meta.sdk.value:15s} {meta.category.value:15s} — {meta.title}"
         )
