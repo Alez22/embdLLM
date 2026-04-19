@@ -8,13 +8,13 @@ EmbedEval is a benchmark for evaluating LLM capability in embedded firmware code
 
 | Metric | Value |
 |--------|-------|
-| **Total cases** | 233 |
+| **Total cases** | 234 |
 | **Categories** | 23 |
 | **Platforms** | 6 (docker_only, esp_idf, native_sim, qemu_arm, stm32_hal, yocto_build) |
-| **Difficulty** | 29 easy, 98 medium, 106 hard |
+| **Difficulty** | 29 easy, 98 medium, 107 hard |
 | **Private held-out** | 48 cases (20%) for contamination prevention |
 | **Evaluation scenarios** | 2 (generation, bugfix) |
-| **Negatives (mutation tests)** | 44 cases, 230 must_fail mutations |
+| **Negatives (mutation tests)** | 45 cases, 242 must_fail mutations |
 
 ### Platform Distribution
 
@@ -39,7 +39,7 @@ EmbedEval is a benchmark for evaluating LLM capability in embedded firmware code
 | gpio-basic | 2 | 2 | 2 | 6 |
 | isr-concurrency | 0 | 3 | 10 | 13 |
 | kconfig | 2 | 4 | 4 | 10 |
-| linux-driver | 0 | 4 | 6 | 10 |
+| linux-driver | 0 | 4 | 7 | 11 |
 | memory-opt | 1 | 5 | 6 | 12 |
 | networking | 1 | 7 | 4 | 12 |
 | ota | 1 | 4 | 7 | 12 |

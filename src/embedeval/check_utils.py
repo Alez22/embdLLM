@@ -418,3 +418,314 @@ def extract_numeric(code: str, pattern: str) -> int | None:
         # Try resolving as macro
         return resolve_define(code, val)
     return None
+
+
+# ---------------------------------------------------------------------------
+# Linux kernel 5.15+ helpers.
+#
+# Used by cases/embedded-linux/linux-driver-* checks. Kept here (not in a
+# per-TC module) so every linux-driver TC uses the same regex discipline and
+# known false-positive traps are fixed in one place.
+# ---------------------------------------------------------------------------
+
+_LINUX_INIT_PATTERNS = (
+    # static int probe(struct platform_device *pdev)
+    r"static\s+(?:int\s+(?:__init\s+)?|__init\s+int\s+)"
+    r"(?P<name>\w+)\s*\(\s*struct\s+platform_device\s*\*\s*\w+\s*\)\s*\{",
+    # static int __init module_init_fn(void)
+    r"static\s+int\s+__init\s+(?P<name2>\w+)\s*\([^)]*\)\s*\{",
+    # int __init name(void)   (no static)
+    r"\bint\s+__init\s+(?P<name3>\w+)\s*\([^)]*\)\s*\{",
+)
+
+_LINUX_EXIT_PATTERNS = (
+    # static int remove(struct platform_device *pdev)
+    r"static\s+(?:int|void)\s+(?:__exit\s+)?"
+    r"(?P<name>\w*(?:remove|cleanup|exit)\w*)\s*"
+    r"\(\s*struct\s+platform_device\s*\*\s*\w+\s*\)\s*\{",
+    # static void __exit module_exit_fn(void)
+    r"static\s+void\s+__exit\s+(?P<name2>\w+)\s*\([^)]*\)\s*\{",
+    # void __exit name(void)
+    r"\bvoid\s+__exit\s+(?P<name3>\w+)\s*\([^)]*\)\s*\{",
+)
+
+
+def _extract_body_from_brace(code: str, start_after_brace: int) -> str | None:
+    depth = 1
+    for i in range(start_after_brace, len(code)):
+        if code[i] == "{":
+            depth += 1
+        elif code[i] == "}":
+            depth -= 1
+            if depth == 0:
+                return code[start_after_brace:i]
+    return None
+
+
+def extract_module_init_body(code: str) -> str | None:
+    """Extract the body of a Linux driver's probe/init function.
+
+    Recognizes ``static int probe(struct platform_device *)``,
+    ``static int __init name(void)``, and ``int __init name(void)``.
+
+    Returns the brace body or None if nothing matches. Only the first
+    match is returned — drivers with multiple probes should use
+    ``extract_function_body`` directly.
+    """
+    stripped = strip_comments(code)
+    for pat in _LINUX_INIT_PATTERNS:
+        match = re.search(pat, stripped)
+        if match:
+            body = _extract_body_from_brace(stripped, match.end())
+            if body is not None:
+                return body
+    return None
+
+
+def extract_module_exit_body(code: str) -> str | None:
+    """Extract the body of a Linux driver's remove/exit function.
+
+    Recognizes ``static int remove(struct platform_device *)``,
+    ``static void __exit name(void)``, and ``void __exit name(void)``.
+
+    Kept separate from ``extract_module_init_body`` because the
+    ``init_error_path_cleanup`` blind-spot documented in
+    PLAN-remaining-blindspots relies on scoping cleanup checks strictly
+    to the init body — an identical call in the exit body must not
+    satisfy an init-path check.
+    """
+    stripped = strip_comments(code)
+    for pat in _LINUX_EXIT_PATTERNS:
+        match = re.search(pat, stripped)
+        if match:
+            body = _extract_body_from_brace(stripped, match.end())
+            if body is not None:
+                return body
+    return None
+
+
+# devm_* allocators and managed-resource getters that automatically release
+# on device detach. Manually pairing a matching kfree/put/free call is a
+# double-free bug (see CVE-2026-23068 spi-sprd-adi).
+_DEVM_TO_MANUAL_FREE: dict[str, tuple[str, ...]] = {
+    "devm_kmalloc": ("kfree",),
+    "devm_kzalloc": ("kfree",),
+    "devm_kcalloc": ("kfree",),
+    "devm_kstrdup": ("kfree",),
+    "devm_clk_get": ("clk_put",),
+    "devm_clk_get_optional": ("clk_put",),
+    "devm_gpiod_get": ("gpiod_put",),
+    "devm_gpiod_get_optional": ("gpiod_put",),
+    "devm_regulator_get": ("regulator_put",),
+    "devm_request_irq": ("free_irq",),
+    "devm_request_threaded_irq": ("free_irq",),
+    "devm_ioremap": ("iounmap",),
+    "devm_ioremap_resource": ("iounmap",),
+    "devm_platform_ioremap_resource": ("iounmap",),
+}
+
+
+def has_manual_free_paired_with_devm(code: str) -> list[tuple[str, str]]:
+    """Find devm_* calls whose matching manual free is also present.
+
+    Returns a list of ``(devm_call, manual_free_call)`` pairs. Empty list
+    means no double-free bug pattern detected. Intended for the
+    ``no_manual_free_for_devm_resource`` negative check that mirrors
+    CVE-2026-23068: devm automatic release + manual free on the same
+    resource produces a double free.
+
+    Caveat from CLAUDE.md 2026-03-29: uses ``has_api_call`` (word-boundary
+    + open paren) so ``__devm_kfree`` does not match ``devm_kmalloc`` and
+    ``kfree_rcu`` does not match ``kfree``.
+    """
+    stripped = strip_comments(code)
+    found: list[tuple[str, str]] = []
+    for devm, manuals in _DEVM_TO_MANUAL_FREE.items():
+        if not has_api_call(stripped, devm):
+            continue
+        for manual in manuals:
+            if has_api_call(stripped, manual):
+                found.append((devm, manual))
+    return found
+
+
+# APIs that return ERR_PTR on failure. Callers must guard with IS_ERR;
+# a plain ``if (!ret)`` check is a bug because ERR_PTR values are
+# non-NULL pointers in the kernel's error-coded pointer range.
+_ERR_PTR_RETURNING_APIS = (
+    "clk_get",
+    "clk_get_optional",
+    "devm_clk_get",
+    "devm_clk_get_optional",
+    "devm_gpiod_get",
+    "devm_gpiod_get_optional",
+    "devm_regulator_get",
+    "devm_platform_ioremap_resource",
+    "devm_ioremap_resource",
+    "platform_get_resource",
+    "of_find_node_by_name",
+    "regmap_init_i2c",
+    "devm_regmap_init_i2c",
+)
+
+
+def returns_err_ptr(api_name: str) -> bool:
+    """Whether an API returns ERR_PTR on failure (requires IS_ERR guard)."""
+    return api_name in _ERR_PTR_RETURNING_APIS
+
+
+def has_is_err_guard(code: str, api_name: str) -> bool:
+    """Check that an ERR_PTR-returning API is guarded by IS_ERR.
+
+    Matches patterns like:
+        x = api_name(...);
+        if (IS_ERR(x))
+
+    Supports struct-member LHS (``priv->regs``, ``dev->clk``,
+    ``state.handle``) as well as plain identifiers.
+
+    False-positive trap: plain ``if (!x)`` is NOT an IS_ERR guard —
+    ERR_PTR values are non-NULL kernel pointers. See kernel.org
+    err.h semantics.
+
+    Known limitation: the ``[^;]*`` argument-list matcher stops at the
+    first semicolon; a macro expansion containing ``;`` inside a devm_*
+    argument list would truncate early. No current kernel idiom hits
+    this; revisit if a concrete false negative surfaces.
+    """
+    stripped = strip_comments(code)
+    if not has_api_call(stripped, api_name):
+        return False
+    # LHS can be: ident  |  ident->field->field  |  ident.field.field
+    # (no whitespace inside the chain, which is standard C formatting).
+    # DOTALL is intentionally NOT set: ``[^;]*`` already matches newlines
+    # by character-class semantics, and the leading ``{lhs}`` contains no
+    # ``.`` wildcards — adding DOTALL was dead-weight in earlier revisions.
+    lhs = r"[A-Za-z_]\w*(?:(?:\s*->\s*|\s*\.\s*)\w+)*"
+    call_pat = re.compile(
+        rf"({lhs})\s*=\s*{re.escape(api_name)}\s*\([^;]*\)\s*;",
+    )
+    for m in call_pat.finditer(stripped):
+        var = re.sub(r"\s+", "", m.group(1))
+        tail = stripped[m.end() : m.end() + 400]
+        # Normalize whitespace in tail so a loose ``IS_ERR( priv -> regs )``
+        # still matches a normalized LHS token.
+        tail_norm = re.sub(r"\s+", "", tail)
+        if re.search(rf"IS_ERR(?:_OR_NULL)?\({re.escape(var)}\)", tail_norm):
+            return True
+    return False
+
+
+# Sleepable kernel APIs forbidden inside atomic contexts (spin_lock /
+# irq handler / RCU read side). Not exhaustive — covers the classes
+# LLMs most often mis-place.
+_ATOMIC_CTX_FORBIDDEN = (
+    "msleep",
+    "usleep_range",
+    "schedule",
+    "schedule_timeout",
+    "wait_for_completion",  # without _timeout variants below
+    "mutex_lock",
+    "down",
+    "down_interruptible",
+    "kmalloc",  # with GFP_KERNEL — checked separately
+    "copy_to_user",
+    "copy_from_user",
+    "vmalloc",
+)
+
+
+def sleepable_calls_in_atomic_ctx(body: str) -> list[str]:
+    """Return sleepable kernel API calls found in an atomic-ctx body.
+
+    Pass the body of a spin-locked region, IRQ handler, or RCU read-side
+    critical section. Returns a list of forbidden API names found.
+
+    False-positive trap: ``mutex_lock`` inside an RCU read-side section
+    is forbidden; ``mutex_lock`` in a plain threaded handler is fine.
+    Callers must decide which set to consult based on context type.
+    """
+    stripped = strip_comments(body)
+    found: list[str] = []
+    for api in _ATOMIC_CTX_FORBIDDEN:
+        if has_api_call(stripped, api):
+            found.append(api)
+    return found
+
+
+# ---------------------------------------------------------------------------
+# Yocto/BitBake recipe helpers.
+#
+# Yocto recipe files (.bb/.bbappend/.bbclass/.inc) use ``#`` line comments
+# and embed URIs like ``file://``, ``git://``, ``http://`` that must not be
+# clobbered by C-style comment stripping. CLAUDE.md 2026-04-19 corrections
+# apply: use scope='raw' from scoped_contains for .bb checks, OR use the
+# yocto-aware helpers below.
+# ---------------------------------------------------------------------------
+
+
+def strip_yocto_comments(text: str) -> str:
+    """Strip shell-style ``#`` line comments from BitBake recipe text.
+
+    Preserves ``file://``/``git://``/``http://`` URIs by only stripping
+    ``#`` when it is the first non-whitespace character on a line, or is
+    preceded by whitespace and NOT by a colon (which would mean we're
+    inside a URI scheme).
+    """
+    out: list[str] = []
+    for line in text.splitlines():
+        # Drop full-line comment or leading-whitespace comment
+        if re.match(r"\s*#", line):
+            continue
+        # Drop trailing "  # comment" but keep URIs intact. The single
+        # ``(?<!:)`` lookbehind suffices — it rejects any whitespace-#
+        # whose preceding char is a colon (e.g., end of ``file:`` just
+        # before a space). A prior revision had a second, redundant
+        # ``(?<!:\/)`` lookbehind; removed as dead code.
+        stripped = re.sub(r"(?<!:)\s+#.*$", "", line)
+        out.append(stripped)
+    return "\n".join(out)
+
+
+def yocto_contains(text: str, needle: str) -> bool:
+    """Yocto-aware substring check: strips #-comments, keeps URIs.
+
+    Use instead of ``scoped_contains(..., scope='raw')`` when the check
+    needs to ignore commented-out recipe lines but must still match
+    tokens that could accidentally live next to URI schemes.
+    """
+    return needle in strip_yocto_comments(text)
+
+
+def yocto_has_override(text: str, var: str, override: str) -> bool:
+    """Detect a BitBake variable override in the modern colon form.
+
+    Kirkstone (Yocto 4.0) supports both ``VAR_append`` (legacy underscore)
+    and ``VAR:append`` (modern colon) forms. This helper matches the colon
+    form only — the preferred kirkstone canonical syntax.
+
+    Example: ``yocto_has_override(text, 'FILESEXTRAPATHS', 'prepend')``
+    matches ``FILESEXTRAPATHS:prepend := "..."``.
+    """
+    body = strip_yocto_comments(text)
+    return bool(
+        re.search(
+            rf"\b{re.escape(var)}:{re.escape(override)}\b\s*[:+?]?=",
+            body,
+        )
+    )
+
+
+def yocto_has_legacy_override(text: str, var: str, override: str) -> bool:
+    """Detect the legacy underscore override form (discouraged on kirkstone+).
+
+    Use as a negative check: a TC that rewards colon form should also
+    penalize the underscore form.
+    """
+    body = strip_yocto_comments(text)
+    return bool(
+        re.search(
+            rf"\b{re.escape(var)}_{re.escape(override)}\b\s*[:+?]?=",
+            body,
+        )
+    )

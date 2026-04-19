@@ -144,6 +144,8 @@ cases:
     sdk: embedded-linux
   linux-driver-008:
     sdk: embedded-linux
+  linux-driver-013:
+    sdk: embedded-linux
   memory-opt-001:
     sdk: zephyr
   memory-opt-002:
