@@ -2,6 +2,14 @@
 
 Thank you for contributing to the embedded firmware LLM benchmark. This guide covers how to add new evaluation cases.
 
+## Interop-stable surfaces
+
+Several EmbedEval artifacts are consumed by downstream tools (primarily [Hiloop](https://github.com/Ecro/hiloop) for YAML rule transpile and evidence injection). When authoring a new TC or changing shared helpers, check [docs/HILOOP-HANDOFF.md](HILOOP-HANDOFF.md) for the full contract: schemas, stability tiers, and breaking-change protocol. Key invariants:
+
+- `check_name` values in `static.py` / `behavior.py` are **stable public identifiers** — renaming orphans landed Hiloop rules.
+- Use `scoped_contains(code, needle, scope=...)` — never `"x" in code`. CI enforces via `scripts/audit_check_scope.py --strict`.
+- New `CaseMetadata` fields require a joint EmbedEval/Hiloop release (consumer-side uses `extra="forbid"`).
+
 ## Case Directory Structure
 
 Each case lives in `cases/<case-id>/` with the following structure:

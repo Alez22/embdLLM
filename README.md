@@ -424,6 +424,7 @@ See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for case authoring. In brief:
 - **New case:** create `cases/<category>-<NNN>/` with `metadata.yaml`, `prompt.md`, `reference/main.c`, plus `checks/static.py` and `checks/behavior.py`. Verify with `uv run embedeval validate --cases cases/ -c <category>`.
 - **New model:** run `uv run embedeval run --model <litellm-id> --cases cases/` for n=3, then PR `results/runs/<date>_<model>/` along with an updated `LEADERBOARD.md`.
 - **Methodology critique:** open an issue using the methodology-question template.
+- **Interop contract:** see [HILOOP-HANDOFF.md](docs/HILOOP-HANDOFF.md) — producer-side schemas, stability tiers, and breaking-change protocol for every artifact consumed by downstream tools (Hiloop transpile, evidence injection).
 
 Issue templates: model evaluation request, case contribution, methodology discussion (under `.github/ISSUE_TEMPLATE/`).
 
