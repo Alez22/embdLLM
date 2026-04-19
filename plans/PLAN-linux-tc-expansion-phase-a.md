@@ -338,6 +338,8 @@ Additive TC expansion in 4 mechanical phases, then validate + benchmark:
 - Reporter + per-category scoring extension if new enum added.
 - Phase A's shared helpers (`scoped_contains_yocto`, scope discipline, factor_id tagging) apply directly in Phase B — no rework.
 
+**Phase C scoping (post-Phase-B):** see [PHASE-C-CANDIDATES.md](PHASE-C-CANDIDATES.md) for the ranked shortlist of four candidates (eBPF multi-file, Linux OTA, linux-networking-kernel, kernel DT bindings) and the recommended next slug.
+
 ## Review checklist (verify before /execute)
 
 - [ ] Scope limited to **15 TCs across 3 existing categories** — no enum extension, no reporter/scorer changes, no existing-TC edits.
