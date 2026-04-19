@@ -729,3 +729,350 @@ def yocto_has_legacy_override(text: str, var: str, override: str) -> bool:
             body,
         )
     )
+
+
+# ---------------------------------------------------------------------------
+# Linux userspace helpers (Phase B).
+#
+# Shared by cases/embedded-linux/linux-userspace-* TCs. Covers systemd unit
+# files, udev rules, libgpiod v1-vs-v2 detection, sd-bus vs libdbus
+# detection, and eBPF CO-RE marker detection.
+#
+# systemd / udev / NetworkManager share ``#`` line-comment semantics with
+# Yocto recipes; strip_yocto_comments is reused as the canonical stripper.
+# ---------------------------------------------------------------------------
+
+# Alias — keeps user-facing API readable ("I'm stripping a systemd unit,
+# not a Yocto recipe") while sharing implementation.
+strip_systemd_comments = strip_yocto_comments
+
+
+def systemd_unit_section_has(
+    text: str,
+    section: str,
+    directive: str,
+) -> str | None:
+    """Return the RHS value of ``<directive>=<value>`` inside ``[section]``.
+
+    Args:
+        text: unit file contents.
+        section: section name without brackets (e.g. ``Service``, ``Unit``,
+            ``Install``, ``Timer``).
+        directive: directive key (e.g. ``Type``, ``WatchdogSec``, ``Restart``).
+
+    Returns:
+        The RHS string (trimmed) if the directive appears inside the named
+        section, None otherwise. If the same directive appears multiple times
+        in the section, returns the last occurrence (systemd's own precedence).
+    """
+    body = strip_systemd_comments(text)
+    # Fold systemd-style line continuations ``\<newline>`` into a single
+    # space so that multi-line directive values (e.g. ``ExecStart=foo \``
+    # continued on the next line with ``--arg1 --arg2``) are visible as
+    # one logical RHS to the directive regex.
+    body = re.sub(r"\\\n\s*", " ", body)
+
+    # Locate section boundary: from ``[section]`` line to the next ``[...]``
+    # header or end of file.
+    sec_pat = re.compile(rf"^\[{re.escape(section)}\]\s*$", re.MULTILINE)
+    m = sec_pat.search(body)
+    if not m:
+        return None
+    start = m.end()
+    next_hdr = re.search(r"^\[[^\]]+\]\s*$", body[start:], re.MULTILINE)
+    end = start + next_hdr.start() if next_hdr else len(body)
+    section_body = body[start:end]
+
+    # Match ``Directive=value`` with optional whitespace around ``=``.
+    directive_pat = re.compile(
+        rf"^\s*{re.escape(directive)}\s*=\s*(.*?)\s*$",
+        re.MULTILINE,
+    )
+    matches = directive_pat.findall(section_body)
+    return matches[-1] if matches else None
+
+
+# udev rule keys that are strictly match-only (must use ``==`` or numeric
+# ops). Using plain ``=`` on these is a classic bug — it becomes an
+# assignment to a non-assignable key and the rule silently no-ops or
+# errors out.
+#
+# Dual-use keys (match via ``==`` OR assign via ``=`` / ``+=``) are NOT
+# in this set:
+#   - ``ENV{foo}``   — match device env (``==``) OR assign new env (``=``)
+#   - ``ATTR{foo}``  — match child-device sysfs attribute (``==``) OR
+#                       WRITE to that attribute (``=``, e.g.
+#                       ``ATTR{brightness}="200"`` to set backlight).
+# ``ATTRS`` (plural, walks parent chain) stays in the match-only set —
+# the kernel has no concept of writing to a parent device attribute.
+_UDEV_MATCH_ONLY_KEYS = frozenset(
+    {
+        "ACTION",
+        "SUBSYSTEM",
+        "SUBSYSTEMS",
+        "DEVPATH",
+        "KERNEL",
+        "KERNELS",
+        "DRIVER",
+        "DRIVERS",
+        "ATTRS",
+        "SYSCTL",
+        "TEST",
+        "RESULT",
+    }
+)
+
+# udev rule keys that are assignment-only (``=``, ``+=``, ``:=``, ``-=``).
+_UDEV_ASSIGN_ONLY_KEYS = frozenset(
+    {
+        "NAME",
+        "SYMLINK",
+        "OWNER",
+        "GROUP",
+        "MODE",
+        "TAG",
+        "RUN",
+        "LABEL",
+        "GOTO",
+        "IMPORT",
+        "OPTIONS",
+    }
+)
+
+
+def udev_rule_matches(text: str, key: str) -> str | None:
+    """Return the RHS value of a udev ``key==value`` match.
+
+    Handles ``key{subkey}`` form (e.g. ``ATTRS{idVendor}``). Returns the
+    RHS with surrounding quotes stripped, or None if no match present.
+    """
+    body = strip_systemd_comments(text)
+    # Escape the key but allow optional ``{subkey}`` qualifier.
+    pat = re.compile(rf'\b{re.escape(key)}(?:\{{[^}}]+\}})?\s*==\s*"([^"]*)"')
+    m = pat.search(body)
+    return m.group(1) if m else None
+
+
+def udev_rule_assigns(text: str, key: str) -> tuple[str, str] | None:
+    """Return ``(operator, value)`` for a udev ``key <op> value`` assignment.
+
+    Operators: ``=``, ``+=``, ``:=``, ``-=``.
+    """
+    body = strip_systemd_comments(text)
+    pat = re.compile(
+        rf'\b{re.escape(key)}(?:\{{[^}}]+\}})?\s*(\+=|:=|-=|=)\s*"([^"]*)"'
+    )
+    m = pat.search(body)
+    return (m.group(1), m.group(2)) if m else None
+
+
+def udev_match_key_used_as_assign(text: str) -> list[str]:
+    """Return the list of match-only keys that the text assigns to via ``=``.
+
+    Classic udev bug: writing ``SUBSYSTEM="usb"`` (assignment) instead of
+    ``SUBSYSTEM=="usb"`` (match) — the rule silently fails to filter and
+    either matches every device or errors out at rule-load time.
+    """
+    body = strip_systemd_comments(text)
+    offenders: list[str] = []
+    for key in _UDEV_MATCH_ONLY_KEYS:
+        # Find ``KEY="..."`` (single =, not ==, not +=) on the same line.
+        # Dual-use keys (ENV, ATTR) are excluded at the set level, so no
+        # per-iteration skip is needed here.
+        pat = re.compile(
+            rf'\b{re.escape(key)}(?:\{{[^}}]+\}})?\s*(?<![=+:\-])=(?!=)\s*"'
+        )
+        if pat.search(body):
+            offenders.append(key)
+    return offenders
+
+
+# libgpiod v1-exclusive symbols (deprecated in v2). Presence of ANY
+# indicates the code targets the 2017-era API rather than the 2023 v2
+# character-device rewrite.
+_LIBGPIOD_V1_EXCLUSIVE = (
+    "gpiod_chip_open_by_name",
+    "gpiod_chip_open_by_number",
+    "gpiod_chip_open_lookup",
+    "gpiod_chip_get_line",
+    "gpiod_chip_get_lines",
+    "gpiod_chip_get_all_lines",
+    "gpiod_line_request_output",
+    "gpiod_line_request_input",
+    "gpiod_line_request_both_edges_events",
+    "gpiod_line_request_rising_edge_events",
+    "gpiod_line_request_falling_edge_events",
+    "gpiod_line_request_bulk_output",
+    "gpiod_line_request_bulk_input",
+    "gpiod_line_get_value",
+    "gpiod_line_set_value",
+    "gpiod_line_event_wait",
+    "gpiod_line_event_read",
+    "gpiod_line_release",
+    "gpiod_line_release_bulk",
+    "gpiod_line_name",
+)
+
+# libgpiod v2-exclusive symbols. These did not exist before v2.0 (March 2023).
+_LIBGPIOD_V2_EXCLUSIVE = (
+    "gpiod_line_settings_new",
+    "gpiod_line_settings_set_direction",
+    "gpiod_line_settings_set_edge_detection",
+    "gpiod_line_settings_set_output_value",
+    "gpiod_line_settings_set_bias",
+    "gpiod_line_settings_free",
+    "gpiod_line_config_new",
+    "gpiod_line_config_add_line_settings",
+    "gpiod_line_config_free",
+    "gpiod_request_config_new",
+    "gpiod_request_config_set_consumer",
+    "gpiod_request_config_free",
+    "gpiod_chip_request_lines",
+    "gpiod_line_request_get_value",
+    "gpiod_line_request_set_value",
+    "gpiod_line_request_read_edge_events",
+    "gpiod_line_request_wait_edge_events",
+    "gpiod_line_request_release",
+    "gpiod_edge_event_buffer_new",
+    "gpiod_edge_event_buffer_free",
+    "gpiod_edge_event_get_line_offset",
+    "gpiod_edge_event_get_event_type",
+)
+
+
+def has_libgpiod_v1_api(code: str) -> list[str]:
+    """Return list of v1-exclusive libgpiod symbols detected in ``code``.
+
+    Non-empty list means the code uses the deprecated 2017-era API. v2
+    symbols are NOT listed here even though both generations coexist in
+    libgpiod 2.x source — they're in ``_LIBGPIOD_V2_EXCLUSIVE``.
+    """
+    stripped = strip_comments(code)
+    return [api for api in _LIBGPIOD_V1_EXCLUSIVE if has_api_call(stripped, api)]
+
+
+def has_libgpiod_v2_api(code: str) -> list[str]:
+    """Return list of v2-exclusive libgpiod symbols detected in ``code``."""
+    stripped = strip_comments(code)
+    return [api for api in _LIBGPIOD_V2_EXCLUSIVE if has_api_call(stripped, api)]
+
+
+# sd-bus symbols — the modern Linux-only D-Bus client library shipped in
+# libsystemd. Official recommendation for systemd-based embedded Linux
+# since systemd 221 (2015).
+_SD_BUS_API_SYMBOLS = (
+    "sd_bus_open_system",
+    "sd_bus_open_user",
+    "sd_bus_open",
+    "sd_bus_default",
+    "sd_bus_default_system",
+    "sd_bus_default_user",
+    "sd_bus_request_name",
+    "sd_bus_release_name",
+    "sd_bus_add_object_vtable",
+    "sd_bus_add_object",
+    "sd_bus_process",
+    "sd_bus_wait",
+    "sd_bus_slot_unref",
+    "sd_bus_unref",
+    "sd_bus_flush_close_unref",
+    "sd_bus_reply_method_return",
+    "sd_bus_message_append",
+    "sd_bus_message_read",
+    "sd_bus_message_new_method_call",
+    "sd_bus_error_set",
+    "sd_bus_error_set_errno",
+    "sd_bus_error_free",
+)
+
+# libdbus symbols — the cross-platform, deprecated-for-Linux-only-daemons
+# reference D-Bus library. Officially discouraged by freedesktop.org
+# ("signing up for some pain"). TCs that require sd-bus must reject these.
+_LIBDBUS_API_SYMBOLS = (
+    "dbus_bus_get",
+    "dbus_bus_request_name",
+    "dbus_connection_open",
+    "dbus_connection_read_write_dispatch",
+    "dbus_connection_read_write",
+    "dbus_connection_send",
+    "dbus_connection_pop_message",
+    "dbus_message_new_method_call",
+    "dbus_message_new_method_return",
+    "dbus_message_iter_init",
+    "dbus_message_iter_append_basic",
+    "dbus_message_unref",
+    "dbus_error_init",
+    "dbus_error_free",
+    "dbus_error_is_set",
+)
+
+
+def has_sd_bus_api(code: str) -> list[str]:
+    """Return sd-bus symbols detected in ``code``."""
+    stripped = strip_comments(code)
+    return [api for api in _SD_BUS_API_SYMBOLS if has_api_call(stripped, api)]
+
+
+def has_libdbus_api(code: str) -> list[str]:
+    """Return libdbus symbols detected in ``code``.
+
+    False-positive trap: ``sd_bus_*`` and ``dbus_*`` share the substring
+    ``_bus_`` — word-boundary matching (``has_api_call``) handles this.
+    """
+    stripped = strip_comments(code)
+    return [api for api in _LIBDBUS_API_SYMBOLS if has_api_call(stripped, api)]
+
+
+# BPF SEC() macro flavours. Detecting the presence of SEC macros is the
+# cheapest way to confirm a file is a BPF program (vs a userspace loader).
+_BPF_SEC_PROGRAM_TYPES = (
+    "kprobe",
+    "kretprobe",
+    "tp",
+    "tracepoint",
+    "raw_tracepoint",
+    "fentry",
+    "fexit",
+    "xdp",
+    "cgroup_skb",
+    "cgroup_sock",
+    "perf_event",
+    "socket",
+    "lsm",
+    "iter",
+)
+
+
+def has_bpf_sec_macro(code: str) -> list[str]:
+    """Return list of BPF SEC program-type attachments detected.
+
+    Recognizes ``SEC("<type>/<attach>")`` forms. Also detects the special
+    non-program sections ``.maps`` and ``license`` separately.
+    """
+    stripped = strip_comments(code)
+    found: list[str] = []
+    for prog_type in _BPF_SEC_PROGRAM_TYPES:
+        if re.search(rf'SEC\(\s*"{re.escape(prog_type)}(?:/[^"]*)?"\s*\)', stripped):
+            found.append(prog_type)
+    # Special non-program sections.
+    if re.search(r'SEC\(\s*"\.maps"\s*\)', stripped):
+        found.append(".maps")
+    if re.search(r'SEC\(\s*"license"\s*\)', stripped):
+        found.append("license")
+    return found
+
+
+def has_bpf_core_read(code: str) -> bool:
+    """Whether the code uses any BPF CO-RE read macro variant."""
+    stripped = strip_comments(code)
+    return any(
+        has_api_call(stripped, macro)
+        for macro in (
+            "BPF_CORE_READ",
+            "BPF_CORE_READ_INTO",
+            "BPF_CORE_READ_STR_INTO",
+            "BPF_CORE_READ_USER",
+            "BPF_CORE_READ_USER_INTO",
+            "BPF_CORE_READ_USER_STR_INTO",
+        )
+    )

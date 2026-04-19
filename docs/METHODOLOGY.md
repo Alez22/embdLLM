@@ -8,13 +8,13 @@ EmbedEval is a benchmark for evaluating LLM capability in embedded firmware code
 
 | Metric | Value |
 |--------|-------|
-| **Total cases** | 248 |
-| **Categories** | 23 |
+| **Total cases** | 256 |
+| **Categories** | 24 |
 | **Platforms** | 6 (docker_only, esp_idf, native_sim, qemu_arm, stm32_hal, yocto_build) |
-| **Difficulty** | 29 easy, 103 medium, 116 hard |
-| **Private held-out** | 48 cases (19%) for contamination prevention |
+| **Difficulty** | 29 easy, 106 medium, 121 hard |
+| **Private held-out** | 48 cases (18%) for contamination prevention |
 | **Evaluation scenarios** | 2 (generation, bugfix) |
-| **Negatives (mutation tests)** | 59 cases, 410 must_fail mutations |
+| **Negatives (mutation tests)** | 67 cases, 506 must_fail mutations |
 
 ### Platform Distribution
 
@@ -40,6 +40,7 @@ EmbedEval is a benchmark for evaluating LLM capability in embedded firmware code
 | isr-concurrency | 0 | 3 | 10 | 13 |
 | kconfig | 2 | 4 | 4 | 10 |
 | linux-driver | 0 | 6 | 12 | 18 |
+| linux-userspace | 0 | 3 | 5 | 8 |
 | memory-opt | 1 | 5 | 6 | 12 |
 | networking | 1 | 7 | 4 | 12 |
 | ota | 1 | 4 | 7 | 12 |
@@ -360,6 +361,7 @@ The following table shows which evaluation layers apply to each category, based 
 | isr-concurrency | 9 | Partial (1/9 skip) | Yes | native_sim | |
 | kconfig | 8 | Yes | Yes | native_sim | Config fragments, not C code |
 | linux-driver | 8 | Yes | N/A | native_sim | docker_only platform |
+| linux-userspace | 8 | Partial (3/8 skip) | N/A | native_sim | Userspace: libgpiod, systemd, udev, spidev, sd-bus, eBPF |
 | memory-opt | 10 | Partial (5/10 skip) | Yes | native_sim | |
 | networking | 10 | Partial (4/10 skip) | Skip (4/10) | native_sim | No network on native_sim |
 | ota | 8 | Skip (6/8) | N/A | nrf52840dk | HW-specific OTA |

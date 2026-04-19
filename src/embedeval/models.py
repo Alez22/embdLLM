@@ -35,6 +35,7 @@ class CaseCategory(str, Enum):
     # Tier 3: Platform-specific
     YOCTO = "yocto"
     LINUX_DRIVER = "linux-driver"
+    LINUX_USERSPACE = "linux-userspace"
     MEMORY_OPT = "memory-opt"
 
 

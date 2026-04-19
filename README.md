@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue)]()
 [![Cases](https://img.shields.io/badge/cases-233-orange)]()
-[![Tests](https://img.shields.io/badge/tests-1270-green)]()
+[![Tests](https://img.shields.io/badge/tests-1338-green)]()
 
 **LLM Embedded Domain Knowledge Probe** — Do LLMs actually understand embedded firmware, or do they just pattern-match?
 
@@ -201,7 +201,7 @@ See [METHODOLOGY.md](docs/METHODOLOGY.md) for detailed architecture diagrams and
 
 ---
 
-## 23 Categories, 6 Platforms
+## 24 Categories, 6 Platforms
 
 ### Platform Coverage
 

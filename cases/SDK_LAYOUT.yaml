@@ -166,6 +166,22 @@ cases:
     sdk: embedded-linux
   linux-driver-016:
     sdk: embedded-linux
+  linux-userspace-001:
+    sdk: embedded-linux
+  linux-userspace-002:
+    sdk: embedded-linux
+  linux-userspace-003:
+    sdk: embedded-linux
+  linux-userspace-004:
+    sdk: embedded-linux
+  linux-userspace-005:
+    sdk: embedded-linux
+  linux-userspace-006:
+    sdk: embedded-linux
+  linux-userspace-007:
+    sdk: embedded-linux
+  linux-userspace-008:
+    sdk: embedded-linux
   memory-opt-001:
     sdk: zephyr
   memory-opt-002:
