@@ -224,28 +224,25 @@ def _diff_html(a: str, b: str, fromfile: str = "reference", tofile: str = "gener
 # Routes
 # ---------------------------------------------------------------------------
 
+_DIFFICULTIES = ["easy", "medium", "hard"]
+
+
 @app.get("/", response_class=HTMLResponse)
 def leaderboard() -> str:
-    """Leaderboard: rows=models, columns=cases."""
+    """Leaderboard: rows=models, columns=difficulty buckets (easy/medium/hard)."""
     results = _all_results()
 
     if not results:
         return _page("Leaderboard", "<div class='card'><p>No results found in results/. Run a benchmark first.</p></div>")
 
-    # Collect unique models and cases (insertion order = discovery order)
+    # Collect unique models (insertion order)
     models: list[str] = []
-    cases: list[str] = []
     seen_models: set[str] = set()
-    seen_cases: set[str] = set()
     for r in results:
         m = r.get("model", "")
-        c = r.get("case_id", "")
         if m and m not in seen_models:
             models.append(m)
             seen_models.add(m)
-        if c and c not in seen_cases:
-            cases.append(c)
-            seen_cases.add(c)
 
     # Build lookup: (case_id, model) → result (keep latest attempt)
     lookup: dict[tuple[str, str], dict] = {}
@@ -254,26 +251,48 @@ def leaderboard() -> str:
         if key not in lookup or r.get("attempt", 0) > lookup[key].get("attempt", 0):
             lookup[key] = r
 
-    # Per-model summary: passed/total across all known cases
-    model_summary: dict[str, dict] = {}
-    for model in models:
-        model_results = [lookup[(c, model)] for c in cases if (c, model) in lookup]
-        total = len(model_results)
-        passed = sum(1 for r in model_results if r.get("passed"))
+    # Map case_id → difficulty from metadata
+    case_difficulty: dict[str, str] = {}
+    for (case_id, _) in lookup:
+        if case_id not in case_difficulty:
+            meta = _find_metadata(case_id)
+            case_difficulty[case_id] = meta.get("difficulty", "unknown")
+
+    # Per-model stats: overall + per difficulty bucket
+    def _bucket_stats(model: str, difficulty: str) -> dict:
+        bucket = [
+            r for (cid, m), r in lookup.items()
+            if m == model and case_difficulty.get(cid) == difficulty
+        ]
+        total = len(bucket)
+        passed = sum(1 for r in bucket if r.get("passed"))
         pct = int(passed / total * 100) if total else 0
-        model_summary[model] = {"passed": passed, "total": total, "pct": pct}
+        return {"passed": passed, "total": total, "pct": pct}
 
-    # Sort models by pass rate descending
-    models = sorted(models, key=lambda m: model_summary[m]["pct"], reverse=True)
+    model_stats: dict[str, dict] = {}
+    for model in models:
+        all_results_for_model = [r for (_, m), r in lookup.items() if m == model]
+        total = len(all_results_for_model)
+        passed = sum(1 for r in all_results_for_model if r.get("passed"))
+        pct = int(passed / total * 100) if total else 0
+        model_stats[model] = {
+            "passed": passed, "total": total, "pct": pct,
+            "buckets": {d: _bucket_stats(model, d) for d in _DIFFICULTIES},
+        }
 
-    # Header: Model | Score | pass/total | <case columns>
-    header_cells = "<th>Model</th><th>Score</th><th>Passed</th>"
-    for case_id in cases:
-        header_cells += f"<th><a href='/case/{case_id}' style='color:#a0aec0'>{case_id}</a></th>"
+    # Sort models by overall pass rate descending
+    models = sorted(models, key=lambda m: model_stats[m]["pct"], reverse=True)
+
+    # Header
+    diff_headers = "".join(
+        f'<th style="text-align:center"><span class="badge badge-{d}">{d.capitalize()}</span></th>'
+        for d in _DIFFICULTIES
+    )
+    header_cells = f"<th>Model</th><th>Overall</th><th>Passed</th>{diff_headers}"
 
     rows = ""
     for model in models:
-        s = model_summary[model]
+        s = model_stats[model]
         short = model.split("/")[-1]
         score_cell = _score_bar(s["passed"] / s["total"] if s["total"] else 0)
         row = (
@@ -281,24 +300,23 @@ def leaderboard() -> str:
             f"<td>{score_cell}</td>"
             f"<td style='color:#a0aec0'>{s['passed']}/{s['total']}</td>"
         )
-        for case_id in cases:
-            result = lookup.get((case_id, model))
-            if result is None:
-                row += "<td class='cell-none'>—</td>"
-            elif result.get("passed"):
-                score = result.get("total_score", 1.0)
-                pct = int(score * 100)
-                row += f"<td class='cell-pass'><a href='/case/{case_id}/{model}' style='color:inherit'>{pct}%</a></td>"
+        for diff in _DIFFICULTIES:
+            b = s["buckets"][diff]
+            if b["total"] == 0:
+                row += "<td class='cell-none' style='text-align:center'>—</td>"
             else:
-                layer = result.get("failed_at_layer")
-                label = f"L{layer}" if layer is not None else "FAIL"
-                row += f"<td class='cell-fail'><a href='/case/{case_id}/{model}' style='color:inherit'>{label}</a></td>"
+                color_cls = "cell-pass" if b["pct"] >= 60 else "cell-fail"
+                row += f"<td class='{color_cls}'>{b['pct']}% <span style='font-weight:normal;font-size:0.75rem'>({b['passed']}/{b['total']})</span></td>"
         rows += f"<tr>{row}</tr>"
+
+    # Case count per difficulty for the subtitle
+    diff_counts = {d: sum(1 for v in case_difficulty.values() if v == d) for d in _DIFFICULTIES}
+    subtitle_parts = [f"{diff_counts[d]} {d}" for d in _DIFFICULTIES if diff_counts[d] > 0]
 
     body = f"""
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem">
   <h1>Leaderboard</h1>
-  <span style="color:#718096;font-size:0.85rem">{len(models)} models · {len(cases)} cases</span>
+  <span style="color:#718096;font-size:0.85rem">{len(models)} models · {sum(diff_counts.values())} cases ({", ".join(subtitle_parts)})</span>
 </div>
 <div class="card" style="padding:0;overflow:auto">
   <table>
