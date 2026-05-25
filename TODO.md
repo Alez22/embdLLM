@@ -9,8 +9,8 @@ Mark done with `[x]`. Add notes inline after `—`.
 
 Foundation required before any NXP cases can be validated.
 
-- [ ] **Fork embedeval upstream** and set up this repo as the working base.
-- [ ] **Add `src/embedeval/check_utils_nxp.py`** — helpers specific to MCUXpresso SDK:
+- [x] **Fork embedeval upstream** and set up this repo as the working base.
+- [x] **Add `src/embedeval/check_utils_nxp.py`** — helpers specific to MCUXpresso SDK:
   - `no_nxp_hallucination(code)` → list of foreign APIs found (STM32 HAL, Zephyr, Arduino)
   - `has_clock_gate_before(code, peripheral)` → bool, checks ordering
   - `has_pinmux_before_init(code)` → bool
@@ -23,8 +23,8 @@ Foundation required before any NXP cases can be validated.
   - Add: MCUXpresso SDK headers (CMSIS + fsl_* drivers for MCXC144)
   - Target: compile a minimal bare-metal main.c with `-mcpu=cortex-m0plus -mthumb`
   - Dockerfile at `Dockerfile.nxp`
-- [ ] **Add `nxp_bare_metal` platform to `src/embedeval/models.py`** (Platform enum).
-- [ ] **Write first reference case `nxp-i2c-001`** end-to-end and verify it passes validate.
+- [x] **Add `nxp_bare_metal` platform to `src/embedeval/models.py`** (Platform enum).
+- [x] **Write first reference case `nxp-mcxc-i2c-001`** end-to-end and verify it passes validate.
 
 ---
 
@@ -35,7 +35,7 @@ Each prompt must NOT mention safety requirements — implicit knowledge only.
 
 - [ ] `nxp-gpio-001` — GPIO output init + toggle. Implicit: clock gate, pin mux order.
 - [ ] `nxp-gpio-002` — GPIO input with edge IRQ. Implicit: NVIC enable, volatile flag, ISR naming.
-- [ ] `nxp-i2c-001` — I2C master register read. Implicit: clock, pin mux, address shift, error check.
+- [x] `nxp-i2c-001` — I2C master register read. Implicit: clock, pin mux, address shift, error check. — done as `nxp-mcxc-i2c-001`
 - [ ] `nxp-i2c-002` — I2C master write + read sequence. Implicit: repeated start, stop condition.
 - [ ] `nxp-spi-001` — SPI master transfer with manual CS. Implicit: CS assert order, clock polarity.
 - [ ] `nxp-uart-001` — UART TX blocking. Implicit: clock enable, baud config, FIFO flush.
@@ -102,14 +102,16 @@ codice generato vs reference, check pass/fail, leaderboard visiva, storico run.
 **Fonte dati:** legge direttamente i JSON esistenti in `results/` e i file
 `reference/main.c` + `metadata.yaml` dei casi — nessun DB aggiuntivo.
 
-- [ ] **Aggiungere `fastapi` e `uvicorn`** a `pyproject.toml`.
-- [ ] **`src/embedeval/dashboard.py`** — server FastAPI:
+- [x] **Aggiungere `fastapi` e `uvicorn`** a `pyproject.toml`.
+- [x] **`src/embedeval/dashboard.py`** — server FastAPI:
   - `GET /` → leaderboard: tabella modelli × casi, celle colorate pass/fail/non-runnato
   - `GET /case/<case_id>/<model>` → dettaglio: check list + diff side-by-side generato vs reference
-    con selettore attempt se ne esistono più di uno
-  - `GET /history` → lista run ordinata per data, click filtra la leaderboard
-  - Syntax highlight del C con Pygments (già installato)
-- [ ] **Aggiungere `dashboard` subcommand a `src/embedeval/cli.py`**.
+  - `GET /history` → lista run ordinata per data con Status e Tokens out; click apre dettaglio
+  - `GET /history/<run_id>` → per-run detail: checks pass/fail + diff side-by-side per ogni caso
+  - `GET /cases` → elenco casi con sdk, difficulty, category, tier, tags
+  - `GET /cases/<id>` → prompt e reference editabili (POST per salvare con conferma)
+  - `GET /cases/<id>/checks` → static.py e behavior.py read-only con syntax highlight (Python ok, C noto issue)
+- [x] **Aggiungere `dashboard` subcommand a `src/embedeval/cli.py`**.
 - [ ] **Verificare che con `--attempts N` tutti gli attempt vengano salvati**
   come file separati in `results/runs/*/details/` (bug osservato: con n=3
   viene scritto un solo file).
@@ -138,9 +140,12 @@ codice generato vs reference, check pass/fail, leaderboard visiva, storico run.
 
 ## Phase 6 — Cloud Model Integration
 
-- [ ] **Verify Groq provider** works end-to-end with embedeval LiteLLM client:
-  - `groq/llama-3.3-70b-versatile`
-  - `groq/qwen-qwq-32b`
+- [x] **Verify Groq provider** works end-to-end with embedeval LiteLLM client:
+  - `groq/llama-3.3-70b-versatile` ✓
+  - `groq/qwen/qwen3-32b` ✓ (con `--no-think` per il limite TPM)
+  - `groq/openai/gpt-oss-20b` ✓
+  - `groq/openai/gpt-oss-120b` ✓
+  - `groq/meta-llama/llama-4-scout-17b-16e-instruct` ✓
 - [ ] **Verify OpenRouter provider**:
   - `openrouter/mistralai/devstral-small`
   - `openrouter/qwen/qwen3-coder`
@@ -150,7 +155,7 @@ codice generato vs reference, check pass/fail, leaderboard visiva, storico run.
   - `anthropic/claude-sonnet-4-20250514` (reference ceiling)
   - `groq/llama-3.3-70b-versatile`
   - One Qwen3 model
-- [ ] **Publish initial leaderboard** in `results/LEADERBOARD.md`.
+- [x] **Publish initial leaderboard** in `results/LEADERBOARD.md`. — aggiornato ad ogni run
 
 ---
 
@@ -367,12 +372,12 @@ Miglioramenti noti alla dashboard (`src/embedeval/dashboard.py`) non ancora riso
   oppure trovare la URL CDN corretta che include tutti i language pack.
 - [ ] **Editor checks** — i file `checks/static.py` e `checks/behavior.py` sono oggi
   read-only. Aggiungere la possibilità di editarli dalla dashboard (POST `/cases/<id>/checks/<file>`).
-- [ ] **Selettore attempt** nella pagina detail `/case/<id>/<model>` — oggi viene mostrato
+- [ ] **Selettore attempt** nella pagina detail `/history/<run_id>` — oggi viene mostrato
   sempre l'attempt più recente. Con `--attempts N > 1` sarebbe utile poter scegliere
   quale attempt visualizzare.
 - [ ] **Filtri leaderboard** — filtrare per SDK, categoria o tier senza ricaricare la pagina.
 - [ ] **Link diretto** dalla leaderboard alla pagina caso (`/cases/<id>`) oltre che
-  al dettaglio run (`/case/<id>/<model>`).
+  al dettaglio run.
 
 ---
 
@@ -383,3 +388,9 @@ Miglioramenti noti alla dashboard (`src/embedeval/dashboard.py`) non ancora riso
   verify the model refuses or flags the inconsistency instead of fabricating register addresses.
 - Sensitivity analysis: run same case with 5 prompt variants, measure score variance.
 - Contribute NXP cases upstream to embedeval via PR.
+- Fix retry delay per modelli thinking (Qwen3): il `_parse_retry_after` parsifica
+  correttamente "try again in Xs" ma non gestisce il formato "350ms" — aggiungere
+  il parsing dei millisecondi.
+- Indagare perché `gpt-oss-20b` (63%) batte `gpt-oss-120b` (45%) su questo
+  benchmark — possibile che il modello più grande sia più prolisso e triggeri
+  check negativi (es. `no_zephyr_apis`, `no_cross_platform_hallucination`).
