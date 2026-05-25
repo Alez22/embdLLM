@@ -162,6 +162,8 @@ class LLMResponse(BaseModel):
     token_usage: TokenUsage
     cost_usd: float = Field(ge=0.0)
     duration_seconds: float = Field(ge=0.0)
+    # Non-empty when the model emitted a <think>...</think> block (reasoning models).
+    thinking_content: str = ""
 
 
 class CheckDetail(BaseModel):
@@ -205,6 +207,8 @@ class EvalResult(BaseModel):
     cost_usd: float = Field(ge=0.0)
     tier: CaseTier | None = None
     reasoning_types: list[ReasoningType] = Field(default_factory=list)
+    # True when the model emitted a <think> block — enables thinking vs non-thinking comparison.
+    used_thinking: bool = False
 
 
 class PerCheckStat(BaseModel):

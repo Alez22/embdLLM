@@ -334,6 +334,7 @@ def _run_single_case(
     result.sdk = meta.sdk
     result.tier = meta.tier
     result.reasoning_types = meta.reasoning_types
+    result.used_thinking = bool(llm_response.thinking_content)
 
     # Compiler feedback loop: retry with error context on early failures
     if (

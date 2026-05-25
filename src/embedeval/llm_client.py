@@ -183,9 +183,10 @@ def _call_claude_code(
         # Fall back to raw stdout
         text_content = result.stdout
 
+    cleaned, thinking_content = _strip_thinking(text_content)
     return LLMResponse(
         model=model,
-        generated_code=_extract_code(text_content),
+        generated_code=_extract_code(cleaned),
         token_usage=TokenUsage(
             input_tokens=input_tokens,
             output_tokens=output_tokens,
@@ -193,6 +194,7 @@ def _call_claude_code(
         ),
         cost_usd=cost_usd,
         duration_seconds=elapsed,
+        thinking_content=thinking_content,
     )
 
 
@@ -221,7 +223,9 @@ def _call_litellm(
             )
             elapsed = time.monotonic() - start
 
-            content: str = _extract_code(response.choices[0].message.content or "")
+            raw_content = response.choices[0].message.content or ""
+            cleaned, thinking_content = _strip_thinking(raw_content)
+            content: str = _extract_code(cleaned)
             usage = response.usage
             input_tokens = usage.prompt_tokens if usage else 0
             output_tokens = usage.completion_tokens if usage else 0
@@ -242,6 +246,7 @@ def _call_litellm(
                 ),
                 cost_usd=float(cost),
                 duration_seconds=elapsed,
+                thinking_content=thinking_content,
             )
         except (KeyboardInterrupt, SystemExit):
             raise
@@ -290,6 +295,24 @@ def _mock_response(full_prompt: str = "") -> LLMResponse:
         cost_usd=0.0,
         duration_seconds=0.01,
     )
+
+
+_THINK_RE = re.compile(r"<think>(.*?)</think>", re.DOTALL | re.IGNORECASE)
+
+
+def _strip_thinking(text: str) -> tuple[str, str]:
+    """Remove <think>...</think> blocks from model output.
+
+    Returns (cleaned_text, thinking_content). thinking_content is the
+    concatenated content of all think blocks, empty string if none found.
+    Reasoning models (Qwen3, DeepSeek-R1, QwQ) emit these blocks before
+    the actual code — leaving them in causes the prose-detector to retry
+    and burns extra tokens on rate-limited providers.
+    """
+    blocks = _THINK_RE.findall(text)
+    thinking_content = "\n".join(b.strip() for b in blocks)
+    cleaned = _THINK_RE.sub("", text).strip()
+    return cleaned, thinking_content
 
 
 _C_FAMILY_LANGS = {"c", "cpp", "c++", "cc", "h", "hpp", "objective-c"}
