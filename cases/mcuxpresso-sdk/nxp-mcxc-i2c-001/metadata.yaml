@@ -1,0 +1,24 @@
+id: nxp-mcxc-i2c-001
+category: spi-i2c
+difficulty: medium
+title: NXP MCXC144 I2C Master Register Read
+description: Configure I2C0 at 100kHz and read a WHO_AM_I register from an I2C sensor on MCXC144
+tags:
+- nxp
+- bare-metal
+- i2c
+- mcuxpresso
+- mcxc144
+- cortex-m0plus
+platform: nxp_bare_metal
+sdk: mcuxpresso-sdk
+estimated_tokens: 450
+sdk_version: SDK2_x_MCXC144
+visibility: public
+created_date: '2026-05-25'
+tier: core
+l1_skip: true
+reasoning_types:
+- system_reasoning
+- api_recall
+- rule_application

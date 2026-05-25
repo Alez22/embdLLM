@@ -1,29 +1,58 @@
 # NXP MCUXpresso SDK case registry.
 # Maps each nxp-bare-metal case-id to its sdk bucket.
+# Naming convention:
+#   nxp-mcxc-<peripheral>-<n>  →  MCXC144 (Cortex-M0+)
+#   nxp-rt-<peripheral>-<n>    →  RT1170  (Cortex-M7 + M4)
 # Update this file whenever a new case is added under cases/nxp-bare-metal/.
 cases:
-  nxp-gpio-001:
+  # --- MCXC144 (Cortex-M0+) ---
+  nxp-mcxc-gpio-001:
     sdk: mcuxpresso-sdk
-  nxp-gpio-002:
+  nxp-mcxc-gpio-002:
     sdk: mcuxpresso-sdk
-  nxp-i2c-001:
+  nxp-mcxc-i2c-001:
     sdk: mcuxpresso-sdk
-  nxp-i2c-002:
+  nxp-mcxc-i2c-002:
     sdk: mcuxpresso-sdk
-  nxp-spi-001:
+  nxp-mcxc-spi-001:
     sdk: mcuxpresso-sdk
-  nxp-uart-001:
+  nxp-mcxc-uart-001:
     sdk: mcuxpresso-sdk
-  nxp-uart-002:
+  nxp-mcxc-uart-002:
     sdk: mcuxpresso-sdk
-  nxp-timer-001:
+  nxp-mcxc-timer-001:
     sdk: mcuxpresso-sdk
-  nxp-isr-001:
+  nxp-mcxc-isr-001:
     sdk: mcuxpresso-sdk
-  nxp-flash-001:
+  nxp-mcxc-flash-001:
     sdk: mcuxpresso-sdk
-  nxp-flash-002:
+  nxp-mcxc-flash-002:
     sdk: mcuxpresso-sdk
-  nxp-watchdog-001:
+  nxp-mcxc-watchdog-001:
+    sdk: mcuxpresso-sdk
+  # --- RT1170 (Cortex-M7 + M4) ---
+  nxp-rt-gpio-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt-gpio-002:
+    sdk: mcuxpresso-sdk
+  nxp-rt-i2c-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt-i2c-002:
+    sdk: mcuxpresso-sdk
+  nxp-rt-spi-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt-uart-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt-uart-002:
+    sdk: mcuxpresso-sdk
+  nxp-rt-timer-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt-isr-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt-dma-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt-flash-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt-watchdog-001:
     sdk: mcuxpresso-sdk
 version: 1
