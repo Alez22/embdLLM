@@ -7233,12 +7233,12 @@
           "header_fsl_clock_h",
           "i2c_master_init_called"
         ],
-        "case_git_hash": "924f5f6c29871b63",
-        "tested_at": "2026-05-25T21:54:36.598772+00:00",
+        "case_git_hash": "6f3b2e3cfdd21011",
+        "tested_at": "2026-05-25T23:04:53.060287+00:00",
         "pass_at_1": 0.0,
         "attempts": 1,
         "input_tokens": 168,
-        "output_tokens": 413,
+        "output_tokens": 434,
         "cost_usd": 0.0
       },
       "esp-gpio-001": {
@@ -7394,6 +7394,198 @@
         "attempts": 1,
         "input_tokens": 146,
         "output_tokens": 1253,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-flash-001": {
+        "case_id": "nxp-mcxc-flash-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "flash_verify_program_called"
+        ],
+        "case_git_hash": "e586139acdd85e77",
+        "tested_at": "2026-05-25T23:04:53.060287+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 265,
+        "output_tokens": 719,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-flash-002": {
+        "case_id": "nxp-mcxc-flash-002",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "full_flash_sequence_present"
+        ],
+        "case_git_hash": "812b64ceb1a08c52",
+        "tested_at": "2026-05-25T23:04:53.060287+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 235,
+        "output_tokens": 948,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-gpio-001": {
+        "case_id": "nxp-mcxc-gpio-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "header_fsl_port_h",
+          "header_fsl_clock_h",
+          "gpio_toggle_called"
+        ],
+        "case_git_hash": "198c38d5e37a3eaf",
+        "tested_at": "2026-05-25T23:04:53.060287+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 132,
+        "output_tokens": 179,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-gpio-002": {
+        "case_id": "nxp-mcxc-gpio-002",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "header_fsl_clock_h",
+          "pin_interrupt_configured",
+          "interrupt_flag_cleared",
+          "isr_handler_defined"
+        ],
+        "case_git_hash": "d29bbb402e3bdeb5",
+        "tested_at": "2026-05-25T23:04:53.060287+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 170,
+        "output_tokens": 511,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-i2c-002": {
+        "case_id": "nxp-mcxc-i2c-002",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "header_fsl_port_h",
+          "header_fsl_clock_h",
+          "both_write_and_read_transfers",
+          "two_separate_transfers"
+        ],
+        "case_git_hash": "3bfcc007d7d6de73",
+        "tested_at": "2026-05-25T23:04:53.060287+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 221,
+        "output_tokens": 579,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-isr-001": {
+        "case_id": "nxp-mcxc-isr-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "header_fsl_clock_h",
+          "pit_isr_defined",
+          "gpio_pin_read_in_code"
+        ],
+        "case_git_hash": "531b58fe6887c85e",
+        "tested_at": "2026-05-25T23:04:53.060287+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 204,
+        "output_tokens": 616,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-spi-001": {
+        "case_id": "nxp-mcxc-spi-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "header_fsl_port_h",
+          "header_fsl_clock_h"
+        ],
+        "case_git_hash": "686f5cacfab6c935",
+        "tested_at": "2026-05-25T23:04:53.060287+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 206,
+        "output_tokens": 517,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-timer-001": {
+        "case_id": "nxp-mcxc-timer-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "header_fsl_clock_h",
+          "pit_timer_started",
+          "pit_isr_defined"
+        ],
+        "case_git_hash": "2d9b8eb2bde459b0",
+        "tested_at": "2026-05-25T23:04:53.060287+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 170,
+        "output_tokens": 383,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-uart-001": {
+        "case_id": "nxp-mcxc-uart-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "header_fsl_port_h",
+          "header_fsl_clock_h"
+        ],
+        "case_git_hash": "c18d6d94a6d5f886",
+        "tested_at": "2026-05-25T23:04:53.060287+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 159,
+        "output_tokens": 334,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-uart-002": {
+        "case_id": "nxp-mcxc-uart-002",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "header_fsl_port_h",
+          "header_fsl_clock_h",
+          "uart_isr_handler_defined"
+        ],
+        "case_git_hash": "f37affd6a0c66318",
+        "tested_at": "2026-05-25T23:04:53.060287+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 195,
+        "output_tokens": 608,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-watchdog-001": {
+        "case_id": "nxp-mcxc-watchdog-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "cop_refresh_called"
+        ],
+        "case_git_hash": "7fb0e8e51dc21ceb",
+        "tested_at": "2026-05-25T23:04:53.060287+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 168,
+        "output_tokens": 176,
         "cost_usd": 0.0
       }
     },
@@ -7578,17 +7770,16 @@
         "passed": false,
         "failed_at_layer": 0,
         "failed_checks": [
-          "header_fsl_i2c_h",
           "header_fsl_port_h",
           "header_fsl_clock_h",
           "i2c_master_init_called",
           "i2c_blocking_transfer_used"
         ],
-        "case_git_hash": "924f5f6c29871b63",
-        "tested_at": "2026-05-25T21:58:43.392627+00:00",
+        "case_git_hash": "6f3b2e3cfdd21011",
+        "tested_at": "2026-05-25T23:09:33.746493+00:00",
         "pass_at_1": 0.0,
         "attempts": 1,
-        "input_tokens": 239,
+        "input_tokens": 207,
         "output_tokens": 2048,
         "cost_usd": 0.0
       },
@@ -7739,6 +7930,205 @@
         "input_tokens": 182,
         "output_tokens": 2048,
         "cost_usd": 0.0
+      },
+      "nxp-mcxc-flash-001": {
+        "case_id": "nxp-mcxc-flash-001",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "flash_init_called",
+          "flash_erase_sector_called",
+          "flash_program_called",
+          "flash_verify_program_called"
+        ],
+        "case_git_hash": "e586139acdd85e77",
+        "tested_at": "2026-05-25T23:09:33.746493+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 303,
+        "output_tokens": 2048,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-flash-002": {
+        "case_id": "nxp-mcxc-flash-002",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "crc_function_implemented",
+          "full_flash_sequence_present"
+        ],
+        "case_git_hash": "812b64ceb1a08c52",
+        "tested_at": "2026-05-25T23:09:33.746493+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 274,
+        "output_tokens": 2048,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-gpio-001": {
+        "case_id": "nxp-mcxc-gpio-001",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "198c38d5e37a3eaf",
+        "tested_at": "2026-05-25T23:09:33.746493+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 170,
+        "output_tokens": 992,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-gpio-002": {
+        "case_id": "nxp-mcxc-gpio-002",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "header_fsl_clock_h",
+          "interrupt_flag_cleared"
+        ],
+        "case_git_hash": "d29bbb402e3bdeb5",
+        "tested_at": "2026-05-25T23:09:33.746493+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 208,
+        "output_tokens": 2048,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-i2c-002": {
+        "case_id": "nxp-mcxc-i2c-002",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "header_fsl_port_h",
+          "i2c_master_init_called",
+          "both_write_and_read_transfers",
+          "two_separate_transfers"
+        ],
+        "case_git_hash": "3bfcc007d7d6de73",
+        "tested_at": "2026-05-25T23:09:33.746493+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 260,
+        "output_tokens": 2048,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-isr-001": {
+        "case_id": "nxp-mcxc-isr-001",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "pit_isr_defined",
+          "volatile_shared_data",
+          "gpio_pin_read_in_code"
+        ],
+        "case_git_hash": "531b58fe6887c85e",
+        "tested_at": "2026-05-25T23:09:33.746493+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 242,
+        "output_tokens": 2048,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-spi-001": {
+        "case_id": "nxp-mcxc-spi-001",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "header_fsl_spi_h",
+          "header_fsl_gpio_h",
+          "header_fsl_port_h",
+          "header_fsl_clock_h",
+          "spi_master_init_called",
+          "spi_blocking_transfer_used"
+        ],
+        "case_git_hash": "686f5cacfab6c935",
+        "tested_at": "2026-05-25T23:09:33.746493+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 275,
+        "output_tokens": 2048,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-timer-001": {
+        "case_id": "nxp-mcxc-timer-001",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "header_fsl_pit_h",
+          "header_fsl_clock_h",
+          "pit_init_called",
+          "pit_period_set",
+          "pit_timer_started",
+          "pit_isr_defined"
+        ],
+        "case_git_hash": "2d9b8eb2bde459b0",
+        "tested_at": "2026-05-25T23:09:33.746493+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 239,
+        "output_tokens": 2048,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-uart-001": {
+        "case_id": "nxp-mcxc-uart-001",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": false,
+        "failed_at_layer": 3,
+        "failed_checks": [
+          "uart_tx_enabled_in_config"
+        ],
+        "case_git_hash": "c18d6d94a6d5f886",
+        "tested_at": "2026-05-25T23:09:33.746493+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 228,
+        "output_tokens": 1618,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-uart-002": {
+        "case_id": "nxp-mcxc-uart-002",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "header_fsl_uart_h",
+          "header_fsl_port_h",
+          "header_fsl_clock_h",
+          "uart_rx_interrupt_enabled",
+          "uart_isr_handler_defined",
+          "ring_buffer_array_declared"
+        ],
+        "case_git_hash": "f37affd6a0c66318",
+        "tested_at": "2026-05-25T23:09:33.746493+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 263,
+        "output_tokens": 2048,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-watchdog-001": {
+        "case_id": "nxp-mcxc-watchdog-001",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "cop_refresh_called"
+        ],
+        "case_git_hash": "7fb0e8e51dc21ceb",
+        "tested_at": "2026-05-25T23:09:33.746493+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 206,
+        "output_tokens": 1542,
+        "cost_usd": 0.0
       }
     },
     "groq/openai/gpt-oss-120b": {
@@ -7748,12 +8138,12 @@
         "passed": true,
         "failed_at_layer": null,
         "failed_checks": [],
-        "case_git_hash": "924f5f6c29871b63",
-        "tested_at": "2026-05-25T21:53:51.750639+00:00",
+        "case_git_hash": "6f3b2e3cfdd21011",
+        "tested_at": "2026-05-25T23:08:19.515779+00:00",
         "pass_at_1": 0.0,
         "attempts": 1,
         "input_tokens": 207,
-        "output_tokens": 1554,
+        "output_tokens": 2529,
         "cost_usd": 0.0
       },
       "esp-gpio-001": {
@@ -7909,6 +8299,186 @@
         "attempts": 1,
         "input_tokens": 182,
         "output_tokens": 2080,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-flash-001": {
+        "case_id": "nxp-mcxc-flash-001",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "flash_init_called",
+          "flash_erase_sector_called",
+          "flash_program_called",
+          "flash_verify_program_called"
+        ],
+        "case_git_hash": "e586139acdd85e77",
+        "tested_at": "2026-05-25T23:08:19.515779+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 303,
+        "output_tokens": 2502,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-flash-002": {
+        "case_id": "nxp-mcxc-flash-002",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "two_flash_slots_defined",
+          "full_flash_sequence_present"
+        ],
+        "case_git_hash": "812b64ceb1a08c52",
+        "tested_at": "2026-05-25T23:08:19.515779+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 274,
+        "output_tokens": 3072,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-gpio-001": {
+        "case_id": "nxp-mcxc-gpio-001",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "198c38d5e37a3eaf",
+        "tested_at": "2026-05-25T23:08:19.515779+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 170,
+        "output_tokens": 951,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-gpio-002": {
+        "case_id": "nxp-mcxc-gpio-002",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "interrupt_flag_cleared"
+        ],
+        "case_git_hash": "d29bbb402e3bdeb5",
+        "tested_at": "2026-05-25T23:08:19.515779+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 208,
+        "output_tokens": 1315,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-i2c-002": {
+        "case_id": "nxp-mcxc-i2c-002",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "3bfcc007d7d6de73",
+        "tested_at": "2026-05-25T23:08:19.515779+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 260,
+        "output_tokens": 2481,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-isr-001": {
+        "case_id": "nxp-mcxc-isr-001",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": false,
+        "failed_at_layer": 3,
+        "failed_checks": [
+          "clock_gate_before_gpio_init"
+        ],
+        "case_git_hash": "531b58fe6887c85e",
+        "tested_at": "2026-05-25T23:08:19.515779+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 242,
+        "output_tokens": 1752,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-spi-001": {
+        "case_id": "nxp-mcxc-spi-001",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": false,
+        "failed_at_layer": 3,
+        "failed_checks": [
+          "cs_asserted_before_transfer",
+          "cs_deasserted_after_transfer",
+          "cs_idle_high_initial_state"
+        ],
+        "case_git_hash": "686f5cacfab6c935",
+        "tested_at": "2026-05-25T23:08:19.515779+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 243,
+        "output_tokens": 1682,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-timer-001": {
+        "case_id": "nxp-mcxc-timer-001",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "pit_isr_defined"
+        ],
+        "case_git_hash": "2d9b8eb2bde459b0",
+        "tested_at": "2026-05-25T23:08:19.515779+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 207,
+        "output_tokens": 1829,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-uart-001": {
+        "case_id": "nxp-mcxc-uart-001",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "header_fsl_clock_h"
+        ],
+        "case_git_hash": "c18d6d94a6d5f886",
+        "tested_at": "2026-05-25T23:08:19.515779+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 196,
+        "output_tokens": 1518,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-uart-002": {
+        "case_id": "nxp-mcxc-uart-002",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": false,
+        "failed_at_layer": 3,
+        "failed_checks": [
+          "ring_buffer_volatile",
+          "ring_buffer_indices_volatile"
+        ],
+        "case_git_hash": "f37affd6a0c66318",
+        "tested_at": "2026-05-25T23:08:19.515779+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 231,
+        "output_tokens": 2281,
+        "cost_usd": 0.0
+      },
+      "nxp-mcxc-watchdog-001": {
+        "case_id": "nxp-mcxc-watchdog-001",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": false,
+        "failed_at_layer": 3,
+        "failed_checks": [
+          "long_timeout_configured",
+          "cop_refresh_inside_main_loop"
+        ],
+        "case_git_hash": "7fb0e8e51dc21ceb",
+        "tested_at": "2026-05-25T23:08:19.515779+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 206,
+        "output_tokens": 968,
         "cost_usd": 0.0
       }
     },

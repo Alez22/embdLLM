@@ -398,5 +398,29 @@
     "passed": 7,
     "failed": 4,
     "pass_at_1": 0.6363636363636364
+  },
+  {
+    "timestamp": "2026-05-25",
+    "model": "groq/llama-3.3-70b-versatile",
+    "total": 12,
+    "passed": 0,
+    "failed": 12,
+    "pass_at_1": 0.0
+  },
+  {
+    "timestamp": "2026-05-25",
+    "model": "groq/openai/gpt-oss-120b",
+    "total": 12,
+    "passed": 3,
+    "failed": 9,
+    "pass_at_1": 0.25
+  },
+  {
+    "timestamp": "2026-05-25",
+    "model": "groq/openai/gpt-oss-20b",
+    "total": 12,
+    "passed": 1,
+    "failed": 11,
+    "pass_at_1": 0.08333333333333333
   }
 ]

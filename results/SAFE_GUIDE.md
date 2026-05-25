@@ -2,7 +2,7 @@
 
 *Auto-generated from benchmark results. Use this to decide when LLM-generated code needs human review.*
 
-**Last updated:** 2026-05-25 21:58 UTC
+**Last updated:** 2026-05-25 23:09 UTC
 
 ## Models Tested
 
@@ -67,26 +67,26 @@
 
 | Pattern | Failures | What to Check |
 |---------|----------|---------------|
-| `header_fsl_clock_h` | 11 | Review LLM output against hardware/RTOS requirements |
-| `header_fsl_port_h` | 8 | Review LLM output against hardware/RTOS requirements |
-| `i2c_blocking_transfer_used` | 8 | Review LLM output against hardware/RTOS requirements |
-| `i2c_master_init_called` | 7 | Review LLM output against hardware/RTOS requirements |
+| `header_fsl_clock_h` | 26 | Review LLM output against hardware/RTOS requirements |
+| `header_fsl_port_h` | 18 | Review LLM output against hardware/RTOS requirements |
+| `i2c_master_init_called` | 10 | Review LLM output against hardware/RTOS requirements |
+| `i2c_blocking_transfer_used` | 9 | Review LLM output against hardware/RTOS requirements |
 | `i2c_clock_enabled` | 5 | Review LLM output against hardware/RTOS requirements |
 | `i2c_master_header` | 5 | Review LLM output against hardware/RTOS requirements |
 | `i2c_master_new_api` | 5 | Review LLM output against hardware/RTOS requirements |
 | `no_legacy_i2c_driver` | 5 | Review LLM output against hardware/RTOS requirements |
+| `pit_isr_defined` | 5 | Review LLM output against hardware/RTOS requirements |
 | `uart_clock_enabled` | 3 | Review LLM output against hardware/RTOS requirements |
 | `spi_clock_enabled` | 3 | Review LLM output against hardware/RTOS requirements |
+| `flash_verify_program_called` | 3 | Review LLM output against hardware/RTOS requirements |
+| `interrupt_flag_cleared` | 3 | Review LLM output against hardware/RTOS requirements |
+| `full_flash_sequence_present` | 3 | Review LLM output against hardware/RTOS requirements |
 | `hal_i2c_mem_read_used` | 3 | Review LLM output against hardware/RTOS requirements |
 | `header_fsl_i2c_h` | 2 | Review LLM output against hardware/RTOS requirements |
 | `event_handler_registered` | 2 | Review LLM output against hardware/RTOS requirements |
 | `no_zephyr_apis` | 2 | Review LLM output against hardware/RTOS requirements |
-| `stm32_hal_header_included` | 2 | Review LLM output against hardware/RTOS requirements |
-| `different_task_priorities` | 1 | Review LLM output against hardware/RTOS requirements |
-| `gpio_config_used` | 1 | Review LLM output against hardware/RTOS requirements |
-| `llm_call` | 1 | Review LLM output against hardware/RTOS requirements |
-| `dma_channel_specified` | 1 | Review LLM output against hardware/RTOS requirements |
-| `uart_clock_before_init` | 1 | Review LLM output against hardware/RTOS requirements |
+| `flash_init_called` | 2 | Review LLM output against hardware/RTOS requirements |
+| `flash_erase_sector_called` | 2 | Review LLM output against hardware/RTOS requirements |
 
 ## Practical Recommendations
 

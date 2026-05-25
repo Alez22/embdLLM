@@ -731,5 +731,11 @@
   "scenario": "generation",
   "temperature": 0.0,
   "n_samples_per_case": 1,
-  "n_runs": 1
+  "n_runs": 1,
+  "run_timestamp": "2026-05-25",
+  "model": "groq/openai/gpt-oss-20b",
+  "total_results": 12,
+  "passed": 1,
+  "failed": 11,
+  "run_id": "nxp-phase2"
 }
