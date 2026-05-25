@@ -662,6 +662,7 @@ def generate_run_archive(
     output_base: Path,
     model: str,
     run_id: str | None = None,
+    no_think: bool = False,
 ) -> Path:
     """Save detailed per-case results and summary to a timestamped run directory.
 
@@ -672,6 +673,8 @@ def generate_run_archive(
             `runs/2026-04-11_<model>/`. When provided, the archive goes
             to `runs/<date>_<model>_<run_id>/`. The id is sanitized to
             `[A-Za-z0-9._-]` to keep it filesystem-safe.
+        no_think: When True, appends `_no_think` to the directory name so
+            thinking and non-thinking runs are distinguishable in the history.
 
     Returns the run directory path.
     """
@@ -683,6 +686,8 @@ def generate_run_archive(
         safe_run_id = _sanitize_run_id(run_id)
         if safe_run_id:
             dir_name = f"{dir_name}_{safe_run_id}"
+    if no_think:
+        dir_name = f"{dir_name}_no_think"
     run_dir = output_base / "runs" / dir_name
     details_dir = run_dir / "details"
     details_dir.mkdir(parents=True, exist_ok=True)
