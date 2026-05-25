@@ -226,10 +226,13 @@ def _diff_html(a: str, b: str, fromfile: str = "reference", tofile: str = "gener
 
 @app.get("/", response_class=HTMLResponse)
 def leaderboard() -> str:
-    """Leaderboard: models × cases grid."""
+    """Leaderboard: rows=models, columns=cases."""
     results = _all_results()
 
-    # Collect unique models and cases
+    if not results:
+        return _page("Leaderboard", "<div class='card'><p>No results found in results/. Run a benchmark first.</p></div>")
+
+    # Collect unique models and cases (insertion order = discovery order)
     models: list[str] = []
     cases: list[str] = []
     seen_models: set[str] = set()
@@ -244,41 +247,41 @@ def leaderboard() -> str:
             cases.append(c)
             seen_cases.add(c)
 
-    if not results:
-        return _page("Leaderboard", "<div class='card'><p>No results found in results/. Run a benchmark first.</p></div>")
-
-    # Build lookup: (case_id, model) → result
+    # Build lookup: (case_id, model) → result (keep latest attempt)
     lookup: dict[tuple[str, str], dict] = {}
     for r in results:
         key = (r.get("case_id", ""), r.get("model", ""))
-        # Keep the latest attempt
         if key not in lookup or r.get("attempt", 0) > lookup[key].get("attempt", 0):
             lookup[key] = r
 
-    # Per-model summary
+    # Per-model summary: passed/total across all known cases
     model_summary: dict[str, dict] = {}
     for model in models:
-        model_results = [lookup.get((c, model)) for c in cases if lookup.get((c, model))]
+        model_results = [lookup[(c, model)] for c in cases if (c, model) in lookup]
         total = len(model_results)
-        passed = sum(1 for r in model_results if r and r.get("passed"))
-        model_summary[model] = {"passed": passed, "total": total}
+        passed = sum(1 for r in model_results if r.get("passed"))
+        pct = int(passed / total * 100) if total else 0
+        model_summary[model] = {"passed": passed, "total": total, "pct": pct}
 
-    # Header row
-    header_cells = "<th>Case</th><th>SDK</th><th>Difficulty</th>"
-    for model in models:
-        short = model.split("/")[-1]
-        s = model_summary[model]
-        header_cells += f"<th title='{model}'>{short}<br><small style='color:#718096'>{s['passed']}/{s['total']}</small></th>"
+    # Sort models by pass rate descending
+    models = sorted(models, key=lambda m: model_summary[m]["pct"], reverse=True)
+
+    # Header: Model | Score | pass/total | <case columns>
+    header_cells = "<th>Model</th><th>Score</th><th>Passed</th>"
+    for case_id in cases:
+        header_cells += f"<th><a href='/case/{case_id}' style='color:#a0aec0'>{case_id}</a></th>"
 
     rows = ""
-    for case_id in cases:
-        meta = _find_metadata(case_id)
-        sdk = meta.get("sdk", "—")
-        diff = meta.get("difficulty", "—")
-        diff_badge = f'<span class="badge badge-{diff}">{diff}</span>' if diff in ("easy", "medium", "hard") else diff
-
-        row = f"<td><a href='/case/{case_id}'>{case_id}</a></td><td>{sdk}</td><td>{diff_badge}</td>"
-        for model in models:
+    for model in models:
+        s = model_summary[model]
+        short = model.split("/")[-1]
+        score_cell = _score_bar(s["passed"] / s["total"] if s["total"] else 0)
+        row = (
+            f"<td title='{model}' style='font-family:monospace;font-size:0.8rem'>{short}</td>"
+            f"<td>{score_cell}</td>"
+            f"<td style='color:#a0aec0'>{s['passed']}/{s['total']}</td>"
+        )
+        for case_id in cases:
             result = lookup.get((case_id, model))
             if result is None:
                 row += "<td class='cell-none'>—</td>"
@@ -295,7 +298,7 @@ def leaderboard() -> str:
     body = f"""
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem">
   <h1>Leaderboard</h1>
-  <span style="color:#718096;font-size:0.85rem">{len(cases)} cases · {len(models)} models</span>
+  <span style="color:#718096;font-size:0.85rem">{len(models)} models · {len(cases)} cases</span>
 </div>
 <div class="card" style="padding:0;overflow:auto">
   <table>
