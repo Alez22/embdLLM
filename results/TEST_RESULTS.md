@@ -1,16 +1,19 @@
 # EmbedEval Test Results
 
-*Last updated: 2026-05-25 19:41 UTC*
+*Last updated: 2026-05-25 21:23 UTC*
 
 ## Summary
 
-> **386 case(s) need retesting** — run `/test <model> --retest-only`
+> **387 case(s) need retesting** — run `/test <model> --retest-only`
 
 | Model | Cases | Passed | Failed | pass@1 | Retest |
 |-------|-------|--------|--------|--------|--------|
 | claude-code://haiku | 233 | 133 | 100 | 57.1% | 189 |
 | claude-code://sonnet | 239 | 163 | 76 | 68.2% | 189 |
-| groq/llama-3.3-70b-versatile | 3 | 1 | 2 | 33.3% | - |
+| groq/llama-3.3-70b-versatile | 3 | 1 | 2 | 33.3% | 1 |
+| groq/openai/gpt-oss-120b | 1 | 1 | 0 | 100.0% | - |
+| groq/openai/gpt-oss-20b | 1 | 0 | 1 | 0.0% | - |
+| groq/qwen/qwen3-32b | 1 | 0 | 1 | 0.0% | - |
 | mock | 8 | 0 | 8 | 0.0% | 8 |
 
 ## claude-code://haiku
@@ -681,6 +684,10 @@
 
 ## groq/llama-3.3-70b-versatile
 
+### Needs Retest (1)
+
+- **nxp-mcxc-i2c-001** (was FAIL, tested 2026-05-25)
+
 | Category | Cases | Passed | pass@1 | Failed Checks |
 |----------|-------|--------|--------|---------------|
 | kconfig | 2 | 1 | 50% | uart_line_ctrl_enabled |
@@ -688,10 +695,40 @@
 
 ### Failed Cases (2)
 
+| Case | Layer | Failed Checks | Tested | Status |
+|------|-------|---------------|--------|--------|
+| kconfig-003 | L0 | uart_line_ctrl_enabled | 2026-05-25 | - |
+| nxp-mcxc-i2c-001 | L0 | header_fsl_port_h, header_fsl_clock_h, i2c_master_init_called, i2c_blocking_transfer_used | 2026-05-25 | RETEST |
+
+## groq/openai/gpt-oss-120b
+
+| Category | Cases | Passed | pass@1 | Failed Checks |
+|----------|-------|--------|--------|---------------|
+| nxp-mcxc-i2c | 1 | 1 | 100% | - |
+
+## groq/openai/gpt-oss-20b
+
+| Category | Cases | Passed | pass@1 | Failed Checks |
+|----------|-------|--------|--------|---------------|
+| nxp-mcxc-i2c | 1 | 0 | 0% | i2c_master_init_called, i2c_blocking_transfer_used |
+
+### Failed Cases (1)
+
 | Case | Layer | Failed Checks | Tested |
 |------|-------|---------------|--------|
-| kconfig-003 | L0 | uart_line_ctrl_enabled | 2026-05-25 |
-| nxp-mcxc-i2c-001 | L0 | header_fsl_port_h, header_fsl_clock_h, i2c_master_init_called, i2c_blocking_transfer_used | 2026-05-25 |
+| nxp-mcxc-i2c-001 | L0 | i2c_master_init_called, i2c_blocking_transfer_used | 2026-05-25 |
+
+## groq/qwen/qwen3-32b
+
+| Category | Cases | Passed | pass@1 | Failed Checks |
+|----------|-------|--------|--------|---------------|
+| nxp-mcxc-i2c | 1 | 0 | 0% | header_fsl_clock_h |
+
+### Failed Cases (1)
+
+| Case | Layer | Failed Checks | Tested |
+|------|-------|---------------|--------|
+| nxp-mcxc-i2c-001 | L0 | header_fsl_clock_h | 2026-05-25 |
 
 ## mock
 

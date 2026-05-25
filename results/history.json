@@ -254,5 +254,69 @@
     "passed": 1,
     "failed": 4,
     "pass_at_1": 0.3333333333333333
+  },
+  {
+    "timestamp": "2026-05-25",
+    "model": "groq/qwen/qwen3-32b",
+    "total": 3,
+    "passed": 0,
+    "failed": 3,
+    "pass_at_1": 0.0
+  },
+  {
+    "timestamp": "2026-05-25",
+    "model": "groq/qwen/qwen3-32b",
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "pass_at_1": 0.0
+  },
+  {
+    "timestamp": "2026-05-25",
+    "model": "groq/qwen/qwen3-32b",
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "pass_at_1": 0.0
+  },
+  {
+    "timestamp": "2026-05-25",
+    "model": "groq/qwen/qwen3-32b",
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "pass_at_1": 0.0
+  },
+  {
+    "timestamp": "2026-05-25",
+    "model": "groq/qwen/qwen3-32b",
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "pass_at_1": 0.0
+  },
+  {
+    "timestamp": "2026-05-25",
+    "model": "groq/qwen/qwen3-32b",
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "pass_at_1": 0.0
+  },
+  {
+    "timestamp": "2026-05-25",
+    "model": "groq/openai/gpt-oss-20b",
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "pass_at_1": 0.0
+  },
+  {
+    "timestamp": "2026-05-25",
+    "model": "groq/openai/gpt-oss-120b",
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "pass_at_1": 1.0
   }
 ]

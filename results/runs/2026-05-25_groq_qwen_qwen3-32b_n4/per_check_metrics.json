@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "run_id": "n4",
+  "generated": "2026-05-25T21:06:25Z",
+  "rows": [
+    {
+      "case_id": "nxp-mcxc-i2c-001",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_clock_h",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-001",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_port_h",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-001",
+      "category": "spi-i2c",
+      "check_name": "i2c_blocking_transfer_used",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-001",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_i2c_h",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-001",
+      "category": "spi-i2c",
+      "check_name": "i2c_master_init_called",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-001",
+      "category": "spi-i2c",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    }
+  ]
+}
