@@ -2,7 +2,7 @@
 
 *Auto-generated from benchmark results. Use this to decide when LLM-generated code needs human review.*
 
-**Last updated:** 2026-05-25 18:17 UTC
+**Last updated:** 2026-05-25 19:41 UTC
 
 ## Models Tested
 
@@ -10,7 +10,7 @@
 |-------|--------|-------|
 | haiku | 57.1% | 233 |
 | sonnet | 67.4% | 233 |
-| groq/llama-3.3-70b-versatile | 50.0% | 2 |
+| groq/llama-3.3-70b-versatile | 33.3% | 3 |
 | mock | 0.0% | 8 |
 
 ## CRITICAL — Do Not Trust
@@ -20,6 +20,7 @@
 | Category | haiku | sonnet | groq/llama-3.3-70b-versatile | mock |
 |----------|------|------|------|------|
 | boot | 100% | 90% | - | 0% |
+| spi-i2c | 64% | 79% | 0% | - |
 | dma | 8% | 31% | - | - |
 | isr-concurrency | 38% | 23% | - | - |
 | storage | 31% | 54% | - | - |
@@ -40,7 +41,6 @@
 | timer | 50% | 83% | - | - |
 | ota | 58% | 67% | - | - |
 | watchdog | 60% | 90% | - | - |
-| spi-i2c | 64% | 79% | - | - |
 | gpio-basic | 83% | 67% | - | - |
 | power-mgmt | 67% | 75% | - | - |
 | sensor-driver | 67% | 75% | - | - |
@@ -63,7 +63,10 @@
 
 | Pattern | Failures | What to Check |
 |---------|----------|---------------|
-| `uart_line_ctrl_enabled` | 1 | Review LLM output against hardware/RTOS requirements |
+| `header_fsl_port_h` | 1 | Review LLM output against hardware/RTOS requirements |
+| `header_fsl_clock_h` | 1 | Review LLM output against hardware/RTOS requirements |
+| `i2c_master_init_called` | 1 | Review LLM output against hardware/RTOS requirements |
+| `i2c_blocking_transfer_used` | 1 | Review LLM output against hardware/RTOS requirements |
 
 ## Practical Recommendations
 

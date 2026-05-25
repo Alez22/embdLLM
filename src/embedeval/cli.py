@@ -1303,6 +1303,44 @@ def refresh_tracker(
     typer.echo("TEST_RESULTS.md refreshed.")
 
 
+@app.command()
+def dashboard(
+    results_dir: Annotated[
+        Path,
+        typer.Option("--results", help="Directory containing run results"),
+    ] = Path("results"),
+    cases_dir: Annotated[
+        Path,
+        typer.Option("--cases", help="Path to cases directory"),
+    ] = Path("cases"),
+    port: Annotated[
+        int,
+        typer.Option("--port", "-p", help="Port to listen on"),
+    ] = 7860,
+    no_browser: Annotated[
+        bool,
+        typer.Option("--no-browser", help="Do not open browser automatically"),
+    ] = False,
+) -> None:
+    """Start the results dashboard web app."""
+    import uvicorn
+
+    import embedeval.dashboard as _dash
+
+    _dash.RESULTS_DIR = results_dir.resolve()
+    _dash.CASES_DIR = cases_dir.resolve()
+
+    url = f"http://localhost:{port}"
+    typer.echo(f"Dashboard: {url}  (Ctrl+C to stop)")
+
+    if not no_browser:
+        from threading import Timer
+
+        Timer(1.0, lambda: __import__("webbrowser").open(url)).start()
+
+    uvicorn.run(_dash.app, host="0.0.0.0", port=port, log_level="warning")
+
+
 @app.command(name="list")
 def list_cases(
     cases_dir: Annotated[

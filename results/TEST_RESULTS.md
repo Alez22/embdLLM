@@ -1,6 +1,6 @@
 # EmbedEval Test Results
 
-*Last updated: 2026-05-25 18:17 UTC*
+*Last updated: 2026-05-25 19:41 UTC*
 
 ## Summary
 
@@ -10,7 +10,7 @@
 |-------|-------|--------|--------|--------|--------|
 | claude-code://haiku | 233 | 133 | 100 | 57.1% | 189 |
 | claude-code://sonnet | 239 | 163 | 76 | 68.2% | 189 |
-| groq/llama-3.3-70b-versatile | 2 | 1 | 1 | 50.0% | - |
+| groq/llama-3.3-70b-versatile | 3 | 1 | 2 | 33.3% | - |
 | mock | 8 | 0 | 8 | 0.0% | 8 |
 
 ## claude-code://haiku
@@ -684,12 +684,14 @@
 | Category | Cases | Passed | pass@1 | Failed Checks |
 |----------|-------|--------|--------|---------------|
 | kconfig | 2 | 1 | 50% | uart_line_ctrl_enabled |
+| nxp-mcxc-i2c | 1 | 0 | 0% | header_fsl_port_h, header_fsl_clock_h, i2c_master_init_called |
 
-### Failed Cases (1)
+### Failed Cases (2)
 
 | Case | Layer | Failed Checks | Tested |
 |------|-------|---------------|--------|
 | kconfig-003 | L0 | uart_line_ctrl_enabled | 2026-05-25 |
+| nxp-mcxc-i2c-001 | L0 | header_fsl_port_h, header_fsl_clock_h, i2c_master_init_called, i2c_blocking_transfer_used | 2026-05-25 |
 
 ## mock
 

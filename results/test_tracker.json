@@ -7222,6 +7222,25 @@
         "input_tokens": 165,
         "output_tokens": 30,
         "cost_usd": 0.0
+      },
+      "nxp-mcxc-i2c-001": {
+        "case_id": "nxp-mcxc-i2c-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "header_fsl_port_h",
+          "header_fsl_clock_h",
+          "i2c_master_init_called",
+          "i2c_blocking_transfer_used"
+        ],
+        "case_git_hash": "80e81902fa19142f",
+        "tested_at": "2026-05-25T19:41:43.584414+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 3,
+        "input_tokens": 504,
+        "output_tokens": 1566,
+        "cost_usd": 0.0
       }
     }
   },
