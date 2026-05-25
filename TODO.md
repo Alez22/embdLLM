@@ -150,10 +150,11 @@ codice generato vs reference, check pass/fail, leaderboard visiva, storico run.
   - `openrouter/qwen/qwen3-coder`
 - [ ] **Document model strings** in `docs/MODELS.md` — name, provider, approx cost/1k tokens,
   context window, notes on embedded code quality.
-- [ ] **Run baseline n=3** on all Phase 2 cases for:
-  - `anthropic/claude-sonnet-4-20250514` (reference ceiling)
-  - `groq/llama-3.3-70b-versatile`
-  - One Qwen3 model
+- [x] **Run baseline on all Phase 2 cases** — 3 models × 12 NXP cases completed:
+  - `groq/llama-3.3-70b-versatile`: 0/12 pass, 61% avg — omits fsl_clock.h/fsl_port.h
+  - `groq/openai/gpt-oss-120b`: 3/12 pass, 84% avg — best overall
+  - `groq/openai/gpt-oss-20b`: 1/12 pass, 51% avg — inconsistent on ISR cases
+  - [ ] Still to run: `anthropic/claude-sonnet-4-20250514` (reference ceiling), Qwen3
 - [x] **Publish initial leaderboard** in `results/LEADERBOARD.md`. — aggiornato ad ogni run
 
 ---
@@ -387,6 +388,9 @@ Miglioramenti noti alla dashboard (`src/embedeval/dashboard.py`) non ancora riso
   verify the model refuses or flags the inconsistency instead of fabricating register addresses.
 - Sensitivity analysis: run same case with 5 prompt variants, measure score variance.
 - Contribute NXP cases upstream to embedeval via PR.
+- NXP include pattern: llama-3.3-70b and gpt-oss-20b consistently use `board.h` instead
+  of explicit `fsl_clock.h` / `fsl_port.h` — fails L0 on every case. Consider whether
+  to relax the check (accept transitive includes) or keep it strict (explicit headers required).
 - Fix retry delay per modelli thinking (Qwen3): il `_parse_retry_after` parsifica
   correttamente "try again in Xs" ma non gestisce il formato "350ms" — aggiungere
   il parsing dei millisecondi.
