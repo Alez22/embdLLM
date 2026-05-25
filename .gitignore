@@ -52,3 +52,6 @@ LAUNCH-COPY.md
 
 # MCP ephemeral session artifacts
 .playwright-mcp/
+
+# Obsidian workspace
+.obsidian/

@@ -230,5 +230,21 @@
     "passed": 157,
     "failed": 76,
     "pass_at_1": 0.6738197424892703
+  },
+  {
+    "timestamp": "2026-05-25",
+    "model": "groq/llama-3.3-70b-versatile",
+    "total": 2,
+    "passed": 0,
+    "failed": 2,
+    "pass_at_1": 0.0
+  },
+  {
+    "timestamp": "2026-05-25",
+    "model": "groq/llama-3.3-70b-versatile",
+    "total": 2,
+    "passed": 1,
+    "failed": 1,
+    "pass_at_1": 0.5
   }
 ]

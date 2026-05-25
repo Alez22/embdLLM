@@ -7191,6 +7191,38 @@
         "output_tokens": 0,
         "cost_usd": 0.0
       }
+    },
+    "groq/llama-3.3-70b-versatile": {
+      "kconfig-001": {
+        "case_id": "kconfig-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "90c44ddff58d9fce",
+        "tested_at": "2026-05-25T18:17:56.444042+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 162,
+        "output_tokens": 45,
+        "cost_usd": 0.0
+      },
+      "kconfig-003": {
+        "case_id": "kconfig-003",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "uart_line_ctrl_enabled"
+        ],
+        "case_git_hash": "4e0ff9d3f252ab00",
+        "tested_at": "2026-05-25T18:17:56.444042+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 165,
+        "output_tokens": 30,
+        "cost_usd": 0.0
+      }
     }
   },
   "context_pack_hash": null

@@ -227,7 +227,10 @@ def _call_litellm(
             output_tokens = usage.completion_tokens if usage else 0
             total_tokens = input_tokens + output_tokens
 
-            cost = litellm.completion_cost(completion_response=response)
+            try:
+                cost = litellm.completion_cost(completion_response=response)
+            except Exception:
+                cost = 0.0
 
             return LLMResponse(
                 model=model,
