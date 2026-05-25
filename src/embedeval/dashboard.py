@@ -585,7 +585,9 @@ def history() -> str:
             status_html = f'<span class="badge badge-fail">partial ({total - incomplete}/{total})</span>'
 
         rows += f"""<tr>
-          <td style="font-family:monospace;font-size:0.8rem">{run['run_id']}</td>
+          <td style="font-family:monospace;font-size:0.8rem">
+            <a href="/history/{run['run_id']}">{run['run_id']}</a>
+          </td>
           <td>{model_tags}</td>
           <td>{status_html}</td>
           <td style="color:#a0aec0;text-align:right;font-variant-numeric:tabular-nums">{tokens_str}</td>
@@ -603,6 +605,121 @@ def history() -> str:
 </div>
 """
     return _page("History", body)
+
+
+@app.get("/history/{run_id:path}", response_class=HTMLResponse)
+def history_detail(run_id: str) -> str:
+    """Detail view for a single run: checks + diff for every case."""
+    run_dir = RESULTS_DIR / "runs" / run_id
+    if not run_dir.is_dir():
+        raise HTTPException(status_code=404, detail=f"Run {run_id} not found")
+
+    cases = []
+    details_dir = run_dir / "details"
+    if details_dir.is_dir():
+        for f in sorted(details_dir.glob("*.json")):
+            try:
+                cases.append(json.loads(f.read_text()))
+            except Exception:
+                pass
+
+    if not cases:
+        return _page(run_id, f"<div class='card'><p>No cases found in run {run_id}.</p></div>")
+
+    model = cases[0].get("model", "")
+    total = len(cases)
+    passed = sum(1 for c in cases if c.get("passed"))
+
+    sections = ""
+    for result in cases:
+        case_id = result.get("case_id", "")
+        reference = _find_reference(case_id) or ""
+        generated = result.get("generated_code", "")
+        overall = _pass_badge(result.get("passed", False))
+        score = _score_bar(result.get("total_score", 0))
+
+        # Checks
+        checks_html = ""
+        for layer in result.get("layers", []):
+            layer_name = layer.get("name", "")
+            layer_passed = layer.get("passed", False)
+            layer_error = layer.get("error")
+            details = layer.get("details", [])
+            badge = _pass_badge(layer_passed)
+            checks_html += f'<div style="margin-bottom:0.75rem"><h3>L{layer["layer"]} — {layer_name} {badge}</h3>'
+            if layer_error and not details:
+                checks_html += f'<p style="color:#718096;font-size:0.8rem;padding:0.25rem 0">{layer_error}</p>'
+            else:
+                for chk in details:
+                    icon = "✓" if chk["passed"] else "✗"
+                    color = "#68d391" if chk["passed"] else "#fc8181"
+                    name = chk.get("check_name", "")
+                    actual = chk.get("actual", "")
+                    expected = chk.get("expected", "")
+                    detail_html = ""
+                    if not chk["passed"]:
+                        act_esc = str(actual).replace("<", "&lt;")
+                        exp_esc = str(expected).replace("<", "&lt;")
+                        detail_html = f'<div class="check-detail">expected: {exp_esc}<br>actual: <span>{act_esc}</span></div>'
+                    checks_html += f"""
+<div class="check-row">
+  <span style="color:{color};font-weight:bold;min-width:1.2rem">{icon}</span>
+  <div class="check-name">{name}{detail_html}</div>
+</div>"""
+            checks_html += "</div>"
+
+        # Diff + side-by-side
+        if reference and generated:
+            diff_content = _diff_html(reference, generated, fromfile="reference/main.c", tofile="generated")
+            diff_section = f'<pre style="max-height:320px;overflow-y:auto">{diff_content}</pre>'
+        else:
+            diff_section = "<p style='color:#718096;font-size:0.8rem'>No reference or no generated code.</p>"
+
+        ref_esc = reference.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        gen_esc = generated.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+        sections += f"""
+<div class="card" style="margin-bottom:1.5rem">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
+    <h2 style="margin:0"><a href="/case/{case_id}">{case_id}</a></h2>
+    {overall} {score}
+  </div>
+  <div class="split">
+    <div>
+      <h3>Checks</h3>
+      {checks_html}
+    </div>
+    <div>
+      <h3>Diff (reference → generated)</h3>
+      {diff_section}
+      <div class="split" style="gap:0.5rem;margin-top:0.75rem">
+        <div>
+          <h3>Reference</h3>
+          <pre class="hljs-wrap" style="max-height:320px;overflow-y:auto"><code class="language-c">{ref_esc}</code></pre>
+        </div>
+        <div>
+          <h3>Generated</h3>
+          <pre class="hljs-wrap" style="max-height:320px;overflow-y:auto"><code class="language-c">{gen_esc}</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>"""
+
+    body = f"""
+<div style="margin-bottom:1rem">
+  <a href="/history" style="color:#718096;font-size:0.85rem">← Run History</a>
+</div>
+<div class="card" style="margin-bottom:1.5rem">
+  <div style="display:flex;align-items:center;gap:1rem">
+    <h1 style="font-size:1rem;font-family:monospace">{run_id}</h1>
+    <span style="color:#718096;font-size:0.85rem">{model.split('/')[-1]}</span>
+    <span style="color:#718096;font-size:0.85rem">{passed}/{total} passed</span>
+  </div>
+</div>
+{sections}
+"""
+    return _page(run_id, body, highlight=True)
 
 
 @app.get("/cases", response_class=HTMLResponse)
