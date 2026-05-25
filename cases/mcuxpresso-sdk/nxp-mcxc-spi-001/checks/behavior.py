@@ -41,16 +41,25 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         check_type="constraint",
     ))
 
-    # CS asserted (low) before transfer — GPIO_PinWrite with 0
-    # Accept either direct GPIO_PinWrite(0) or a wrapper call
-    cs_assert_pattern = re.search(
-        r"GPIO_PinWrite\s*\([^,]+,\s*\w+\s*,\s*0[Uu]?\s*\)", generated_code
-    )
+    # CS asserted (low) before transfer — must be called in the transfer sequence,
+    # not just defined as a helper. Anchor on SPI_MasterInit: the inline helper
+    # definition (if any) appears before it, so search for the cs assert pattern
+    # only in the code that follows SPI_MasterInit.
+    spi_init_match = re.search(r"\bSPI_MasterInit\s*\(", generated_code)
+    transfer_match = re.search(r"\bSPI_MasterTransferBlocking\s*\(", generated_code)
+    if spi_init_match and transfer_match:
+        between = generated_code[spi_init_match.end():transfer_match.start()]
+        cs_assert_call = bool(re.search(
+            r"(cs_assert\s*\(\s*\)|GPIO_PinWrite\s*\([^,]+,\s*\w+\s*,\s*0[Uu]?\s*\))",
+            between
+        ))
+    else:
+        cs_assert_call = False
     details.append(CheckDetail(
         check_name="cs_asserted_before_transfer",
-        passed=bool(cs_assert_pattern),
-        expected="CS driven low (GPIO_PinWrite with 0) before SPI transfer",
-        actual="present" if cs_assert_pattern else "missing",
+        passed=cs_assert_call,
+        expected="CS driven low (GPIO_PinWrite with 0 or cs_assert()) called before SPI transfer",
+        actual="present" if cs_assert_call else "missing",
         check_type="constraint",
     ))
 

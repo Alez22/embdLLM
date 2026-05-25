@@ -49,15 +49,15 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         check_type="constraint",
     ))
 
-    # volatile on head/tail indices
-    has_volatile_idx = bool(re.search(
-        r"\bvolatile\b[^;]*(head|tail|write_idx|read_idx|wr_ptr|rd_ptr)", generated_code
+    # Both head AND tail indices volatile
+    volatile_idx_count = len(re.findall(
+        r"\bvolatile\b[^;\n]*(head|tail|write_idx|read_idx|wr_ptr|rd_ptr)", generated_code
     ))
     details.append(CheckDetail(
         check_name="ring_buffer_indices_volatile",
-        passed=has_volatile_idx,
-        expected="ring buffer head/tail indices declared volatile",
-        actual="present" if has_volatile_idx else "missing",
+        passed=volatile_idx_count >= 2,
+        expected="both head and tail index variables declared volatile",
+        actual=f"{volatile_idx_count} volatile index declaration(s) found",
         check_type="constraint",
     ))
 
@@ -68,17 +68,18 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     )
     if isr_match:
         isr_body = isr_match.group(1)
+        # Both the status function AND the specific RX flag must be present
         flag_checked = (
             "kUART_RxDataRegFullFlag" in isr_body
-            or "UART_GetStatusFlags" in isr_body
+            and "UART_GetStatusFlags" in isr_body
         )
     else:
         flag_checked = False
     details.append(CheckDetail(
         check_name="rx_flag_checked_in_isr",
         passed=flag_checked,
-        expected="kUART_RxDataRegFullFlag checked before reading byte in ISR",
-        actual="present" if flag_checked else "missing",
+        expected="UART_GetStatusFlags & kUART_RxDataRegFullFlag checked in ISR",
+        actual="present" if flag_checked else "missing or wrong flag used",
         check_type="constraint",
     ))
 

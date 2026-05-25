@@ -44,15 +44,18 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         check_type="constraint",
     ))
 
-    # Corruption recovery: handle both-slots-invalid case
+    # Corruption recovery: both slots invalid → assign magic and default data.
+    # Look for an assignment to ->magic (or equivalent struct field) outside
+    # the normal write path — indicates a "reset to defaults" branch.
     has_default = bool(re.search(
-        r"(default|corrupt|invalid|memset|both\s+\w+\s+invalid|neither)",
-        generated_code, re.IGNORECASE
+        r"(->magic|\.magic)\s*=(?!=)", generated_code
+    )) and bool(re.search(
+        r"(->data|\.data|->crc|\.crc)\s*=\s*[^=]", generated_code
     ))
     details.append(CheckDetail(
         check_name="corruption_recovery_handled",
         passed=has_default,
-        expected="Handles case where both slots are corrupt (default init)",
+        expected="Handles both-slots-corrupt case: assigns magic and default data fields",
         actual="present" if has_default else "missing",
         check_type="constraint",
     ))

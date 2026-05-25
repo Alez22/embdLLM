@@ -49,12 +49,14 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         check_type="constraint",
     ))
 
-    # volatile on ISR-shared counter
-    has_volatile = bool(re.search(r"\bvolatile\b", generated_code))
+    # volatile on ISR-shared counter — match only variable declarations
+    has_volatile = bool(re.search(
+        r"\bvolatile\b\s+(?:uint|int|bool|char|float|double)\w*", generated_code
+    ))
     details.append(CheckDetail(
         check_name="isr_counter_volatile",
         passed=has_volatile,
-        expected="volatile qualifier on ISR-shared counter",
+        expected="volatile qualifier on ISR-shared counter declaration",
         actual="present" if has_volatile else "missing",
         check_type="constraint",
     ))

@@ -39,11 +39,14 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # volatile on ISR-shared variable — implicit: prompt never mentions this
-    has_volatile = bool(re.search(r"\bvolatile\b", generated_code))
+    # Match only variable declarations (not __asm volatile or comments)
+    has_volatile = bool(re.search(
+        r"\bvolatile\b\s+(?:uint|int|bool|char|float|double|struct)\w*", generated_code
+    ))
     details.append(CheckDetail(
         check_name="isr_shared_variable_volatile",
         passed=has_volatile,
-        expected="volatile qualifier on ISR-shared variable",
+        expected="volatile qualifier on ISR-shared variable declaration",
         actual="present" if has_volatile else "missing",
         check_type="constraint",
     ))

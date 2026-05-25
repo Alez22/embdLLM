@@ -67,12 +67,15 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Both shared variables volatile (flag AND value)
-    volatile_count = len(re.findall(r"\bvolatile\b", generated_code))
+    # Match only variable declarations, not __asm volatile or comments
+    volatile_count = len(re.findall(
+        r"\bvolatile\b\s+(?:uint|int|bool|char|float|double|struct)\w*", generated_code
+    ))
     details.append(CheckDetail(
         check_name="both_shared_vars_volatile",
         passed=volatile_count >= 2,
-        expected="at least 2 volatile declarations (flag and value)",
-        actual=f"{volatile_count} volatile declaration(s) found",
+        expected="at least 2 volatile variable declarations (flag and value)",
+        actual=f"{volatile_count} volatile variable declaration(s) found",
         check_type="constraint",
     ))
 

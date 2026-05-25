@@ -66,8 +66,8 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # I2C address must be 7-bit (0x68), not pre-shifted.
     # MCUXpresso SDK handles the shift internally.
     # Wrong forms: 0xD0 hardcoded, or any expression like (0x68 << 1).
-    has_preshifted_literal = bool(re.search(r"\b0[xX][Dd]0\b", generated_code))
-    has_shift_expr = bool(re.search(r"\b0[xX]68\b\s*<<\s*1", generated_code))
+    has_preshifted_literal = bool(re.search(r"0[xX][Dd]0[Uu]?\b", generated_code))
+    has_shift_expr = bool(re.search(r"0[xX]68[Uu]?\s*<<\s*1", generated_code))
     addr_ok = not has_preshifted_literal and not has_shift_expr
     details.append(CheckDetail(
         check_name="i2c_address_not_preshifted",
