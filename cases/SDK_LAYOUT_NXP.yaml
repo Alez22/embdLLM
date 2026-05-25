@@ -1,0 +1,29 @@
+# NXP MCUXpresso SDK case registry.
+# Maps each nxp-bare-metal case-id to its sdk bucket.
+# Update this file whenever a new case is added under cases/nxp-bare-metal/.
+cases:
+  nxp-gpio-001:
+    sdk: mcuxpresso-sdk
+  nxp-gpio-002:
+    sdk: mcuxpresso-sdk
+  nxp-i2c-001:
+    sdk: mcuxpresso-sdk
+  nxp-i2c-002:
+    sdk: mcuxpresso-sdk
+  nxp-spi-001:
+    sdk: mcuxpresso-sdk
+  nxp-uart-001:
+    sdk: mcuxpresso-sdk
+  nxp-uart-002:
+    sdk: mcuxpresso-sdk
+  nxp-timer-001:
+    sdk: mcuxpresso-sdk
+  nxp-isr-001:
+    sdk: mcuxpresso-sdk
+  nxp-flash-001:
+    sdk: mcuxpresso-sdk
+  nxp-flash-002:
+    sdk: mcuxpresso-sdk
+  nxp-watchdog-001:
+    sdk: mcuxpresso-sdk
+version: 1

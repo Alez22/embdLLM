@@ -83,6 +83,8 @@ class EvalPlatform(str, Enum):
     ESP_IDF = "esp_idf"
     # STM32 HAL
     STM32_HAL = "stm32_hal"
+    # NXP bare-metal
+    NXP_BARE_METAL = "nxp_bare_metal"
     # Linux
     DOCKER_ONLY = "docker_only"
     QEMU_LINUX = "qemu_linux"
@@ -101,6 +103,7 @@ class Sdk(str, Enum):
     FREERTOS = "freertos"
     ESP_IDF = "esp-idf"
     STM32_HAL = "stm32-hal"
+    MCUXPRESSO = "mcuxpresso-sdk"
 
 
 class TokenUsage(BaseModel):
