@@ -2,7 +2,7 @@
 
 *Auto-generated from benchmark results. Use this to decide when LLM-generated code needs human review.*
 
-**Last updated:** 2026-05-25 21:38 UTC
+**Last updated:** 2026-05-25 21:58 UTC
 
 ## Models Tested
 
@@ -10,11 +10,11 @@
 |-------|--------|-------|
 | haiku | 57.1% | 233 |
 | sonnet | 67.4% | 233 |
-| groq/llama-3.3-70b-versatile | 33.3% | 3 |
-| groq/meta-llama/llama-4-scout-17b-16e-instruct | 0.0% | 1 |
-| groq/openai/gpt-oss-120b | 100.0% | 1 |
-| groq/openai/gpt-oss-20b | 0.0% | 1 |
-| groq/qwen/qwen3-32b | 0.0% | 1 |
+| groq/llama-3.3-70b-versatile | 38.5% | 13 |
+| groq/meta-llama/llama-4-scout-17b-16e-instruct | 18.2% | 11 |
+| groq/openai/gpt-oss-120b | 45.5% | 11 |
+| groq/openai/gpt-oss-20b | 63.6% | 11 |
+| groq/qwen/qwen3-32b | 36.4% | 11 |
 | mock | 0.0% | 8 |
 
 ## CRITICAL — Do Not Trust
@@ -24,12 +24,13 @@
 | Category | haiku | sonnet | groq/llama-3.3-70b-versatile | groq/meta-llama/llama-4-scout-17b-16e-instruct | groq/openai/gpt-oss-120b | groq/openai/gpt-oss-20b | groq/qwen/qwen3-32b | mock |
 |----------|------|------|------|------|------|------|------|------|
 | boot | 100% | 90% | - | - | - | - | - | 0% |
-| spi-i2c | 64% | 79% | 0% | 0% | 100% | 0% | 0% | - |
+| networking | 75% | 75% | 50% | 0% | 50% | 50% | 50% | - |
+| spi-i2c | 64% | 79% | 0% | 0% | 40% | 40% | 20% | - |
+| threading | 33% | 33% | 100% | 0% | 0% | 100% | 0% | - |
 | dma | 8% | 31% | - | - | - | - | - | - |
 | isr-concurrency | 38% | 23% | - | - | - | - | - | - |
 | storage | 31% | 54% | - | - | - | - | - | - |
 | memory-opt | 33% | 67% | - | - | - | - | - | - |
-| threading | 33% | 33% | - | - | - | - | - | - |
 | uart | 67% | 33% | - | - | - | - | - | - |
 | ble | 45% | 82% | - | - | - | - | - | - |
 
@@ -40,17 +41,16 @@
 | Category | haiku | sonnet | groq/llama-3.3-70b-versatile | groq/meta-llama/llama-4-scout-17b-16e-instruct | groq/openai/gpt-oss-120b | groq/openai/gpt-oss-20b | groq/qwen/qwen3-32b | mock |
 |----------|------|------|------|------|------|------|------|------|
 | adc | 50% | 100% | - | - | - | - | - | - |
+| gpio-basic | 83% | 67% | 50% | 50% | 50% | 100% | 50% | - |
 | kconfig | 60% | 90% | 50% | - | - | - | - | - |
 | security | 70% | 50% | - | - | - | - | - | - |
-| timer | 50% | 83% | - | - | - | - | - | - |
+| timer | 50% | 83% | 100% | 100% | 100% | 100% | 100% | - |
 | ota | 58% | 67% | - | - | - | - | - | - |
 | watchdog | 60% | 90% | - | - | - | - | - | - |
-| gpio-basic | 83% | 67% | - | - | - | - | - | - |
 | power-mgmt | 67% | 75% | - | - | - | - | - | - |
 | sensor-driver | 67% | 75% | - | - | - | - | - | - |
 | linux-driver | 70% | 70% | - | - | - | - | - | - |
 | yocto | 70% | 80% | - | - | - | - | - | - |
-| networking | 75% | 75% | - | - | - | - | - | - |
 
 ## RELIABLE — Generally Safe
 
@@ -67,12 +67,26 @@
 
 | Pattern | Failures | What to Check |
 |---------|----------|---------------|
-| `header_fsl_clock_h` | 7 | Review LLM output against hardware/RTOS requirements |
-| `i2c_blocking_transfer_used` | 6 | Review LLM output against hardware/RTOS requirements |
-| `header_fsl_port_h` | 5 | Review LLM output against hardware/RTOS requirements |
-| `i2c_master_init_called` | 5 | Review LLM output against hardware/RTOS requirements |
+| `header_fsl_clock_h` | 11 | Review LLM output against hardware/RTOS requirements |
+| `header_fsl_port_h` | 8 | Review LLM output against hardware/RTOS requirements |
+| `i2c_blocking_transfer_used` | 8 | Review LLM output against hardware/RTOS requirements |
+| `i2c_master_init_called` | 7 | Review LLM output against hardware/RTOS requirements |
+| `i2c_clock_enabled` | 5 | Review LLM output against hardware/RTOS requirements |
+| `i2c_master_header` | 5 | Review LLM output against hardware/RTOS requirements |
+| `i2c_master_new_api` | 5 | Review LLM output against hardware/RTOS requirements |
+| `no_legacy_i2c_driver` | 5 | Review LLM output against hardware/RTOS requirements |
+| `uart_clock_enabled` | 3 | Review LLM output against hardware/RTOS requirements |
+| `spi_clock_enabled` | 3 | Review LLM output against hardware/RTOS requirements |
+| `hal_i2c_mem_read_used` | 3 | Review LLM output against hardware/RTOS requirements |
+| `header_fsl_i2c_h` | 2 | Review LLM output against hardware/RTOS requirements |
+| `event_handler_registered` | 2 | Review LLM output against hardware/RTOS requirements |
+| `no_zephyr_apis` | 2 | Review LLM output against hardware/RTOS requirements |
+| `stm32_hal_header_included` | 2 | Review LLM output against hardware/RTOS requirements |
+| `different_task_priorities` | 1 | Review LLM output against hardware/RTOS requirements |
+| `gpio_config_used` | 1 | Review LLM output against hardware/RTOS requirements |
 | `llm_call` | 1 | Review LLM output against hardware/RTOS requirements |
-| `header_fsl_i2c_h` | 1 | Review LLM output against hardware/RTOS requirements |
+| `dma_channel_specified` | 1 | Review LLM output against hardware/RTOS requirements |
+| `uart_clock_before_init` | 1 | Review LLM output against hardware/RTOS requirements |
 
 ## Practical Recommendations
 

@@ -7231,15 +7231,169 @@
         "failed_checks": [
           "header_fsl_port_h",
           "header_fsl_clock_h",
-          "i2c_master_init_called",
-          "i2c_blocking_transfer_used"
+          "i2c_master_init_called"
         ],
-        "case_git_hash": "80e81902fa19142f",
-        "tested_at": "2026-05-25T19:41:43.584414+00:00",
+        "case_git_hash": "924f5f6c29871b63",
+        "tested_at": "2026-05-25T21:54:36.598772+00:00",
         "pass_at_1": 0.0,
-        "attempts": 3,
-        "input_tokens": 504,
-        "output_tokens": 1566,
+        "attempts": 1,
+        "input_tokens": 168,
+        "output_tokens": 413,
+        "cost_usd": 0.0
+      },
+      "esp-gpio-001": {
+        "case_id": "esp-gpio-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "4e194398724bd597",
+        "tested_at": "2026-05-25T21:54:36.598772+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 128,
+        "output_tokens": 262,
+        "cost_usd": 0.0
+      },
+      "esp-i2c-001": {
+        "case_id": "esp-i2c-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "i2c_master_header",
+          "i2c_master_new_api",
+          "no_legacy_i2c_driver"
+        ],
+        "case_git_hash": "c2e775dae8b5f3f6",
+        "tested_at": "2026-05-25T21:54:36.598772+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 170,
+        "output_tokens": 435,
+        "cost_usd": 0.0
+      },
+      "esp-spi-001": {
+        "case_id": "esp-spi-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "spi_master_header"
+        ],
+        "case_git_hash": "2f31de778f557378",
+        "tested_at": "2026-05-25T21:54:36.598772+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 202,
+        "output_tokens": 497,
+        "cost_usd": 0.0
+      },
+      "esp-timer-001": {
+        "case_id": "esp-timer-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "9ce13240533c884d",
+        "tested_at": "2026-05-25T21:54:36.598772+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 209,
+        "output_tokens": 419,
+        "cost_usd": 0.0
+      },
+      "esp-wifi-001": {
+        "case_id": "esp-wifi-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "5fdb45aac9420a17",
+        "tested_at": "2026-05-25T21:54:36.598772+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 209,
+        "output_tokens": 507,
+        "cost_usd": 0.0
+      },
+      "stm32-freertos-001": {
+        "case_id": "stm32-freertos-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "a3b1080ccd5a5dfd",
+        "tested_at": "2026-05-25T21:54:36.598772+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 160,
+        "output_tokens": 246,
+        "cost_usd": 0.0
+      },
+      "stm32-gpio-001": {
+        "case_id": "stm32-gpio-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 3,
+        "failed_checks": [
+          "exti_callback_defined"
+        ],
+        "case_git_hash": "59ac158ca70f6d0f",
+        "tested_at": "2026-05-25T21:54:36.598772+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 149,
+        "output_tokens": 214,
+        "cost_usd": 0.0
+      },
+      "stm32-i2c-001": {
+        "case_id": "stm32-i2c-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "hal_i2c_mem_read_used",
+          "i2c_clock_enabled"
+        ],
+        "case_git_hash": "b97795461deaea3f",
+        "tested_at": "2026-05-25T21:54:36.598772+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 157,
+        "output_tokens": 557,
+        "cost_usd": 0.0
+      },
+      "stm32-spi-001": {
+        "case_id": "stm32-spi-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "spi_clock_enabled"
+        ],
+        "case_git_hash": "a7eca701dd633b19",
+        "tested_at": "2026-05-25T21:54:36.598772+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 150,
+        "output_tokens": 489,
+        "cost_usd": 0.0
+      },
+      "stm32-uart-001": {
+        "case_id": "stm32-uart-001",
+        "model": "groq/llama-3.3-70b-versatile",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "uart_clock_enabled"
+        ],
+        "case_git_hash": "c4a2fbfa23509028",
+        "tested_at": "2026-05-25T21:54:36.598772+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 146,
+        "output_tokens": 1253,
         "cost_usd": 0.0
       }
     },
@@ -7253,11 +7407,167 @@
           "header_fsl_clock_h"
         ],
         "case_git_hash": "924f5f6c29871b63",
-        "tested_at": "2026-05-25T21:08:49.409209+00:00",
+        "tested_at": "2026-05-25T21:56:21.575858+00:00",
         "pass_at_1": 0.0,
         "attempts": 1,
         "input_tokens": 150,
-        "output_tokens": 644,
+        "output_tokens": 703,
+        "cost_usd": 0.0
+      },
+      "esp-gpio-001": {
+        "case_id": "esp-gpio-001",
+        "model": "groq/qwen/qwen3-32b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "4e194398724bd597",
+        "tested_at": "2026-05-25T21:56:21.575858+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 106,
+        "output_tokens": 278,
+        "cost_usd": 0.0
+      },
+      "esp-i2c-001": {
+        "case_id": "esp-i2c-001",
+        "model": "groq/qwen/qwen3-32b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "i2c_master_header",
+          "i2c_master_new_api",
+          "no_legacy_i2c_driver",
+          "no_zephyr_apis"
+        ],
+        "case_git_hash": "c2e775dae8b5f3f6",
+        "tested_at": "2026-05-25T21:56:21.575858+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 152,
+        "output_tokens": 702,
+        "cost_usd": 0.0
+      },
+      "esp-spi-001": {
+        "case_id": "esp-spi-001",
+        "model": "groq/qwen/qwen3-32b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "2f31de778f557378",
+        "tested_at": "2026-05-25T21:56:21.575858+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 184,
+        "output_tokens": 698,
+        "cost_usd": 0.0
+      },
+      "esp-timer-001": {
+        "case_id": "esp-timer-001",
+        "model": "groq/qwen/qwen3-32b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "9ce13240533c884d",
+        "tested_at": "2026-05-25T21:56:21.575858+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 189,
+        "output_tokens": 494,
+        "cost_usd": 0.0
+      },
+      "esp-wifi-001": {
+        "case_id": "esp-wifi-001",
+        "model": "groq/qwen/qwen3-32b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "5fdb45aac9420a17",
+        "tested_at": "2026-05-25T21:56:21.575858+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 185,
+        "output_tokens": 563,
+        "cost_usd": 0.0
+      },
+      "stm32-freertos-001": {
+        "case_id": "stm32-freertos-001",
+        "model": "groq/qwen/qwen3-32b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "stm32_hal_header_included"
+        ],
+        "case_git_hash": "a3b1080ccd5a5dfd",
+        "tested_at": "2026-05-25T21:56:21.575858+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 140,
+        "output_tokens": 1482,
+        "cost_usd": 0.0
+      },
+      "stm32-gpio-001": {
+        "case_id": "stm32-gpio-001",
+        "model": "groq/qwen/qwen3-32b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "nvic_configured"
+        ],
+        "case_git_hash": "59ac158ca70f6d0f",
+        "tested_at": "2026-05-25T21:56:21.575858+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 132,
+        "output_tokens": 854,
+        "cost_usd": 0.0
+      },
+      "stm32-i2c-001": {
+        "case_id": "stm32-i2c-001",
+        "model": "groq/qwen/qwen3-32b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "hal_i2c_mem_read_used",
+          "i2c_clock_enabled"
+        ],
+        "case_git_hash": "b97795461deaea3f",
+        "tested_at": "2026-05-25T21:56:21.575858+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 142,
+        "output_tokens": 1049,
+        "cost_usd": 0.0
+      },
+      "stm32-spi-001": {
+        "case_id": "stm32-spi-001",
+        "model": "groq/qwen/qwen3-32b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "spi_clock_enabled"
+        ],
+        "case_git_hash": "a7eca701dd633b19",
+        "tested_at": "2026-05-25T21:56:21.575858+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 131,
+        "output_tokens": 1044,
+        "cost_usd": 0.0
+      },
+      "stm32-uart-001": {
+        "case_id": "stm32-uart-001",
+        "model": "groq/qwen/qwen3-32b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "uart_clock_enabled"
+        ],
+        "case_git_hash": "c4a2fbfa23509028",
+        "tested_at": "2026-05-25T21:56:21.575858+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 131,
+        "output_tokens": 1143,
         "cost_usd": 0.0
       }
     },
@@ -7268,14 +7578,165 @@
         "passed": false,
         "failed_at_layer": 0,
         "failed_checks": [
+          "header_fsl_i2c_h",
+          "header_fsl_port_h",
+          "header_fsl_clock_h",
           "i2c_master_init_called",
           "i2c_blocking_transfer_used"
         ],
         "case_git_hash": "924f5f6c29871b63",
-        "tested_at": "2026-05-25T21:18:23.130222+00:00",
+        "tested_at": "2026-05-25T21:58:43.392627+00:00",
         "pass_at_1": 0.0,
         "attempts": 1,
         "input_tokens": 239,
+        "output_tokens": 2048,
+        "cost_usd": 0.0
+      },
+      "esp-gpio-001": {
+        "case_id": "esp-gpio-001",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "4e194398724bd597",
+        "tested_at": "2026-05-25T21:58:43.392627+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 164,
+        "output_tokens": 738,
+        "cost_usd": 0.0
+      },
+      "esp-i2c-001": {
+        "case_id": "esp-i2c-001",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "i2c_master_header",
+          "i2c_master_new_api",
+          "no_legacy_i2c_driver"
+        ],
+        "case_git_hash": "c2e775dae8b5f3f6",
+        "tested_at": "2026-05-25T21:58:43.392627+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 207,
+        "output_tokens": 1620,
+        "cost_usd": 0.0
+      },
+      "esp-spi-001": {
+        "case_id": "esp-spi-001",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "2f31de778f557378",
+        "tested_at": "2026-05-25T21:58:43.392627+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 238,
+        "output_tokens": 1550,
+        "cost_usd": 0.0
+      },
+      "esp-timer-001": {
+        "case_id": "esp-timer-001",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "9ce13240533c884d",
+        "tested_at": "2026-05-25T21:58:43.392627+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 247,
+        "output_tokens": 2048,
+        "cost_usd": 0.0
+      },
+      "esp-wifi-001": {
+        "case_id": "esp-wifi-001",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "5fdb45aac9420a17",
+        "tested_at": "2026-05-25T21:58:43.392627+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 248,
+        "output_tokens": 1438,
+        "cost_usd": 0.0
+      },
+      "stm32-freertos-001": {
+        "case_id": "stm32-freertos-001",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "a3b1080ccd5a5dfd",
+        "tested_at": "2026-05-25T21:58:43.392627+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 200,
+        "output_tokens": 1885,
+        "cost_usd": 0.0
+      },
+      "stm32-gpio-001": {
+        "case_id": "stm32-gpio-001",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "59ac158ca70f6d0f",
+        "tested_at": "2026-05-25T21:58:43.392627+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 218,
+        "output_tokens": 1125,
+        "cost_usd": 0.0
+      },
+      "stm32-i2c-001": {
+        "case_id": "stm32-i2c-001",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "i2c_clock_enabled"
+        ],
+        "case_git_hash": "b97795461deaea3f",
+        "tested_at": "2026-05-25T21:58:43.392627+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 193,
+        "output_tokens": 1803,
+        "cost_usd": 0.0
+      },
+      "stm32-spi-001": {
+        "case_id": "stm32-spi-001",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "a7eca701dd633b19",
+        "tested_at": "2026-05-25T21:58:43.392627+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 186,
+        "output_tokens": 1786,
+        "cost_usd": 0.0
+      },
+      "stm32-uart-001": {
+        "case_id": "stm32-uart-001",
+        "model": "groq/openai/gpt-oss-20b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "uart_clock_enabled"
+        ],
+        "case_git_hash": "c4a2fbfa23509028",
+        "tested_at": "2026-05-25T21:58:43.392627+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 182,
         "output_tokens": 2048,
         "cost_usd": 0.0
       }
@@ -7288,11 +7749,166 @@
         "failed_at_layer": null,
         "failed_checks": [],
         "case_git_hash": "924f5f6c29871b63",
-        "tested_at": "2026-05-25T21:23:19.954887+00:00",
+        "tested_at": "2026-05-25T21:53:51.750639+00:00",
         "pass_at_1": 0.0,
         "attempts": 1,
         "input_tokens": 207,
-        "output_tokens": 2356,
+        "output_tokens": 1554,
+        "cost_usd": 0.0
+      },
+      "esp-gpio-001": {
+        "case_id": "esp-gpio-001",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "gpio_config_used"
+        ],
+        "case_git_hash": "4e194398724bd597",
+        "tested_at": "2026-05-25T21:53:51.750639+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 164,
+        "output_tokens": 555,
+        "cost_usd": 0.0
+      },
+      "esp-i2c-001": {
+        "case_id": "esp-i2c-001",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "i2c_master_header",
+          "i2c_master_new_api",
+          "no_legacy_i2c_driver",
+          "no_zephyr_apis"
+        ],
+        "case_git_hash": "c2e775dae8b5f3f6",
+        "tested_at": "2026-05-25T21:53:51.750639+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 207,
+        "output_tokens": 1433,
+        "cost_usd": 0.0
+      },
+      "esp-spi-001": {
+        "case_id": "esp-spi-001",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "2f31de778f557378",
+        "tested_at": "2026-05-25T21:53:51.750639+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 238,
+        "output_tokens": 1061,
+        "cost_usd": 0.0
+      },
+      "esp-timer-001": {
+        "case_id": "esp-timer-001",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "9ce13240533c884d",
+        "tested_at": "2026-05-25T21:53:51.750639+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 247,
+        "output_tokens": 1318,
+        "cost_usd": 0.0
+      },
+      "esp-wifi-001": {
+        "case_id": "esp-wifi-001",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "event_handler_registered"
+        ],
+        "case_git_hash": "5fdb45aac9420a17",
+        "tested_at": "2026-05-25T21:53:51.750639+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 248,
+        "output_tokens": 1158,
+        "cost_usd": 0.0
+      },
+      "stm32-freertos-001": {
+        "case_id": "stm32-freertos-001",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": false,
+        "failed_at_layer": 3,
+        "failed_checks": [
+          "different_task_priorities"
+        ],
+        "case_git_hash": "a3b1080ccd5a5dfd",
+        "tested_at": "2026-05-25T21:53:51.750639+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 200,
+        "output_tokens": 2224,
+        "cost_usd": 0.0
+      },
+      "stm32-gpio-001": {
+        "case_id": "stm32-gpio-001",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "59ac158ca70f6d0f",
+        "tested_at": "2026-05-25T21:53:51.750639+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 186,
+        "output_tokens": 2081,
+        "cost_usd": 0.0
+      },
+      "stm32-i2c-001": {
+        "case_id": "stm32-i2c-001",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "i2c_clock_enabled"
+        ],
+        "case_git_hash": "b97795461deaea3f",
+        "tested_at": "2026-05-25T21:53:51.750639+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 193,
+        "output_tokens": 1972,
+        "cost_usd": 0.0
+      },
+      "stm32-spi-001": {
+        "case_id": "stm32-spi-001",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "spi_clock_enabled"
+        ],
+        "case_git_hash": "a7eca701dd633b19",
+        "tested_at": "2026-05-25T21:53:51.750639+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 186,
+        "output_tokens": 2010,
+        "cost_usd": 0.0
+      },
+      "stm32-uart-001": {
+        "case_id": "stm32-uart-001",
+        "model": "groq/openai/gpt-oss-120b",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "c4a2fbfa23509028",
+        "tested_at": "2026-05-25T21:53:51.750639+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 182,
+        "output_tokens": 2080,
         "cost_usd": 0.0
       }
     },
@@ -7305,15 +7921,173 @@
         "failed_checks": [
           "header_fsl_port_h",
           "header_fsl_clock_h",
-          "i2c_master_init_called",
           "i2c_blocking_transfer_used"
         ],
         "case_git_hash": "924f5f6c29871b63",
-        "tested_at": "2026-05-25T21:38:42.103291+00:00",
+        "tested_at": "2026-05-25T21:55:14.390558+00:00",
         "pass_at_1": 0.0,
         "attempts": 1,
         "input_tokens": 144,
-        "output_tokens": 419,
+        "output_tokens": 527,
+        "cost_usd": 0.0
+      },
+      "esp-gpio-001": {
+        "case_id": "esp-gpio-001",
+        "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+        "passed": false,
+        "failed_at_layer": 3,
+        "failed_checks": [
+          "gpio_config_error_checked"
+        ],
+        "case_git_hash": "4e194398724bd597",
+        "tested_at": "2026-05-25T21:55:14.390558+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 103,
+        "output_tokens": 278,
+        "cost_usd": 0.0
+      },
+      "esp-i2c-001": {
+        "case_id": "esp-i2c-001",
+        "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "i2c_master_header",
+          "i2c_master_new_api",
+          "no_legacy_i2c_driver"
+        ],
+        "case_git_hash": "c2e775dae8b5f3f6",
+        "tested_at": "2026-05-25T21:55:14.390558+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 146,
+        "output_tokens": 709,
+        "cost_usd": 0.0
+      },
+      "esp-spi-001": {
+        "case_id": "esp-spi-001",
+        "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+        "passed": false,
+        "failed_at_layer": 3,
+        "failed_checks": [
+          "dma_channel_specified"
+        ],
+        "case_git_hash": "2f31de778f557378",
+        "tested_at": "2026-05-25T21:55:14.390558+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 178,
+        "output_tokens": 592,
+        "cost_usd": 0.0
+      },
+      "esp-timer-001": {
+        "case_id": "esp-timer-001",
+        "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "9ce13240533c884d",
+        "tested_at": "2026-05-25T21:55:14.390558+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 184,
+        "output_tokens": 385,
+        "cost_usd": 0.0
+      },
+      "esp-wifi-001": {
+        "case_id": "esp-wifi-001",
+        "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "event_handler_registered"
+        ],
+        "case_git_hash": "5fdb45aac9420a17",
+        "tested_at": "2026-05-25T21:55:14.390558+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 190,
+        "output_tokens": 662,
+        "cost_usd": 0.0
+      },
+      "stm32-freertos-001": {
+        "case_id": "stm32-freertos-001",
+        "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "stm32_hal_header_included"
+        ],
+        "case_git_hash": "a3b1080ccd5a5dfd",
+        "tested_at": "2026-05-25T21:55:14.390558+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 136,
+        "output_tokens": 715,
+        "cost_usd": 0.0
+      },
+      "stm32-gpio-001": {
+        "case_id": "stm32-gpio-001",
+        "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+        "passed": true,
+        "failed_at_layer": null,
+        "failed_checks": [],
+        "case_git_hash": "59ac158ca70f6d0f",
+        "tested_at": "2026-05-25T21:55:14.390558+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 124,
+        "output_tokens": 301,
+        "cost_usd": 0.0
+      },
+      "stm32-i2c-001": {
+        "case_id": "stm32-i2c-001",
+        "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "hal_i2c_mem_read_used"
+        ],
+        "case_git_hash": "b97795461deaea3f",
+        "tested_at": "2026-05-25T21:55:14.390558+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 132,
+        "output_tokens": 1296,
+        "cost_usd": 0.0
+      },
+      "stm32-spi-001": {
+        "case_id": "stm32-spi-001",
+        "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "software_nss_used",
+          "no_cross_platform_hallucination"
+        ],
+        "case_git_hash": "a7eca701dd633b19",
+        "tested_at": "2026-05-25T21:55:14.390558+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 125,
+        "output_tokens": 1322,
+        "cost_usd": 0.0
+      },
+      "stm32-uart-001": {
+        "case_id": "stm32-uart-001",
+        "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+        "passed": false,
+        "failed_at_layer": 3,
+        "failed_checks": [
+          "uart_clock_before_init"
+        ],
+        "case_git_hash": "c4a2fbfa23509028",
+        "tested_at": "2026-05-25T21:55:14.390558+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 121,
+        "output_tokens": 1144,
         "cost_usd": 0.0
       }
     }

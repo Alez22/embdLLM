@@ -50,8 +50,8 @@ def call_model(
     context_files: list[str] | None = None,
     context_pack: str | None = None,
     timeout: float = 300.0,
-    max_retries: int = 3,
-    rate_limit_delay: float = 1.0,
+    max_retries: int = 6,
+    rate_limit_delay: float = 5.0,
     no_think: bool = False,
 ) -> LLMResponse:
     """Call an LLM model and return generated code.
@@ -207,6 +207,22 @@ def _call_claude_code(
     )
 
 
+_RETRY_AFTER_RE = re.compile(r"try again in\s+([\d.]+)s", re.IGNORECASE)
+
+
+def _parse_retry_after(error_msg: str, default: float) -> float:
+    """Extract wait time from Groq rate-limit error message.
+
+    Groq embeds "Please try again in X.XXs" in the error body.
+    We add a 1-second buffer on top to avoid hitting the limit again
+    immediately when the window resets at a boundary.
+    """
+    match = _RETRY_AFTER_RE.search(error_msg)
+    if match:
+        return float(match.group(1)) + 1.0
+    return default
+
+
 def _call_litellm(
     model: str,
     prompt: str,
@@ -272,7 +288,9 @@ def _call_litellm(
                 exc,
             )
             if attempt < max_retries:
-                time.sleep(rate_limit_delay)
+                delay = _parse_retry_after(str(exc), rate_limit_delay)
+                logger.info("Waiting %.1fs before retry...", delay)
+                time.sleep(delay)
         except Exception as exc:
             logger.error("LLM call failed (non-retryable): %s", exc)
             raise RuntimeError(f"Non-retryable error for model {model}: {exc}") from exc

@@ -1,20 +1,20 @@
 # EmbedEval Test Results
 
-*Last updated: 2026-05-25 21:38 UTC*
+*Last updated: 2026-05-25 21:58 UTC*
 
 ## Summary
 
-> **387 case(s) need retesting** — run `/test <model> --retest-only`
+> **386 case(s) need retesting** — run `/test <model> --retest-only`
 
 | Model | Cases | Passed | Failed | pass@1 | Retest |
 |-------|-------|--------|--------|--------|--------|
 | claude-code://haiku | 233 | 133 | 100 | 57.1% | 189 |
 | claude-code://sonnet | 239 | 163 | 76 | 68.2% | 189 |
-| groq/llama-3.3-70b-versatile | 3 | 1 | 2 | 33.3% | 1 |
-| groq/meta-llama/llama-4-scout-17b-16e-instruct | 1 | 0 | 1 | 0.0% | - |
-| groq/openai/gpt-oss-120b | 1 | 1 | 0 | 100.0% | - |
-| groq/openai/gpt-oss-20b | 1 | 0 | 1 | 0.0% | - |
-| groq/qwen/qwen3-32b | 1 | 0 | 1 | 0.0% | - |
+| groq/llama-3.3-70b-versatile | 13 | 5 | 8 | 38.5% | - |
+| groq/meta-llama/llama-4-scout-17b-16e-instruct | 11 | 2 | 9 | 18.2% | - |
+| groq/openai/gpt-oss-120b | 11 | 5 | 6 | 45.5% | - |
+| groq/openai/gpt-oss-20b | 11 | 7 | 4 | 63.6% | - |
+| groq/qwen/qwen3-32b | 11 | 4 | 7 | 36.4% | - |
 | mock | 8 | 0 | 8 | 0.0% | 8 |
 
 ## claude-code://haiku
@@ -685,63 +685,143 @@
 
 ## groq/llama-3.3-70b-versatile
 
-### Needs Retest (1)
-
-- **nxp-mcxc-i2c-001** (was FAIL, tested 2026-05-25)
-
 | Category | Cases | Passed | pass@1 | Failed Checks |
 |----------|-------|--------|--------|---------------|
+| esp-gpio | 1 | 1 | 100% | - |
+| esp-i2c | 1 | 0 | 0% | i2c_master_header, i2c_master_new_api, no_legacy_i2c_driver |
+| esp-spi | 1 | 0 | 0% | spi_master_header |
+| esp-timer | 1 | 1 | 100% | - |
+| esp-wifi | 1 | 1 | 100% | - |
 | kconfig | 2 | 1 | 50% | uart_line_ctrl_enabled |
 | nxp-mcxc-i2c | 1 | 0 | 0% | header_fsl_port_h, header_fsl_clock_h, i2c_master_init_called |
+| stm32-freertos | 1 | 1 | 100% | - |
+| stm32-gpio | 1 | 0 | 0% | exti_callback_defined |
+| stm32-i2c | 1 | 0 | 0% | hal_i2c_mem_read_used, i2c_clock_enabled |
+| stm32-spi | 1 | 0 | 0% | spi_clock_enabled |
+| stm32-uart | 1 | 0 | 0% | uart_clock_enabled |
 
-### Failed Cases (2)
+### Failed Cases (8)
 
-| Case | Layer | Failed Checks | Tested | Status |
-|------|-------|---------------|--------|--------|
-| kconfig-003 | L0 | uart_line_ctrl_enabled | 2026-05-25 | - |
-| nxp-mcxc-i2c-001 | L0 | header_fsl_port_h, header_fsl_clock_h, i2c_master_init_called, i2c_blocking_transfer_used | 2026-05-25 | RETEST |
+| Case | Layer | Failed Checks | Tested |
+|------|-------|---------------|--------|
+| esp-i2c-001 | L0 | i2c_master_header, i2c_master_new_api, no_legacy_i2c_driver | 2026-05-25 |
+| esp-spi-001 | L0 | spi_master_header | 2026-05-25 |
+| kconfig-003 | L0 | uart_line_ctrl_enabled | 2026-05-25 |
+| nxp-mcxc-i2c-001 | L0 | header_fsl_port_h, header_fsl_clock_h, i2c_master_init_called | 2026-05-25 |
+| stm32-gpio-001 | L3 | exti_callback_defined | 2026-05-25 |
+| stm32-i2c-001 | L0 | hal_i2c_mem_read_used, i2c_clock_enabled | 2026-05-25 |
+| stm32-spi-001 | L0 | spi_clock_enabled | 2026-05-25 |
+| stm32-uart-001 | L0 | uart_clock_enabled | 2026-05-25 |
 
 ## groq/meta-llama/llama-4-scout-17b-16e-instruct
 
 | Category | Cases | Passed | pass@1 | Failed Checks |
 |----------|-------|--------|--------|---------------|
-| nxp-mcxc-i2c | 1 | 0 | 0% | header_fsl_port_h, header_fsl_clock_h, i2c_master_init_called |
+| esp-gpio | 1 | 0 | 0% | gpio_config_error_checked |
+| esp-i2c | 1 | 0 | 0% | i2c_master_header, i2c_master_new_api, no_legacy_i2c_driver |
+| esp-spi | 1 | 0 | 0% | dma_channel_specified |
+| esp-timer | 1 | 1 | 100% | - |
+| esp-wifi | 1 | 0 | 0% | event_handler_registered |
+| nxp-mcxc-i2c | 1 | 0 | 0% | header_fsl_port_h, header_fsl_clock_h, i2c_blocking_transfer_used |
+| stm32-freertos | 1 | 0 | 0% | stm32_hal_header_included |
+| stm32-gpio | 1 | 1 | 100% | - |
+| stm32-i2c | 1 | 0 | 0% | hal_i2c_mem_read_used |
+| stm32-spi | 1 | 0 | 0% | software_nss_used, no_cross_platform_hallucination |
+| stm32-uart | 1 | 0 | 0% | uart_clock_before_init |
 
-### Failed Cases (1)
+### Failed Cases (9)
 
 | Case | Layer | Failed Checks | Tested |
 |------|-------|---------------|--------|
-| nxp-mcxc-i2c-001 | L0 | header_fsl_port_h, header_fsl_clock_h, i2c_master_init_called, i2c_blocking_transfer_used | 2026-05-25 |
+| esp-gpio-001 | L3 | gpio_config_error_checked | 2026-05-25 |
+| esp-i2c-001 | L0 | i2c_master_header, i2c_master_new_api, no_legacy_i2c_driver | 2026-05-25 |
+| esp-spi-001 | L3 | dma_channel_specified | 2026-05-25 |
+| esp-wifi-001 | L0 | event_handler_registered | 2026-05-25 |
+| nxp-mcxc-i2c-001 | L0 | header_fsl_port_h, header_fsl_clock_h, i2c_blocking_transfer_used | 2026-05-25 |
+| stm32-freertos-001 | L0 | stm32_hal_header_included | 2026-05-25 |
+| stm32-i2c-001 | L0 | hal_i2c_mem_read_used | 2026-05-25 |
+| stm32-spi-001 | L0 | software_nss_used, no_cross_platform_hallucination | 2026-05-25 |
+| stm32-uart-001 | L3 | uart_clock_before_init | 2026-05-25 |
 
 ## groq/openai/gpt-oss-120b
 
 | Category | Cases | Passed | pass@1 | Failed Checks |
 |----------|-------|--------|--------|---------------|
+| esp-gpio | 1 | 0 | 0% | gpio_config_used |
+| esp-i2c | 1 | 0 | 0% | i2c_master_header, i2c_master_new_api, no_legacy_i2c_driver |
+| esp-spi | 1 | 1 | 100% | - |
+| esp-timer | 1 | 1 | 100% | - |
+| esp-wifi | 1 | 0 | 0% | event_handler_registered |
 | nxp-mcxc-i2c | 1 | 1 | 100% | - |
+| stm32-freertos | 1 | 0 | 0% | different_task_priorities |
+| stm32-gpio | 1 | 1 | 100% | - |
+| stm32-i2c | 1 | 0 | 0% | i2c_clock_enabled |
+| stm32-spi | 1 | 0 | 0% | spi_clock_enabled |
+| stm32-uart | 1 | 1 | 100% | - |
+
+### Failed Cases (6)
+
+| Case | Layer | Failed Checks | Tested |
+|------|-------|---------------|--------|
+| esp-gpio-001 | L0 | gpio_config_used | 2026-05-25 |
+| esp-i2c-001 | L0 | i2c_master_header, i2c_master_new_api, no_legacy_i2c_driver, no_zephyr_apis | 2026-05-25 |
+| esp-wifi-001 | L0 | event_handler_registered | 2026-05-25 |
+| stm32-freertos-001 | L3 | different_task_priorities | 2026-05-25 |
+| stm32-i2c-001 | L0 | i2c_clock_enabled | 2026-05-25 |
+| stm32-spi-001 | L0 | spi_clock_enabled | 2026-05-25 |
 
 ## groq/openai/gpt-oss-20b
 
 | Category | Cases | Passed | pass@1 | Failed Checks |
 |----------|-------|--------|--------|---------------|
-| nxp-mcxc-i2c | 1 | 0 | 0% | i2c_master_init_called, i2c_blocking_transfer_used |
+| esp-gpio | 1 | 1 | 100% | - |
+| esp-i2c | 1 | 0 | 0% | i2c_master_header, i2c_master_new_api, no_legacy_i2c_driver |
+| esp-spi | 1 | 1 | 100% | - |
+| esp-timer | 1 | 1 | 100% | - |
+| esp-wifi | 1 | 1 | 100% | - |
+| nxp-mcxc-i2c | 1 | 0 | 0% | header_fsl_i2c_h, header_fsl_port_h, header_fsl_clock_h |
+| stm32-freertos | 1 | 1 | 100% | - |
+| stm32-gpio | 1 | 1 | 100% | - |
+| stm32-i2c | 1 | 0 | 0% | i2c_clock_enabled |
+| stm32-spi | 1 | 1 | 100% | - |
+| stm32-uart | 1 | 0 | 0% | uart_clock_enabled |
 
-### Failed Cases (1)
+### Failed Cases (4)
 
 | Case | Layer | Failed Checks | Tested |
 |------|-------|---------------|--------|
-| nxp-mcxc-i2c-001 | L0 | i2c_master_init_called, i2c_blocking_transfer_used | 2026-05-25 |
+| esp-i2c-001 | L0 | i2c_master_header, i2c_master_new_api, no_legacy_i2c_driver | 2026-05-25 |
+| nxp-mcxc-i2c-001 | L0 | header_fsl_i2c_h, header_fsl_port_h, header_fsl_clock_h, i2c_master_init_called (+1) | 2026-05-25 |
+| stm32-i2c-001 | L0 | i2c_clock_enabled | 2026-05-25 |
+| stm32-uart-001 | L0 | uart_clock_enabled | 2026-05-25 |
 
 ## groq/qwen/qwen3-32b
 
 | Category | Cases | Passed | pass@1 | Failed Checks |
 |----------|-------|--------|--------|---------------|
+| esp-gpio | 1 | 1 | 100% | - |
+| esp-i2c | 1 | 0 | 0% | i2c_master_header, i2c_master_new_api, no_legacy_i2c_driver |
+| esp-spi | 1 | 1 | 100% | - |
+| esp-timer | 1 | 1 | 100% | - |
+| esp-wifi | 1 | 1 | 100% | - |
 | nxp-mcxc-i2c | 1 | 0 | 0% | header_fsl_clock_h |
+| stm32-freertos | 1 | 0 | 0% | stm32_hal_header_included |
+| stm32-gpio | 1 | 0 | 0% | nvic_configured |
+| stm32-i2c | 1 | 0 | 0% | hal_i2c_mem_read_used, i2c_clock_enabled |
+| stm32-spi | 1 | 0 | 0% | spi_clock_enabled |
+| stm32-uart | 1 | 0 | 0% | uart_clock_enabled |
 
-### Failed Cases (1)
+### Failed Cases (7)
 
 | Case | Layer | Failed Checks | Tested |
 |------|-------|---------------|--------|
+| esp-i2c-001 | L0 | i2c_master_header, i2c_master_new_api, no_legacy_i2c_driver, no_zephyr_apis | 2026-05-25 |
 | nxp-mcxc-i2c-001 | L0 | header_fsl_clock_h | 2026-05-25 |
+| stm32-freertos-001 | L0 | stm32_hal_header_included | 2026-05-25 |
+| stm32-gpio-001 | L0 | nvic_configured | 2026-05-25 |
+| stm32-i2c-001 | L0 | hal_i2c_mem_read_used, i2c_clock_enabled | 2026-05-25 |
+| stm32-spi-001 | L0 | spi_clock_enabled | 2026-05-25 |
+| stm32-uart-001 | L0 | uart_clock_enabled | 2026-05-25 |
 
 ## mock
 

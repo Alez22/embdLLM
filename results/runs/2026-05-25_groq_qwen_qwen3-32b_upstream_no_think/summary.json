@@ -3,27 +3,27 @@
   "date": "2026-05-25",
   "models": [
     {
-      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
-      "pass_at_1": 0.18181818181818182,
-      "pass_at_1_quality": 0.18181818181818182,
+      "model": "groq/qwen/qwen3-32b",
+      "pass_at_1": 0.36363636363636365,
+      "pass_at_1_quality": 0.36363636363636365,
       "pass_at_1_comparable": null,
-      "pass_at_3": 0.18181818181818182,
-      "pass_at_5": 0.18181818181818182,
-      "avg_score": 0.18181818181818182,
+      "pass_at_3": 0.36363636363636365,
+      "pass_at_5": 0.36363636363636365,
+      "avg_score": 0.36363636363636365,
       "total_cases": 11,
-      "passed_cases": 2,
-      "passed_cases_quality": 2,
+      "passed_cases": 4,
+      "passed_cases_quality": 4,
       "comparable_cases": null,
       "layer_pass_rates": {
         "compile_gate": 1.0,
         "runtime_execution": 1.0,
-        "static_analysis": 0.45454545454545453,
-        "static_heuristic": 0.4,
+        "static_analysis": 0.36363636363636365,
+        "static_heuristic": 1.0,
         "test_quality_proof": 1.0
       },
       "pass_at_1_ci": [
-        0.05136660067100063,
-        0.4769861375782448
+        0.15166223614131383,
+        0.6462032231083628
       ],
       "n_samples": 1,
       "per_check_stats": [
@@ -60,14 +60,6 @@
           "failing_tc_ids": []
         },
         {
-          "check_name": "baud_rate_115200_configured",
-          "category": "networking",
-          "total_runs": 1,
-          "fail_count": 0,
-          "pass_rate": 1.0,
-          "failing_tc_ids": []
-        },
-        {
           "check_name": "callback_defined",
           "category": "timer",
           "total_runs": 1,
@@ -84,26 +76,8 @@
           "failing_tc_ids": []
         },
         {
-          "check_name": "clock_enabled_before_gpio_init",
-          "category": "gpio-basic",
-          "total_runs": 1,
-          "fail_count": 0,
-          "pass_rate": 1.0,
-          "failing_tc_ids": []
-        },
-        {
           "check_name": "dma_channel_specified",
           "category": "spi-i2c",
-          "total_runs": 1,
-          "fail_count": 1,
-          "pass_rate": 0.0,
-          "failing_tc_ids": [
-            "esp-spi-001"
-          ]
-        },
-        {
-          "check_name": "error_callback_defined",
-          "category": "networking",
           "total_runs": 1,
           "fail_count": 0,
           "pass_rate": 1.0,
@@ -127,6 +101,14 @@
         },
         {
           "check_name": "esp_idf_available",
+          "category": "networking",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "esp_idf_available",
           "category": "spi-i2c",
           "total_runs": 1,
           "fail_count": 0,
@@ -136,6 +118,14 @@
         {
           "check_name": "esp_idf_available",
           "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "esp_netif_init_called",
+          "category": "networking",
           "total_runs": 1,
           "fail_count": 0,
           "pass_rate": 1.0,
@@ -214,26 +204,16 @@
           "failing_tc_ids": []
         },
         {
-          "check_name": "event_handler_registered",
+          "check_name": "esp_wifi_start_called",
           "category": "networking",
-          "total_runs": 1,
-          "fail_count": 1,
-          "pass_rate": 0.0,
-          "failing_tc_ids": [
-            "esp-wifi-001"
-          ]
-        },
-        {
-          "check_name": "exti_callback_defined",
-          "category": "gpio-basic",
           "total_runs": 1,
           "fail_count": 0,
           "pass_rate": 1.0,
           "failing_tc_ids": []
         },
         {
-          "check_name": "exti_interrupt_mode_set",
-          "category": "gpio-basic",
+          "check_name": "event_handler_registered",
+          "category": "networking",
           "total_runs": 1,
           "fail_count": 0,
           "pass_rate": 1.0,
@@ -259,11 +239,9 @@
           "check_name": "gpio_config_error_checked",
           "category": "gpio-basic",
           "total_runs": 1,
-          "fail_count": 1,
-          "pass_rate": 0.0,
-          "failing_tc_ids": [
-            "esp-gpio-001"
-          ]
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
         },
         {
           "check_name": "gpio_config_struct",
@@ -345,11 +323,9 @@
           "check_name": "header_fsl_port_h",
           "category": "spi-i2c",
           "total_runs": 1,
-          "fail_count": 1,
-          "pass_rate": 0.0,
-          "failing_tc_ids": [
-            "nxp-mcxc-i2c-001"
-          ]
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
         },
         {
           "check_name": "i2c1_instance_configured",
@@ -363,19 +339,19 @@
           "check_name": "i2c_blocking_transfer_used",
           "category": "spi-i2c",
           "total_runs": 1,
-          "fail_count": 1,
-          "pass_rate": 0.0,
-          "failing_tc_ids": [
-            "nxp-mcxc-i2c-001"
-          ]
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
         },
         {
           "check_name": "i2c_clock_enabled",
           "category": "spi-i2c",
           "total_runs": 1,
-          "fail_count": 0,
-          "pass_rate": 1.0,
-          "failing_tc_ids": []
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "stm32-i2c-001"
+          ]
         },
         {
           "check_name": "i2c_handle_typedef_used",
@@ -422,14 +398,6 @@
           "failing_tc_ids": []
         },
         {
-          "check_name": "led_toggled_via_hal",
-          "category": "gpio-basic",
-          "total_runs": 1,
-          "fail_count": 0,
-          "pass_rate": 1.0,
-          "failing_tc_ids": []
-        },
-        {
           "check_name": "no_arduino_apis",
           "category": "gpio-basic",
           "total_runs": 1,
@@ -454,8 +422,8 @@
           "failing_tc_ids": []
         },
         {
-          "check_name": "no_button_polling_loop",
-          "category": "gpio-basic",
+          "check_name": "no_arduino_wifi_apis",
+          "category": "networking",
           "total_runs": 1,
           "fail_count": 0,
           "pass_rate": 1.0,
@@ -464,7 +432,7 @@
         {
           "check_name": "no_cross_platform_apis",
           "category": "gpio-basic",
-          "total_runs": 2,
+          "total_runs": 1,
           "fail_count": 0,
           "pass_rate": 1.0,
           "failing_tc_ids": []
@@ -513,11 +481,9 @@
           "check_name": "no_cross_platform_hallucination",
           "category": "spi-i2c",
           "total_runs": 3,
-          "fail_count": 1,
-          "pass_rate": 0.6666666666666666,
-          "failing_tc_ids": [
-            "stm32-spi-001"
-          ]
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
         },
         {
           "check_name": "no_freertos_timer_mixing",
@@ -573,9 +539,11 @@
           "check_name": "no_zephyr_apis",
           "category": "spi-i2c",
           "total_runs": 2,
-          "fail_count": 0,
-          "pass_rate": 1.0,
-          "failing_tc_ids": []
+          "fail_count": 1,
+          "pass_rate": 0.5,
+          "failing_tc_ids": [
+            "esp-i2c-001"
+          ]
         },
         {
           "check_name": "no_zephyr_hallucination",
@@ -594,7 +562,17 @@
           "failing_tc_ids": []
         },
         {
-          "check_name": "non_polling_receive",
+          "check_name": "nvic_configured",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "stm32-gpio-001"
+          ]
+        },
+        {
+          "check_name": "nvs_error_recovery",
           "category": "networking",
           "total_runs": 1,
           "fail_count": 0,
@@ -602,23 +580,15 @@
           "failing_tc_ids": []
         },
         {
-          "check_name": "nvic_configured",
-          "category": "gpio-basic",
-          "total_runs": 1,
-          "fail_count": 0,
-          "pass_rate": 1.0,
-          "failing_tc_ids": []
-        },
-        {
-          "check_name": "nvic_priority_set_before_enable",
-          "category": "gpio-basic",
-          "total_runs": 1,
-          "fail_count": 0,
-          "pass_rate": 1.0,
-          "failing_tc_ids": []
-        },
-        {
           "check_name": "nvs_flash_header",
+          "category": "networking",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "nvs_initialized_before_wifi",
           "category": "networking",
           "total_runs": 1,
           "fail_count": 0,
@@ -634,7 +604,7 @@
           "failing_tc_ids": []
         },
         {
-          "check_name": "receive_it_rearmed_in_callback",
+          "check_name": "reconnect_on_disconnect",
           "category": "networking",
           "total_runs": 1,
           "fail_count": 0,
@@ -644,7 +614,7 @@
         {
           "check_name": "runtime_skip",
           "category": "gpio-basic",
-          "total_runs": 2,
+          "total_runs": 1,
           "fail_count": 0,
           "pass_rate": 1.0,
           "failing_tc_ids": []
@@ -674,14 +644,6 @@
           "failing_tc_ids": []
         },
         {
-          "check_name": "rx_complete_callback_defined",
-          "category": "networking",
-          "total_runs": 1,
-          "fail_count": 0,
-          "pass_rate": 1.0,
-          "failing_tc_ids": []
-        },
-        {
           "check_name": "scheduler_started",
           "category": "threading",
           "total_runs": 1,
@@ -693,11 +655,9 @@
           "check_name": "software_nss_used",
           "category": "spi-i2c",
           "total_runs": 1,
-          "fail_count": 1,
-          "pass_rate": 0.0,
-          "failing_tc_ids": [
-            "stm32-spi-001"
-          ]
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
         },
         {
           "check_name": "spi1_instance_configured",
@@ -743,9 +703,11 @@
           "check_name": "spi_clock_enabled",
           "category": "spi-i2c",
           "total_runs": 1,
-          "fail_count": 0,
-          "pass_rate": 1.0,
-          "failing_tc_ids": []
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "stm32-spi-001"
+          ]
         },
         {
           "check_name": "spi_device_interface_config_struct",
@@ -790,22 +752,6 @@
         {
           "check_name": "spi_transaction_struct",
           "category": "spi-i2c",
-          "total_runs": 1,
-          "fail_count": 0,
-          "pass_rate": 1.0,
-          "failing_tc_ids": []
-        },
-        {
-          "check_name": "stm32_available",
-          "category": "gpio-basic",
-          "total_runs": 1,
-          "fail_count": 0,
-          "pass_rate": 1.0,
-          "failing_tc_ids": []
-        },
-        {
-          "check_name": "stm32_available",
-          "category": "networking",
           "total_runs": 1,
           "fail_count": 0,
           "pass_rate": 1.0,
@@ -870,7 +816,7 @@
           "failing_tc_ids": []
         },
         {
-          "check_name": "uart_clock_before_init",
+          "check_name": "uart_clock_enabled",
           "category": "networking",
           "total_runs": 1,
           "fail_count": 1,
@@ -878,14 +824,6 @@
           "failing_tc_ids": [
             "stm32-uart-001"
           ]
-        },
-        {
-          "check_name": "uart_clock_enabled",
-          "category": "networking",
-          "total_runs": 1,
-          "fail_count": 0,
-          "pass_rate": 1.0,
-          "failing_tc_ids": []
         },
         {
           "check_name": "uart_handle_typedef_used",
@@ -912,6 +850,14 @@
           "failing_tc_ids": []
         },
         {
+          "check_name": "wifi_init_config_default",
+          "category": "networking",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
           "check_name": "wifi_mode_sta",
           "category": "networking",
           "total_runs": 1,
@@ -931,15 +877,15 @@
     },
     {
       "category": "networking",
-      "pass_at_1": 0.0,
+      "pass_at_1": 0.5,
       "total_cases": 2,
-      "passed_cases": 0
+      "passed_cases": 1
     },
     {
       "category": "spi-i2c",
-      "pass_at_1": 0.0,
+      "pass_at_1": 0.2,
       "total_cases": 5,
-      "passed_cases": 0
+      "passed_cases": 1
     },
     {
       "category": "threading",
@@ -957,29 +903,29 @@
   "tier_scores": [
     {
       "tier": "core",
-      "pass_at_1": 0.18181818181818182,
+      "pass_at_1": 0.36363636363636365,
       "total_cases": 11,
-      "passed_cases": 2
+      "passed_cases": 4
     }
   ],
   "reasoning_scores": [
     {
       "reasoning_type": "api_recall",
-      "pass_at_1": 0.18181818181818182,
+      "pass_at_1": 0.36363636363636365,
       "total_cases": 11,
-      "passed_cases": 2
+      "passed_cases": 4
     },
     {
       "reasoning_type": "rule_application",
-      "pass_at_1": 0.25,
+      "pass_at_1": 0.5,
       "total_cases": 8,
-      "passed_cases": 2
+      "passed_cases": 4
     },
     {
       "reasoning_type": "system_reasoning",
-      "pass_at_1": 0.125,
+      "pass_at_1": 0.5,
       "total_cases": 8,
-      "passed_cases": 1
+      "passed_cases": 4
     }
   ],
   "sdk_scores": [
@@ -991,15 +937,15 @@
     },
     {
       "sdk": "esp-idf",
-      "pass_at_1": 0.2,
+      "pass_at_1": 0.8,
       "total_cases": 5,
-      "passed_cases": 1
+      "passed_cases": 4
     },
     {
       "sdk": "stm32-hal",
-      "pass_at_1": 0.25,
+      "pass_at_1": 0.0,
       "total_cases": 4,
-      "passed_cases": 1
+      "passed_cases": 0
     },
     {
       "sdk": "mcuxpresso-sdk",
@@ -1011,13 +957,19 @@
   "overall": {
     "total_cases": 11,
     "total_models": 1,
-    "best_model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
-    "best_pass_at_1": 0.18181818181818182,
+    "best_model": "groq/qwen/qwen3-32b",
+    "best_pass_at_1": 0.36363636363636365,
     "common_cases": null,
     "case_set_warning": null
   },
   "scenario": "generation",
   "temperature": 0.0,
   "n_samples_per_case": 1,
-  "n_runs": 1
+  "n_runs": 1,
+  "run_timestamp": "2026-05-25",
+  "model": "groq/qwen/qwen3-32b",
+  "total_results": 11,
+  "passed": 4,
+  "failed": 7,
+  "run_id": "upstream"
 }
