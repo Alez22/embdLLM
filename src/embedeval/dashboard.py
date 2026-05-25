@@ -568,11 +568,27 @@ def history() -> str:
         model_tags = " ".join(
             f'<span class="tag">{m.split("/")[-1]}</span>' for m in models
         )
-        pct = int(passed / total * 100) if total else 0
         bar = _score_bar(passed / total if total else 0)
+
+        # Total output tokens for the run
+        output_tokens = sum(
+            c.get("token_usage", {}).get("output_tokens", 0) for c in cases
+        )
+        tokens_str = f"{output_tokens:,}"
+
+        # A run is complete if every case produced generated_code (non-empty).
+        # Cases that errored before the LLM call have empty generated_code.
+        incomplete = sum(1 for c in cases if not c.get("generated_code", "").strip())
+        if incomplete == 0:
+            status_html = '<span class="badge badge-pass">complete</span>'
+        else:
+            status_html = f'<span class="badge badge-fail">partial ({total - incomplete}/{total})</span>'
+
         rows += f"""<tr>
-          <td style="font-family:monospace">{run['run_id']}</td>
+          <td style="font-family:monospace;font-size:0.8rem">{run['run_id']}</td>
           <td>{model_tags}</td>
+          <td>{status_html}</td>
+          <td style="color:#a0aec0;text-align:right;font-variant-numeric:tabular-nums">{tokens_str}</td>
           <td>{bar}</td>
           <td style="color:#718096">{passed}/{total}</td>
         </tr>"""
@@ -581,7 +597,7 @@ def history() -> str:
 <h1 style="margin-bottom:1rem">Run History</h1>
 <div class="card" style="padding:0;overflow:auto">
   <table>
-    <thead><tr><th>Run</th><th>Models</th><th>Score</th><th>Passed</th></tr></thead>
+    <thead><tr><th>Run</th><th>Models</th><th>Status</th><th style="text-align:right">Tokens out</th><th>Score</th><th>Passed</th></tr></thead>
     <tbody>{rows}</tbody>
   </table>
 </div>
