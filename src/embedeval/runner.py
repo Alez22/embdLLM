@@ -312,6 +312,7 @@ def _run_single_case(
     attempt: int,
     feedback_rounds: int,
     context_pack: str | None = None,
+    no_think: bool = False,
 ) -> EvalResult:
     """Evaluate one case/attempt — extracted so the caller can wrap it
     in a broad try/except without duplicating the happy-path logic."""
@@ -320,6 +321,7 @@ def _run_single_case(
         prompt=prompt,
         context_files=context_files,
         context_pack=context_pack,
+        no_think=no_think,
     )
 
     result = evaluate(
@@ -365,6 +367,7 @@ def _run_single_case(
                 model=model,
                 prompt=feedback_prompt,
                 context_pack=context_pack,
+                no_think=no_think,
             )
             generated_code = fb_response.generated_code
             result = evaluate(
@@ -402,6 +405,7 @@ def run_benchmark(
     extra_cases_dirs: list[Path] | None = None,
     checkpoint_path: Path | None = None,
     context_pack: str | None = None,
+    no_think: bool = False,
 ) -> list[EvalResult]:
     """Run the benchmark pipeline: discover, filter, LLM call, evaluate.
 
@@ -486,6 +490,7 @@ def run_benchmark(
                         attempt=attempt,
                         feedback_rounds=feedback_rounds,
                         context_pack=context_pack,
+                        no_think=no_think,
                     )
                 except Exception as exc:  # noqa: BLE001
                     # Catch ANY per-case error (UnicodeDecodeError,

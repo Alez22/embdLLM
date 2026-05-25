@@ -41,6 +41,9 @@ _PROSE_RETRY_SUFFIX = (
 )
 
 
+_NO_THINK_SUFFIX = "\n/no_think"
+
+
 def call_model(
     model: str,
     prompt: str,
@@ -49,6 +52,7 @@ def call_model(
     timeout: float = 300.0,
     max_retries: int = 3,
     rate_limit_delay: float = 1.0,
+    no_think: bool = False,
 ) -> LLMResponse:
     """Call an LLM model and return generated code.
 
@@ -64,11 +68,16 @@ def call_model(
         context_pack: Run-wide context (e.g. team's CLAUDE.md or expert pack)
             prepended to every prompt. Distinct from per-case `context_files`.
             See docs/CONTEXT-QUALITY-MODE.md for usage.
+        no_think: Append /no_think to the prompt to disable chain-of-thought
+            on models that support it (Qwen3, QwQ). Saves tokens on
+            rate-limited providers.
 
     If the first response looks like prose (no C-family tokens), retry once
     with a stronger "code only" instruction appended to the prompt.
     """
     full_prompt = _build_full_prompt(prompt, context_files, context_pack)
+    if no_think:
+        full_prompt = full_prompt + _NO_THINK_SUFFIX
 
     if model == "mock":
         return _mock_response(full_prompt)
@@ -308,11 +317,26 @@ def _strip_thinking(text: str) -> tuple[str, str]:
     Reasoning models (Qwen3, DeepSeek-R1, QwQ) emit these blocks before
     the actual code — leaving them in causes the prose-detector to retry
     and burns extra tokens on rate-limited providers.
+
+    Also handles truncated responses where the model hit the token limit
+    before emitting </think> — in that case everything after <think> is
+    reasoning and there is no code to extract.
     """
     blocks = _THINK_RE.findall(text)
-    thinking_content = "\n".join(b.strip() for b in blocks)
-    cleaned = _THINK_RE.sub("", text).strip()
-    return cleaned, thinking_content
+    if blocks:
+        thinking_content = "\n".join(b.strip() for b in blocks)
+        cleaned = _THINK_RE.sub("", text).strip()
+        return cleaned, thinking_content
+
+    # Unclosed <think> block — truncated by token limit.
+    # Everything from <think> onward is reasoning, not code.
+    open_match = re.search(r"<think>", text, re.IGNORECASE)
+    if open_match:
+        thinking_content = text[open_match.end():].strip()
+        cleaned = text[:open_match.start()].strip()
+        return cleaned, thinking_content
+
+    return text, ""
 
 
 _C_FAMILY_LANGS = {"c", "cpp", "c++", "cc", "h", "hpp", "objective-c"}

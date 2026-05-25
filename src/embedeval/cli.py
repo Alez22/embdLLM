@@ -283,6 +283,17 @@ def run(
             ),
         ),
     ] = None,
+    no_think: Annotated[
+        bool,
+        typer.Option(
+            "--no-think",
+            help=(
+                "Append /no_think to every prompt to disable chain-of-thought "
+                "on models that support it (Qwen3, QwQ). Saves tokens on "
+                "rate-limited providers."
+            ),
+        ),
+    ] = False,
     verbose: Annotated[
         bool,
         typer.Option("--verbose", "-v", help="Enable verbose logging"),
@@ -458,6 +469,7 @@ def run(
             extra_cases_dirs=extra_dirs,
             checkpoint_path=checkpoint_path,
             context_pack=context_pack_text,
+            no_think=no_think,
         )
 
     if not results:
