@@ -1,187 +1,170 @@
-# embedeval-nxp
+# EmbedEval
 
-**LLM benchmark for NXP bare-metal firmware development.**
+**Benchmark for evaluating LLMs on embedded firmware tasks.**
 
-Fork/extension of [EmbedEval](https://github.com/Ecro/embedeval) adding NXP MCUXpresso SDK
-cases, new task types absent from the upstream project, and a human-in-the-loop review workflow.
+Embedded firmware development has specific requirements that general-purpose coding benchmarks
+do not capture: hardware abstraction layers, peripheral initialization sequences, timing
+constraints, ISR safety, memory layout, and SDK-specific API conventions. A model that scores
+well on LeetCode or HumanEval may still produce dangerous firmware code that compiles cleanly
+but silently violates hardware constraints.
 
----
-
-## Why This Exists
-
-Upstream EmbedEval covers Zephyr, ESP-IDF, STM32 HAL, FreeRTOS, Linux kernel.
-**NXP bare-metal is completely absent.** For audio amplifier firmware development on
-Kinetis/MCX platforms with MCUXpresso SDK, this gap makes the upstream benchmark
-useless for deciding which local LLM to deploy.
-
-Secondary goal: evaluate task types that upstream ignores entirely — refactoring,
-documentation generation (Doxygen), code explanation, and architectural reasoning.
-These are high-value for daily firmware work but require human judgment to grade.
+This project measures that gap — across both frontier models (GPT-4, Claude, Gemini) and
+open-weight models deployable on local hardware (Llama, Qwen, Mistral, DeepSeek).
 
 ---
 
-## Getting Started
+## The Core Question
 
-### 1. Fork the upstream repo
+> **Can open-weight models running locally match frontier models on embedded firmware tasks?**
 
-Go to https://github.com/Ecro/embedeval and click **Fork** (top-right).
-This creates your own copy under `github.com/YOUR_USERNAME/embedeval`.
-
-### 2. Clone your fork locally
-
-```bash
-# Replace YOUR_USERNAME with your GitHub username
-git clone https://github.com/YOUR_USERNAME/embedeval.git embedeval-nxp
-cd embedeval-nxp
-```
-
-### 3. Install and validate
-
-```bash
-# Install dependencies
-uv sync
-
-# Validate that upstream cases work (optional)
-uv run embedeval validate --cases cases/zephyr/ --category isr-concurrency
-
-# Test the pipeline with a mock model (free, no API key)
-uv run embedeval run --model mock --cases cases/zephyr/isr-concurrency-001/
-```
+This matters because production firmware often cannot leave private infrastructure.
+If a 70B open-weight model running on-premise reaches 80% of GPT-4's accuracy on real
+firmware tasks, the trade-off is acceptable. If it reaches 40%, it is not.
+This benchmark gives a data-driven answer.
 
 ---
 
-## Key Design Principle: Implicit Knowledge
+## What Makes Embedded Different
 
-Prompts state **what** to build, never **how** to make it safe.
+Standard coding benchmarks miss the implicit knowledge embedded engineers carry:
 
 ```
 Prompt:  "Implement an I2C master read from register 0x75 on device 0x68.
-          Use NXP MCUXpresso SDK for MCXC144. Handle communication errors."
+          Use the MCUXpresso SDK. Handle communication errors."
 
-What an embedded engineer knows (not in prompt):
-  - CLOCK_EnableClock() before I2C_MasterInit()
-  - PORT_SetPinMux() before peripheral use
-  - Address must be left-shifted for 8-bit format (0x68 << 1)
-  - I2C_MasterTransferBlocking() return value must be checked
-  - kI2C_TransferDefaultFlag for standard transfers
+What the model must know without being told:
+  — Enable the peripheral clock before calling I2C_MasterInit()
+  — Configure pin mux before peripheral use
+  — Use 7-bit address format (SDK shifts internally — 0x68, not 0xD0)
+  — Check the return value of I2C_MasterTransferBlocking()
+  — Set kI2C_TransferDefaultFlag in the transfer struct
 ```
 
-A model that writes correct code without being told these things has real domain knowledge.
-A model that needs explicit hints is not safe to use unsupervised on production firmware.
+A model that gets this right without hints has real domain knowledge.
+A model that needs explicit guidance is not safe to use on production firmware.
+
+Every prompt in this benchmark states **what** to build, never **how** to make it correct.
+The checks verify knowledge the model must bring from its training data.
+
+---
+
+## Evaluation Layers
+
+Each case runs up to five evaluation layers, stopping at the first failure:
+
+| Layer | Name | What it checks |
+|-------|------|----------------|
+| L0 | Static analysis | Required headers, APIs, anti-hallucination patterns |
+| L1 | Compile gate | Code compiles for the target (Docker, SDK toolchain) |
+| L2 | Runtime execution | Correct behavior on native simulator |
+| L3 | Static heuristic | Implicit knowledge: ordering, safety, SDK conventions |
+| L4 | Mutation proof | Test suite catches seeded bugs |
+
+L1 requires Docker with the target SDK. L1-skip cases (bare-metal, no RTOS) run L0+L3 only.
 
 ---
 
 ## Task Types
 
-This project covers task types missing from all existing embedded LLM benchmarks:
-
 | Type | Description | Grading |
 |------|-------------|---------|
-| Generation | Write firmware from spec (implicit) | Automated (compile + checks) |
-| Bug detection | Find bug in seeded-mutation code | Automated (mutation pass/fail) |
-| Refactoring | Reduce complexity/stack, preserve behavior | Automated (lizard + regression) |
-| Documentation | Generate Doxygen headers | Human review + LLM pre-screen |
-| Explanation | Explain legacy/obfuscated code | Human review + LLM pre-screen |
-| Test generation | Write Unity tests for a module | Automated (compile + mutation coverage) |
-| Architecture | Design a system (e.g. power-safe flash) | Human review + LLM pre-screen |
+| Generation | Write firmware from spec | Automated |
+| Bug detection | Find a seeded bug | Automated |
+| Refactoring | Reduce complexity, preserve behavior | Automated (lizard + regression) |
+| Documentation | Generate Doxygen headers | Automated + human review |
+| Test generation | Write unit tests for a module | Automated (compile + mutation coverage) |
+| Architecture | Design a system component | Human review |
 
 ---
 
-## Human Review Workflow
+## SDK Coverage
 
-For subjective tasks, an LLM pre-screener (Opus/Sonnet) analyzes the output
-and produces a structured critique before the human reviews it.
+Cases exist for the following SDKs and platforms:
 
-```
-model output → LLM pre-analysis (JSON) → human confirms/overrides scores
-```
-
-This halves review time: the LLM handles reading and initial assessment,
-the human handles final judgment on correctness and domain accuracy.
+| SDK | Platforms | Cases |
+|-----|-----------|-------|
+| Zephyr RTOS | nRF52, STM32, native_sim | upstream |
+| ESP-IDF | ESP32 | upstream |
+| STM32 HAL | STM32F4, STM32H7 | upstream |
+| FreeRTOS | generic Cortex-M | upstream |
+| Linux kernel | drivers, sysfs | upstream |
+| MCUXpresso SDK | MCXC144 (M0+), RT1170 (M7+M4) | this repo |
 
 ---
 
 ## Model Strategy
 
-**Phase 1 — Benchmark now (cloud APIs):**
-Same model weights, no local hardware needed yet.
+**Phase 1 — Benchmark via cloud APIs.**
+Run the same model weights through Groq/OpenRouter without local hardware.
 
-| Provider | Models | Notes |
-|----------|--------|-------|
-| Groq | llama-3.3-70b-versatile, qwen-qwq-32b | Free tier, fast |
-| OpenRouter | devstral, qwen3-coder, deepseek-v3 | Wider selection |
-| Anthropic | claude-opus-4, claude-sonnet-4.6 | Reference ceiling |
+| Provider | Models |
+|----------|--------|
+| Groq | llama-3.3-70b-versatile, qwen3-32b |
+| OpenRouter | devstral, qwen3-coder, deepseek-v3 |
+| Anthropic | claude-sonnet-4.6, claude-opus-4 (reference ceiling) |
 
-**Phase 2 — Deploy locally (Ollama):**
-Once dedicated hardware is available, redeploy the winner from Phase 1.
+**Phase 2 — Deploy the winner locally via Ollama.**
 Benchmark results transfer directly — same weights, same scores.
+The only variable that changes is latency and privacy.
 
 ---
 
 ## Getting Started
 
-### 1. Fork the upstream repo
-
-Go to https://github.com/Ecro/embedeval and click **Fork** (top-right).
-This creates your own copy under `github.com/YOUR_USERNAME/embedeval`.
-
-### 2. Clone your fork locally
-
 ```bash
-# Replace YOUR_USERNAME with your GitHub username
-git clone https://github.com/YOUR_USERNAME/embedeval.git embedeval-nxp
-cd embedeval-nxp
-
-# (optional) Rename the remote to distinguish your fork
-git remote rename origin my-fork
-```
-
-### 3. Install and validate
-
-```bash
-# Install dependencies and activate environment
+# Install
 uv sync
 
-# Validate all reference solutions pass their checks
-uv run embedeval validate --cases cases/nxp-bare-metal/
-
-# Run benchmark against a model (mock = no API key needed)
-uv run embedeval run --model mock --cases cases/nxp-bare-metal/
+# Run with a mock model (no API key needed)
+uv run embedeval run --model mock --cases cases/
 
 # Run against Groq (free tier)
 export GROQ_API_KEY=your_key_here
 uv run embedeval run \
   --model groq/llama-3.3-70b-versatile \
-  --cases cases/nxp-bare-metal/ \
+  --cases cases/ \
   --attempts 3
 
-# Human review of subjective tasks
-uv run embedeval review \
-  --cases cases/nxp-bare-metal/ \
-  --reviewer-model anthropic/claude-opus-4-20250514
+# Open the results dashboard
+uv run embedeval dashboard
 ```
 
 ---
 
-## NXP Case Categories
+## Results Dashboard
 
-| Category | Target Knowledge |
-|----------|-----------------|
-| nxp-gpio | GPIO init, pin mux, IRQ, clock gate |
-| nxp-i2c | I2C master/slave, address format, error handling |
-| nxp-spi | SPI master, CS manual control, transfer sequences |
-| nxp-uart | UART async TX/RX, ring buffer, baud config |
-| nxp-dma | DMA transfer, completion callback, channel config |
-| nxp-timer | Periodic interrupt, callback safety, reload |
-| nxp-isr | ISR-safe shared data, volatile, __DSB, atomic |
-| nxp-flash | Flash lifecycle, erase/write/verify, power-loss safety |
-| nxp-watchdog | WDT feed timing, reset handling |
-| nxp-lowpower | Sleep mode entry, wakeup sources, peripheral shutdown |
+```bash
+uv run embedeval dashboard
+# → http://localhost:7860
+```
+
+Leaderboard shows models ranked by pass rate, broken down by difficulty (Easy / Medium / Hard).
+Each cell links to a detailed view with check results and a diff against the reference solution.
 
 ---
 
-## Relation to Upstream EmbedEval
+## Adding Cases
 
-This project is a fork, not a replacement. Upstream STM32/FreeRTOS/Zephyr cases are
-preserved. NXP cases follow the identical case format (metadata.yaml + prompt.md +
-checks/) so they could eventually be contributed upstream via PR.
+Cases follow a simple directory layout:
+
+```
+cases/<sdk-bucket>/<case-id>/
+├── metadata.yaml     # id, platform, sdk, difficulty, tier, tags
+├── prompt.md         # what to build — never how to make it safe
+├── reference/
+│   └── main.c        # correct implementation
+└── checks/
+    ├── static.py     # L0: required headers, APIs, no hallucination
+    └── behavior.py   # L3: implicit knowledge, ordering, safety
+```
+
+The prompt must state what to build, never mention safety requirements, clock enables,
+address formats, or any other knowledge the model is expected to have.
+
+---
+
+## Relation to Upstream
+
+Built on top of [EmbedEval](https://github.com/Ecro/embedeval), which covers Zephyr,
+ESP-IDF, STM32 HAL, FreeRTOS, and Linux. Upstream cases are preserved unchanged.
+New cases follow the identical format and can be contributed upstream via PR.
