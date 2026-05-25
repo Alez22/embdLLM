@@ -92,7 +92,31 @@ Task types absent from all existing embedded LLM benchmarks.
 
 ---
 
-## Phase 4 — Human Review Workflow
+## Phase 4 — Results Dashboard
+
+Web dashboard locale per esplorare i risultati del benchmark: confronto
+codice generato vs reference, check pass/fail, leaderboard visiva, storico run.
+
+**Dipendenze:** `fastapi`, `uvicorn` (da aggiungere a `pyproject.toml`).
+**Avvio:** `uv run embedeval dashboard` → apre `http://localhost:7860`.
+**Fonte dati:** legge direttamente i JSON esistenti in `results/` e i file
+`reference/main.c` + `metadata.yaml` dei casi — nessun DB aggiuntivo.
+
+- [ ] **Aggiungere `fastapi` e `uvicorn`** a `pyproject.toml`.
+- [ ] **`src/embedeval/dashboard.py`** — server FastAPI:
+  - `GET /` → leaderboard: tabella modelli × casi, celle colorate pass/fail/non-runnato
+  - `GET /case/<case_id>/<model>` → dettaglio: check list + diff side-by-side generato vs reference
+    con selettore attempt se ne esistono più di uno
+  - `GET /history` → lista run ordinata per data, click filtra la leaderboard
+  - Syntax highlight del C con Pygments (già installato)
+- [ ] **Aggiungere `dashboard` subcommand a `src/embedeval/cli.py`**.
+- [ ] **Verificare che con `--attempts N` tutti gli attempt vengano salvati**
+  come file separati in `results/runs/*/details/` (bug osservato: con n=3
+  viene scritto un solo file).
+
+---
+
+## Phase 5 — Human Review Workflow
 
 - [ ] **`src/embedeval/review.py`** — new module:
   - `load_review_cases(cases_dir)` — discover cases with `checks/review.py`
@@ -112,7 +136,7 @@ Task types absent from all existing embedded LLM benchmarks.
 
 ---
 
-## Phase 5 — Cloud Model Integration
+## Phase 6 — Cloud Model Integration
 
 - [ ] **Verify Groq provider** works end-to-end with embedeval LiteLLM client:
   - `groq/llama-3.3-70b-versatile`
@@ -130,7 +154,7 @@ Task types absent from all existing embedded LLM benchmarks.
 
 ---
 
-## Phase 6 — Knowledge Currency Probing
+## Phase 7 — Knowledge Currency Probing
 
 Tests whether the model's knowledge of a framework is current or stale.
 This is a separate axis from capability — a highly capable model with an old training
@@ -208,7 +232,7 @@ More opaque changelog than Zephyr — populate from SDK release notes as encount
 
 ---
 
-## Phase 7 — Language-variant evaluation (IT/EN prompt reproducibility)
+## Phase 8 — Language-variant evaluation (IT/EN prompt reproducibility)
 
 **Depends on:** Phase 1 (L1 compile) and Phase 3 (lizard + .text measurement).
 Reuses the existing repetition mechanism (`--attempts`) — not a new subsystem,
@@ -274,7 +298,7 @@ indistinguishable from sampling noise and is reported as "no measurable effect".
 
 ---
 
-## Phase 8 — Incremental execution (two-tier cache)
+## Phase 9 — Incremental execution (two-tier cache)
 
 **Goal:** consume the fewest tokens possible and avoid useless regenerations.
 Treat results as a persistent corpus, not as one-shot runs. Each launch reconciles
