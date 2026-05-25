@@ -357,6 +357,25 @@ re-runs while authoring cases don't re-burn the LLM calls.
 
 ---
 
+## Dashboard — Miglioramenti futuri
+
+Miglioramenti noti alla dashboard (`src/embedeval/dashboard.py`) non ancora risolti.
+
+- [ ] **Syntax highlight codice C** — `highlight.js` funziona sul Python ma non sul C.
+  Il bundle `highlight.min.js` da CDN sembra non includere il language pack C.
+  Opzioni da esplorare: usare Pygments lato server (genera HTML colorato senza JS),
+  oppure trovare la URL CDN corretta che include tutti i language pack.
+- [ ] **Editor checks** — i file `checks/static.py` e `checks/behavior.py` sono oggi
+  read-only. Aggiungere la possibilità di editarli dalla dashboard (POST `/cases/<id>/checks/<file>`).
+- [ ] **Selettore attempt** nella pagina detail `/case/<id>/<model>` — oggi viene mostrato
+  sempre l'attempt più recente. Con `--attempts N > 1` sarebbe utile poter scegliere
+  quale attempt visualizzare.
+- [ ] **Filtri leaderboard** — filtrare per SDK, categoria o tier senza ricaricare la pagina.
+- [ ] **Link diretto** dalla leaderboard alla pagina caso (`/cases/<id>`) oltre che
+  al dettaglio run (`/case/<id>/<model>`).
+
+---
+
 ## Backlog (not scheduled)
 
 - Hardware-in-the-loop (L5): flash code to real MCXC144 board, verify via serial output.

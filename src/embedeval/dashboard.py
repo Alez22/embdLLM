@@ -14,7 +14,8 @@ from threading import Timer
 
 import yaml
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
+from pydantic import BaseModel
 
 app = FastAPI(title="EmbedEval Dashboard")
 
@@ -91,6 +92,40 @@ def _find_prompt(case_id: str) -> str | None:
     return None
 
 
+def _find_case_dir(case_id: str) -> Path | None:
+    """Return the case directory Path, or None if not found."""
+    for sdk_dir in CASES_DIR.iterdir():
+        if not sdk_dir.is_dir():
+            continue
+        candidate = sdk_dir / case_id
+        if candidate.is_dir():
+            return candidate
+    return None
+
+
+def _all_cases() -> list[dict]:
+    """Return all cases sorted by sdk then case_id, with their metadata."""
+    cases = []
+    if not CASES_DIR.is_dir():
+        return cases
+    for sdk_dir in sorted(CASES_DIR.iterdir()):
+        if not sdk_dir.is_dir():
+            continue
+        for case_dir in sorted(sdk_dir.iterdir()):
+            if not case_dir.is_dir():
+                continue
+            meta_file = case_dir / "metadata.yaml"
+            if not meta_file.is_file():
+                continue
+            try:
+                meta = yaml.safe_load(meta_file.read_text()) or {}
+            except Exception:
+                meta = {}
+            meta["_case_id"] = case_dir.name
+            cases.append(meta)
+    return cases
+
+
 # ---------------------------------------------------------------------------
 # HTML helpers
 # ---------------------------------------------------------------------------
@@ -134,6 +169,9 @@ tr:hover td { background: #252840; }
 pre { background: #0d1117; border: 1px solid #2d3748; border-radius: 6px;
       padding: 1rem; overflow-x: auto; font-size: 0.8rem;
       line-height: 1.5; white-space: pre; }
+pre.hljs-wrap { background: transparent; border: none; padding: 0; }
+pre.hljs-wrap code.hljs { border-radius: 6px; font-size: 0.8rem;
+                           line-height: 1.5; display: block; }
 .diff-add { background: #1a3a2a; color: #68d391; display: block; }
 .diff-del { background: #3a1a1a; color: #fc8181; display: block; }
 .diff-ctx { display: block; color: #718096; }
@@ -158,12 +196,20 @@ _NAV = """
 <nav class="nav">
   <h1>EmbedEval</h1>
   <a href="/">Leaderboard</a>
+  <a href="/cases">Cases</a>
   <a href="/history">Run History</a>
 </nav>
 """
 
 
-def _page(title: str, body: str) -> str:
+_HLJS_HEAD = """
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css">
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+  <script>document.addEventListener('DOMContentLoaded', () => hljs.highlightAll());</script>"""
+
+
+def _page(title: str, body: str, highlight: bool = False) -> str:
+    hljs = _HLJS_HEAD if highlight else ""
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -171,6 +217,7 @@ def _page(title: str, body: str) -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{title} — EmbedEval</title>
   <style>{_BASE_CSS}</style>
+{hljs}
 </head>
 <body>
 {_NAV}
@@ -490,11 +537,11 @@ def case_detail(case_id: str, model: str) -> str:
       <div class="split" style="gap:0.5rem">
         <div>
           <h3>Reference</h3>
-          <pre>{ref_esc}</pre>
+          <pre class="hljs-wrap"><code class="language-c">{ref_esc}</code></pre>
         </div>
         <div>
           <h3>Generated</h3>
-          <pre>{gen_esc}</pre>
+          <pre class="hljs-wrap"><code class="language-c">{gen_esc}</code></pre>
         </div>
       </div>
     </div>
@@ -502,7 +549,7 @@ def case_detail(case_id: str, model: str) -> str:
 
 </div>
 """
-    return _page(f"{case_id} / {model_short}", body)
+    return _page(f"{case_id} / {model_short}", body, highlight=True)
 
 
 @app.get("/history", response_class=HTMLResponse)
@@ -540,3 +587,224 @@ def history() -> str:
 </div>
 """
     return _page("History", body)
+
+
+@app.get("/cases", response_class=HTMLResponse)
+def cases_list() -> str:
+    """List of all benchmark cases with metadata."""
+    cases = _all_cases()
+    if not cases:
+        return _page("Cases", "<div class='card'><p>No cases found.</p></div>")
+
+    rows = ""
+    for meta in cases:
+        case_id = meta.get("_case_id", "")
+        sdk = meta.get("sdk", "—")
+        diff = meta.get("difficulty", "—")
+        diff_badge = f'<span class="badge badge-{diff}">{diff}</span>' if diff in ("easy", "medium", "hard") else diff
+        tier = meta.get("tier", "—")
+        category = meta.get("category", "—")
+        title = meta.get("title", "")
+        tags = " ".join(f'<span class="tag">{t}</span>' for t in meta.get("tags", []))
+        rows += f"""<tr>
+          <td><a href="/cases/{case_id}">{case_id}</a></td>
+          <td style="color:#718096;font-size:0.8rem">{sdk}</td>
+          <td>{diff_badge}</td>
+          <td style="color:#718096">{category}</td>
+          <td style="color:#718096">{tier}</td>
+          <td style="color:#a0aec0;font-size:0.8rem">{title}</td>
+          <td>{tags}</td>
+        </tr>"""
+
+    body = f"""
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem">
+  <h1>Cases</h1>
+  <span style="color:#718096;font-size:0.85rem">{len(cases)} cases</span>
+</div>
+<div class="card" style="padding:0;overflow:auto">
+  <table>
+    <thead><tr>
+      <th>Case ID</th><th>SDK</th><th>Difficulty</th>
+      <th>Category</th><th>Tier</th><th>Title</th><th>Tags</th>
+    </tr></thead>
+    <tbody>{rows}</tbody>
+  </table>
+</div>
+"""
+    return _page("Cases", body)
+
+
+def _editor_panel(
+    label: str,
+    subtitle: str,
+    editor_id: str,
+    content_esc: str,
+    save_fn: str,
+    msg_id: str,
+) -> str:
+    """Reusable editable panel with Save button."""
+    return f"""
+<div class="card">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem">
+    <h2 style="margin:0">{label} <span style="font-weight:normal;color:#718096;font-size:0.8rem">{subtitle}</span></h2>
+    <div style="display:flex;align-items:center;gap:1rem">
+      <span id="{msg_id}" style="font-size:0.8rem"></span>
+      <button onclick="{save_fn}()"
+        style="background:#2d3748;border:1px solid #4a5568;color:#e2e8f0;
+               padding:4px 14px;border-radius:4px;cursor:pointer;font-size:0.85rem">
+        Save
+      </button>
+    </div>
+  </div>
+  <textarea id="{editor_id}"
+    style="width:100%;height:480px;background:#0d1117;color:#e2e8f0;
+           border:1px solid #2d3748;border-radius:6px;padding:0.75rem;
+           font-family:monospace;font-size:0.8rem;line-height:1.5;resize:vertical"
+    spellcheck="false">{content_esc}</textarea>
+</div>"""
+
+
+def _check_panel(case_dir: Path) -> str:
+    """Read-only panel showing checks/static.py and checks/behavior.py."""
+    checks_dir = case_dir / "checks"
+    if not checks_dir.is_dir():
+        return "<div class='card'><h2>Checks</h2><p style='color:#718096'>No checks directory found.</p></div>"
+
+    html = "<div class='card'><h2>Checks</h2>"
+    for fname in ("static.py", "behavior.py"):
+        fpath = checks_dir / fname
+        if not fpath.is_file():
+            continue
+        code = fpath.read_text(encoding="utf-8")
+        code_esc = code.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        html += (
+            f'<h3 style="margin-top:1rem">{fname}</h3>'
+            f'<pre class="hljs-wrap" style="max-height:480px;overflow-y:auto">'
+            f'<code class="language-python">{code_esc}</code></pre>'
+        )
+    html += "</div>"
+    return html
+
+
+@app.get("/cases/{case_id}", response_class=HTMLResponse)
+def case_editor(case_id: str) -> str:
+    """Case detail: prompt editor, reference editor, checks (read-only)."""
+    case_dir = _find_case_dir(case_id)
+    if case_dir is None:
+        raise HTTPException(status_code=404, detail=f"Case {case_id} not found")
+
+    meta = _find_metadata(case_id)
+    prompt = _find_prompt(case_id) or ""
+    reference = _find_reference(case_id) or ""
+
+    diff = meta.get("difficulty", "")
+    diff_badge = f'<span class="badge badge-{diff}">{diff}</span>' if diff else ""
+    tags = " ".join(f'<span class="tag">{t}</span>' for t in meta.get("tags", []))
+
+    prompt_esc = prompt.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    ref_esc = reference.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+    save_js = f"""
+function _save(url, content, msgId, confirmMsg) {{
+  if (!confirm(confirmMsg)) return;
+  fetch(url, {{
+    method: 'POST',
+    headers: {{'Content-Type': 'application/json'}},
+    body: JSON.stringify({{content: content}})
+  }})
+  .then(r => r.json())
+  .then(data => {{
+    const msg = document.getElementById(msgId);
+    msg.textContent = data.ok ? 'Saved.' : ('Error: ' + data.error);
+    msg.style.color = data.ok ? '#68d391' : '#fc8181';
+    setTimeout(() => {{ msg.textContent = ''; }}, 3000);
+  }});
+}}
+function savePrompt() {{
+  _save('/cases/{case_id}/prompt',
+        document.getElementById('prompt-editor').value,
+        'prompt-msg', 'Overwrite prompt.md for {case_id}?');
+}}
+function saveReference() {{
+  _save('/cases/{case_id}/reference',
+        document.getElementById('ref-editor').value,
+        'ref-msg', 'Overwrite reference/main.c for {case_id}?');
+}}
+"""
+
+    prompt_panel = _editor_panel("Prompt", "prompt.md", "prompt-editor", prompt_esc, "savePrompt", "prompt-msg")
+    ref_panel = _editor_panel("Reference", "reference/main.c", "ref-editor", ref_esc, "saveReference", "ref-msg")
+
+    body = f"""
+<div style="margin-bottom:1rem;display:flex;align-items:center;gap:1.5rem">
+  <a href="/cases" style="color:#718096;font-size:0.85rem">← Cases</a>
+  <a href="/cases/{case_id}/checks" style="color:#718096;font-size:0.85rem">View checks →</a>
+</div>
+<div class="card">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:0.5rem">
+    <h1>{case_id}</h1>
+    {diff_badge}
+    <span style="color:#718096;font-size:0.85rem">{meta.get('sdk','')}</span>
+    <span style="color:#718096;font-size:0.85rem">{meta.get('category','')}</span>
+  </div>
+  <p style="color:#a0aec0;margin-bottom:0.5rem">{meta.get('title','')}</p>
+  <div>{tags}</div>
+</div>
+
+<div class="split">
+  {prompt_panel}
+  {ref_panel}
+</div>
+<script>{save_js}</script>
+"""
+    return _page(case_id, body)
+
+
+class _FilePayload(BaseModel):
+    content: str
+
+
+@app.get("/cases/{case_id}/checks", response_class=HTMLResponse)
+def case_checks(case_id: str) -> str:
+    """Read-only view of checks/static.py and checks/behavior.py."""
+    case_dir = _find_case_dir(case_id)
+    if case_dir is None:
+        raise HTTPException(status_code=404, detail=f"Case {case_id} not found")
+
+    checks_html = _check_panel(case_dir)
+
+    body = f"""
+<div style="margin-bottom:1rem">
+  <a href="/cases/{case_id}" style="color:#718096;font-size:0.85rem">← {case_id}</a>
+</div>
+{checks_html}
+"""
+    return _page(f"{case_id} / checks", body, highlight=True)
+
+
+@app.post("/cases/{case_id}/prompt")
+def save_prompt(case_id: str, payload: _FilePayload) -> JSONResponse:
+    """Overwrite prompt.md for a case."""
+    case_dir = _find_case_dir(case_id)
+    if case_dir is None:
+        return JSONResponse({"ok": False, "error": f"Case {case_id} not found"}, status_code=404)
+    try:
+        (case_dir / "prompt.md").write_text(payload.content, encoding="utf-8")
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
+    return JSONResponse({"ok": True})
+
+
+@app.post("/cases/{case_id}/reference")
+def save_reference(case_id: str, payload: _FilePayload) -> JSONResponse:
+    """Overwrite reference/main.c for a case."""
+    case_dir = _find_case_dir(case_id)
+    if case_dir is None:
+        return JSONResponse({"ok": False, "error": f"Case {case_id} not found"}, status_code=404)
+    ref_file = case_dir / "reference" / "main.c"
+    try:
+        ref_file.parent.mkdir(parents=True, exist_ok=True)
+        ref_file.write_text(payload.content, encoding="utf-8")
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
+    return JSONResponse({"ok": True})
