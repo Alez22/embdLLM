@@ -1,0 +1,25 @@
+id: nxp-mcxc-flash-001
+category: storage
+difficulty: hard
+title: NXP MCXC144 Flash Erase, Write and Verify
+description: Erase a flash sector, write data, and verify the write on MCXC144 using the MCUXpresso SDK flash driver
+tags:
+- nxp
+- bare-metal
+- flash
+- storage
+- mcuxpresso
+- mcxc144
+- cortex-m0plus
+platform: nxp_bare_metal
+sdk: mcuxpresso-sdk
+estimated_tokens: 600
+sdk_version: SDK2_x_MCXC144
+visibility: public
+created_date: '2026-05-26'
+tier: core
+l1_skip: true
+reasoning_types:
+- system_reasoning
+- api_recall
+- rule_application

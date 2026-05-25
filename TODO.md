@@ -33,19 +33,18 @@ Foundation required before any NXP cases can be validated.
 10 core cases covering the most relevant categories for audio amplifier firmware.
 Each prompt must NOT mention safety requirements — implicit knowledge only.
 
-- [ ] `nxp-gpio-001` — GPIO output init + toggle. Implicit: clock gate, pin mux order.
-- [ ] `nxp-gpio-002` — GPIO input with edge IRQ. Implicit: NVIC enable, volatile flag, ISR naming.
+- [x] `nxp-gpio-001` — GPIO output init + toggle. Implicit: clock gate, pin mux order.
+- [x] `nxp-gpio-002` — GPIO input with edge IRQ. Implicit: NVIC enable, volatile flag, ISR naming.
 - [x] `nxp-i2c-001` — I2C master register read. Implicit: clock, pin mux, address shift, error check. — done as `nxp-mcxc-i2c-001`
-- [ ] `nxp-i2c-002` — I2C master write + read sequence. Implicit: repeated start, stop condition.
-- [ ] `nxp-spi-001` — SPI master transfer with manual CS. Implicit: CS assert order, clock polarity.
-- [ ] `nxp-uart-001` — UART TX blocking. Implicit: clock enable, baud config, FIFO flush.
-- [ ] `nxp-uart-002` — UART RX interrupt-driven with ring buffer. Implicit: volatile ring buffer, ISR safety.
-- [ ] `nxp-timer-001` — Periodic PIT interrupt. Implicit: clock gate, NVIC, volatile counter, ISR naming.
-- [ ] `nxp-isr-001` — ISR-to-main data transfer. Implicit: volatile, memory barrier (__DSB), atomic flag.
-- [ ] `nxp-flash-001` — Flash sector erase + write + verify. Implicit: erase before write, alignment, timeout.
-- [ ] `nxp-flash-002` — Power-loss safe write pattern. Implicit: write-then-validate, recovery on partial write.
-  Note: this is the hardest case — maps directly to the safeFlash WAL architecture.
-- [ ] `nxp-watchdog-001` — WDT init + feed in main loop. Implicit: feed before timeout, refresh window.
+- [x] `nxp-i2c-002` — I2C master write + read sequence. Implicit: two separate transfers, address not pre-shifted.
+- [x] `nxp-spi-001` — SPI master transfer with manual CS. Implicit: CS assert order, clock polarity, idle-high.
+- [x] `nxp-uart-001` — UART TX blocking. Implicit: clock enable, enableTx in config.
+- [x] `nxp-uart-002` — UART RX interrupt-driven with ring buffer. Implicit: volatile ring buffer, NVIC, RX flag check.
+- [x] `nxp-timer-001` — Periodic PIT interrupt. Implicit: clock gate, NVIC, volatile counter, flag clear in ISR.
+- [x] `nxp-isr-001` — ISR-to-main data transfer. Implicit: volatile flag + value, ready flag cleared before consume.
+- [x] `nxp-flash-001` — Flash sector erase + write + verify. Implicit: erase before write, erase key, status check.
+- [x] `nxp-flash-002` — Power-loss safe write pattern. Implicit: two slots, inactive-first, CRC excludes CRC field.
+- [x] `nxp-watchdog-001` — WDT init + feed in main loop. Implicit: LPO clock source, long timeout, refresh in loop.
 
 ---
 
