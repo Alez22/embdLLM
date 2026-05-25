@@ -1,6 +1,6 @@
 # EmbedEval Test Results
 
-*Last updated: 2026-05-25 21:23 UTC*
+*Last updated: 2026-05-25 21:38 UTC*
 
 ## Summary
 
@@ -11,6 +11,7 @@
 | claude-code://haiku | 233 | 133 | 100 | 57.1% | 189 |
 | claude-code://sonnet | 239 | 163 | 76 | 68.2% | 189 |
 | groq/llama-3.3-70b-versatile | 3 | 1 | 2 | 33.3% | 1 |
+| groq/meta-llama/llama-4-scout-17b-16e-instruct | 1 | 0 | 1 | 0.0% | - |
 | groq/openai/gpt-oss-120b | 1 | 1 | 0 | 100.0% | - |
 | groq/openai/gpt-oss-20b | 1 | 0 | 1 | 0.0% | - |
 | groq/qwen/qwen3-32b | 1 | 0 | 1 | 0.0% | - |
@@ -699,6 +700,18 @@
 |------|-------|---------------|--------|--------|
 | kconfig-003 | L0 | uart_line_ctrl_enabled | 2026-05-25 | - |
 | nxp-mcxc-i2c-001 | L0 | header_fsl_port_h, header_fsl_clock_h, i2c_master_init_called, i2c_blocking_transfer_used | 2026-05-25 | RETEST |
+
+## groq/meta-llama/llama-4-scout-17b-16e-instruct
+
+| Category | Cases | Passed | pass@1 | Failed Checks |
+|----------|-------|--------|--------|---------------|
+| nxp-mcxc-i2c | 1 | 0 | 0% | header_fsl_port_h, header_fsl_clock_h, i2c_master_init_called |
+
+### Failed Cases (1)
+
+| Case | Layer | Failed Checks | Tested |
+|------|-------|---------------|--------|
+| nxp-mcxc-i2c-001 | L0 | header_fsl_port_h, header_fsl_clock_h, i2c_master_init_called, i2c_blocking_transfer_used | 2026-05-25 |
 
 ## groq/openai/gpt-oss-120b
 

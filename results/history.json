@@ -318,5 +318,13 @@
     "passed": 1,
     "failed": 0,
     "pass_at_1": 1.0
+  },
+  {
+    "timestamp": "2026-05-25",
+    "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "pass_at_1": 0.0
   }
 ]

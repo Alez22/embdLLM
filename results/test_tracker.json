@@ -7295,6 +7295,27 @@
         "output_tokens": 2356,
         "cost_usd": 0.0
       }
+    },
+    "groq/meta-llama/llama-4-scout-17b-16e-instruct": {
+      "nxp-mcxc-i2c-001": {
+        "case_id": "nxp-mcxc-i2c-001",
+        "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+        "passed": false,
+        "failed_at_layer": 0,
+        "failed_checks": [
+          "header_fsl_port_h",
+          "header_fsl_clock_h",
+          "i2c_master_init_called",
+          "i2c_blocking_transfer_used"
+        ],
+        "case_git_hash": "924f5f6c29871b63",
+        "tested_at": "2026-05-25T21:38:42.103291+00:00",
+        "pass_at_1": 0.0,
+        "attempts": 1,
+        "input_tokens": 144,
+        "output_tokens": 419,
+        "cost_usd": 0.0
+      }
     }
   },
   "context_pack_hash": null

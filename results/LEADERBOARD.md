@@ -7,10 +7,11 @@
 
 | Model | pass@1 (full) | pass@1 (quality) | 95% CI | pass@5 | Passed | Quality | Total | Samples |
 |-------|---------------|------------------|--------|--------|--------|---------|-------|---------|
-| groq/openai/gpt-oss-120b | 100.0% | 100.0% | [20.7%, 100.0%] | 100.0% | 1 | 1 | 1 | n=1 |
+| groq/meta-llama/llama-4-scout-17b-16e-instruct | 0.0% | 0.0% | [0.0%, 79.3%] | 0.0% | 0 | 0 | 1 | n=1 |
 | claude-code://haiku | 59.8% | 72.0% | [52.7%, 66.5%] | 59.8% | 113 | 136 | 189 | n=1 |
 | claude-code://sonnet | 70.9% | 83.6% | [64.1%, 76.9%] | 70.9% | 134 | 158 | 189 | n=1 |
 | groq/llama-3.3-70b-versatile | 33.3% | 33.3% | [6.1%, 79.2%] | 33.3% | 1 | 1 | 3 | n=1 |
+| groq/openai/gpt-oss-120b | 100.0% | 100.0% | [20.7%, 100.0%] | 100.0% | 1 | 1 | 1 | n=1 |
 | groq/openai/gpt-oss-20b | 0.0% | 0.0% | [0.0%, 79.3%] | 0.0% | 0 | 0 | 1 | n=1 |
 | groq/qwen/qwen3-32b | 0.0% | 0.0% | [0.0%, 79.3%] | 0.0% | 0 | 0 | 1 | n=1 |
 
@@ -20,7 +21,7 @@
 
 | Tier | pass@1 | Passed | Total |
 |------|--------|--------|-------|
-| Core | 100.0% | 1 | 1 |
+| Core | 0.0% | 0 | 1 |
 | Sanity (not scored) | 33.3% | 1 | 3 |
 | Core | 67.3% | 66 | 98 |
 | Challenge | 52.3% | 46 | 88 |
@@ -29,6 +30,7 @@
 | Challenge | 64.8% | 57 | 88 |
 | Sanity (not scored) | 50.0% | 1 | 2 |
 | Core | 0.0% | 0 | 1 |
+| Core | 100.0% | 1 | 1 |
 | Core | 0.0% | 0 | 1 |
 | Core | 0.0% | 0 | 1 |
 
@@ -36,9 +38,9 @@
 
 | Reasoning Type | pass@1 | Cases | LLM Reliability |
 |----------------|--------|-------|-----------------|
-| L1 API Recall | 100.0% | 1 | Reliable |
-| L2 Rule Application | 100.0% | 1 | Reliable |
-| L4 System Reasoning | 100.0% | 1 | Reliable |
+| L1 API Recall | 0.0% | 1 | Expert review required |
+| L2 Rule Application | 0.0% | 1 | Expert review required |
+| L4 System Reasoning | 0.0% | 1 | Expert review required |
 | L1 API Recall | 62.6% | 171 | Expert review required |
 | L2 Rule Application | 66.4% | 110 | Expert review required |
 | L3 Cross-Domain | 36.1% | 36 | Expert review required |
@@ -50,6 +52,9 @@
 | L1 API Recall | 33.3% | 3 | Expert review required |
 | L2 Rule Application | 33.3% | 3 | Expert review required |
 | L4 System Reasoning | 0.0% | 1 | Expert review required |
+| L1 API Recall | 100.0% | 1 | Reliable |
+| L2 Rule Application | 100.0% | 1 | Reliable |
+| L4 System Reasoning | 100.0% | 1 | Reliable |
 | L1 API Recall | 0.0% | 1 | Expert review required |
 | L2 Rule Application | 0.0% | 1 | Expert review required |
 | L4 System Reasoning | 0.0% | 1 | Expert review required |
@@ -61,7 +66,7 @@
 
 | SDK | pass@1 | Passed | Total | Notes |
 |-----|--------|--------|-------|-------|
-| mcuxpresso-sdk | 100.0% | 1 | 1 | thin bucket (n<8) |
+| mcuxpresso-sdk | 0.0% | 0 | 1 | thin bucket (n<8) |
 | zephyr | 58.2% | 92 | 158 |  |
 | embedded-linux | 71.4% | 15 | 21 |  |
 | freertos | 0.0% | 0 | 1 | thin bucket (n<8) |
@@ -74,6 +79,7 @@
 | stm32-hal | 25.0% | 1 | 4 | thin bucket (n<8) |
 | zephyr | 50.0% | 1 | 2 | thin bucket (n<8) |
 | mcuxpresso-sdk | 0.0% | 0 | 1 | thin bucket (n<8) |
+| mcuxpresso-sdk | 100.0% | 1 | 1 | thin bucket (n<8) |
 | mcuxpresso-sdk | 0.0% | 0 | 1 | thin bucket (n<8) |
 | mcuxpresso-sdk | 0.0% | 0 | 1 | thin bucket (n<8) |
 
@@ -81,7 +87,7 @@
 
 | Category | pass@1 | Passed | Total | Status |
 |----------|--------|--------|-------|--------|
-| spi-i2c | 100.0% | 1 | 1 | PASS |
+| spi-i2c | 0.0% | 0 | 1 | FAIL |
 | adc | 50.0% | 1 | 2 | PARTIAL |
 | ble | 50.0% | 4 | 8 | PARTIAL |
 | boot | 100.0% | 8 | 8 | PASS |
@@ -130,6 +136,7 @@
 | yocto | 80.0% | 8 | 10 | PASS |
 | kconfig | 50.0% | 1 | 2 | PARTIAL |
 | spi-i2c | 0.0% | 0 | 1 | FAIL |
+| spi-i2c | 100.0% | 1 | 1 | PASS |
 | spi-i2c | 0.0% | 0 | 1 | FAIL |
 | spi-i2c | 0.0% | 0 | 1 | FAIL |
 
@@ -137,10 +144,11 @@
 
 | Model| L0 Static| L1 Build| L2 Runtime| L3 Heuristic| L4 Mutation| |
 |-------|----------|----------|----------|----------|----------||
-| groq/openai/gpt-oss-120b| 100%| 100%| 100%| 100%| 100%| |
+| groq/meta-llama/llama-4-scout-17b-16e-instruct| 0%| -| -| -| -| |
 | claude-code://haiku| 83%| 92%| 92%| 84%| 100%| |
 | claude-code://sonnet| 95%| 98%| 89%| 86%| 100%| |
 | groq/llama-3.3-70b-versatile| 33%| 100%| 100%| 100%| 100%| |
+| groq/openai/gpt-oss-120b| 100%| 100%| 100%| 100%| 100%| |
 | groq/openai/gpt-oss-20b| 0%| -| -| -| -| |
 | groq/qwen/qwen3-32b| 0%| -| -| -| -| |
 
@@ -148,17 +156,17 @@
 
 | Layer | Failures | % of Total |
 |-------|----------|-----------|
-| L0 Static | 2.9 | 83% |
-| L1 Build | 0.1 | 3% |
-| L2 Runtime | 0.2 | 5% |
-| L3 Heuristic | 0.3 | 8% |
+| L0 Static | 3.9 | 87% |
+| L1 Build | 0.1 | 2% |
+| L2 Runtime | 0.2 | 4% |
+| L3 Heuristic | 0.3 | 7% |
 | L4 Mutation | 0.0 | 0% |
 
 ## Category Breakdown
 
 | Category | Pass@1 | Cases |
 |----------|--------|-------|
-| spi-i2c | 100% | 1 |
+| spi-i2c | 0% | 1 |
 | adc | 50% | 2 |
 | ble | 50% | 8 |
 | boot | 100% | 8 |
@@ -207,6 +215,7 @@
 | yocto | 80% | 10 |
 | kconfig | 50% | 2 |
 | spi-i2c | 0% | 1 |
+| spi-i2c | 100% | 1 |
 | spi-i2c | 0% | 1 |
 | spi-i2c | 0% | 1 |
 

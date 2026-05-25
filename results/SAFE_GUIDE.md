@@ -2,7 +2,7 @@
 
 *Auto-generated from benchmark results. Use this to decide when LLM-generated code needs human review.*
 
-**Last updated:** 2026-05-25 21:23 UTC
+**Last updated:** 2026-05-25 21:38 UTC
 
 ## Models Tested
 
@@ -11,6 +11,7 @@
 | haiku | 57.1% | 233 |
 | sonnet | 67.4% | 233 |
 | groq/llama-3.3-70b-versatile | 33.3% | 3 |
+| groq/meta-llama/llama-4-scout-17b-16e-instruct | 0.0% | 1 |
 | groq/openai/gpt-oss-120b | 100.0% | 1 |
 | groq/openai/gpt-oss-20b | 0.0% | 1 |
 | groq/qwen/qwen3-32b | 0.0% | 1 |
@@ -20,45 +21,45 @@
 
 *LLM fails >50% of the time. Always write this code manually or review every line.*
 
-| Category | haiku | sonnet | groq/llama-3.3-70b-versatile | groq/openai/gpt-oss-120b | groq/openai/gpt-oss-20b | groq/qwen/qwen3-32b | mock |
-|----------|------|------|------|------|------|------|------|
-| boot | 100% | 90% | - | - | - | - | 0% |
-| spi-i2c | 64% | 79% | 0% | 100% | 0% | 0% | - |
-| dma | 8% | 31% | - | - | - | - | - |
-| isr-concurrency | 38% | 23% | - | - | - | - | - |
-| storage | 31% | 54% | - | - | - | - | - |
-| memory-opt | 33% | 67% | - | - | - | - | - |
-| threading | 33% | 33% | - | - | - | - | - |
-| uart | 67% | 33% | - | - | - | - | - |
-| ble | 45% | 82% | - | - | - | - | - |
+| Category | haiku | sonnet | groq/llama-3.3-70b-versatile | groq/meta-llama/llama-4-scout-17b-16e-instruct | groq/openai/gpt-oss-120b | groq/openai/gpt-oss-20b | groq/qwen/qwen3-32b | mock |
+|----------|------|------|------|------|------|------|------|------|
+| boot | 100% | 90% | - | - | - | - | - | 0% |
+| spi-i2c | 64% | 79% | 0% | 0% | 100% | 0% | 0% | - |
+| dma | 8% | 31% | - | - | - | - | - | - |
+| isr-concurrency | 38% | 23% | - | - | - | - | - | - |
+| storage | 31% | 54% | - | - | - | - | - | - |
+| memory-opt | 33% | 67% | - | - | - | - | - | - |
+| threading | 33% | 33% | - | - | - | - | - | - |
+| uart | 67% | 33% | - | - | - | - | - | - |
+| ble | 45% | 82% | - | - | - | - | - | - |
 
 ## CAUTION — Always Review
 
 *LLM fails 20-50%. Use as starting point only. Expert review mandatory.*
 
-| Category | haiku | sonnet | groq/llama-3.3-70b-versatile | groq/openai/gpt-oss-120b | groq/openai/gpt-oss-20b | groq/qwen/qwen3-32b | mock |
-|----------|------|------|------|------|------|------|------|
-| adc | 50% | 100% | - | - | - | - | - |
-| kconfig | 60% | 90% | 50% | - | - | - | - |
-| security | 70% | 50% | - | - | - | - | - |
-| timer | 50% | 83% | - | - | - | - | - |
-| ota | 58% | 67% | - | - | - | - | - |
-| watchdog | 60% | 90% | - | - | - | - | - |
-| gpio-basic | 83% | 67% | - | - | - | - | - |
-| power-mgmt | 67% | 75% | - | - | - | - | - |
-| sensor-driver | 67% | 75% | - | - | - | - | - |
-| linux-driver | 70% | 70% | - | - | - | - | - |
-| yocto | 70% | 80% | - | - | - | - | - |
-| networking | 75% | 75% | - | - | - | - | - |
+| Category | haiku | sonnet | groq/llama-3.3-70b-versatile | groq/meta-llama/llama-4-scout-17b-16e-instruct | groq/openai/gpt-oss-120b | groq/openai/gpt-oss-20b | groq/qwen/qwen3-32b | mock |
+|----------|------|------|------|------|------|------|------|------|
+| adc | 50% | 100% | - | - | - | - | - | - |
+| kconfig | 60% | 90% | 50% | - | - | - | - | - |
+| security | 70% | 50% | - | - | - | - | - | - |
+| timer | 50% | 83% | - | - | - | - | - | - |
+| ota | 58% | 67% | - | - | - | - | - | - |
+| watchdog | 60% | 90% | - | - | - | - | - | - |
+| gpio-basic | 83% | 67% | - | - | - | - | - | - |
+| power-mgmt | 67% | 75% | - | - | - | - | - | - |
+| sensor-driver | 67% | 75% | - | - | - | - | - | - |
+| linux-driver | 70% | 70% | - | - | - | - | - | - |
+| yocto | 70% | 80% | - | - | - | - | - | - |
+| networking | 75% | 75% | - | - | - | - | - | - |
 
 ## RELIABLE — Generally Safe
 
 *LLM passes 90%+. Standard code review is sufficient.*
 
-| Category | haiku | sonnet | groq/llama-3.3-70b-versatile | groq/openai/gpt-oss-120b | groq/openai/gpt-oss-20b | groq/qwen/qwen3-32b | mock |
-|----------|------|------|------|------|------|------|------|
-| device-tree | 100% | 100% | - | - | - | - | - |
-| pwm | 100% | 100% | - | - | - | - | - |
+| Category | haiku | sonnet | groq/llama-3.3-70b-versatile | groq/meta-llama/llama-4-scout-17b-16e-instruct | groq/openai/gpt-oss-120b | groq/openai/gpt-oss-20b | groq/qwen/qwen3-32b | mock |
+|----------|------|------|------|------|------|------|------|------|
+| device-tree | 100% | 100% | - | - | - | - | - | - |
+| pwm | 100% | 100% | - | - | - | - | - | - |
 
 ## Most Common Failure Patterns
 
@@ -66,10 +67,10 @@
 
 | Pattern | Failures | What to Check |
 |---------|----------|---------------|
-| `header_fsl_clock_h` | 6 | Review LLM output against hardware/RTOS requirements |
-| `i2c_blocking_transfer_used` | 5 | Review LLM output against hardware/RTOS requirements |
-| `header_fsl_port_h` | 4 | Review LLM output against hardware/RTOS requirements |
-| `i2c_master_init_called` | 4 | Review LLM output against hardware/RTOS requirements |
+| `header_fsl_clock_h` | 7 | Review LLM output against hardware/RTOS requirements |
+| `i2c_blocking_transfer_used` | 6 | Review LLM output against hardware/RTOS requirements |
+| `header_fsl_port_h` | 5 | Review LLM output against hardware/RTOS requirements |
+| `i2c_master_init_called` | 5 | Review LLM output against hardware/RTOS requirements |
 | `llm_call` | 1 | Review LLM output against hardware/RTOS requirements |
 | `header_fsl_i2c_h` | 1 | Review LLM output against hardware/RTOS requirements |
 
