@@ -235,13 +235,20 @@ def _pass_badge(passed: bool) -> str:
 
 
 def _score_bar(score: float) -> str:
+    """Render a coloured progress bar. Does NOT include the percentage text."""
     pct = int(score * 100)
     color = "#68d391" if score >= 0.8 else "#f6ad55" if score >= 0.5 else "#fc8181"
     return (
         f'<span class="score-bar">'
         f'<span class="score-fill" style="width:{pct}%;background:{color}"></span>'
-        f'</span> {pct}%'
+        f'</span>'
     )
+
+
+def _bar_cell(score: float) -> str:
+    """Bar + percentage label, suitable for a table cell."""
+    pct = int(score * 100)
+    return f'{_score_bar(score)} <span style="font-size:0.8rem">{pct}%</span>'
 
 
 def _diff_html(a: str, b: str, fromfile: str = "reference", tofile: str = "generated") -> str:
@@ -346,13 +353,10 @@ def leaderboard() -> str:
     for model in models:
         s = model_stats[model]
         short = model.split("/")[-1]
-        score_cell = _score_bar(s["passed"] / s["total"] if s["total"] else 0)
-        coverage_cell = _score_bar(s["coverage"])
-        coverage_pct = f'{int(s["coverage"] * 100)}%'
         row = (
             f"<td title='{model}' style='font-family:monospace;font-size:0.8rem'>{short}</td>"
-            f"<td>{score_cell}</td>"
-            f"<td>{coverage_cell} <span style='font-size:0.75rem;color:#a0aec0'>{coverage_pct}</span></td>"
+            f"<td>{_bar_cell(s['passed'] / s['total'] if s['total'] else 0)}</td>"
+            f"<td>{_bar_cell(s['coverage'])}</td>"
             f"<td style='color:#a0aec0'>{s['passed']}/{s['total']}</td>"
         )
         for diff in _DIFFICULTIES:
@@ -407,7 +411,7 @@ def case_overview(case_id: str) -> str:
     for model, r in seen.items():
         short = model.split("/")[-1]
         passed = _pass_badge(r.get("passed", False))
-        score = _score_bar(r.get("total_score", 0))
+        score = _bar_cell(r.get("total_score", 0))
         layer = r.get("failed_at_layer")
         layer_str = f"L{layer}" if layer is not None else "—"
         rows += f"""<tr>
@@ -578,7 +582,7 @@ def history() -> str:
         model_tags = " ".join(
             f'<span class="tag">{m.split("/")[-1]}</span>' for m in models
         )
-        bar = _score_bar(passed / total if total else 0)
+        bar = _bar_cell(passed / total if total else 0)
 
         # Total output tokens for the run
         output_tokens = sum(
@@ -646,7 +650,7 @@ def history_detail(run_id: str) -> str:
         reference = _find_reference(case_id) or ""
         generated = result.get("generated_code", "")
         overall = _pass_badge(result.get("passed", False))
-        score = _score_bar(result.get("total_score", 0))
+        score = _bar_cell(result.get("total_score", 0))
 
         # Checks
         checks_html = ""
