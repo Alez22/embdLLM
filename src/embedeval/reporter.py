@@ -695,7 +695,7 @@ def generate_run_archive(
     # Save per-case detailed results
     for r in results:
         case_data = r.model_dump(mode="json")
-        case_file = details_dir / f"{r.case_id}.json"
+        case_file = details_dir / f"{r.case_id}_attempt{r.attempt}.json"
         case_file.write_text(
             json.dumps(case_data, indent=2, ensure_ascii=False) + "\n",
             encoding="utf-8",

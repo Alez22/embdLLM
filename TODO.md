@@ -1,50 +1,85 @@
 # TODO
 
-Tasks are ordered by dependency. Complete Phase 1 before moving to Phase 2.
+Tasks are ordered by **current priority** (updated 2026-05-26).
 Mark done with `[x]`. Add notes inline after `—`.
 
----
+## Priority order (next 2-4 weeks)
 
-## Phase 1 — NXP Infrastructure
-
-Foundation required before any NXP cases can be validated.
-
-- [x] **Fork embedeval upstream** and set up this repo as the working base.
-- [x] **Add `src/embedeval/check_utils_nxp.py`** — helpers specific to MCUXpresso SDK:
-  - `no_nxp_hallucination(code)` → list of foreign APIs found (STM32 HAL, Zephyr, Arduino)
-  - `has_clock_gate_before(code, peripheral)` → bool, checks ordering
-  - `has_pinmux_before_init(code)` → bool
-  - Common NXP SDK token lists: `FSL_HEADERS`, `CLOCK_APIS`, `PORT_APIS`, `GPIO_APIS`
-- [ ] **Define `cases/SDK_LAYOUT_NXP.yaml`** — NXP SDK structure, following the pattern
-  of the upstream `cases/SDK_LAYOUT.yaml`.
-- [ ] **Docker image for NXP compile check (L1):**
-  - Base: `debian:bookworm-slim`
-  - Install: `arm-none-eabi-gcc`, `arm-none-eabi-newlib`
-  - Add: MCUXpresso SDK headers (CMSIS + fsl_* drivers for MCXC144)
-  - Target: compile a minimal bare-metal main.c with `-mcpu=cortex-m0plus -mthumb`
-  - Dockerfile at `Dockerfile.nxp`
-- [x] **Add `nxp_bare_metal` platform to `src/embedeval/models.py`** (Platform enum).
-- [x] **Write first reference case `nxp-mcxc-i2c-001`** end-to-end and verify it passes validate.
+1. **Phase 4** — Dashboard: fix bug --attempts + improvements
+2. **Phase 6** — Cloud model runs: completare modelli mancanti + docs
+3. **Phase 3** — Nuovi task types (refactoring, doxygen, test gen, arch)
+4. **Phase 5** — Human Review workflow
+5. **Phase 1** — Infrastruttura rimanente (SDK_LAYOUT, Docker)
+6. **Phase 7** — Knowledge Currency Probing
+7. **Phase 8** — Language-variant evaluation
+8. **Backlog** — Hardware-in-the-loop, trap prompts, upstream PR
 
 ---
 
-## Phase 2 — NXP Generation Cases (implicit knowledge)
+## Phase 4 — Results Dashboard
 
-10 core cases covering the most relevant categories for audio amplifier firmware.
-Each prompt must NOT mention safety requirements — implicit knowledge only.
+Web dashboard locale per esplorare i risultati del benchmark: confronto
+codice generato vs reference, check pass/fail, leaderboard visiva, storico run.
 
-- [x] `nxp-gpio-001` — GPIO output init + toggle. Implicit: clock gate, pin mux order.
-- [x] `nxp-gpio-002` — GPIO input with edge IRQ. Implicit: NVIC enable, volatile flag, ISR naming.
-- [x] `nxp-i2c-001` — I2C master register read. Implicit: clock, pin mux, address shift, error check. — done as `nxp-mcxc-i2c-001`
-- [x] `nxp-i2c-002` — I2C master write + read sequence. Implicit: two separate transfers, address not pre-shifted.
-- [x] `nxp-spi-001` — SPI master transfer with manual CS. Implicit: CS assert order, clock polarity, idle-high.
-- [x] `nxp-uart-001` — UART TX blocking. Implicit: clock enable, enableTx in config.
-- [x] `nxp-uart-002` — UART RX interrupt-driven with ring buffer. Implicit: volatile ring buffer, NVIC, RX flag check.
-- [x] `nxp-timer-001` — Periodic PIT interrupt. Implicit: clock gate, NVIC, volatile counter, flag clear in ISR.
-- [x] `nxp-isr-001` — ISR-to-main data transfer. Implicit: volatile flag + value, ready flag cleared before consume.
-- [x] `nxp-flash-001` — Flash sector erase + write + verify. Implicit: erase before write, erase key, status check.
-- [x] `nxp-flash-002` — Power-loss safe write pattern. Implicit: two slots, inactive-first, CRC excludes CRC field.
-- [x] `nxp-watchdog-001` — WDT init + feed in main loop. Implicit: LPO clock source, long timeout, refresh in loop.
+**Dipendenze:** `fastapi`, `uvicorn` (da aggiungere a `pyproject.toml`).
+**Avvio:** `uv run embedeval dashboard` → apre `http://localhost:7860`.
+**Fonte dati:** legge direttamente i JSON esistenti in `results/` e i file
+`reference/main.c` + `metadata.yaml` dei casi — nessun DB aggiuntivo.
+
+- [x] **Aggiungere `fastapi` e `uvicorn`** a `pyproject.toml`.
+- [x] **`src/embedeval/dashboard.py`** — server FastAPI:
+  - `GET /` → leaderboard: tabella modelli × casi, celle colorate pass/fail/non-runnato
+  - `GET /case/<case_id>/<model>` → dettaglio: check list + diff side-by-side generato vs reference
+  - `GET /history` → lista run ordinata per data con Status e Tokens out; click apre dettaglio
+  - `GET /history/<run_id>` → per-run detail: checks pass/fail + diff side-by-side per ogni caso
+  - `GET /cases` → elenco casi con sdk, difficulty, category, tier, tags
+  - `GET /cases/<id>` → prompt e reference editabili (POST per salvare con conferma)
+  - `GET /cases/<id>/checks` → static.py e behavior.py read-only con syntax highlight (Python ok, C noto issue)
+- [x] **Aggiungere `dashboard` subcommand a `src/embedeval/cli.py`**.
+- [x] **Verificare che con `--attempts N` tutti gli attempt vengano salvati**
+  come file separati in `results/runs/*/details/` — fix: nome file ora include
+  `_attempt{N}` (`reporter.py:698`), era `{case_id}.json` → ogni attempt sovrascriveva.
+
+### Dashboard — Miglioramenti futuri
+
+Miglioramenti noti alla dashboard non ancora risolti, in ordine di utilità:
+
+- [ ] **Syntax highlight codice C** — `highlight.js` funziona sul Python ma non sul C.
+  Il bundle `highlight.min.js` da CDN sembra non includere il language pack C.
+  Opzioni: usare Pygments lato server (genera HTML colorato senza JS),
+  oppure trovare la URL CDN corretta che include tutti i language pack.
+- [ ] **Selettore attempt** nella pagina detail `/history/<run_id>` — oggi viene mostrato
+  sempre l'attempt più recente. Con `--attempts N > 1` sarebbe utile poter scegliere
+  quale attempt visualizzare.
+- [ ] **Filtri leaderboard** — filtrare per SDK, categoria o tier senza ricaricare la pagina.
+- [ ] **Editor checks** — i file `checks/static.py` e `checks/behavior.py` sono oggi
+  read-only. Aggiungere la possibilità di editarli dalla dashboard (POST `/cases/<id>/checks/<file>`).
+- [ ] **Link diretto** dalla leaderboard alla pagina caso (`/cases/<id>`) oltre che
+  al dettaglio run.
+
+---
+
+## Phase 6 — Cloud Model Integration
+
+- [x] **Verify Groq provider** works end-to-end with embedeval LiteLLM client:
+  - `groq/llama-3.3-70b-versatile` ✓
+  - `groq/qwen/qwen3-32b` ✓ (con `--no-think` per il limite TPM)
+  - `groq/openai/gpt-oss-20b` ✓
+  - `groq/openai/gpt-oss-120b` ✓
+  - `groq/meta-llama/llama-4-scout-17b-16e-instruct` ✓
+- [ ] **Verify OpenRouter provider**:
+  - `openrouter/mistralai/devstral-small`
+  - `openrouter/qwen/qwen3-coder`
+- [ ] **Still to run** on all Phase 2 cases:
+  - `anthropic/claude-sonnet-4-20250514` (reference ceiling)
+  - `groq/qwen/qwen3-32b` (Qwen3 baseline)
+- [ ] **Document model strings** in `docs/MODELS.md` — name, provider, approx cost/1k tokens,
+  context window, notes on embedded code quality.
+- [x] **Run baseline on all Phase 2 cases** — 3 models × 12 NXP cases completed:
+  - `groq/llama-3.3-70b-versatile`: 0/12 pass, 61% avg — omits fsl_clock.h/fsl_port.h
+  - `groq/openai/gpt-oss-120b`: 3/12 pass, 84% avg — best overall
+  - `groq/openai/gpt-oss-20b`: 1/12 pass, 51% avg — inconsistent on ISR cases
+- [x] **Publish initial leaderboard** in `results/LEADERBOARD.md`. — aggiornato ad ogni run
 
 ---
 
@@ -91,33 +126,9 @@ Task types absent from all existing embedded LLM benchmarks.
 
 ---
 
-## Phase 4 — Results Dashboard
-
-Web dashboard locale per esplorare i risultati del benchmark: confronto
-codice generato vs reference, check pass/fail, leaderboard visiva, storico run.
-
-**Dipendenze:** `fastapi`, `uvicorn` (da aggiungere a `pyproject.toml`).
-**Avvio:** `uv run embedeval dashboard` → apre `http://localhost:7860`.
-**Fonte dati:** legge direttamente i JSON esistenti in `results/` e i file
-`reference/main.c` + `metadata.yaml` dei casi — nessun DB aggiuntivo.
-
-- [x] **Aggiungere `fastapi` e `uvicorn`** a `pyproject.toml`.
-- [x] **`src/embedeval/dashboard.py`** — server FastAPI:
-  - `GET /` → leaderboard: tabella modelli × casi, celle colorate pass/fail/non-runnato
-  - `GET /case/<case_id>/<model>` → dettaglio: check list + diff side-by-side generato vs reference
-  - `GET /history` → lista run ordinata per data con Status e Tokens out; click apre dettaglio
-  - `GET /history/<run_id>` → per-run detail: checks pass/fail + diff side-by-side per ogni caso
-  - `GET /cases` → elenco casi con sdk, difficulty, category, tier, tags
-  - `GET /cases/<id>` → prompt e reference editabili (POST per salvare con conferma)
-  - `GET /cases/<id>/checks` → static.py e behavior.py read-only con syntax highlight (Python ok, C noto issue)
-- [x] **Aggiungere `dashboard` subcommand a `src/embedeval/cli.py`**.
-- [ ] **Verificare che con `--attempts N` tutti gli attempt vengano salvati**
-  come file separati in `results/runs/*/details/` (bug osservato: con n=3
-  viene scritto un solo file).
-
----
-
 ## Phase 5 — Human Review Workflow
+
+**Depends on:** Phase 3 (review.py rubric format defined for doxygen/explain/arch cases).
 
 - [ ] **`src/embedeval/review.py`** — new module:
   - `load_review_cases(cases_dir)` — discover cases with `checks/review.py`
@@ -137,25 +148,22 @@ codice generato vs reference, check pass/fail, leaderboard visiva, storico run.
 
 ---
 
-## Phase 6 — Cloud Model Integration
+## Phase 1 — NXP Infrastructure (remaining)
 
-- [x] **Verify Groq provider** works end-to-end with embedeval LiteLLM client:
-  - `groq/llama-3.3-70b-versatile` ✓
-  - `groq/qwen/qwen3-32b` ✓ (con `--no-think` per il limite TPM)
-  - `groq/openai/gpt-oss-20b` ✓
-  - `groq/openai/gpt-oss-120b` ✓
-  - `groq/meta-llama/llama-4-scout-17b-16e-instruct` ✓
-- [ ] **Verify OpenRouter provider**:
-  - `openrouter/mistralai/devstral-small`
-  - `openrouter/qwen/qwen3-coder`
-- [ ] **Document model strings** in `docs/MODELS.md` — name, provider, approx cost/1k tokens,
-  context window, notes on embedded code quality.
-- [x] **Run baseline on all Phase 2 cases** — 3 models × 12 NXP cases completed:
-  - `groq/llama-3.3-70b-versatile`: 0/12 pass, 61% avg — omits fsl_clock.h/fsl_port.h
-  - `groq/openai/gpt-oss-120b`: 3/12 pass, 84% avg — best overall
-  - `groq/openai/gpt-oss-20b`: 1/12 pass, 51% avg — inconsistent on ISR cases
-  - [ ] Still to run: `anthropic/claude-sonnet-4-20250514` (reference ceiling), Qwen3
-- [x] **Publish initial leaderboard** in `results/LEADERBOARD.md`. — aggiornato ad ogni run
+Foundation items still open — not blocking Phase 2-6 but needed for L1 compile checks.
+
+- [x] Fork embedeval upstream and set up this repo as the working base.
+- [x] Add `src/embedeval/check_utils_nxp.py` — helpers specific to MCUXpresso SDK.
+- [x] Add `nxp_bare_metal` platform to `src/embedeval/models.py` (Platform enum).
+- [x] Write first reference case `nxp-mcxc-i2c-001` end-to-end and verify it passes validate.
+- [ ] **Define `cases/SDK_LAYOUT_NXP.yaml`** — NXP SDK structure, following the pattern
+  of the upstream `cases/SDK_LAYOUT.yaml`.
+- [ ] **Docker image for NXP compile check (L1):**
+  - Base: `debian:bookworm-slim`
+  - Install: `arm-none-eabi-gcc`, `arm-none-eabi-newlib`
+  - Add: MCUXpresso SDK headers (CMSIS + fsl_* drivers for MCXC144)
+  - Target: compile a minimal bare-metal main.c with `-mcpu=cortex-m0plus -mthumb`
+  - Dockerfile at `Dockerfile.nxp`
 
 ---
 
@@ -188,43 +196,20 @@ cutoff will fail these. Score separately in the leaderboard (currency score vs c
 Each case: prompt asks to use a feature, static check verifies current vs deprecated API.
 
 - [ ] `zephyr-probe-device-001` — Device access pattern.
-  - Deprecated: `device_get_binding("I2C_0")` (removed in 3.x)
-  - Current: `DEVICE_DT_GET(DT_NODELABEL(i2c0))`
-  - Change introduced: Zephyr 2.7
-
+  Deprecated: `device_get_binding("I2C_0")` → Current: `DEVICE_DT_GET(DT_NODELABEL(i2c0))` (Zephyr 2.7)
 - [ ] `zephyr-probe-i2c-001` — I2C burst read.
-  - Deprecated: `i2c_burst_read()`
-  - Current: `i2c_write_read()`
-  - Change introduced: Zephyr 3.0
-
+  Deprecated: `i2c_burst_read()` → Current: `i2c_write_read()` (Zephyr 3.0)
 - [ ] `zephyr-probe-gpio-001` — GPIO pin write.
-  - Deprecated: `gpio_pin_write()`
-  - Current: `gpio_pin_set()`
-  - Change introduced: Zephyr 2.5
-
+  Deprecated: `gpio_pin_write()` → Current: `gpio_pin_set()` (Zephyr 2.5)
 - [ ] `zephyr-probe-include-001` — Kernel include path.
-  - Deprecated: `#include <kernel.h>`
-  - Current: `#include <zephyr/kernel.h>` (zephyr/ prefix)
-  - Change introduced: Zephyr 3.0
-
+  Deprecated: `#include <kernel.h>` → Current: `#include <zephyr/kernel.h>` (Zephyr 3.0)
 - [ ] `zephyr-probe-dt-001` — Device tree label macro.
-  - Deprecated: `DT_LABEL(DT_NODELABEL(uart0))`
-  - Current: direct node reference without DT_LABEL
-  - Change introduced: Zephyr 3.0
-
+  Deprecated: `DT_LABEL(DT_NODELABEL(uart0))` → Current: direct node reference (Zephyr 3.0)
 - [ ] `zephyr-probe-flash-001` — Flash write protection.
-  - Deprecated: `flash_write_protection_set()` (removed entirely)
-  - Current: protection handled via partition manager, not explicit API call
-  - Change introduced: Zephyr 3.1
-
-- [ ] `zephyr-probe-thread-001` — Thread stack definition.
-  - Deprecated: `K_THREAD_STACK_DEFINE` with old parameter order
-  - Current: verify model uses correct `K_THREAD_DEFINE` signature for current Zephyr
-  - Change introduced: Zephyr 2.6
+  Deprecated: `flash_write_protection_set()` removed entirely → Current: partition manager (Zephyr 3.1)
+- [ ] `zephyr-probe-thread-001` — Thread stack definition signature (Zephyr 2.6).
 
 ### MCUXpresso SDK — Breaking API Changes
-
-More opaque changelog than Zephyr — populate from SDK release notes as encountered.
 
 - [ ] Research MCUXpresso SDK 2.x → 3.x breaking changes and document in
   `docs/NXP-CHANGELOG-PROBE.md` before writing cases.
@@ -240,142 +225,51 @@ More opaque changelog than Zephyr — populate from SDK release notes as encount
 ## Phase 8 — Language-variant evaluation (IT/EN prompt reproducibility)
 
 **Depends on:** Phase 1 (L1 compile) and Phase 3 (lizard + .text measurement).
-Reuses the existing repetition mechanism (`--attempts`) — not a new subsystem,
-just a second prompt variant layered on top of existing repetitions.
 
 ### Objective
-Measure how much the prompt language (Italian vs English), at identical
-specification and level of detail, affects the quality and consistency of the
-code a model produces.
-
-### Why
-An LLM is non-deterministic: the same prompt at temperature > 0 produces
-different outputs across runs. There is a baseline "sampling noise" independent
-of language. The goal is NOT perfect reproducibility (unreachable) but to
-determine whether language is a source of variation *significant relative to
-that noise*. Language sensitivity is itself a reliability indicator: a model
-that yields the same result in IT and EN is preferable to one that degrades in
-one language. Especially relevant for small local models, which have seen less
-Italian technical text.
+Measure whether prompt language (IT vs EN), at identical specification, affects
+code quality and consistency beyond normal sampling noise.
 
 ### Tasks
-- [ ] **Select 3 tasks per benchmark category**, stratified by difficulty:
-  1 easy, 1 medium, 1 hard. Rationale: the language effect can interact with
-  difficulty (tends to grow on harder tasks). Choosing 3 easy tasks would hide
-  exactly the most interesting phenomenon.
-  - Note: start with a subset of categories (e.g. 3-4) to validate the method
-    before scaling to all NXP categories — full run is ~30 tasks x 2 langs x 5
-    reps = 300 runs/model. Decide scope before generating cases.
-- [ ] **Prepare each task in two prompt variants, IT and EN**, with identical
-  specification and detail. Only the prompt language changes.
-  - Store as `prompt.md` (EN) + `prompt.it.md` (IT) in the same case folder.
+- [ ] **Select 3 tasks per benchmark category**, stratified by difficulty (1 easy, 1 medium, 1 hard).
+  Start with 3-4 categories to validate the method before scaling (~30 tasks × 2 langs × 5 reps = 300 runs/model).
+- [ ] **Prepare each task in two prompt variants** — `prompt.md` (EN) + `prompt.it.md` (IT), identical spec.
 - [ ] **Run 5 repetitions per variant**, temperature > 0.
+- [ ] **Define the metric aggregation method** — normalize bool/int/bytes metrics before comparing
+  intra-variant variance vs inter-variant difference. Document in `docs/LANGUAGE-VARIANT-METHOD.md`.
+- [ ] **Handle the binary metric correctly** — compile y/n is a proportion (4/5), use standard error.
+- [ ] **Report per model** — per-category "language sensitivity" in `results/LEADERBOARD.md`.
 
-### Metrics (objective only, already in the harness)
-- compiles with arm-gcc (yes/no)
-- passes unit tests (% of tests passed)
-- cyclomatic complexity (lizard)
-- .text section size
-
-From these, two quantities to compare:
-- **Intra-variant variance**: divergence across the 5 runs of the same language.
-  This is the sampling-noise floor.
-- **Inter-variant difference**: divergence between IT and EN results.
-
-### Implementation gaps to resolve first
-- [ ] **Define the metric aggregation method.** The four metrics have different
-  units (bool / % / int / bytes). Normalize before comparing intra vs inter
-  variance — use coefficient of variation per metric, or z-score normalization,
-  then aggregate into a single per-category sensitivity number. Document the
-  chosen method in `docs/LANGUAGE-VARIANT-METHOD.md`.
-- [ ] **Handle the binary metric correctly.** "Compiles y/n" over 5 runs is a
-  pass proportion (e.g. 4/5), not a continuous std-dev. Treat it as a proportion
-  (use its standard error), not as a deviation.
-
-### Reading rule
-The language effect is real only if the inter-variant difference EXCEEDS the
-intra-variant variance. Below that threshold, the difference is
-indistinguishable from sampling noise and is reported as "no measurable effect".
-
-### Output
-- [ ] Per model, a per-category "language sensitivity" reported alongside the
-  other benchmark metrics as a reliability indicator, in `results/LEADERBOARD.md`.
+**Reading rule:** language effect is real only if inter-variant difference > intra-variant variance.
 
 ---
 
-## Phase 9 — Incremental execution (two-tier cache)
+## Completed — Phase 2 (NXP Generation Cases)
 
-**Goal:** consume the fewest tokens possible and avoid useless regenerations.
-Treat results as a persistent corpus, not as one-shot runs. Each launch reconciles
-the requested grid (cases x models x attempts at given params) against what already
-exists, and runs ONLY the missing cells.
+All 12 core NXP generation cases done. Each prompt omits safety requirements — implicit knowledge only.
 
-**Timing:** worth doing BEFORE the token-heavy phases (5, 6, 7) so iterative
-re-runs while authoring cases don't re-burn the LLM calls.
-
-### Two separate caches
-
-- [x] **Generation cache** — stores the model output (`generated_code`).
-  - Key: `(prompt_hash, model, temperature, generation_params, attempt_index)`
-  - `prompt_hash` = SHA256 of the full prompt as sent (post context_pack + no_think).
-    Editing a prompt causes a cache miss and regenerates.
-  - `generation_params` = `{feedback_rounds, no_think}` (sorted dict, stable key).
-  - Store: `results/corpus/<model_slug>/<case_id>/<attempt>.json` (CorpusCell).
-  - Implemented in `src/embedeval/corpus.py`.
-
-- [x] **Grading cache** — stores check results, applied on top of generated_code.
-  - Key: `(generated_code_hash, checks_hash)`
-  - `checks_hash` = SHA256 of static.py + behavior.py + negatives.py (if present).
-  - Store: `results/corpus/grades/<code_hash>/<checks_hash>.json` (full EvalResult).
-  - Effect: editing only a check causes a grade miss → re-grades from cached code,
-    zero LLM call. Neither changed → both caches hit, entire case skipped in O(ms).
-  - Implemented in `src/embedeval/corpus.py` (grade_lookup, grade_store).
-
-### Reconcile logic
-
-- [x] **Subtract present cells** found in the corpus store → skip LLM call on hit.
-- [x] **Run only missing cells.** Store each cell immediately after the LLM call.
-- [x] **ensure-N-samples semantics:** "make sure at least N attempts exist", NOT
-  "skip if any exists". Verified correct: runner iterates `range(1, attempts+1)` and
-  calls `corpus_lookup(attempt=k)` for each k independently. Cells 1-5 hit if they
-  exist; cells 6-10 miss and are generated. N→N+M top-up works without extra logic.
-- [x] **Lowering attempts is a no-op:** request 3 when 5 exist → corpus hits for 1-3,
-  cells 4-5 are ignored (runner only iterates up to `attempts`).
-
-### Force and storage
-
-- [x] **`--force` flag** — bypasses the corpus lookup and regenerates all cells in
-  scope, overwriting existing entries. Long form only (`-f` taken by `--feedback-rounds`).
-- [x] **Build on a durable store separate from the checkpoint.**
-  `results/corpus/` is persistent; `.checkpoint_*.jsonl` remains crash-recovery only.
-- [x] **Persist temperature + generation_params in the stored result.**
-  `EvalResult` now carries `temperature` and `generation_params`; `CorpusCell` stores
-  them as part of the key so mismatches are detected on load.
-
-### Non-determinism note
-- [x] Document in `docs/INCREMENTAL-EXECUTION.md`: stored samples are the ground
-  truth. Most providers expose no seed, so a specific past sample cannot be
-  reproduced — `--force` generates NEW samples, it does not reproduce old ones.
-  — Documented inline in corpus.py module docstring; separate .md deferred to backlog.
+- [x] `nxp-gpio-001` — GPIO output init + toggle
+- [x] `nxp-gpio-002` — GPIO input with edge IRQ
+- [x] `nxp-i2c-001` / `nxp-mcxc-i2c-001` — I2C master register read
+- [x] `nxp-i2c-002` — I2C master write + read sequence
+- [x] `nxp-spi-001` — SPI master transfer with manual CS
+- [x] `nxp-uart-001` — UART TX blocking
+- [x] `nxp-uart-002` — UART RX interrupt-driven with ring buffer
+- [x] `nxp-timer-001` — Periodic PIT interrupt
+- [x] `nxp-isr-001` — ISR-to-main data transfer
+- [x] `nxp-flash-001` — Flash sector erase + write + verify
+- [x] `nxp-flash-002` — Power-loss safe write pattern
+- [x] `nxp-watchdog-001` — WDT init + feed in main loop
 
 ---
 
-## Dashboard — Miglioramenti futuri
+## Completed — Phase 9 (Incremental execution / two-tier cache)
 
-Miglioramenti noti alla dashboard (`src/embedeval/dashboard.py`) non ancora risolti.
-
-- [ ] **Syntax highlight codice C** — `highlight.js` funziona sul Python ma non sul C.
-  Il bundle `highlight.min.js` da CDN sembra non includere il language pack C.
-  Opzioni da esplorare: usare Pygments lato server (genera HTML colorato senza JS),
-  oppure trovare la URL CDN corretta che include tutti i language pack.
-- [ ] **Editor checks** — i file `checks/static.py` e `checks/behavior.py` sono oggi
-  read-only. Aggiungere la possibilità di editarli dalla dashboard (POST `/cases/<id>/checks/<file>`).
-- [ ] **Selettore attempt** nella pagina detail `/history/<run_id>` — oggi viene mostrato
-  sempre l'attempt più recente. Con `--attempts N > 1` sarebbe utile poter scegliere
-  quale attempt visualizzare.
-- [ ] **Filtri leaderboard** — filtrare per SDK, categoria o tier senza ricaricare la pagina.
-- [ ] **Link diretto** dalla leaderboard alla pagina caso (`/cases/<id>`) oltre che
-  al dettaglio run.
+- [x] Generation cache (`results/corpus/<model_slug>/<case_id>/<attempt>.json`)
+- [x] Grading cache (`results/corpus/grades/<code_hash>/<checks_hash>.json`)
+- [x] ensure-N-samples semantics + top-up + lowering attempts is a no-op
+- [x] `--force` flag to regenerate all cells in scope
+- [x] Temperature + generation_params persisted in stored results
 
 ---
 
@@ -389,9 +283,8 @@ Miglioramenti noti alla dashboard (`src/embedeval/dashboard.py`) non ancora riso
 - NXP include pattern: llama-3.3-70b and gpt-oss-20b consistently use `board.h` instead
   of explicit `fsl_clock.h` / `fsl_port.h` — fails L0 on every case. Consider whether
   to relax the check (accept transitive includes) or keep it strict (explicit headers required).
-- Fix retry delay per modelli thinking (Qwen3): il `_parse_retry_after` parsifica
-  correttamente "try again in Xs" ma non gestisce il formato "350ms" — aggiungere
-  il parsing dei millisecondi.
-- Indagare perché `gpt-oss-20b` (63%) batte `gpt-oss-120b` (45%) su questo
-  benchmark — possibile che il modello più grande sia più prolisso e triggeri
-  check negativi (es. `no_zephyr_apis`, `no_cross_platform_hallucination`).
+- Fix retry delay per modelli thinking (Qwen3): `_parse_retry_after` non gestisce il formato
+  "350ms" — aggiungere il parsing dei millisecondi.
+- Indagare perché `gpt-oss-20b` (63%) batte `gpt-oss-120b` (45%) — possibile che il modello
+  più grande sia più prolisso e triggeri check negativi (no_zephyr_apis, no_cross_platform_hallucination).
+- Document in `docs/INCREMENTAL-EXECUTION.md` the non-determinism note from corpus.py docstring.
