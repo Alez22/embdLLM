@@ -361,9 +361,14 @@ def leaderboard(request: Request) -> str:
             sum(r.get("total_score", 0.0) for r in all_results_for_model) / total
             if total else 0.0
         )
+        avg_duration = (
+            sum(r.get("duration_seconds", 0.0) for r in all_results_for_model) / total
+            if total else 0.0
+        )
         model_stats[model] = {
             "passed": passed, "total": total, "pct": pct,
             "coverage": coverage,
+            "avg_duration": avg_duration,
             "buckets": {d: _bucket_stats(model, d) for d in _DIFFICULTIES},
         }
 
@@ -389,16 +394,20 @@ def leaderboard(request: Request) -> str:
         f'<th style="text-align:center"><span class="badge badge-{d}">{d.capitalize()}</span></th>'
         for d in _DIFFICULTIES
     )
-    header_cells = f"<th>Model</th><th>pass@1</th><th>check coverage</th><th>Passed</th>{diff_headers}"
+    header_cells = f"<th>Model</th><th>pass@1</th><th>check coverage</th><th>avg time</th><th>Passed</th>{diff_headers}"
 
     rows = ""
     for model in models:
         s = model_stats[model]
         short = model.split("/")[-1]
+        dur = s["avg_duration"]
+        dur_str = f"{dur:.1f}s" if dur < 60 else f"{dur/60:.1f}m"
+        dur_color = "#68d391" if dur < 10 else "#f6ad55" if dur < 30 else "#fc8181"
         row = (
             f"<td title='{model}' style='font-family:monospace;font-size:0.8rem'>{short}</td>"
             f"<td>{_bar_cell(s['passed'] / s['total'] if s['total'] else 0)}</td>"
             f"<td>{_bar_cell(s['coverage'])}</td>"
+            f"<td style='color:{dur_color};font-variant-numeric:tabular-nums'>{dur_str}</td>"
             f"<td style='color:#a0aec0'>{s['passed']}/{s['total']}</td>"
         )
         for diff in _DIFFICULTIES:

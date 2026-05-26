@@ -262,6 +262,11 @@ class ModelScore(BaseModel):
         le=1.0,
         description="Mean fraction of individual checks passed across all results, regardless of case pass/fail",
     )
+    avg_duration_seconds: float = Field(
+        default=0.0,
+        ge=0.0,
+        description="Mean end-to-end duration per result (LLM call + evaluation)",
+    )
     total_cases: int = Field(ge=0)
     passed_cases: int = Field(ge=0)
     passed_cases_quality: int = Field(default=0, ge=0)

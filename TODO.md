@@ -112,10 +112,11 @@ Miglioramenti noti alla dashboard non ancora risolti, in ordine di utilità:
   sempre l'attempt più recente. Con `--attempts N > 1` sarebbe utile poter scegliere
   quale attempt visualizzare.
 - [x] **Filtri leaderboard** — filtrare per SDK e difficulty via query params (`?sdk=zephyr&difficulty=medium`).
-- [ ] **Tempo medio di risposta per modello** — visualizzare nella leaderboard il tempo medio
+- [x] **Tempo medio di risposta per modello** — visualizzare nella leaderboard il tempo medio
   per caso (avg `duration_seconds` sui result). Un modello lento anche se accurato ha un costo
   operativo reale. Mostrare come colonna aggiuntiva nella leaderboard dashboard e nel
   leaderboard markdown. Il campo `duration_seconds` è già presente in `EvalResult`.
+  Fix: `llm_response.duration_seconds` ora propagato a `EvalResult` in tutti i path di `runner.py`.
 - [ ] **Editor checks** — i file `checks/static.py` e `checks/behavior.py` sono oggi
   read-only. Aggiungere la possibilità di editarli dalla dashboard (POST `/cases/<id>/checks/<file>`).
 - [ ] **Link diretto** dalla leaderboard alla pagina caso (`/cases/<id>`) oltre che

@@ -148,6 +148,10 @@ def _calculate_model_scores(results: list[EvalResult]) -> list[ModelScore]:
             sum(r.total_score for r in model_results) / len(model_results)
             if model_results else 0.0
         )
+        avg_duration = (
+            sum(r.duration_seconds for r in model_results) / len(model_results)
+            if model_results else 0.0
+        )
 
         scores.append(
             ModelScore(
@@ -159,6 +163,7 @@ def _calculate_model_scores(results: list[EvalResult]) -> list[ModelScore]:
                 pass_at_5=pass_at_5,
                 avg_score=pass_at_1,
                 check_coverage=check_coverage,
+                avg_duration_seconds=avg_duration,
                 total_cases=n_cases,
                 passed_cases=passed_cases,
                 passed_cases_quality=passed_quality,

@@ -324,6 +324,7 @@ def _build_result_from_grade(
     temperature: float,
     gen_params: dict,
     used_thinking: bool,
+    llm_duration_seconds: float = 0.0,
 ) -> EvalResult:
     """Reconstruct an EvalResult from a cached GradeCell + current call metadata.
 
@@ -331,6 +332,7 @@ def _build_result_from_grade(
     failed_at_layer, total_score). Per-call fields like model, attempt,
     token_usage, cost_usd come from the current invocation so a hit never
     leaks state from the call that originally populated the cache.
+    llm_duration_seconds is 0.0 for generation cache hits (no LLM call made).
     """
     return EvalResult(
         case_id=meta.id,
@@ -343,7 +345,7 @@ def _build_result_from_grade(
         failed_at_layer=grade.failed_at_layer,
         passed=grade.passed,
         total_score=grade.total_score,
-        duration_seconds=0.0,
+        duration_seconds=llm_duration_seconds,
         token_usage=token_usage,
         cost_usd=cost_usd,
         tier=meta.tier,
@@ -491,6 +493,7 @@ def _run_single_case(
                 temperature=temperature,
                 gen_params=gen_params,
                 used_thinking=bool(llm_response.thinking_content),
+                llm_duration_seconds=llm_response.duration_seconds,
             )
             # Skip feedback loop: a cached grade means we already know the
             # outcome; if the user wants to re-run feedback they must --force.
@@ -511,6 +514,7 @@ def _run_single_case(
     result.used_thinking = bool(llm_response.thinking_content)
     result.temperature = temperature
     result.generation_params = gen_params
+    result.duration_seconds = llm_response.duration_seconds
     if corpus_dir is not None:
         grade_store(corpus_dir, llm_response.generated_code, case_dir, result)
 
@@ -570,6 +574,7 @@ def _run_single_case(
         result.reasoning_types = meta.reasoning_types
         result.temperature = temperature
         result.generation_params = gen_params
+        result.duration_seconds = fb_response.duration_seconds
 
         logger.info(
             "Feedback round %d/%d for case %s: %s",
