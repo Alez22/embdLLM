@@ -367,8 +367,8 @@ def leaderboard(request: Request) -> str:
             "buckets": {d: _bucket_stats(model, d) for d in _DIFFICULTIES},
         }
 
-    # Sort models by overall pass rate descending
-    models = sorted(models, key=lambda m: model_stats[m]["pct"], reverse=True)
+    # Sort by pass rate descending, then check coverage as tiebreaker
+    models = sorted(models, key=lambda m: (model_stats[m]["pct"], model_stats[m]["coverage"]), reverse=True)
 
     # Filter form
     def _options(values: set[str], current: str, param: str) -> str:
