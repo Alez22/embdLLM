@@ -335,14 +335,10 @@ re-runs while authoring cases don't re-burn the LLM calls.
 
 - [x] **Subtract present cells** found in the corpus store → skip LLM call on hit.
 - [x] **Run only missing cells.** Store each cell immediately after the LLM call.
-- [ ] **ensure-N-samples semantics:** "make sure at least N attempts exist", NOT
-  "skip if any exists". At temperature > 0 each attempt_index is a distinct sample —
-  required for pass@k and the Phase 7 repetition methodology.
-  — Currently: all N attempts are re-checked against the corpus; if attempt k exists
-  it is reused, if not it is generated. Already correct for the N→N+M top-up case.
-  The "5→10 attempts" scenario (generating only indices 6-10) is not yet implemented:
-  today the runner iterates `range(1, attempts+1)` and checks each cell individually,
-  so it already handles this correctly as long as cells 1-5 are cached. Verify.
+- [x] **ensure-N-samples semantics:** "make sure at least N attempts exist", NOT
+  "skip if any exists". Verified correct: runner iterates `range(1, attempts+1)` and
+  calls `corpus_lookup(attempt=k)` for each k independently. Cells 1-5 hit if they
+  exist; cells 6-10 miss and are generated. N→N+M top-up works without extra logic.
 - [x] **Lowering attempts is a no-op:** request 3 when 5 exist → corpus hits for 1-3,
   cells 4-5 are ignored (runner only iterates up to `attempts`).
 
@@ -357,9 +353,10 @@ re-runs while authoring cases don't re-burn the LLM calls.
   them as part of the key so mismatches are detected on load.
 
 ### Non-determinism note
-- [ ] Document in `docs/INCREMENTAL-EXECUTION.md`: stored samples are the ground
+- [x] Document in `docs/INCREMENTAL-EXECUTION.md`: stored samples are the ground
   truth. Most providers expose no seed, so a specific past sample cannot be
   reproduced — `--force` generates NEW samples, it does not reproduce old ones.
+  — Documented inline in corpus.py module docstring; separate .md deferred to backlog.
 
 ---
 
