@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
+from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 
 from embedeval.corpus import (
@@ -657,6 +658,45 @@ def run_benchmark(
     results: list[EvalResult] = list(completed.values())
     total_tasks = len(selected) * attempts
     skipped = 0
+
+    # Pre-run cache summary: count how many cells are already in the generation cache
+    if corpus_dir is not None:
+        gen_params_dict_for_check = GenerationParams(
+            no_think=no_think,
+            feedback_rounds=feedback_rounds,
+        ).as_sorted_dict()
+        cache_hits = 0
+        cache_misses = 0
+        for case_dir, meta in selected:
+            if meta.id in completed:
+                continue
+            prompt = _load_prompt(case_dir)
+            prompt = _inject_board_target(prompt, meta)
+            context_files = _collect_context_files(case_dir)
+            full_prompt_for_hash = build_full_prompt(prompt, context_files, context_pack)
+            if no_think:
+                full_prompt_for_hash = full_prompt_for_hash + "\n/no_think"
+            ph = hash_prompt(full_prompt_for_hash)
+            for attempt in range(1, attempts + 1):
+                cell = corpus_lookup(
+                    corpus_dir=corpus_dir,
+                    model=model,
+                    case_id=meta.id,
+                    prompt_hash=ph,
+                    attempt=attempt,
+                    temperature=temperature,
+                    generation_params=gen_params_dict_for_check,
+                )
+                if cell is not None:
+                    cache_hits += 1
+                else:
+                    cache_misses += 1
+        console = Console()
+        total_cells = cache_hits + cache_misses
+        console.print(
+            f"[bold]Cache:[/bold] {cache_hits}/{total_cells} cells cached "
+            f"([green]{cache_hits} hits[/green], [yellow]{cache_misses} LLM calls[/yellow])"
+        )
 
     with Progress(
         SpinnerColumn(),
