@@ -144,6 +144,11 @@ def _calculate_model_scores(results: list[EvalResult]) -> list[ModelScore]:
                     pass_at_1_comparable = _calculate_pass_at_k(common_results, 1)
                     comparable_cases = len(common_case_ids)
 
+        check_coverage = (
+            sum(r.total_score for r in model_results) / len(model_results)
+            if model_results else 0.0
+        )
+
         scores.append(
             ModelScore(
                 model=model,
@@ -153,6 +158,7 @@ def _calculate_model_scores(results: list[EvalResult]) -> list[ModelScore]:
                 pass_at_3=pass_at_3,
                 pass_at_5=pass_at_5,
                 avg_score=pass_at_1,
+                check_coverage=check_coverage,
                 total_cases=n_cases,
                 passed_cases=passed_cases,
                 passed_cases_quality=passed_quality,

@@ -322,8 +322,13 @@ def leaderboard() -> str:
         total = len(all_results_for_model)
         passed = sum(1 for r in all_results_for_model if r.get("passed"))
         pct = int(passed / total * 100) if total else 0
+        coverage = (
+            sum(r.get("total_score", 0.0) for r in all_results_for_model) / total
+            if total else 0.0
+        )
         model_stats[model] = {
             "passed": passed, "total": total, "pct": pct,
+            "coverage": coverage,
             "buckets": {d: _bucket_stats(model, d) for d in _DIFFICULTIES},
         }
 
@@ -335,16 +340,19 @@ def leaderboard() -> str:
         f'<th style="text-align:center"><span class="badge badge-{d}">{d.capitalize()}</span></th>'
         for d in _DIFFICULTIES
     )
-    header_cells = f"<th>Model</th><th>Overall</th><th>Passed</th>{diff_headers}"
+    header_cells = f"<th>Model</th><th>pass@1</th><th>check coverage</th><th>Passed</th>{diff_headers}"
 
     rows = ""
     for model in models:
         s = model_stats[model]
         short = model.split("/")[-1]
         score_cell = _score_bar(s["passed"] / s["total"] if s["total"] else 0)
+        coverage_cell = _score_bar(s["coverage"])
+        coverage_pct = f'{int(s["coverage"] * 100)}%'
         row = (
             f"<td title='{model}' style='font-family:monospace;font-size:0.8rem'>{short}</td>"
             f"<td>{score_cell}</td>"
+            f"<td>{coverage_cell} <span style='font-size:0.75rem;color:#a0aec0'>{coverage_pct}</span></td>"
             f"<td style='color:#a0aec0'>{s['passed']}/{s['total']}</td>"
         )
         for diff in _DIFFICULTIES:
@@ -462,9 +470,11 @@ def case_detail(case_id: str, model: str) -> str:
         layer_passed = layer.get("passed", False)
         layer_error = layer.get("error")
         details = layer.get("details", [])
+        layer_score = layer.get("score")
 
         badge = _pass_badge(layer_passed)
-        checks_html += f'<div style="margin-bottom:1rem"><h3>L{layer["layer"]} — {layer_name} {badge}</h3>'
+        score_pct = f'<span style="font-size:0.8rem;color:#718096;margin-left:0.5rem">{int(layer_score * 100)}%</span>' if layer_score is not None and details else ""
+        checks_html += f'<div style="margin-bottom:1rem"><h3>L{layer["layer"]} — {layer_name} {badge}{score_pct}</h3>'
 
         if layer_error and not details:
             checks_html += f'<p style="color:#718096;font-size:0.8rem;padding:0.5rem 0">{layer_error}</p>'
@@ -645,8 +655,10 @@ def history_detail(run_id: str) -> str:
             layer_passed = layer.get("passed", False)
             layer_error = layer.get("error")
             details = layer.get("details", [])
+            layer_score = layer.get("score")
             badge = _pass_badge(layer_passed)
-            checks_html += f'<div style="margin-bottom:0.75rem"><h3>L{layer["layer"]} — {layer_name} {badge}</h3>'
+            score_pct = f'<span style="font-size:0.8rem;color:#718096;margin-left:0.5rem">{int(layer_score * 100)}%</span>' if layer_score is not None and details else ""
+            checks_html += f'<div style="margin-bottom:0.75rem"><h3>L{layer["layer"]} — {layer_name} {badge}{score_pct}</h3>'
             if layer_error and not details:
                 checks_html += f'<p style="color:#718096;font-size:0.8rem;padding:0.25rem 0">{layer_error}</p>'
             else:

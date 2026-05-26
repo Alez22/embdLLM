@@ -256,6 +256,12 @@ class ModelScore(BaseModel):
     pass_at_3: float = Field(default=0.0, ge=0.0, le=1.0)
     pass_at_5: float = Field(ge=0.0, le=1.0)
     avg_score: float = Field(default=0.0, ge=0.0, le=1.0)
+    check_coverage: float = Field(
+        default=0.0,
+        ge=0.0,
+        le=1.0,
+        description="Mean fraction of individual checks passed across all results, regardless of case pass/fail",
+    )
     total_cases: int = Field(ge=0)
     passed_cases: int = Field(ge=0)
     passed_cases_quality: int = Field(default=0, ge=0)

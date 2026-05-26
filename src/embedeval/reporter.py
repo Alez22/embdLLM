@@ -299,9 +299,9 @@ def _model_comparison_table(reports: list[BenchmarkReport]) -> list[str]:
     else:
         lines.extend(
             [
-                "| Model | pass@1 (full) | pass@1 (quality) | 95% CI"
+                "| Model | pass@1 (full) | pass@1 (quality) | check coverage | 95% CI"
                 " | pass@5 | Passed | Quality | Total | Samples |",
-                "|-------|---------------|------------------|--------|"
+                "|-------|---------------|------------------|----------------|--------|"
                 "--------|--------|---------|-------|---------|",
             ]
         )
@@ -337,6 +337,7 @@ def _model_comparison_table(reports: list[BenchmarkReport]) -> list[str]:
                     f"| {model_score.model} "
                     f"| {model_score.pass_at_1:.1%} "
                     f"| {model_score.pass_at_1_quality:.1%} "
+                    f"| {model_score.check_coverage:.1%} "
                     f"| {ci_str} "
                     f"| {model_score.pass_at_5:.1%} "
                     f"| {model_score.passed_cases} "
