@@ -315,14 +315,13 @@ re-runs while authoring cases don't re-burn the LLM calls.
 
 ### Two separate caches
 
-- [ ] **Generation cache** — stores the model output (`generated_code`).
+- [x] **Generation cache** — stores the model output (`generated_code`).
   - Key: `(prompt_hash, model, temperature, generation_params, attempt_index)`
-  - `prompt_hash` = content hash of the prompt actually sent (NOT the case_id).
-    Editing a prompt changes the hash, so the cell misses and regenerates.
-    Critical: prevents stale results being served for a case that was modified.
-  - `generation_params` must include everything that affects the output:
-    feedback_rounds, context_pack, max_tokens, and the resolved model/version string.
-  - `attempt_index` makes "5 -> 10 attempts" generate only indices 5-9.
+  - `prompt_hash` = SHA256 of the full prompt as sent (post context_pack + no_think).
+    Editing a prompt causes a cache miss and regenerates.
+  - `generation_params` = `{feedback_rounds, no_think}` (sorted dict, stable key).
+  - Store: `results/corpus/<model_slug>/<case_id>/<attempt>.json` (CorpusCell).
+  - Implemented in `src/embedeval/corpus.py`.
 
 - [ ] **Grading cache** — stores check results, applied on top of generated_code.
   - Key: `(generated_code_hash, checks_hash)`
@@ -332,28 +331,28 @@ re-runs while authoring cases don't re-burn the LLM calls.
 
 ### Reconcile logic
 
-- [ ] **Compute requested grid** from CLI args: selected cases x models x attempts,
-  at the given temperature and generation params.
-- [ ] **Subtract present cells** found in the durable store → list of missing cells.
-- [ ] **Run only missing cells.** Append each to the store as it completes.
+- [x] **Subtract present cells** found in the corpus store → skip LLM call on hit.
+- [x] **Run only missing cells.** Store each cell immediately after the LLM call.
 - [ ] **ensure-N-samples semantics:** "make sure at least N attempts exist", NOT
   "skip if any exists". At temperature > 0 each attempt_index is a distinct sample —
   required for pass@k and the Phase 7 repetition methodology.
-- [ ] **Lowering attempts is a no-op:** request 5 when 10 exist → use the first 5,
-  delete nothing.
+  — Currently: all N attempts are re-checked against the corpus; if attempt k exists
+  it is reused, if not it is generated. Already correct for the N→N+M top-up case.
+  The "5→10 attempts" scenario (generating only indices 6-10) is not yet implemented:
+  today the runner iterates `range(1, attempts+1)` and checks each cell individually,
+  so it already handles this correctly as long as cells 1-5 are cached. Verify.
+- [x] **Lowering attempts is a no-op:** request 3 when 5 exist → corpus hits for 1-3,
+  cells 4-5 are ignored (runner only iterates up to `attempts`).
 
 ### Force and storage
 
-- [ ] **`--force` flag** — discard and regenerate the requested scope (ignores the
-  generation cache). To force a single case, scope the command (e.g. `--category`
-  or case filter) and add `--force`. Note: `-f` is taken by `--feedback-rounds`,
-  so use the long form `--force`.
-- [ ] **Build on the durable tracker/runs store**, NOT the existing checkpoint.
-  The current `.checkpoint_*.jsonl` is crash-recovery only and is deleted on
-  successful completion — it cannot serve as the persistent corpus.
-- [ ] **Persist temperature + generation_params in the stored result.** Today
-  `EvalResult` records model and attempt but not temperature (it lives only in
-  report metadata). Add the missing fields so cells can be keyed correctly.
+- [x] **`--force` flag** — bypasses the corpus lookup and regenerates all cells in
+  scope, overwriting existing entries. Long form only (`-f` taken by `--feedback-rounds`).
+- [x] **Build on a durable store separate from the checkpoint.**
+  `results/corpus/` is persistent; `.checkpoint_*.jsonl` remains crash-recovery only.
+- [x] **Persist temperature + generation_params in the stored result.**
+  `EvalResult` now carries `temperature` and `generation_params`; `CorpusCell` stores
+  them as part of the key so mismatches are detected on load.
 
 ### Non-determinism note
 - [ ] Document in `docs/INCREMENTAL-EXECUTION.md`: stored samples are the ground
