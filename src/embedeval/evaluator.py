@@ -97,11 +97,57 @@ def evaluate(
         EvalResult with per-layer pass/fail results.
     """
     start = time.monotonic()
-    layers: list[LayerResult] = []
-    failed_at_layer: int | None = None
     effective_token_usage = token_usage or TokenUsage(
         input_tokens=0, output_tokens=0, total_tokens=0
     )
+
+    # Fast-path: model returned no code at all (prose response, extraction failure).
+    # Record a dedicated check so the cause is visible in results and dashboard.
+    if not generated_code.strip():
+        logger.warning("evaluate: empty generated_code for %s attempt %d", case_dir.name, attempt)
+        no_code_layer = LayerResult(
+            layer=0,
+            name="static_analysis",
+            passed=False,
+            details=[CheckDetail(
+                check_name="code_extracted",
+                passed=False,
+                expected="LLM output contains a C source file",
+                actual="empty — model returned prose or no code",
+                check_type="constraint",
+            )],
+            error=None,
+            duration_seconds=time.monotonic() - start,
+            score=0.0,
+        )
+        skipped = [
+            LayerResult(
+                layer=i,
+                name=LAYER_NAMES[i],
+                passed=False,
+                details=[],
+                error="Skipped: layer 0 failed (no code extracted)",
+                duration_seconds=0.0,
+            )
+            for i in range(1, 5)
+        ]
+        return EvalResult(
+            case_id=case_dir.name,
+            category=category,
+            model=model,
+            attempt=attempt,
+            generated_code="",
+            layers=[no_code_layer] + skipped,
+            failed_at_layer=0,
+            passed=False,
+            total_score=0.0,
+            token_usage=effective_token_usage,
+            cost_usd=cost_usd,
+            duration_seconds=time.monotonic() - start,
+        )
+
+    layers: list[LayerResult] = []
+    failed_at_layer: int | None = None
 
     # Shared build directory: created once, used by L1 (compile) and L2 (runtime),
     # cleaned up after all layers complete.
