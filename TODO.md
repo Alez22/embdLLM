@@ -323,11 +323,13 @@ re-runs while authoring cases don't re-burn the LLM calls.
   - Store: `results/corpus/<model_slug>/<case_id>/<attempt>.json` (CorpusCell).
   - Implemented in `src/embedeval/corpus.py`.
 
-- [ ] **Grading cache** — stores check results, applied on top of generated_code.
+- [x] **Grading cache** — stores check results, applied on top of generated_code.
   - Key: `(generated_code_hash, checks_hash)`
-  - `checks_hash` = content hash of static.py / behavior.py / review rubric.
-  - Effect: tweaking ONLY a check (not the prompt) re-grades from the cached
-    generation — no LLM call, near-zero cost. This is the main efficiency win.
+  - `checks_hash` = SHA256 of static.py + behavior.py + negatives.py (if present).
+  - Store: `results/corpus/grades/<code_hash>/<checks_hash>.json` (full EvalResult).
+  - Effect: editing only a check causes a grade miss → re-grades from cached code,
+    zero LLM call. Neither changed → both caches hit, entire case skipped in O(ms).
+  - Implemented in `src/embedeval/corpus.py` (grade_lookup, grade_store).
 
 ### Reconcile logic
 
