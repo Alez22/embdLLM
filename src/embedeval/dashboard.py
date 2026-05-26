@@ -186,10 +186,10 @@ pre.hljs-wrap code.hljs { border-radius: 6px; font-size: 0.8rem;
 .tag { display: inline-block; background: #2d3748; color: #a0aec0;
        padding: 1px 6px; border-radius: 3px; font-size: 0.7rem;
        margin: 1px; }
-.score-bar { display: inline-block; height: 8px; border-radius: 4px;
-             background: #2d3748; width: 80px; vertical-align: middle;
-             position: relative; overflow: hidden; }
-.score-fill { height: 100%; border-radius: 4px; }
+.score-bar { display: inline-block; height: 14px; border-radius: 4px;
+             background: #3a3f55; width: 90px; vertical-align: middle;
+             overflow: hidden; position: relative; }
+.score-fill { display: block; height: 100%; position: absolute; top: 0; left: 0; }
 """
 
 _NAV = """
