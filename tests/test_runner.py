@@ -227,6 +227,193 @@ class TestRunBenchmark:
         )
         assert len(results) == 3
 
+    @patch("embedeval.runner.evaluate")
+    @patch("embedeval.runner.call_model")
+    def test_feedback_loop_handles_failed_at_layer_none(
+        self,
+        mock_call_model: object,
+        mock_evaluate: object,
+        tmp_path: Path,
+    ) -> None:
+        """Regression for bug #1: the feedback loop crashed when a round
+        produced ``failed_at_layer = None`` because the index was used at
+        the top of the next iteration before re-checking the condition.
+
+        Scenario: first evaluate() returns FAIL@L0; second (inside the
+        feedback round) returns PASS with failed_at_layer=None. The loop
+        must break cleanly, not raise.
+        """
+        from unittest.mock import MagicMock
+
+        from embedeval.models import (
+            CheckDetail,
+            EvalResult,
+            LayerResult,
+            TokenUsage,
+        )
+
+        _create_case(tmp_path, "case-001")
+
+        mock_response = MagicMock()
+        mock_response.generated_code = "int main() {}"
+        mock_response.token_usage = TokenUsage(
+            input_tokens=10, output_tokens=5, total_tokens=15
+        )
+        mock_response.cost_usd = 0.0
+        mock_response.thinking_content = ""
+        mock_call_model.return_value = mock_response  # type: ignore[union-attr]
+
+        fail_l0 = EvalResult(
+            case_id="case-001",
+            category=CaseCategory.KCONFIG,
+            model="mock",
+            attempt=1,
+            generated_code="int main() {}",
+            layers=[
+                LayerResult(
+                    layer=0,
+                    name="static_analysis",
+                    passed=False,
+                    details=[
+                        CheckDetail(
+                            check_name="hdr",
+                            passed=False,
+                            expected="x",
+                            actual="missing",
+                            check_type="exact_match",
+                        )
+                    ],
+                    error="L0 fail",
+                    duration_seconds=0.0,
+                )
+            ],
+            failed_at_layer=0,
+            passed=False,
+            total_score=0.0,
+            duration_seconds=0.0,
+            token_usage=TokenUsage(input_tokens=0, output_tokens=0, total_tokens=0),
+            cost_usd=0.0,
+        )
+        pass_result = EvalResult(
+            case_id="case-001",
+            category=CaseCategory.KCONFIG,
+            model="mock",
+            attempt=1,
+            generated_code="int main() { return 0; }",
+            layers=[
+                LayerResult(
+                    layer=0,
+                    name="static_analysis",
+                    passed=True,
+                    details=[],
+                    duration_seconds=0.0,
+                )
+            ],
+            failed_at_layer=None,
+            passed=True,
+            total_score=1.0,
+            duration_seconds=0.0,
+            token_usage=TokenUsage(input_tokens=0, output_tokens=0, total_tokens=0),
+            cost_usd=0.0,
+        )
+        mock_evaluate.side_effect = [fail_l0, pass_result]  # type: ignore[union-attr]
+
+        results = run_benchmark(
+            cases_dir=tmp_path,
+            model="mock",
+            attempts=1,
+            feedback_rounds=2,
+        )
+        assert len(results) == 1
+        assert results[0].passed is True
+
+    @patch("embedeval.runner.evaluate")
+    @patch("embedeval.runner.call_model")
+    def test_feedback_loop_stops_when_failure_moves_past_l1(
+        self,
+        mock_call_model: object,
+        mock_evaluate: object,
+        tmp_path: Path,
+    ) -> None:
+        """Regression for bug #1: the feedback loop's guard checks
+        ``failed_at_layer <= 1`` only on entry. If a round produces a
+        failure at L2 (behavioral), feeding back a compile error is
+        nonsense — the loop must terminate.
+        """
+        from unittest.mock import MagicMock
+
+        from embedeval.models import (
+            CheckDetail,
+            EvalResult,
+            LayerResult,
+            TokenUsage,
+        )
+
+        _create_case(tmp_path, "case-001")
+
+        mock_response = MagicMock()
+        mock_response.generated_code = "int main() {}"
+        mock_response.token_usage = TokenUsage(
+            input_tokens=10, output_tokens=5, total_tokens=15
+        )
+        mock_response.cost_usd = 0.0
+        mock_response.thinking_content = ""
+        mock_call_model.return_value = mock_response  # type: ignore[union-attr]
+
+        def _make_result(layer_idx: int, passed: bool) -> EvalResult:
+            return EvalResult(
+                case_id="case-001",
+                category=CaseCategory.KCONFIG,
+                model="mock",
+                attempt=1,
+                generated_code="int main() {}",
+                layers=[
+                    LayerResult(
+                        layer=i,
+                        name=f"L{i}",
+                        passed=(i != layer_idx) if not passed else True,
+                        details=[
+                            CheckDetail(
+                                check_name="c",
+                                passed=False,
+                                expected="x",
+                                actual="y",
+                                check_type="exact_match",
+                            )
+                        ]
+                        if not passed and i == layer_idx
+                        else [],
+                        duration_seconds=0.0,
+                    )
+                    for i in range(3)
+                ],
+                failed_at_layer=None if passed else layer_idx,
+                passed=passed,
+                total_score=1.0 if passed else 0.0,
+                duration_seconds=0.0,
+                token_usage=TokenUsage(input_tokens=0, output_tokens=0, total_tokens=0),
+                cost_usd=0.0,
+            )
+
+        # First evaluate: FAIL@L0 — triggers feedback.
+        # Second evaluate (feedback round 1): FAIL@L2 — must NOT feed back further.
+        # Third evaluate must NOT be called.
+        mock_evaluate.side_effect = [  # type: ignore[union-attr]
+            _make_result(0, passed=False),
+            _make_result(2, passed=False),
+        ]
+
+        results = run_benchmark(
+            cases_dir=tmp_path,
+            model="mock",
+            attempts=1,
+            feedback_rounds=3,
+        )
+        assert len(results) == 1
+        assert results[0].failed_at_layer == 2
+        # 2 evaluate calls: initial + 1 feedback round. NOT 4 (initial + 3 rounds).
+        assert mock_evaluate.call_count == 2  # type: ignore[union-attr]
+
 
 class TestPrivateHeldOutSet:
     """Tests for private/public visibility filtering."""

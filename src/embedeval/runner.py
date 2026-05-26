@@ -460,79 +460,84 @@ def _run_single_case(
     if corpus_dir is not None:
         grade_store(corpus_dir, llm_response.generated_code, case_dir, result)
 
-    # Compiler feedback loop: retry with error context on early failures
-    if (
-        feedback_rounds > 0
+    # Compiler feedback loop: retry with error context on early failures.
+    # Re-check the failed layer at each iteration: a previous feedback round
+    # may have moved the failure deeper (e.g. L0 → L2) or fixed it entirely,
+    # in which case feeding back stale L0 errors is wrong.
+    feedback_round = 0
+    while (
+        feedback_round < feedback_rounds
         and not result.passed
         and result.failed_at_layer is not None
-        and result.failed_at_layer <= 1
+        and 0 <= result.failed_at_layer <= 1
+        and result.failed_at_layer < len(result.layers)
     ):
-        for feedback_round in range(feedback_rounds):
-            failed_layer = result.layers[result.failed_at_layer]
-            error_msg = failed_layer.error or ""
-            failed_details = "\n".join(
-                f"- {d.check_name}: expected={d.expected}, actual={d.actual}"
-                for d in failed_layer.details
-                if not d.passed
-            )
-            error_info = (
-                "\n".join(filter(None, [error_msg, failed_details])) or "Check failed"
-            )
-            feedback_prompt = (
-                f"Your previous code had the following error:\n"
-                f"```\n{error_info[:800]}\n```\n\n"
-                f"Original task:\n{prompt}\n\n"
-                f"Please fix the code and output ONLY the complete"
-                f" corrected C source file."
-            )
-            fb_response = call_model(
+        failed_layer = result.layers[result.failed_at_layer]
+        error_msg = failed_layer.error or ""
+        failed_details = "\n".join(
+            f"- {d.check_name}: expected={d.expected}, actual={d.actual}"
+            for d in failed_layer.details
+            if not d.passed
+        )
+        error_info = (
+            "\n".join(filter(None, [error_msg, failed_details])) or "Check failed"
+        )
+        feedback_prompt = (
+            f"Your previous code had the following error:\n"
+            f"```\n{error_info[:800]}\n```\n\n"
+            f"Original task:\n{prompt}\n\n"
+            f"Please fix the code and output ONLY the complete"
+            f" corrected C source file."
+        )
+        fb_response = call_model(
+            model=model,
+            prompt=feedback_prompt,
+            context_pack=context_pack,
+            no_think=no_think,
+        )
+        fb_code = fb_response.generated_code
+
+        # Grading cache lookup for feedback round result.
+        if corpus_dir is not None and not force:
+            cached_result = grade_lookup(corpus_dir, fb_code, case_dir)
+        else:
+            cached_result = None
+
+        if cached_result is not None:
+            result = cached_result
+            result.sdk = meta.sdk
+            result.tier = meta.tier
+            result.reasoning_types = meta.reasoning_types
+            result.temperature = temperature
+            result.generation_params = gen_params
+        else:
+            result = evaluate(
+                case_dir=case_dir,
+                generated_code=fb_code,
                 model=model,
-                prompt=feedback_prompt,
-                context_pack=context_pack,
-                no_think=no_think,
+                attempt=attempt,
+                token_usage=fb_response.token_usage,
+                cost_usd=fb_response.cost_usd,
+                category=meta.category,
             )
-            fb_code = fb_response.generated_code
+            result.sdk = meta.sdk
+            result.tier = meta.tier
+            result.reasoning_types = meta.reasoning_types
+            result.temperature = temperature
+            result.generation_params = gen_params
+            if corpus_dir is not None:
+                grade_store(corpus_dir, fb_code, case_dir, result)
 
-            # Grading cache lookup for feedback round result.
-            if corpus_dir is not None and not force:
-                cached_result = grade_lookup(corpus_dir, fb_code, case_dir)
-            else:
-                cached_result = None
-
-            if cached_result is not None:
-                result = cached_result
-                result.sdk = meta.sdk
-                result.tier = meta.tier
-                result.reasoning_types = meta.reasoning_types
-                result.temperature = temperature
-                result.generation_params = gen_params
-            else:
-                result = evaluate(
-                    case_dir=case_dir,
-                    generated_code=fb_code,
-                    model=model,
-                    attempt=attempt,
-                    token_usage=fb_response.token_usage,
-                    cost_usd=fb_response.cost_usd,
-                    category=meta.category,
-                )
-                result.sdk = meta.sdk
-                result.tier = meta.tier
-                result.reasoning_types = meta.reasoning_types
-                result.temperature = temperature
-                result.generation_params = gen_params
-                if corpus_dir is not None:
-                    grade_store(corpus_dir, fb_code, case_dir, result)
-
-            logger.info(
-                "Feedback round %d/%d for case %s: %s",
-                feedback_round + 1,
-                feedback_rounds,
-                meta.id,
-                "PASS" if result.passed else f"FAIL@L{result.failed_at_layer}",
-            )
-            if result.passed:
-                break
+        logger.info(
+            "Feedback round %d/%d for case %s: %s",
+            feedback_round + 1,
+            feedback_rounds,
+            meta.id,
+            "PASS" if result.passed else f"FAIL@L{result.failed_at_layer}",
+        )
+        feedback_round += 1
+        if result.passed:
+            break
 
     return result
 
