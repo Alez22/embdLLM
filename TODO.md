@@ -135,11 +135,15 @@ Miglioramenti noti alla dashboard non ancora risolti, in ordine di utilità:
   - `groq/qwen/qwen3-32b` (Qwen3 baseline)
 - [ ] **Document model strings** in `docs/MODELS.md` — name, provider, approx cost/1k tokens,
   context window, notes on embedded code quality.
-- [x] **Run baseline on all Phase 2 cases** — 3 models × 12 NXP cases completed:
+- [ ] **Re-run baseline on all Phase 2 cases** — previous results wiped in
+  commit `6b4ac0b` because the runs predated the cache + reporter fixes
+  (bugs #1, #2, attempt-file overwrite). Numeri attesi storici per
+  riferimento prima del wipe:
   - `groq/llama-3.3-70b-versatile`: 0/12 pass, 61% avg — omits fsl_clock.h/fsl_port.h
   - `groq/openai/gpt-oss-120b`: 3/12 pass, 84% avg — best overall
   - `groq/openai/gpt-oss-20b`: 1/12 pass, 51% avg — inconsistent on ISR cases
-- [x] **Publish initial leaderboard** in `results/LEADERBOARD.md`. — aggiornato ad ogni run
+- [ ] **Re-publish leaderboard** in `results/LEADERBOARD.md` dopo la prima
+  run pulita.
 
 ---
 
