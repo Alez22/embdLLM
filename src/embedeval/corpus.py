@@ -24,6 +24,8 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
+from embedeval.models import LayerResult
+
 if TYPE_CHECKING:
     from embedeval.models import EvalResult
 
@@ -181,6 +183,21 @@ def hash_checks(case_dir: Path) -> str:
     return hashlib.sha256("\n".join(parts).encode()).hexdigest()[:16]
 
 
+class GradeCell(BaseModel):
+    """Cached output of the check pipeline.
+
+    Stores ONLY fields that are a pure function of (generated_code, checks).
+    Excludes runtime/per-call fields (model, attempt, token_usage, cost_usd,
+    duration_seconds, ...) which would poison cross-model and cross-attempt
+    lookups if shared via the cache.
+    """
+
+    layers: list[LayerResult]
+    failed_at_layer: int | None = Field(default=None, ge=0, le=4)
+    passed: bool
+    total_score: float = Field(default=1.0, ge=0.0, le=1.0)
+
+
 def _grade_path(corpus_dir: Path, code_hash: str, checks_hash: str) -> Path:
     """Return the file path for a grade cache entry.
 
@@ -195,10 +212,12 @@ def grade_lookup(
     corpus_dir: Path,
     generated_code: str,
     case_dir: Path,
-) -> "EvalResult | None":
-    """Return a cached EvalResult if (code_hash, checks_hash) matches, else None."""
-    from embedeval.models import EvalResult
+) -> GradeCell | None:
+    """Return a cached GradeCell if (code_hash, checks_hash) matches, else None.
 
+    The caller is responsible for combining the GradeCell with the current
+    call's runtime metadata to build an EvalResult.
+    """
     code_hash = hash_code(generated_code)
     checks_hash = hash_checks(case_dir)
     path = _grade_path(corpus_dir, code_hash, checks_hash)
@@ -208,7 +227,7 @@ def grade_lookup(
 
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
-        return EvalResult.model_validate(data)
+        return GradeCell.model_validate(data)
     except Exception as exc:
         logger.warning("Grade cache: failed to load %s: %s", path, exc)
         return None
@@ -220,13 +239,20 @@ def grade_store(
     case_dir: Path,
     result: "EvalResult",
 ) -> None:
-    """Persist an EvalResult in the grading cache."""
+    """Persist the check-pipeline output as a GradeCell."""
     code_hash = hash_code(generated_code)
     checks_hash = hash_checks(case_dir)
     path = _grade_path(corpus_dir, code_hash, checks_hash)
     path.parent.mkdir(parents=True, exist_ok=True)
+
+    cell = GradeCell(
+        layers=result.layers,
+        failed_at_layer=result.failed_at_layer,
+        passed=result.passed,
+        total_score=result.total_score,
+    )
     path.write_text(
-        result.model_dump_json(indent=2) + "\n",
+        cell.model_dump_json(indent=2) + "\n",
         encoding="utf-8",
     )
     logger.debug(
