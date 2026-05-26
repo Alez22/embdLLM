@@ -5,7 +5,7 @@ Mark done with `[x]`. Add notes inline after `—`.
 
 ## Priority order (next 2-4 weeks)
 
-1. **Phase 4** — Dashboard: fix bug --attempts + improvements
+1. **Phase 4** — Dashboard: improvements (bug --attempts done)
 2. **Phase 6** — Cloud model runs: completare modelli mancanti + docs
 3. **Phase 3** — Nuovi task types (refactoring, doxygen, test gen, arch)
 4. **Phase 5** — Human Review workflow
@@ -13,6 +13,66 @@ Mark done with `[x]`. Add notes inline after `—`.
 6. **Phase 7** — Knowledge Currency Probing
 7. **Phase 8** — Language-variant evaluation
 8. **Backlog** — Hardware-in-the-loop, trap prompts, upstream PR
+
+## Code health (from review 2026-05-26)
+
+Punti emersi dalla review del 2026-05-26 — alcuni risolti, altri tracciati come debito.
+
+### Resolved
+- [x] **Bug #1**: feedback loop crashava con `failed_at_layer = None` o `> 1`
+  dopo il primo round. Fix in commit `82932cb` (while + bounds check + test).
+- [x] **Bug #2**: grade cache memorizzava l'intero `EvalResult` keyed solo su
+  `(code_hash, checks_hash)` → leak di metadata cross-model. Fix in commit
+  `6e61fd7`: nuovo `GradeCell` con solo campi pure-function; runner ricostruisce
+  l'`EvalResult` dai metadati della call corrente. Caching rimosso dai feedback
+  round (chiave non distinguente).
+- [x] **Smoke regression test** end-to-end: commit `e67d1c1`. 6 scenari di
+  caching coperti con mock model.
+
+### Aperti — priorità media
+
+- [ ] **`_extract_code` su fence non chiusi** (`src/embedeval/llm_client.py`).
+  Se il modello tronca a metà output (limite token), nessun fence di chiusura →
+  `_extract_code` ritorna l'intero testo incluso ragionamento. Fix proposto:
+  se trovi `\`\`\`(c|cpp)?` di apertura ma nessun match completo, prendi tutto
+  dall'apertura alla fine come fallback.
+- [ ] **`_call_litellm` swallowa errori non-retryable**: converte qualsiasi
+  `Exception` in `RuntimeError`, perdendo classe specifica
+  (`BadRequestError`, `AuthenticationError`). Il caller `_make_error_result`
+  già usa `type(exc).__name__`, quindi propagare le eccezioni tipizzate dà più
+  informazione. Lasciare `except (RateLimitError, ...)` come ora; rimuovere il
+  catch-all `except Exception`.
+- [ ] **MOCK_C_CODE usa Zephyr**: `llm_client.py:24` ha `#include <zephyr/kernel.h>`
+  che fa fallire `no_cross_platform_hallucination` su casi NXP. Probabile
+  residuo upstream. Cambiare in un main.c stile bare-metal NXP, o renderlo
+  configurabile per SDK.
+- [ ] **Allineamento `Platform` enum vs `metadata.yaml`**: il CLAUDE.md mostra
+  `platform: nxp_bare_metal` mentre `EvalPlatform.NXP_BARE_METAL = "nxp_bare_metal"`
+  esiste. Verificare se il campo `platform` in `CaseMetadata` è ancora vivo o
+  deprecated rispetto a `sdk`. Se deprecated, rimuovere dai metadata.
+
+### Aperti — priorità bassa (debito strutturale)
+
+- [ ] **File enormi senza single responsibility**: `cli.py` 1439 righe,
+  `check_utils.py` 1430, `evaluator.py` 1180, `reporter.py` 1148,
+  `safety_guide.py` 976, `dashboard.py` 943. Quando uno di questi diventa
+  doloroso da modificare, estrarre sub-moduli. Non prioritario in assoluto,
+  ma il costo cresce nel tempo.
+- [ ] **`_RETRY_AFTER_RE` cattura solo "try again in"**: OpenRouter usa
+  formati diversi ("retry after Xs"). Quando Phase 6 attiverà OpenRouter,
+  estendere il pattern o renderlo provider-aware.
+- [ ] **Nessun retry budget complessivo**: `max_retries=6` è per-call.
+  Su run di 12 casi × 5 attempt × 3 feedback con rate limit pesante, il
+  benchmark può silenziosamente diventare ore di wait. Aggiungere
+  `--run-deadline=2h` o accumulatore di wait globale.
+- [ ] **Test pre-esistenti fragili**: `test_three_runs_cover_same_case_set`
+  (test_context_quality_mode_e2e.py) trova 4 casi UART invece di 2,
+  `test_sdk_buckets` fallisce su 2 casi. Non causati da modifiche recenti
+  ma indicano fixture che drifta con i casi nuovi.
+- [ ] **Semantica `feedback_rounds` vs `attempt`**: il `token_usage` finale
+  riflette solo l'ultima call LLM, non la somma su tutti i round. Confronti
+  di costo tra modelli con feedback attivo sono sottostimati. Decidere se
+  sommare o documentare la convenzione.
 
 ---
 

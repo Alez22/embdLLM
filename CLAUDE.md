@@ -212,3 +212,55 @@ uv run pytest tests/
 - Do not create a refactoring case without providing the original code in the prompt.
 - Do not implement additional features or optimizations without explicit request.
 - Do not skip the anti-hallucination check in static.py.
+
+## Caching architecture — non-obvious invariants
+
+Two-tier cache in `src/embedeval/corpus.py`. Get these wrong and the
+benchmark numbers silently become invalid.
+
+### Generation cache
+- Key: `(prompt_hash, model, temperature, generation_params, attempt)`.
+- Layout: `results/corpus/generations/<model_slug>/<case_id>/<attempt>.json`.
+- Per-model directory: a model never reads another model's cells.
+
+### Grading cache (`GradeCell`)
+- Key: `(generated_code_hash, checks_hash)` — **NOT** model or attempt.
+- **Stores ONLY pure-function-of-(code,checks) fields**: `layers`,
+  `passed`, `failed_at_layer`, `total_score`. Nothing else.
+- Per-call metadata (model, attempt, token_usage, cost_usd,
+  duration_seconds, used_thinking, temperature, generation_params) must
+  come from the *current* call site via `_build_result_from_grade`.
+- Rationale: two different models that happen to emit identical code
+  (common with temperature=0) share the cache key — leaking the first
+  model's metadata into the second would falsify per-model results.
+
+### Feedback rounds do NOT use the grade cache
+- The cache key cannot distinguish a base generation from a feedback-round
+  output, so caching them together would poison cross-context lookups.
+- Feedback rounds always call `evaluate()` afresh. Accept the cost.
+
+### When adding fields to `EvalResult`
+- If the new field depends only on `(generated_code, checks)`, add it to
+  `GradeCell` too.
+- If it depends on the call site (model, params, timing), pass it via
+  `_build_result_from_grade` arguments. Do NOT add it to `GradeCell`.
+
+### `--force` semantics
+- Bypasses both caches. Generates NEW samples, does NOT reproduce old
+  ones — most providers expose no seed. A specific past sample cannot be
+  recovered after `--force`.
+
+## Retry policy (LLM client)
+
+- `_call_litellm` uses exponential backoff with full jitter:
+  `min(base * 2^(attempt-1), cap) + uniform(0, 1)`.
+  Defaults: `base=5s` (`rate_limit_delay`), `cap=120s` (`max_retry_delay`),
+  `max_retries=6`.
+- On `RateLimitError`: `delay = max(provider_delay, backoff)` — the
+  provider-supplied wait time is always respected. Parsed from HTTP
+  `Retry-After` header first, then from the message body
+  ("try again in X.XXs" / "350ms").
+- Other transient errors (`ServiceUnavailableError`, `Timeout`,
+  `ConnectionError`) use pure backoff.
+- Anything else propagates as `RuntimeError(f"Non-retryable error...")` —
+  caller turns it into FAIL@L0 via `_make_error_result`.
