@@ -36,8 +36,9 @@ docker-compose.override.yml
 build/
 twister-out*/
 
-# Results — track summaries, ignore per-TC detail JSONs
+# Results — track summaries, ignore per-TC detail JSONs and the run history log
 results/runs/*/details/
+results/history.json
 
 # Environment
 .env
