@@ -13,7 +13,7 @@ from pathlib import Path
 from threading import Timer
 
 import yaml
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
 
@@ -282,14 +282,42 @@ _DIFFICULTIES = ["easy", "medium", "hard"]
 
 
 @app.get("/", response_class=HTMLResponse)
-def leaderboard() -> str:
-    """Leaderboard: rows=models, columns=difficulty buckets (easy/medium/hard)."""
-    results = _all_results()
+def leaderboard(request: Request) -> str:
+    """Leaderboard: rows=models, columns=difficulty buckets (easy/medium/hard).
 
-    if not results:
+    Optional query params:
+      ?sdk=zephyr        — filter by SDK bucket
+      ?difficulty=medium — filter by difficulty
+    Both can be combined: ?sdk=zephyr&difficulty=medium
+    """
+    filter_sdk = request.query_params.get("sdk", "")
+    filter_diff = request.query_params.get("difficulty", "")
+
+    all_results = _all_results()
+
+    if not all_results:
         return _page("Leaderboard", "<div class='card'><p>No results found in results/. Run a benchmark first.</p></div>")
 
-    # Collect unique models (insertion order)
+    # Collect available sdk and difficulty values across all results (for filter UI)
+    all_sdks: set[str] = set()
+    all_diffs: set[str] = set()
+    for r in all_results:
+        meta = _find_metadata(r.get("case_id", ""))
+        sdk = meta.get("sdk", "")
+        if sdk:
+            all_sdks.add(sdk)
+        d = meta.get("difficulty", "")
+        if d:
+            all_diffs.add(d)
+
+    # Apply filters
+    results = all_results
+    if filter_sdk:
+        results = [r for r in results if _find_metadata(r.get("case_id", "")).get("sdk") == filter_sdk]
+    if filter_diff:
+        results = [r for r in results if _find_metadata(r.get("case_id", "")).get("difficulty") == filter_diff]
+
+    # Collect unique models from filtered results
     models: list[str] = []
     seen_models: set[str] = set()
     for r in results:
@@ -342,6 +370,20 @@ def leaderboard() -> str:
     # Sort models by overall pass rate descending
     models = sorted(models, key=lambda m: model_stats[m]["pct"], reverse=True)
 
+    # Filter form
+    def _options(values: set[str], current: str, param: str) -> str:
+        opts = f'<option value="">All</option>'
+        for v in sorted(values):
+            sel = ' selected' if v == current else ''
+            opts += f'<option value="{v}"{sel}>{v}</option>'
+        return f'<select name="{param}" onchange="this.form.submit()" style="background:#2d3748;color:#e2e8f0;border:1px solid #4a5568;border-radius:4px;padding:3px 8px;font-size:0.8rem">{opts}</select>'
+
+    filter_form = f"""
+<form method="get" style="display:flex;align-items:center;gap:1rem;font-size:0.85rem;color:#a0aec0">
+  <span>SDK: {_options(all_sdks, filter_sdk, "sdk")}</span>
+  <span>Difficulty: {_options(all_diffs, filter_diff, "difficulty")}</span>
+</form>"""
+
     # Header
     diff_headers = "".join(
         f'<th style="text-align:center"><span class="badge badge-{d}">{d.capitalize()}</span></th>'
@@ -372,16 +414,22 @@ def leaderboard() -> str:
     diff_counts = {d: sum(1 for v in case_difficulty.values() if v == d) for d in _DIFFICULTIES}
     subtitle_parts = [f"{diff_counts[d]} {d}" for d in _DIFFICULTIES if diff_counts[d] > 0]
 
+    no_results_msg = ""
+    if not models:
+        no_results_msg = "<p style='color:#718096;padding:1rem'>No results match the selected filters.</p>"
+
     body = f"""
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.75rem">
   <h1>Leaderboard</h1>
-  <span style="color:#718096;font-size:0.85rem">{len(models)} models · {sum(diff_counts.values())} cases ({", ".join(subtitle_parts)})</span>
+  <span style="color:#718096;font-size:0.85rem">{len(models)} models · {sum(diff_counts.values())} cases ({", ".join(subtitle_parts) or "none"})</span>
 </div>
-<div class="card" style="padding:0;overflow:auto">
+{filter_form}
+<div class="card" style="padding:0;overflow:auto;margin-top:1rem">
   <table>
     <thead><tr>{header_cells}</tr></thead>
     <tbody>{rows}</tbody>
   </table>
+  {no_results_msg}
 </div>
 """
     return _page("Leaderboard", body)
