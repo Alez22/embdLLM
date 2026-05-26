@@ -82,7 +82,7 @@ def test_archive_without_run_id_uses_date_model_dir(tmp_path: Path):
     assert "sonnet" in name
     assert ":" not in name and "/" not in name
     assert (run_dir / "summary.json").is_file()
-    assert (run_dir / "details" / "kconfig-001.json").is_file()
+    assert (run_dir / "details" / "kconfig-001_attempt1.json").is_file()
 
 
 def test_archive_with_run_id_appends_suffix(tmp_path: Path):

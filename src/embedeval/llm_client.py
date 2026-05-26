@@ -2,6 +2,7 @@
 
 import json
 import logging
+import random
 import re
 import subprocess
 import time
@@ -207,20 +208,53 @@ def _call_claude_code(
     )
 
 
-_RETRY_AFTER_RE = re.compile(r"try again in\s+([\d.]+)s", re.IGNORECASE)
+_RETRY_AFTER_RE = re.compile(
+    r"try again in\s+([\d.]+)\s*(ms|s)", re.IGNORECASE
+)
 
 
-def _parse_retry_after(error_msg: str, default: float) -> float:
-    """Extract wait time from Groq rate-limit error message.
+def _parse_retry_after(exc: Exception, default: float) -> tuple[float, str]:
+    """Extract wait time from a rate-limit error.
 
-    Groq embeds "Please try again in X.XXs" in the error body.
-    We add a 1-second buffer on top to avoid hitting the limit again
-    immediately when the window resets at a boundary.
+    Checks in order:
+    1. HTTP Retry-After header (numeric seconds only; HTTP-date skipped).
+    2. Provider message body: "try again in X.XXs" or "in 350ms".
+    3. Falls back to ``default``.
+
+    Returns (delay_seconds, source) where source is "header", "message",
+    or "backoff" — used only for logging.
     """
-    match = _RETRY_AFTER_RE.search(error_msg)
+    # --- HTTP header ---
+    response = getattr(exc, "response", None)
+    if response is not None:
+        try:
+            header_val = response.headers.get("Retry-After") or response.headers.get(
+                "retry-after"
+            )
+            if header_val is not None:
+                return float(header_val) + 1.0, "header"
+        except Exception:
+            pass
+
+    # --- message body ---
+    match = _RETRY_AFTER_RE.search(str(exc))
     if match:
-        return float(match.group(1)) + 1.0
-    return default
+        value = float(match.group(1))
+        unit = match.group(2).lower()
+        seconds = value / 1000.0 if unit == "ms" else value
+        return seconds + 1.0, "message"
+
+    return default, "backoff"
+
+
+def _backoff_delay(attempt: int, base: float, cap: float) -> float:
+    """Exponential backoff with full jitter.
+
+    Formula: min(base * 2^(attempt-1), cap) + uniform(0, 1).
+    Jitter spreads retries so concurrent runs don't all wake at the same
+    instant when a shared rate-limit window resets.
+    """
+    return min(base * (2 ** (attempt - 1)), cap) + random.uniform(0.0, 1.0)
 
 
 def _call_litellm(
@@ -229,6 +263,7 @@ def _call_litellm(
     timeout: float,
     max_retries: int,
     rate_limit_delay: float,
+    max_retry_delay: float = 120.0,
 ) -> LLMResponse:
     """Call LLM via litellm (requires API keys)."""
     last_error: Exception | None = None
@@ -283,13 +318,24 @@ def _call_litellm(
         ) as exc:
             last_error = exc
             logger.warning(
-                "LLM call attempt %d failed (retryable): %s",
+                "LLM call attempt %d/%d failed (%s): %s",
                 attempt,
+                max_retries,
+                type(exc).__name__,
                 exc,
             )
             if attempt < max_retries:
-                delay = _parse_retry_after(str(exc), rate_limit_delay)
-                logger.info("Waiting %.1fs before retry...", delay)
+                backoff = _backoff_delay(attempt, rate_limit_delay, max_retry_delay)
+                if isinstance(exc, RateLimitError):
+                    # Respect the provider-supplied wait time; never wait less.
+                    provider_delay, source = _parse_retry_after(exc, rate_limit_delay)
+                    delay = max(provider_delay, backoff)
+                else:
+                    delay, source = backoff, "backoff"
+                delay = min(delay, max_retry_delay)
+                logger.info(
+                    "Waiting %.1fs before retry (source: %s)...", delay, source
+                )
                 time.sleep(delay)
         except Exception as exc:
             logger.error("LLM call failed (non-retryable): %s", exc)
