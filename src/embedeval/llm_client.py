@@ -75,7 +75,7 @@ def call_model(
     If the first response looks like prose (no C-family tokens), retry once
     with a stronger "code only" instruction appended to the prompt.
     """
-    full_prompt = _build_full_prompt(prompt, context_files, context_pack)
+    full_prompt = build_full_prompt(prompt, context_files, context_pack)
     if no_think:
         full_prompt = full_prompt + _NO_THINK_SUFFIX
 
@@ -395,7 +395,7 @@ def _build_context(context_files: list[str]) -> str:
     return "\n".join(parts)
 
 
-def _build_full_prompt(
+def build_full_prompt(
     prompt: str,
     context_files: list[str] | None,
     context_pack: str | None,

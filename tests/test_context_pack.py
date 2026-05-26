@@ -12,7 +12,7 @@ from embedeval.context_pack import (
     hash_context_pack,
     resolve_context_pack,
 )
-from embedeval.llm_client import _build_full_prompt, call_model
+from embedeval.llm_client import build_full_prompt as _build_full_prompt, call_model
 
 
 class TestBuildFullPrompt:

@@ -8,8 +8,14 @@ from pathlib import Path
 import yaml
 from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 
+from embedeval.corpus import (
+    GenerationParams,
+    corpus_lookup,
+    corpus_store,
+    hash_prompt,
+)
 from embedeval.evaluator import evaluate
-from embedeval.llm_client import call_model
+from embedeval.llm_client import build_full_prompt, call_model
 from embedeval.models import (
     CaseCategory,
     CaseMetadata,
@@ -313,9 +319,60 @@ def _run_single_case(
     feedback_rounds: int,
     context_pack: str | None = None,
     no_think: bool = False,
+    corpus_dir: Path | None = None,
+    prompt_hash: str | None = None,
+    temperature: float = 0.0,
+    gen_params_dict: dict | None = None,
+    force: bool = False,
 ) -> EvalResult:
     """Evaluate one case/attempt — extracted so the caller can wrap it
-    in a broad try/except without duplicating the happy-path logic."""
+    in a broad try/except without duplicating the happy-path logic.
+
+    When corpus_dir and prompt_hash are provided, checks the generation
+    corpus before calling the model.  On a cache hit the stored
+    generated_code is used directly (no LLM call).  The result is written
+    to the corpus on every cache miss so subsequent runs can reuse it.
+    """
+    gen_params = gen_params_dict or {}
+
+    # --- corpus lookup (cache hit → skip LLM call) ---
+    cached_code: str | None = None
+    if corpus_dir is not None and prompt_hash is not None and not force:
+        cell = corpus_lookup(
+            corpus_dir=corpus_dir,
+            case_id=meta.id,
+            model=model,
+            attempt=attempt,
+            prompt_hash=prompt_hash,
+            temperature=temperature,
+            generation_params=gen_params,
+        )
+        if cell is not None:
+            logger.info(
+                "Corpus hit: %s attempt %d — skipping LLM call",
+                meta.id,
+                attempt,
+            )
+            cached_code = cell.generated_code
+
+    if cached_code is not None:
+        # Re-grade from cached generation (no LLM call).
+        result = evaluate(
+            case_dir=case_dir,
+            generated_code=cached_code,
+            model=model,
+            attempt=attempt,
+            token_usage=TokenUsage(input_tokens=0, output_tokens=0, total_tokens=0),
+            cost_usd=0.0,
+            category=meta.category,
+        )
+        result.sdk = meta.sdk
+        result.tier = meta.tier
+        result.reasoning_types = meta.reasoning_types
+        result.temperature = temperature
+        result.generation_params = gen_params
+        return result
+
     llm_response = call_model(
         model=model,
         prompt=prompt,
@@ -323,6 +380,22 @@ def _run_single_case(
         context_pack=context_pack,
         no_think=no_think,
     )
+
+    # --- corpus store (cache miss → persist after LLM call) ---
+    if corpus_dir is not None and prompt_hash is not None:
+        corpus_store(
+            corpus_dir=corpus_dir,
+            case_id=meta.id,
+            model=model,
+            attempt=attempt,
+            prompt_hash=prompt_hash,
+            temperature=temperature,
+            generation_params=gen_params,
+            generated_code=llm_response.generated_code,
+            input_tokens=llm_response.token_usage.input_tokens,
+            output_tokens=llm_response.token_usage.output_tokens,
+            cost_usd=llm_response.cost_usd,
+        )
 
     result = evaluate(
         case_dir=case_dir,
@@ -337,6 +410,8 @@ def _run_single_case(
     result.tier = meta.tier
     result.reasoning_types = meta.reasoning_types
     result.used_thinking = bool(llm_response.thinking_content)
+    result.temperature = temperature
+    result.generation_params = gen_params
 
     # Compiler feedback loop: retry with error context on early failures
     if (
@@ -382,6 +457,8 @@ def _run_single_case(
             result.sdk = meta.sdk
             result.tier = meta.tier
             result.reasoning_types = meta.reasoning_types
+            result.temperature = temperature
+            result.generation_params = gen_params
             logger.info(
                 "Feedback round %d/%d for case %s: %s",
                 feedback_round + 1,
@@ -406,6 +483,9 @@ def run_benchmark(
     checkpoint_path: Path | None = None,
     context_pack: str | None = None,
     no_think: bool = False,
+    corpus_dir: Path | None = None,
+    temperature: float = 0.0,
+    force: bool = False,
 ) -> list[EvalResult]:
     """Run the benchmark pipeline: discover, filter, LLM call, evaluate.
 
@@ -428,6 +508,13 @@ def run_benchmark(
         context_pack: Optional run-wide context (team CLAUDE.md or expert
             pack content) prepended to every LLM prompt. See
             docs/CONTEXT-QUALITY-MODE.md.
+        corpus_dir: Directory for the generation cache.  When provided,
+            completed cells are looked up before calling the model, and
+            new cells are stored after each LLM call.
+        temperature: LLM sampling temperature — stored in each CorpusCell
+            so the cache can detect key mismatches on reruns.
+        force: When True, bypass the corpus lookup and always call the
+            model, overwriting any existing cells in the corpus.
 
     Returns:
         List of EvalResult for all case/attempt combinations.
@@ -448,6 +535,12 @@ def run_benchmark(
     completed: dict[str, EvalResult] = {}
     if checkpoint_path is not None:
         completed = _load_checkpoint(checkpoint_path)
+
+    # Build the generation params dict once — same for all cells in this run.
+    gen_params_dict = GenerationParams(
+        no_think=no_think,
+        feedback_rounds=feedback_rounds,
+    ).as_sorted_dict()
 
     results: list[EvalResult] = list(completed.values())
     total_tasks = len(selected) * attempts
@@ -474,6 +567,14 @@ def run_benchmark(
             prompt = _inject_board_target(prompt, meta)
             context_files = _collect_context_files(case_dir)
 
+            # Compute the hash of the full prompt as the model will see it.
+            # Must include context_pack and no_think suffix so any change
+            # to the prompt composition causes a cache miss.
+            full_prompt_for_hash = build_full_prompt(prompt, context_files, context_pack)
+            if no_think:
+                full_prompt_for_hash = full_prompt_for_hash + "\n/no_think"
+            prompt_hash = hash_prompt(full_prompt_for_hash)
+
             for attempt in range(1, attempts + 1):
                 progress.update(
                     task,
@@ -491,6 +592,11 @@ def run_benchmark(
                         feedback_rounds=feedback_rounds,
                         context_pack=context_pack,
                         no_think=no_think,
+                        corpus_dir=corpus_dir,
+                        prompt_hash=prompt_hash,
+                        temperature=temperature,
+                        gen_params_dict=gen_params_dict,
+                        force=force,
                     )
                 except Exception as exc:  # noqa: BLE001
                     # Catch ANY per-case error (UnicodeDecodeError,

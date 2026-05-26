@@ -294,6 +294,29 @@ def run(
             ),
         ),
     ] = False,
+    corpus_dir: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--corpus-dir",
+            help=(
+                "Directory for the generation corpus cache. "
+                "When set, completed cells are reused across runs "
+                "(no LLM call when the key matches). "
+                "Defaults to <output-dir>/corpus when not specified."
+            ),
+        ),
+    ] = None,
+    force: Annotated[
+        bool,
+        typer.Option(
+            "--force",
+            help=(
+                "Bypass the corpus cache and regenerate all cells in scope. "
+                "Overwrites existing corpus entries. "
+                "Use with a case filter to force a single case."
+            ),
+        ),
+    ] = False,
     verbose: Annotated[
         bool,
         typer.Option("--verbose", "-v", help="Enable verbose logging"),
@@ -459,6 +482,8 @@ def run(
         )
     else:
         extra_dirs = [private_cases] if private_cases else None
+        # Default corpus_dir to <output_dir>/corpus when not explicitly set.
+        effective_corpus_dir = corpus_dir if corpus_dir is not None else output_dir / "corpus"
         results = run_benchmark(
             cases_dir=cases_dir,
             model=model,
@@ -470,6 +495,9 @@ def run(
             checkpoint_path=checkpoint_path,
             context_pack=context_pack_text,
             no_think=no_think,
+            corpus_dir=effective_corpus_dir,
+            temperature=temperature,
+            force=force,
         )
 
     if not results:

@@ -209,6 +209,10 @@ class EvalResult(BaseModel):
     reasoning_types: list[ReasoningType] = Field(default_factory=list)
     # True when the model emitted a <think> block — enables thinking vs non-thinking comparison.
     used_thinking: bool = False
+    # Generation parameters — stored so the corpus cache can match cells exactly.
+    # Defaults keep older EvalResult JSON files valid on load.
+    temperature: float = Field(default=0.0, ge=0.0)
+    generation_params: dict = Field(default_factory=dict)
 
 
 class PerCheckStat(BaseModel):
