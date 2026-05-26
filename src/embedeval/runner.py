@@ -12,6 +12,8 @@ from embedeval.corpus import (
     GenerationParams,
     corpus_lookup,
     corpus_store,
+    grade_lookup,
+    grade_store,
     hash_prompt,
 )
 from embedeval.evaluator import evaluate
@@ -356,7 +358,25 @@ def _run_single_case(
             cached_code = cell.generated_code
 
     if cached_code is not None:
-        # Re-grade from cached generation (no LLM call).
+        # Generation cache hit — re-grade from cached code.
+        # Check grading cache first: if checks haven't changed either, skip evaluate().
+        if corpus_dir is not None and not force:
+            cached_result = grade_lookup(corpus_dir, cached_code, case_dir)
+            if cached_result is not None:
+                logger.info(
+                    "Grade cache hit: %s attempt %d — skipping evaluate()",
+                    meta.id,
+                    attempt,
+                )
+                cached_result.model = model
+                cached_result.attempt = attempt
+                cached_result.sdk = meta.sdk
+                cached_result.tier = meta.tier
+                cached_result.reasoning_types = meta.reasoning_types
+                cached_result.temperature = temperature
+                cached_result.generation_params = gen_params
+                return cached_result
+
         result = evaluate(
             case_dir=case_dir,
             generated_code=cached_code,
@@ -371,6 +391,8 @@ def _run_single_case(
         result.reasoning_types = meta.reasoning_types
         result.temperature = temperature
         result.generation_params = gen_params
+        if corpus_dir is not None:
+            grade_store(corpus_dir, cached_code, case_dir, result)
         return result
 
     llm_response = call_model(
@@ -381,7 +403,7 @@ def _run_single_case(
         no_think=no_think,
     )
 
-    # --- corpus store (cache miss → persist after LLM call) ---
+    # --- corpus store (generation cache miss → persist after LLM call) ---
     if corpus_dir is not None and prompt_hash is not None:
         corpus_store(
             corpus_dir=corpus_dir,
@@ -396,6 +418,29 @@ def _run_single_case(
             output_tokens=llm_response.token_usage.output_tokens,
             cost_usd=llm_response.cost_usd,
         )
+
+    # --- grading cache lookup (new generation, but checks may be unchanged) ---
+    if corpus_dir is not None and not force:
+        cached_result = grade_lookup(
+            corpus_dir, llm_response.generated_code, case_dir
+        )
+        if cached_result is not None:
+            logger.info(
+                "Grade cache hit (post-LLM): %s attempt %d — skipping evaluate()",
+                meta.id,
+                attempt,
+            )
+            cached_result.model = model
+            cached_result.attempt = attempt
+            cached_result.sdk = meta.sdk
+            cached_result.tier = meta.tier
+            cached_result.reasoning_types = meta.reasoning_types
+            cached_result.used_thinking = bool(llm_response.thinking_content)
+            cached_result.temperature = temperature
+            cached_result.generation_params = gen_params
+            cached_result.token_usage = llm_response.token_usage
+            cached_result.cost_usd = llm_response.cost_usd
+            return cached_result
 
     result = evaluate(
         case_dir=case_dir,
@@ -412,6 +457,8 @@ def _run_single_case(
     result.used_thinking = bool(llm_response.thinking_content)
     result.temperature = temperature
     result.generation_params = gen_params
+    if corpus_dir is not None:
+        grade_store(corpus_dir, llm_response.generated_code, case_dir, result)
 
     # Compiler feedback loop: retry with error context on early failures
     if (
@@ -444,21 +491,39 @@ def _run_single_case(
                 context_pack=context_pack,
                 no_think=no_think,
             )
-            generated_code = fb_response.generated_code
-            result = evaluate(
-                case_dir=case_dir,
-                generated_code=generated_code,
-                model=model,
-                attempt=attempt,
-                token_usage=fb_response.token_usage,
-                cost_usd=fb_response.cost_usd,
-                category=meta.category,
-            )
-            result.sdk = meta.sdk
-            result.tier = meta.tier
-            result.reasoning_types = meta.reasoning_types
-            result.temperature = temperature
-            result.generation_params = gen_params
+            fb_code = fb_response.generated_code
+
+            # Grading cache lookup for feedback round result.
+            if corpus_dir is not None and not force:
+                cached_result = grade_lookup(corpus_dir, fb_code, case_dir)
+            else:
+                cached_result = None
+
+            if cached_result is not None:
+                result = cached_result
+                result.sdk = meta.sdk
+                result.tier = meta.tier
+                result.reasoning_types = meta.reasoning_types
+                result.temperature = temperature
+                result.generation_params = gen_params
+            else:
+                result = evaluate(
+                    case_dir=case_dir,
+                    generated_code=fb_code,
+                    model=model,
+                    attempt=attempt,
+                    token_usage=fb_response.token_usage,
+                    cost_usd=fb_response.cost_usd,
+                    category=meta.category,
+                )
+                result.sdk = meta.sdk
+                result.tier = meta.tier
+                result.reasoning_types = meta.reasoning_types
+                result.temperature = temperature
+                result.generation_params = gen_params
+                if corpus_dir is not None:
+                    grade_store(corpus_dir, fb_code, case_dir, result)
+
             logger.info(
                 "Feedback round %d/%d for case %s: %s",
                 feedback_round + 1,

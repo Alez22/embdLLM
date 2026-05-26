@@ -1,21 +1,18 @@
-"""Generation corpus — persistent store for LLM-generated code cells.
+"""Generation corpus and grading cache.
 
-Layout on disk:
-    results/corpus/<model_slug>/<case_id>/<attempt>.json
+Generation cache layout:
+    results/corpus/generations/<model_slug>/<case_id>/<attempt>.json  (CorpusCell)
 
-Each file is a CorpusCell.  The cache key is
-    (prompt_hash, model, temperature, generation_params, attempt)
-and is stored inside the file so a key mismatch is detected on load
-(e.g. the prompt was edited but the file from the old prompt is still
-present under the same path).
+Grading cache layout:
+    results/corpus/grades/<generated_code_hash>/<checks_hash>.json  (GradeCell)
 
-Usage in runner.py:
-    cell = corpus_lookup(corpus_dir, case_id, model, attempt, key)
-    if cell is not None:
-        use cell.generated_code          # cache hit
-    else:
-        generated_code = call_model(...)
-        corpus_store(corpus_dir, case_id, model, attempt, key, ...)
+Generation cache key:  (prompt_hash, model, temperature, generation_params, attempt)
+Grading cache key:     (generated_code_hash, checks_hash)
+
+The two caches are independent:
+  - Editing a prompt → generation miss → regenerate → grading miss → re-grade.
+  - Editing only a check → generation hit → grading miss → re-grade from cached code.
+  - Neither changed → both hit → zero work.
 """
 
 import hashlib
@@ -23,8 +20,12 @@ import json
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
+
+if TYPE_CHECKING:
+    from embedeval.models import EvalResult
 
 logger = logging.getLogger(__name__)
 
@@ -66,9 +67,9 @@ def hash_prompt(prompt: str) -> str:
 
 
 def _cell_path(corpus_dir: Path, case_id: str, model: str, attempt: int) -> Path:
-    """Return the file path for a corpus cell."""
+    """Return the file path for a generation corpus cell."""
     model_slug = model.replace("/", "_").replace(":", "_")
-    return corpus_dir / model_slug / case_id / f"{attempt}.json"
+    return corpus_dir / "generations" / model_slug / case_id / f"{attempt}.json"
 
 
 def corpus_lookup(
@@ -146,3 +147,88 @@ def corpus_store(
         encoding="utf-8",
     )
     logger.debug("Corpus: stored %s attempt %d at %s", case_id, attempt, path)
+
+
+# ---------------------------------------------------------------------------
+# Grading cache
+# ---------------------------------------------------------------------------
+
+def hash_code(generated_code: str) -> str:
+    """Return a 16-char SHA256 prefix of the generated code."""
+    return hashlib.sha256(generated_code.encode("utf-8")).hexdigest()[:16]
+
+
+def hash_checks(case_dir: Path) -> str:
+    """Return a 16-char content hash of all check files in case_dir/checks/.
+
+    Covers static.py, behavior.py, and negatives.py (if present).
+    A change to any of these produces a different hash → grading cache miss.
+    """
+    checks_dir = case_dir / "checks"
+    if not checks_dir.is_dir():
+        return "no_checks"
+
+    parts: list[str] = []
+    for name in ("static.py", "behavior.py", "negatives.py"):
+        f = checks_dir / name
+        if f.is_file():
+            fhash = hashlib.sha256(f.read_bytes()).hexdigest()[:8]
+            parts.append(f"{name}:{fhash}")
+
+    if not parts:
+        return "no_checks"
+
+    return hashlib.sha256("\n".join(parts).encode()).hexdigest()[:16]
+
+
+def _grade_path(corpus_dir: Path, code_hash: str, checks_hash: str) -> Path:
+    """Return the file path for a grade cache entry.
+
+    Two-level layout: first dir is the code hash (16 chars), file name is
+    the checks hash.  This keeps the directory tree shallow even with many
+    models and cases.
+    """
+    return corpus_dir / "grades" / code_hash / f"{checks_hash}.json"
+
+
+def grade_lookup(
+    corpus_dir: Path,
+    generated_code: str,
+    case_dir: Path,
+) -> "EvalResult | None":
+    """Return a cached EvalResult if (code_hash, checks_hash) matches, else None."""
+    from embedeval.models import EvalResult
+
+    code_hash = hash_code(generated_code)
+    checks_hash = hash_checks(case_dir)
+    path = _grade_path(corpus_dir, code_hash, checks_hash)
+
+    if not path.is_file():
+        return None
+
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return EvalResult.model_validate(data)
+    except Exception as exc:
+        logger.warning("Grade cache: failed to load %s: %s", path, exc)
+        return None
+
+
+def grade_store(
+    corpus_dir: Path,
+    generated_code: str,
+    case_dir: Path,
+    result: "EvalResult",
+) -> None:
+    """Persist an EvalResult in the grading cache."""
+    code_hash = hash_code(generated_code)
+    checks_hash = hash_checks(case_dir)
+    path = _grade_path(corpus_dir, code_hash, checks_hash)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        result.model_dump_json(indent=2) + "\n",
+        encoding="utf-8",
+    )
+    logger.debug(
+        "Grade cache: stored %s/%s at %s", code_hash, checks_hash, path
+    )
