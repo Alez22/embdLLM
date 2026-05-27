@@ -344,6 +344,14 @@ All 12 core NXP generation cases done. Each prompt omits safety requirements —
 
 ## Backlog (not scheduled)
 
+### Future directions — to investigate
+
+- **Agentic capability evaluation**: investigate how to benchmark the agentic capabilities of
+  models (multi-step tool use, self-correction, iterative debugging without human prompts).
+  Understand what existing frameworks exist (SWE-bench, AgentBench, custom harness), whether
+  embedeval can be extended to support agentic runs (e.g. model drives a compile-fix loop),
+  and how to define a fair metric that accounts for token cost of agent iterations.
+
 - Hardware-in-the-loop (L5): flash code to real MCXC144 board, verify via serial output.
 - Anti-hallucination trap prompts: ask for a peripheral that doesn't exist on MCXC144,
   verify the model refuses or flags the inconsistency instead of fabricating register addresses.
