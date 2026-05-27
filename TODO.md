@@ -352,6 +352,15 @@ All 12 core NXP generation cases done. Each prompt omits safety requirements —
   embedeval can be extended to support agentic runs (e.g. model drives a compile-fix loop),
   and how to define a fair metric that accounts for token cost of agent iterations.
 
+- **Bug-detection task type**: add cases where the prompt provides already-written embedded C code
+  containing a deliberate bug (e.g. missing clock enable, wrong I2C address shift, unprotected
+  ISR-shared variable, off-by-one in flash address arithmetic) and asks the model to identify it.
+  Grading: static check verifies the model's output names the correct bug location/cause; a
+  negatives check ensures it does not hallucinate additional non-existent bugs.
+  Fits as a new `task_type: bug_detection` in `metadata.yaml`, parallel to refactoring/doxygen.
+  Candidate first cases: missing `volatile` on ISR flag, wrong address bit-shift for I2C slave,
+  clock gate enabled after peripheral init (ordering bug), buffer overflow in ring-buffer wrap.
+
 - Hardware-in-the-loop (L5): flash code to real MCXC144 board, verify via serial output.
 - Anti-hallucination trap prompts: ask for a peripheral that doesn't exist on MCXC144,
   verify the model refuses or flags the inconsistency instead of fabricating register addresses.
