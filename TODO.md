@@ -374,3 +374,10 @@ All 12 core NXP generation cases done. Each prompt omits safety requirements —
 - Indagare perché `gpt-oss-20b` (63%) batte `gpt-oss-120b` (45%) — possibile che il modello
   più grande sia più prolisso e triggeri check negativi (no_zephyr_apis, no_cross_platform_hallucination).
 - Document in `docs/INCREMENTAL-EXECUTION.md` the non-determinism note from corpus.py docstring.
+- **Quantized local model variants**: investigate how to benchmark the same base model across
+  multiple quantization levels (e.g. Q4_K_M, Q5_K_M, Q8_0, F16) running locally via Ollama.
+  Key questions: how to represent each variant as a distinct model slug in the leaderboard
+  (e.g. `ollama/qwen2.5-coder:7b-q4_k_m` vs `ollama/qwen2.5-coder:7b-q8_0`); whether the
+  cache key already handles this correctly (it keys on model string, so slug differences are
+  enough); how to add a "quant" axis to the leaderboard/dashboard to compare accuracy vs
+  inference speed trade-off across quantization levels for the same underlying model.
