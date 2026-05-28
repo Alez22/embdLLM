@@ -381,3 +381,18 @@ All 12 core NXP generation cases done. Each prompt omits safety requirements —
   cache key already handles this correctly (it keys on model string, so slug differences are
   enough); how to add a "quant" axis to the leaderboard/dashboard to compare accuracy vs
   inference speed trade-off across quantization levels for the same underlying model.
+
+- **Long-context evaluation**: benchmark how models behave when the prompt includes a large
+  surrounding codebase (e.g. entire driver module or SDK header dump) alongside the actual task.
+  Goal: separate short-context capability from the ability to extract the relevant signal from
+  noise. Key approaches to investigate:
+  - *Needle-in-a-haystack*: embed a single critical detail (e.g. a custom register address or
+    a non-standard API function signature) deep inside a large irrelevant C file; verify the
+    model actually uses it rather than falling back to generic SDK patterns.
+  - *Distraction injection*: pad the prompt with plausible-but-wrong code snippets from a
+    different peripheral or platform; check that the model ignores them and produces correct output.
+  - *Context window scaling*: run the same case at increasing context sizes (4k, 16k, 32k, 128k)
+    to find where each model degrades — useful for deciding which models can handle
+    real SpeakerMate driver files as context.
+  Infrastructure notes: needs a `context_size_tokens` field in `metadata.yaml`; the generation
+  cache key must include context payload hash to avoid collisions with the short-context variant.
