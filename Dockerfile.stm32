@@ -7,13 +7,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     cmake make wget unzip ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Download STM32F4 HAL (CMSIS + HAL Driver)
-RUN mkdir -p /opt/stm32f4 && \
-    wget -q https://github.com/STMicroelectronics/STM32CubeF4/archive/refs/tags/v1.28.1.tar.gz -O /tmp/stm32.tar.gz && \
-    tar xzf /tmp/stm32.tar.gz -C /tmp && \
-    cp -r /tmp/STM32CubeF4-1.28.1/Drivers/CMSIS /opt/stm32f4/CMSIS && \
-    cp -r /tmp/STM32CubeF4-1.28.1/Drivers/STM32F4xx_HAL_Driver /opt/stm32f4/HAL_Driver && \
-    rm -rf /tmp/stm32.tar.gz /tmp/STM32CubeF4-1.28.1
+# Download STM32F4 headers from individual STM repos (STM32CubeF4 tarball ships empty Drivers/)
+# 1. CMSIS core (arm-none-eabi-gcc ships its own core_cm4.h but we need the STM include path)
+# 2. CMSIS device headers for STM32F4xx (stm32f4xx.h, stm32f407xx.h, system_stm32f4xx.h)
+# 3. STM32F4xx HAL Driver (stm32f4xx_hal.h and peripheral drivers)
+RUN mkdir -p /opt/stm32f4/CMSIS/Device/ST/STM32F4xx/Include \
+             /opt/stm32f4/CMSIS/Include \
+             /opt/stm32f4/HAL_Driver && \
+    wget -q https://github.com/STMicroelectronics/cmsis_device_f4/archive/refs/tags/v2.6.9.tar.gz -O /tmp/cmsis_device.tar.gz && \
+    tar xzf /tmp/cmsis_device.tar.gz -C /tmp && \
+    cp -r /tmp/cmsis-device-f4-2.6.9/Include/. /opt/stm32f4/CMSIS/Device/ST/STM32F4xx/Include/ && \
+    rm -rf /tmp/cmsis_device.tar.gz /tmp/cmsis-device-f4-2.6.9 && \
+    wget -q https://github.com/STMicroelectronics/stm32f4xx_hal_driver/archive/refs/tags/v1.8.3.tar.gz -O /tmp/hal.tar.gz && \
+    tar xzf /tmp/hal.tar.gz -C /tmp && \
+    cp -r /tmp/stm32f4xx-hal-driver-1.8.3/Inc/. /opt/stm32f4/HAL_Driver/Inc/ && \
+    cp -r /tmp/stm32f4xx-hal-driver-1.8.3/Src/. /opt/stm32f4/HAL_Driver/Src/ && \
+    rm -rf /tmp/hal.tar.gz /tmp/stm32f4xx-hal-driver-1.8.3 && \
+    cp -r /usr/lib/arm-none-eabi/include/. /opt/stm32f4/CMSIS/Include/ && \
+    cp /opt/stm32f4/HAL_Driver/Inc/stm32f4xx_hal_conf_template.h \
+       /opt/stm32f4/HAL_Driver/Inc/stm32f4xx_hal_conf.h && \
+    wget -q https://github.com/ARM-software/CMSIS_5/archive/refs/tags/5.9.0.tar.gz -O /tmp/cmsis5.tar.gz && \
+    tar xzf /tmp/cmsis5.tar.gz -C /tmp && \
+    cp -r /tmp/CMSIS_5-5.9.0/CMSIS/Core/Include/. /opt/stm32f4/CMSIS/Include/ && \
+    rm -rf /tmp/cmsis5.tar.gz /tmp/CMSIS_5-5.9.0
 
 # Install Python tooling
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
