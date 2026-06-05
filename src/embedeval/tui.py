@@ -416,6 +416,10 @@ class EmbedEvalTUI(App):
     _filter_sdk: reactive[str] = reactive("all")
     _filter_not_run_only: reactive[bool] = reactive(False)
 
+    # Sort state: column key and direction.
+    _sort_col: reactive[str] = reactive("case_id")
+    _sort_desc: reactive[bool] = reactive(False)
+
     def compose(self) -> ComposeResult:
         yield Header()
 
@@ -442,6 +446,25 @@ class EmbedEvalTUI(App):
                 allow_blank=False,
             )
             yield Checkbox("Not run only", id="chk-not-run-only")
+            yield Label("Sort:")
+            yield Select(
+                [
+                    ("Case", "case_id"),
+                    ("Model", "model"),
+                    ("Score", "score"),
+                    ("Layer", "layer"),
+                    ("Date", "date"),
+                ],
+                value="case_id",
+                id="sel-sort-col",
+                allow_blank=False,
+            )
+            yield Select(
+                [("↑ Asc", "asc"), ("↓ Desc", "desc")],
+                value="asc",
+                id="sel-sort-dir",
+                allow_blank=False,
+            )
             yield Button("New Run", variant="primary", id="btn-new-run")
 
         yield DataTable(id="results-table", cursor_type="row")
@@ -516,12 +539,40 @@ class EmbedEvalTUI(App):
             and (not self._filter_not_run_only or r.get("_not_run"))
         ]
 
-        # Real results first, not-run rows at the bottom.
-        def _sort_key(x: dict) -> tuple[int, str, str]:
-            not_run = 1 if x.get("_not_run") else 0
-            return (not_run, x.get("case_id", ""), x.get("model", ""))
+        # Sort in Python before inserting rows.
+        col = self._sort_col
+        desc = self._sort_desc
 
-        for r in sorted(filtered, key=_sort_key):
+        def _sort_key(x: dict) -> tuple[int, object]:
+            # not-run rows always at the bottom regardless of sort.
+            not_run = 1 if x.get("_not_run") else 0
+            if col == "score":
+                val: object = -2.0 if x.get("_not_run") else x.get("total_score", -1.0)
+            elif col == "date":
+                val = x.get("_run_date", "") if not x.get("_not_run") else ""
+            elif col == "model":
+                val = x.get("model", "").split("/")[-1]
+            elif col == "layer":
+                val = x.get("failed_at_layer", 99) if not x.get("_not_run") else 99
+            else:
+                val = x.get("case_id", "")
+            return (not_run, val)
+
+        # not-run rows always at bottom: sort real rows by key (with reverse),
+        # then append not-run rows sorted alphabetically.
+        real_rows = [r for r in filtered if not r.get("_not_run")]
+        not_run_filtered = [r for r in filtered if r.get("_not_run")]
+
+        def _val_key(x: dict) -> object:
+            _, v = _sort_key(x)
+            return v
+
+        sorted_real = sorted(real_rows, key=_val_key, reverse=desc)
+        sorted_not_run = sorted(
+            not_run_filtered, key=lambda x: x.get("case_id", "")
+        )
+
+        for r in sorted_real + sorted_not_run:
             if r.get("_not_run"):
                 table.add_row(
                     r.get("case_id", ""),
@@ -561,6 +612,20 @@ class EmbedEvalTUI(App):
             f"  {len(real)} results | {passed} passed | "
             f"{len(real) - passed} failed | {not_run_count} not run"
         )
+
+    # -----------------------------------------------------------------------
+    # Sort
+    # -----------------------------------------------------------------------
+
+    @on(Select.Changed, "#sel-sort-col")
+    def on_sort_col_changed(self, event: Select.Changed) -> None:
+        self._sort_col = str(event.value)
+        self._refresh_table()
+
+    @on(Select.Changed, "#sel-sort-dir")
+    def on_sort_dir_changed(self, event: Select.Changed) -> None:
+        self._sort_desc = event.value == "desc"
+        self._refresh_table()
 
     # -----------------------------------------------------------------------
     # Filter changes
