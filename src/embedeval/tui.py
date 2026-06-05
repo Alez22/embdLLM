@@ -350,6 +350,7 @@ class EmbedEvalTUI(App):
     # Reactive filter state — changes trigger a table refresh.
     _filter_model: reactive[str] = reactive("all")
     _filter_category: reactive[str] = reactive("all")
+    _filter_not_run_only: reactive[bool] = reactive(False)
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -369,6 +370,7 @@ class EmbedEvalTUI(App):
                 id="sel-category",
                 allow_blank=False,
             )
+            yield Checkbox("Not run only", id="chk-not-run-only")
             yield Button("New Run", variant="primary", id="btn-new-run")
 
         yield DataTable(id="results-table", cursor_type="row")
@@ -427,6 +429,7 @@ class EmbedEvalTUI(App):
                 self._filter_category == "all"
                 or r.get("category") == self._filter_category
             )
+            and (not self._filter_not_run_only or r.get("_not_run"))
         ]
 
         # Real results first, not-run rows at the bottom.
@@ -485,6 +488,11 @@ class EmbedEvalTUI(App):
     @on(Select.Changed, "#sel-category")
     def on_category_changed(self, event: Select.Changed) -> None:
         self._filter_category = str(event.value)
+        self._refresh_table()
+
+    @on(Checkbox.Changed, "#chk-not-run-only")
+    def on_not_run_only_changed(self, event: Checkbox.Changed) -> None:
+        self._filter_not_run_only = event.value
         self._refresh_table()
 
     # -----------------------------------------------------------------------
