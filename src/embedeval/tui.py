@@ -57,7 +57,7 @@ def _discover_cases(cases_dir: Path) -> list[dict]:
 
 
 def _load_results() -> list[dict]:
-    """Load all EvalResult detail JSONs from results/runs/*/details/*.json."""
+    """Load all EvalResult detail JSONs, attaching _run_date from directory name."""
     results: list[dict] = []
     runs_root = RESULTS_DIR / "runs"
     if not runs_root.is_dir():
@@ -66,10 +66,12 @@ def _load_results() -> list[dict]:
         details_dir = run_dir / "details"
         if not details_dir.is_dir():
             continue
+        # Date is the first 10 chars of the run dir name (YYYY-MM-DD).
+        run_date = run_dir.name[:10]
         for detail_file in sorted(details_dir.glob("*.json")):
             try:
                 data = json.loads(detail_file.read_text(encoding="utf-8"))
-                # Keep only the most recent attempt per (case_id, model).
+                data["_run_date"] = run_date
                 results.append(data)
             except Exception:
                 pass
@@ -77,14 +79,17 @@ def _load_results() -> list[dict]:
 
 
 def _best_results(raw: list[dict]) -> list[dict]:
-    """Keep the best attempt per (case_id, model), excluding mock runs."""
+    """Keep the most recent result per (case_id, model), excluding mock runs.
+
+    Most recent = highest _run_date string (ISO format sorts correctly).
+    """
     best: dict[tuple[str, str], dict] = {}
     for r in raw:
         if r.get("model") == "mock":
             continue
         key = (r.get("case_id", ""), r.get("model", ""))
         prev = best.get(key)
-        if prev is None or r.get("total_score", 0) > prev.get("total_score", 0):
+        if prev is None or r.get("_run_date", "") > prev.get("_run_date", ""):
             best[key] = r
     return list(best.values())
 
@@ -455,9 +460,15 @@ class EmbedEvalTUI(App):
         self._log_file: Path = RESULTS_DIR / "tui-run.log"
 
         table = self.query_one("#results-table", DataTable)
-        table.add_columns(
-            "Case", "Model", "Score", "Layer", "Category", "SDK", "Attempts"
-        )
+        table.cursor_type = "row"
+        table.add_column("Case", key="case_id")
+        table.add_column("Model", key="model")
+        table.add_column("Score", key="score")
+        table.add_column("Layer", key="layer")
+        table.add_column("Category", key="category")
+        table.add_column("SDK", key="sdk")
+        table.add_column("Date", key="date")
+        table.add_column("Att.", key="attempts")
 
         self._load_data()
 
@@ -520,6 +531,7 @@ class EmbedEvalTUI(App):
                     r.get("category", ""),
                     r.get("sdk", ""),
                     "—",
+                    "—",
                 )
             else:
                 score = r.get("total_score", 0.0)
@@ -537,6 +549,7 @@ class EmbedEvalTUI(App):
                     layer_str,
                     r.get("category", ""),
                     r.get("sdk", ""),
+                    r.get("_run_date", "—"),
                     str(attempts),
                 )
 
