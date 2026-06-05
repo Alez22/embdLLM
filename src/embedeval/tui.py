@@ -77,14 +77,38 @@ def _load_results() -> list[dict]:
 
 
 def _best_results(raw: list[dict]) -> list[dict]:
-    """Keep the best attempt per (case_id, model) — highest total_score."""
+    """Keep the best attempt per (case_id, model), excluding mock runs."""
     best: dict[tuple[str, str], dict] = {}
     for r in raw:
+        if r.get("model") == "mock":
+            continue
         key = (r.get("case_id", ""), r.get("model", ""))
         prev = best.get(key)
         if prev is None or r.get("total_score", 0) > prev.get("total_score", 0):
             best[key] = r
     return list(best.values())
+
+
+def _not_run_rows(
+    cases: list[dict], results: list[dict]
+) -> list[dict]:
+    """Return sentinel rows for cases that have no real result yet."""
+    tested = {r.get("case_id") for r in results}
+    rows = []
+    for case in cases:
+        cid = case.get("id", "")
+        if cid and cid not in tested:
+            rows.append({
+                "case_id": cid,
+                "model": "",
+                "total_score": -1.0,  # sentinel: sorts after real results
+                "passed": None,
+                "failed_at_layer": None,
+                "category": case.get("category", ""),
+                "sdk": case.get("sdk", ""),
+                "_not_run": True,
+            })
+    return rows
 
 
 def _layer_label(r: dict) -> str:
@@ -371,17 +395,19 @@ class EmbedEvalTUI(App):
 
     def _load_data(self) -> None:
         self._cases = _discover_cases(CASES_DIR)
-        self._results = _best_results(_load_results())
+        real = _best_results(_load_results())
+        self._results = real + _not_run_rows(self._cases, real)
         self._rebuild_filters()
         self._refresh_table()
 
     def _rebuild_filters(self) -> None:
-        """Repopulate Select widgets with values found in loaded results."""
+        """Repopulate Select widgets with values found in loaded results and cases."""
         models = sorted(
             {r.get("model", "") for r in self._results if r.get("model")}
         )
+        # Categories come from all cases, not just tested ones.
         cats = sorted(
-            {r.get("category", "") for r in self._results if r.get("category")}
+            {c.get("category", "") for c in self._cases if c.get("category")}
         )
 
         model_sel = self.query_one("#sel-model", Select)
@@ -403,36 +429,48 @@ class EmbedEvalTUI(App):
             )
         ]
 
-        def _sort_key(x: dict) -> tuple[str, str]:
-            return (x.get("case_id", ""), x.get("model", ""))
+        # Real results first, not-run rows at the bottom.
+        def _sort_key(x: dict) -> tuple[int, str, str]:
+            not_run = 1 if x.get("_not_run") else 0
+            return (not_run, x.get("case_id", ""), x.get("model", ""))
 
         for r in sorted(filtered, key=_sort_key):
-            score = r.get("total_score", 0.0)
-            score_str = f"{_score_bar(score)} {score:.2f}"
-            layer_str = _layer_label(r)
+            if r.get("_not_run"):
+                table.add_row(
+                    r.get("case_id", ""),
+                    "—",
+                    "not run",
+                    "—",
+                    r.get("category", ""),
+                    r.get("sdk", ""),
+                    "—",
+                )
+            else:
+                score = r.get("total_score", 0.0)
+                score_str = f"{_score_bar(score)} {score:.2f}"
+                layer_str = _layer_label(r)
+                attempts = sum(
+                    1 for x in self._results
+                    if x.get("case_id") == r.get("case_id")
+                    and x.get("model") == r.get("model")
+                )
+                table.add_row(
+                    r.get("case_id", ""),
+                    r.get("model", "").split("/")[-1],
+                    score_str,
+                    layer_str,
+                    r.get("category", ""),
+                    r.get("sdk", ""),
+                    str(attempts),
+                )
 
-            # Count how many attempts exist for this (case_id, model).
-            attempts = sum(
-                1 for x in self._results
-                if x.get("case_id") == r.get("case_id")
-                and x.get("model") == r.get("model")
-            )
-
-            table.add_row(
-                r.get("case_id", ""),
-                r.get("model", "").split("/")[-1],
-                score_str,
-                layer_str,
-                r.get("category", ""),
-                r.get("sdk", ""),
-                str(attempts),
-            )
-
-        passed = sum(1 for r in filtered if r.get("passed"))
+        real = [r for r in filtered if not r.get("_not_run")]
+        not_run_count = sum(1 for r in filtered if r.get("_not_run"))
+        passed = sum(1 for r in real if r.get("passed"))
         summary = self.query_one("#summary-bar", Static)
         summary.update(
-            f"  {len(filtered)} results | {passed} passed | "
-            f"{len(filtered) - passed} failed"
+            f"  {len(real)} results | {passed} passed | "
+            f"{len(real) - passed} failed | {not_run_count} not run"
         )
 
     # -----------------------------------------------------------------------
