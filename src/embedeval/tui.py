@@ -175,6 +175,13 @@ class RunFormScreen(ModalScreen[dict | None]):
     #custom-model-row.visible {
         display: block;
     }
+    #form-filter-row {
+        height: auto;
+        margin-top: 1;
+    }
+    #form-filter-row Select {
+        width: 1fr;
+    }
     #cases-list {
         height: 10;
         border: solid $primary-darken-2;
@@ -191,6 +198,26 @@ class RunFormScreen(ModalScreen[dict | None]):
     def __init__(self, cases: list[dict]) -> None:
         super().__init__()
         self._cases = cases
+
+    def _sdk_options(self) -> list[tuple[str, str]]:
+        sdks = sorted({c.get("sdk", "") for c in self._cases if c.get("sdk")})
+        return [("All SDKs", "all")] + [(s, s) for s in sdks]
+
+    def _category_options(self) -> list[tuple[str, str]]:
+        cats = sorted(
+            {c.get("category", "") for c in self._cases if c.get("category")}
+        )
+        return [("All categories", "all")] + [(c, c) for c in cats]
+
+    def _visible_cases(self) -> list[dict]:
+        """Return cases matching the current SDK/category filter in the form."""
+        sdk = str(self.query_one("#sel-form-sdk", Select).value)
+        cat = str(self.query_one("#sel-form-category", Select).value)
+        return [
+            c for c in self._cases
+            if (sdk == "all" or c.get("sdk") == sdk)
+            and (cat == "all" or c.get("category") == cat)
+        ]
 
     def compose(self) -> ComposeResult:
         known = _known_models()
@@ -219,7 +246,21 @@ class RunFormScreen(ModalScreen[dict | None]):
             yield Label("Cases dir")
             yield Input(str(CASES_DIR), id="input-cases-dir")
 
-            yield Label("Cases (leave empty = all in dir)")
+            with Horizontal(id="form-filter-row"):
+                yield Select(
+                    self._sdk_options(),
+                    value="all",
+                    id="sel-form-sdk",
+                    allow_blank=False,
+                )
+                yield Select(
+                    self._category_options(),
+                    value="all",
+                    id="sel-form-category",
+                    allow_blank=False,
+                )
+
+            yield Label("Cases (leave empty = all matching filters)")
             with ScrollableContainer(id="cases-list"):
                 for case in self._cases:
                     yield Checkbox(
@@ -236,6 +277,19 @@ class RunFormScreen(ModalScreen[dict | None]):
             with Horizontal(id="form-buttons"):
                 yield Button("Cancel", variant="default", id="btn-cancel")
                 yield Button("Run", variant="primary", id="btn-run")
+
+    def _update_case_visibility(self) -> None:
+        """Show/hide case checkboxes based on SDK/category form filters."""
+        visible_ids = {c.get("id") for c in self._visible_cases()}
+        for case in self._cases:
+            cid = case.get("id", "")
+            cb = self.query_one(f"#case-{cid}", Checkbox)
+            cb.display = cid in visible_ids
+
+    @on(Select.Changed, "#sel-form-sdk")
+    @on(Select.Changed, "#sel-form-category")
+    def on_form_filter_changed(self, event: Select.Changed) -> None:
+        self._update_case_visibility()
 
     @on(Select.Changed, "#sel-run-model")
     def on_model_select_changed(self, event: Select.Changed) -> None:
@@ -272,8 +326,10 @@ class RunFormScreen(ModalScreen[dict | None]):
             attempts = 1
         force = self.query_one("#check-force", Checkbox).value
         no_think = self.query_one("#check-no-think", Checkbox).value
+        sdk_filter = str(self.query_one("#sel-form-sdk", Select).value)
+        cat_filter = str(self.query_one("#sel-form-category", Select).value)
 
-        # Collect selected cases.
+        # Collect explicitly checked cases; fall back to all visible ones.
         selected_cases: list[str] = []
         for case in self._cases:
             cid = case.get("id", "")
@@ -289,6 +345,8 @@ class RunFormScreen(ModalScreen[dict | None]):
                 "force": force,
                 "no_think": no_think,
                 "selected_cases": selected_cases,
+                "sdk_filter": sdk_filter,
+                "cat_filter": cat_filter,
             }
         )
 
@@ -350,6 +408,7 @@ class EmbedEvalTUI(App):
     # Reactive filter state — changes trigger a table refresh.
     _filter_model: reactive[str] = reactive("all")
     _filter_category: reactive[str] = reactive("all")
+    _filter_sdk: reactive[str] = reactive("all")
     _filter_not_run_only: reactive[bool] = reactive(False)
 
     def compose(self) -> ComposeResult:
@@ -361,6 +420,13 @@ class EmbedEvalTUI(App):
                 [("All", "all")],
                 value="all",
                 id="sel-model",
+                allow_blank=False,
+            )
+            yield Label("SDK:")
+            yield Select(
+                [("All", "all")],
+                value="all",
+                id="sel-sdk",
                 allow_blank=False,
             )
             yield Label("Category:")
@@ -403,20 +469,26 @@ class EmbedEvalTUI(App):
         self._refresh_table()
 
     def _rebuild_filters(self) -> None:
-        """Repopulate Select widgets with values found in loaded results and cases."""
+        """Repopulate Select widgets from all cases (not just tested ones)."""
         models = sorted(
             {r.get("model", "") for r in self._results if r.get("model")}
         )
-        # Categories come from all cases, not just tested ones.
+        sdks = sorted(
+            {c.get("sdk", "") for c in self._cases if c.get("sdk")}
+        )
         cats = sorted(
             {c.get("category", "") for c in self._cases if c.get("category")}
         )
 
-        model_sel = self.query_one("#sel-model", Select)
-        cat_sel = self.query_one("#sel-category", Select)
-
-        model_sel.set_options([("All", "all")] + [(m, m) for m in models])
-        cat_sel.set_options([("All", "all")] + [(c, c) for c in cats])
+        self.query_one("#sel-model", Select).set_options(
+            [("All", "all")] + [(m, m) for m in models]
+        )
+        self.query_one("#sel-sdk", Select).set_options(
+            [("All", "all")] + [(s, s) for s in sdks]
+        )
+        self.query_one("#sel-category", Select).set_options(
+            [("All", "all")] + [(c, c) for c in cats]
+        )
 
     def _refresh_table(self) -> None:
         table = self.query_one("#results-table", DataTable)
@@ -425,6 +497,7 @@ class EmbedEvalTUI(App):
         filtered = [
             r for r in self._results
             if (self._filter_model == "all" or r.get("model") == self._filter_model)
+            and (self._filter_sdk == "all" or r.get("sdk") == self._filter_sdk)
             and (
                 self._filter_category == "all"
                 or r.get("category") == self._filter_category
@@ -485,6 +558,11 @@ class EmbedEvalTUI(App):
         self._filter_model = str(event.value)
         self._refresh_table()
 
+    @on(Select.Changed, "#sel-sdk")
+    def on_sdk_changed(self, event: Select.Changed) -> None:
+        self._filter_sdk = str(event.value)
+        self._refresh_table()
+
     @on(Select.Changed, "#sel-category")
     def on_category_changed(self, event: Select.Changed) -> None:
         self._filter_category = str(event.value)
@@ -539,6 +617,12 @@ class EmbedEvalTUI(App):
 
         if selected:
             cmd += ["--case-ids", ",".join(selected)]
+        else:
+            # No explicit case selection: apply SDK/category filters if set.
+            if config.get("sdk_filter", "all") != "all":
+                cmd += ["--sdk", config["sdk_filter"]]
+            if config.get("cat_filter", "all") != "all":
+                cmd += ["--category", config["cat_filter"]]
 
         if config["force"]:
             cmd.append("--force")
