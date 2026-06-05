@@ -306,6 +306,13 @@ def run(
             ),
         ),
     ] = None,
+    case_ids: Annotated[
+        Optional[str],
+        typer.Option(
+            "--case-ids",
+            help="Comma-separated case IDs to run (e.g. nxp-mcxc-i2c-001).",
+        ),
+    ] = None,
     force: Annotated[
         bool,
         typer.Option(
@@ -359,6 +366,8 @@ def run(
         filters.visibility = Visibility(visibility)
     if after_date:
         filters.after_date = after_date
+    if case_ids:
+        filters.case_ids = [c.strip() for c in case_ids.split(",") if c.strip()]
 
     # Build case_dir_map covering all discoverable cases (public + private).
     # Needed so update_tracker and generate_results_doc can hash private
@@ -1379,6 +1388,27 @@ def dashboard(
         Timer(1.0, lambda: __import__("webbrowser").open(url)).start()
 
     uvicorn.run(_dash.app, host="0.0.0.0", port=port, log_level="warning")
+
+
+@app.command()
+def tui(
+    results_dir: Annotated[
+        Path,
+        typer.Option("--results", help="Directory containing run results"),
+    ] = Path("results"),
+    cases_dir: Annotated[
+        Path,
+        typer.Option("--cases", help="Path to cases directory"),
+    ] = Path("cases"),
+) -> None:
+    """Start the Textual TUI dashboard."""
+    import embedeval.tui as _tui
+
+    _tui.RESULTS_DIR = results_dir.resolve()
+    _tui.CASES_DIR = cases_dir.resolve()
+
+    app = _tui.EmbedEvalTUI()
+    app.run()
 
 
 @app.command(name="list")
