@@ -125,13 +125,16 @@ uv run embedeval run \
   --cases cases/ \
   --attempts 3
 
-# Open the results dashboard
+# Open the result web dashboard (browser)
 uv run embedeval dashboard
+
+# Open the control TUI dashboard (terminal)
+uv run embedeval tui
 ```
 
 ---
 
-## Results Dashboard
+## Result Web Dashboard
 
 ```bash
 uv run embedeval dashboard
@@ -140,6 +143,14 @@ uv run embedeval dashboard
 
 Leaderboard shows models ranked by pass rate, broken down by difficulty (Easy / Medium / Hard).
 Each cell links to a detailed view with check results and a diff against the reference solution.
+
+## Control TUI Dashboard
+
+```bash
+uv run embedeval tui
+```
+
+Interactive terminal interface — browse results, filter by model/SDK/difficulty, and sort columns without leaving the terminal.
 
 ---
 
