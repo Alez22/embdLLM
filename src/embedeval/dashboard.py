@@ -156,6 +156,7 @@ h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: #a0aec0
 .badge-medium { background: #744210; color: #f6ad55; }
 .badge-hard { background: #742a2a; color: #fc8181; }
 .badge-easy { background: #1a365d; color: #63b3ed; }
+.badge-error { background: #2d2a1a; color: #e9c46a; }
 table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
 th { background: #2d3748; padding: 0.6rem 0.75rem; text-align: left;
      font-weight: 600; color: #a0aec0; white-space: nowrap; }
@@ -228,6 +229,31 @@ def _page(title: str, body: str, highlight: bool = False) -> str:
 </div>
 </body>
 </html>"""
+
+
+def _result_status(r: dict) -> str:
+    """Derive 'pass' | 'fail' | 'error' from a result dict without touching saved JSON.
+
+    - pass:  passed == True
+    - error: generated_code is empty AND output_tokens == 0 (infra failure, not model's fault)
+    - fail:  everything else (model produced prose, bad code, failed checks)
+    """
+    if r.get("passed"):
+        return "pass"
+    if not r.get("generated_code", "").strip():
+        output_tokens = r.get("token_usage", {}).get("output_tokens", 0)
+        if output_tokens == 0:
+            return "error"
+    return "fail"
+
+
+def _status_badge(r: dict) -> str:
+    status = _result_status(r)
+    if status == "pass":
+        return '<span class="badge badge-pass">PASS</span>'
+    if status == "error":
+        return '<span class="badge badge-error">ERROR</span>'
+    return '<span class="badge badge-fail">FAIL</span>'
 
 
 def _pass_badge(passed: bool) -> str:
@@ -342,33 +368,39 @@ def leaderboard(request: Request) -> str:
             meta = _find_metadata(case_id)
             case_difficulty[case_id] = meta.get("difficulty", "unknown")
 
-    # Per-model stats: overall + per difficulty bucket
+    # Per-model stats: overall + per difficulty bucket.
+    # ERROR results (infra failures, output_tokens==0) are excluded from pass-rate
+    # and coverage so they don't penalise the model unfairly.
     def _bucket_stats(model: str, difficulty: str) -> dict:
         bucket = [
             r for (cid, m), r in lookup.items()
             if m == model and case_difficulty.get(cid) == difficulty
         ]
-        total = len(bucket)
-        passed = sum(1 for r in bucket if r.get("passed"))
+        scorable = [r for r in bucket if _result_status(r) != "error"]
+        errors = len(bucket) - len(scorable)
+        total = len(scorable)
+        passed = sum(1 for r in scorable if r.get("passed"))
         pct = int(passed / total * 100) if total else 0
-        return {"passed": passed, "total": total, "pct": pct}
+        return {"passed": passed, "total": total, "errors": errors, "pct": pct}
 
     model_stats: dict[str, dict] = {}
     for model in models:
         all_results_for_model = [r for (_, m), r in lookup.items() if m == model]
-        total = len(all_results_for_model)
-        passed = sum(1 for r in all_results_for_model if r.get("passed"))
+        scorable = [r for r in all_results_for_model if _result_status(r) != "error"]
+        errors = len(all_results_for_model) - len(scorable)
+        total = len(scorable)
+        passed = sum(1 for r in scorable if r.get("passed"))
         pct = int(passed / total * 100) if total else 0
         coverage = (
-            sum(r.get("total_score", 0.0) for r in all_results_for_model) / total
+            sum(r.get("total_score", 0.0) for r in scorable) / total
             if total else 0.0
         )
         avg_duration = (
-            sum(r.get("duration_seconds", 0.0) for r in all_results_for_model) / total
+            sum(r.get("duration_seconds", 0.0) for r in scorable) / total
             if total else 0.0
         )
         model_stats[model] = {
-            "passed": passed, "total": total, "pct": pct,
+            "passed": passed, "total": total, "errors": errors, "pct": pct,
             "coverage": coverage,
             "avg_duration": avg_duration,
             "buckets": {d: _bucket_stats(model, d) for d in _DIFFICULTIES},
@@ -396,7 +428,7 @@ def leaderboard(request: Request) -> str:
         f'<th style="text-align:center"><span class="badge badge-{d}">{d.capitalize()}</span></th>'
         for d in _DIFFICULTIES
     )
-    header_cells = f"<th>Model</th><th>pass@1</th><th>check coverage</th><th>avg time</th><th>Passed</th>{diff_headers}"
+    header_cells = f"<th>Model</th><th>pass@1</th><th>check coverage</th><th>avg time</th><th>Passed</th><th>Errors</th>{diff_headers}"
 
     rows = ""
     for model in models:
@@ -408,6 +440,12 @@ def leaderboard(request: Request) -> str:
         review_url = f"/review?model={quote(model, safe='')}"
         if filter_sdk:
             review_url += f"&sdk={quote(filter_sdk, safe='')}"
+        errors = s["errors"]
+        errors_cell = (
+            f'<span class="badge badge-error">{errors}</span>'
+            if errors > 0
+            else '<span style="color:#4a5568">—</span>'
+        )
         row = (
             f"<td title='{model}' style='font-family:monospace;font-size:0.8rem'>"
             f"<a href='{review_url}'>{short}</a></td>"
@@ -415,6 +453,7 @@ def leaderboard(request: Request) -> str:
             f"<td>{_bar_cell(s['coverage'])}</td>"
             f"<td style='color:{dur_color};font-variant-numeric:tabular-nums'>{dur_str}</td>"
             f"<td style='color:#a0aec0'>{s['passed']}/{s['total']}</td>"
+            f"<td style='text-align:center'>{errors_cell}</td>"
         )
         for diff in _DIFFICULTIES:
             b = s["buckets"][diff]
@@ -710,8 +749,8 @@ def review(request: Request) -> str:
         sdk_label = meta.get("sdk", "—")
         category = meta.get("category", "—")
         title = meta.get("title", "")
-        passed_badge = _pass_badge(r.get("passed", False))
-        score = _bar_cell(r.get("total_score", 0))
+        passed_badge = _status_badge(r)
+        score = _bar_cell(r.get("total_score", 0)) if _result_status(r) != "error" else '<span style="color:#4a5568;font-size:0.8rem">n/a</span>'
         layer = r.get("failed_at_layer")
         layer_str = f"L{layer}" if layer is not None else "—"
         detail_url = f"/case/{cid}/{filter_model}"
@@ -727,9 +766,15 @@ def review(request: Request) -> str:
           <td style="color:#718096;font-size:0.8rem">{r.get('attempt', 1)}</td>
         </tr>"""
 
-    total = len(sorted_cases)
-    passed = sum(1 for r in sorted_cases if r.get("passed"))
+    scorable = [r for r in sorted_cases if _result_status(r) != "error"]
+    errors = len(sorted_cases) - len(scorable)
+    total = len(scorable)
+    passed = sum(1 for r in scorable if r.get("passed"))
     model_short = filter_model.split("/")[-1]
+    errors_summary = (
+        f' · <span class="badge badge-error">{errors} error{"s" if errors != 1 else ""}</span>'
+        if errors > 0 else ""
+    )
 
     body = f"""
 <div style="margin-bottom:1rem">
@@ -741,6 +786,7 @@ def review(request: Request) -> str:
     <span style="color:#718096;font-size:0.85rem" title="{filter_model}">{filter_model}</span>
     <span style="color:#718096;font-size:0.85rem">{passed}/{total} passed</span>
     {_bar_cell(passed / total if total else 0)}
+    {errors_summary}
   </div>
 </div>
 {filter_form}
