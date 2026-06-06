@@ -297,7 +297,17 @@ def _run_layer(
 
 def _run_static_checks(case_dir: Path, generated_code: str) -> LayerResult:
     """Layer 0: Static analysis checks from case checks/static.py."""
-    checks_module = _load_check_module(case_dir, "static")
+    try:
+        checks_module = _load_check_module(case_dir, "static")
+    except _CheckModuleError as exc:
+        return LayerResult(
+            layer=0,
+            name="static_analysis",
+            passed=False,
+            details=[],
+            error=str(exc),
+            duration_seconds=0.0,
+        )
     if checks_module is None:
         return LayerResult(
             layer=0,
@@ -797,7 +807,17 @@ def _run_runtime(
 
 def _run_behavioral(case_dir: Path, generated_code: str) -> LayerResult:
     """Layer 3: Behavioral assertion checks from case checks/behavior.py."""
-    checks_module = _load_check_module(case_dir, "behavior")
+    try:
+        checks_module = _load_check_module(case_dir, "behavior")
+    except _CheckModuleError as exc:
+        return LayerResult(
+            layer=3,
+            name="static_heuristic",
+            passed=False,
+            details=[],
+            error=str(exc),
+            duration_seconds=0.0,
+        )
     if checks_module is None:
         return LayerResult(
             layer=3,
@@ -906,7 +926,11 @@ def _run_mutant_checks(case_dir: Path, generated_code: str) -> LayerResult:
 
 def _load_negatives(case_dir: Path) -> list[dict[str, Any]] | None:
     """Load NEGATIVES mutation data from checks/negatives.py."""
-    module = _load_check_module(case_dir, "negatives")
+    try:
+        module = _load_check_module(case_dir, "negatives")
+    except _CheckModuleError as exc:
+        logger.warning("negatives.py load error for %s: %s", case_dir.name, exc)
+        return None
     if module is None:
         return None
     negatives: list[dict[str, Any]] | None = getattr(module, "NEGATIVES", None)
@@ -915,8 +939,21 @@ def _load_negatives(case_dir: Path) -> list[dict[str, Any]] | None:
     return negatives
 
 
+class _CheckModuleError(Exception):
+    """Raised when a check module exists but fails to import or execute.
+
+    Distinct from returning None (file not found = no checks = pass).
+    Callers must turn this into a FAIL layer result so broken checks
+    are never silently treated as passing.
+    """
+
+
 def _load_check_module(case_dir: Path, module_name: str) -> ModuleType | None:
-    """Load a check module from the case's checks/ directory."""
+    """Load a check module from the case's checks/ directory.
+
+    Returns None if the module file does not exist (no checks → layer passes).
+    Raises _CheckModuleError if the file exists but cannot be loaded or executed.
+    """
     module_path = case_dir / "checks" / f"{module_name}.py"
     if not module_path.is_file():
         logger.debug("Check module not found: %s", module_path)
@@ -926,15 +963,15 @@ def _load_check_module(case_dir: Path, module_name: str) -> ModuleType | None:
         f"case_checks.{module_name}", module_path
     )
     if spec is None or spec.loader is None:
-        logger.warning("Could not load module spec: %s", module_path)
-        return None
+        raise _CheckModuleError(f"Could not load module spec: {module_path}")
 
     module = importlib.util.module_from_spec(spec)
     try:
         spec.loader.exec_module(module)
     except Exception as exc:
-        logger.warning("Failed to execute check module %s: %s", module_path, exc)
-        return None
+        raise _CheckModuleError(
+            f"Failed to execute check module {module_path}: {exc}"
+        ) from exc
     return module
 
 
