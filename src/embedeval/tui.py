@@ -482,6 +482,14 @@ class EmbedEvalTUI(App):
         self._log_queue: Queue[str] = Queue()
         self._log_file: Path = RESULTS_DIR / "tui-run.log"
 
+        # Progress tracking during an active run.
+        self._run_total: int = 0      # total case×attempt tasks
+        self._run_done: int = 0       # completed tasks
+        self._run_pass: int = 0
+        self._run_fail: int = 0
+        self._run_error: int = 0
+        self._run_current: str = ""   # last case_id seen
+
         table = self.query_one("#results-table", DataTable)
         table.cursor_type = "row"
         table.add_column("Case", key="case_id")
@@ -706,9 +714,30 @@ class EmbedEvalTUI(App):
             cmd.append("--force")
         if config["no_think"]:
             cmd.append("--no-think")
+        # Verbose so runner emits INFO lines ("Case X attempt N: PASS/FAIL")
+        # which the TUI parses to drive the progress bar.
+        cmd.append("--verbose")
 
         # Mirror all run output to a plain-text file so it can be copied.
         self._log_file = RESULTS_DIR / "tui-run.log"
+
+        # Compute expected total tasks for the progress bar.
+        if selected:
+            n_cases = len(selected)
+        else:
+            sdk_f = config.get("sdk_filter", "all")
+            cat_f = config.get("cat_filter", "all")
+            n_cases = sum(
+                1 for c in self._cases
+                if (sdk_f == "all" or c.get("sdk") == sdk_f)
+                and (cat_f == "all" or c.get("category") == cat_f)
+            )
+        self._run_total = n_cases * config["attempts"]
+        self._run_done = 0
+        self._run_pass = 0
+        self._run_fail = 0
+        self._run_error = 0
+        self._run_current = ""
 
         log = self.query_one("#run-log", Log)
         log.write_line(f"[log] {self._log_file}")
@@ -752,7 +781,15 @@ class EmbedEvalTUI(App):
         rc = self._proc.returncode
         self.call_from_thread(self._append_log, f"[done] exit code {rc}")
         # Auto-refresh results after a run completes.
-        self.call_from_thread(self._load_data)
+        self.call_from_thread(self._finish_run)
+
+    def _finish_run(self) -> None:
+        """Called on the main thread when the subprocess exits."""
+        self._load_data()
+        # Summary bar will be repopulated by _refresh_table via _load_data.
+        # Reset run state so stale progress isn't shown on next run.
+        self._run_total = 0
+        self._run_done = 0
 
     def _append_log(self, line: str) -> None:
         log = self.query_one("#run-log", Log)
@@ -760,3 +797,45 @@ class EmbedEvalTUI(App):
         if hasattr(self, "_log_file"):
             with self._log_file.open("a", encoding="utf-8") as f:
                 f.write(line + "\n")
+        self._parse_progress(line)
+
+    def _parse_progress(self, line: str) -> None:
+        """Extract case completion events from verbose runner output.
+
+        The runner emits: "Case <id> attempt <n>: PASS" or "FAIL@L<n>"
+        via logger.info (visible only with --verbose).
+        """
+        # e.g. "INFO:embedeval.runner:Case nxp-mcxc-i2c-001 attempt 1: PASS"
+        import re
+        m = re.search(r"Case (\S+) attempt \d+: (PASS|FAIL@L\S+)", line)
+        if not m:
+            return
+        case_id, status = m.group(1), m.group(2)
+        self._run_done += 1
+        self._run_current = case_id
+        if status == "PASS":
+            self._run_pass += 1
+        elif "FAIL" in status:
+            # Distinguish infra errors (output_tokens unknown here — use layer 0)
+            if status == "FAIL@LNone" or status == "FAIL@L0":
+                self._run_error += 1
+            else:
+                self._run_fail += 1
+        self._update_progress_bar()
+
+    def _update_progress_bar(self) -> None:
+        """Render progress into #summary-bar while a run is active."""
+        total = self._run_total
+        done = self._run_done
+        if total == 0:
+            return
+        bar_width = 20
+        filled = round(done / total * bar_width)
+        bar = "█" * filled + "░" * (bar_width - filled)
+        pct = int(done / total * 100)
+        summary = self.query_one("#summary-bar", Static)
+        summary.update(
+            f"  Running  [{bar}]  {done}/{total} ({pct}%)"
+            f"  {self._run_current}"
+            f"  ·  {self._run_pass} pass  {self._run_fail} fail  {self._run_error} error"
+        )
