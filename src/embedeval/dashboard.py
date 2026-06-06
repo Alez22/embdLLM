@@ -11,6 +11,7 @@ import difflib
 import webbrowser
 from pathlib import Path
 from threading import Timer
+from urllib.parse import quote
 
 import yaml
 from fastapi import FastAPI, HTTPException, Request
@@ -198,6 +199,7 @@ _NAV = """
   <a href="/">Leaderboard</a>
   <a href="/cases">Cases</a>
   <a href="/history">Run History</a>
+  <a href="/review">Review</a>
 </nav>
 """
 
@@ -403,8 +405,12 @@ def leaderboard(request: Request) -> str:
         dur = s["avg_duration"]
         dur_str = f"{dur:.1f}s" if dur < 60 else f"{dur/60:.1f}m"
         dur_color = "#68d391" if dur < 10 else "#f6ad55" if dur < 30 else "#fc8181"
+        review_url = f"/review?model={quote(model, safe='')}"
+        if filter_sdk:
+            review_url += f"&sdk={quote(filter_sdk, safe='')}"
         row = (
-            f"<td title='{model}' style='font-family:monospace;font-size:0.8rem'>{short}</td>"
+            f"<td title='{model}' style='font-family:monospace;font-size:0.8rem'>"
+            f"<a href='{review_url}'>{short}</a></td>"
             f"<td>{_bar_cell(s['passed'] / s['total'] if s['total'] else 0)}</td>"
             f"<td>{_bar_cell(s['coverage'])}</td>"
             f"<td style='color:{dur_color};font-variant-numeric:tabular-nums'>{dur_str}</td>"
@@ -621,6 +627,134 @@ def case_detail(case_id: str, model: str) -> str:
 </div>
 """
     return _page(f"{case_id} / {model_short}", body, highlight=True)
+
+
+@app.get("/review", response_class=HTMLResponse)
+def review(request: Request) -> str:
+    """Human review view: all cases for a given model + optional SDK filter.
+
+    Query params:
+      ?model=groq/llama-3.3-70b-versatile  — required
+      ?sdk=mcuxpresso-sdk                   — optional, narrows the case list
+    """
+    filter_model = request.query_params.get("model", "")
+    filter_sdk = request.query_params.get("sdk", "")
+
+    if not filter_model:
+        return _page("Review", "<div class='card'><p>No model selected. Go back to <a href='/'>Leaderboard</a> and click a model name.</p></div>")
+
+    all_results = _all_results()
+
+    # Collect all SDKs available for this model
+    model_results = [r for r in all_results if r.get("model") == filter_model]
+    if not model_results:
+        return _page("Review", f"<div class='card'><p>No results found for model <code>{filter_model}</code>.</p></div>")
+
+    available_sdks: set[str] = set()
+    for r in model_results:
+        sdk = _find_metadata(r.get("case_id", "")).get("sdk", "")
+        if sdk:
+            available_sdks.add(sdk)
+
+    # Apply SDK filter
+    if filter_sdk:
+        visible = [
+            r for r in model_results
+            if _find_metadata(r.get("case_id", "")).get("sdk") == filter_sdk
+        ]
+    else:
+        visible = model_results
+
+    # Keep only latest attempt per case
+    latest: dict[str, dict] = {}
+    for r in visible:
+        cid = r.get("case_id", "")
+        if cid not in latest or r.get("attempt", 0) > latest[cid].get("attempt", 0):
+            latest[cid] = r
+
+    # Sort by difficulty order then case_id
+    _diff_order = {"easy": 0, "medium": 1, "hard": 2, "unknown": 3}
+    sorted_cases = sorted(
+        latest.values(),
+        key=lambda r: (
+            _diff_order.get(_find_metadata(r.get("case_id", "")).get("difficulty", "unknown"), 3),
+            r.get("case_id", ""),
+        ),
+    )
+
+    # SDK dropdown
+    def _sdk_options() -> str:
+        opts = f'<option value="">All SDKs</option>'
+        for sdk in sorted(available_sdks):
+            sel = ' selected' if sdk == filter_sdk else ''
+            opts += f'<option value="{sdk}"{sel}>{sdk}</option>'
+        return (
+            f'<select name="sdk" onchange="this.form.submit()" '
+            f'style="background:#2d3748;color:#e2e8f0;border:1px solid #4a5568;'
+            f'border-radius:4px;padding:3px 8px;font-size:0.8rem">{opts}</select>'
+        )
+
+    filter_form = f"""
+<form method="get" style="display:flex;align-items:center;gap:1rem;font-size:0.85rem;color:#a0aec0">
+  <input type="hidden" name="model" value="{filter_model}">
+  <span>SDK: {_sdk_options()}</span>
+</form>"""
+
+    # Table rows
+    rows = ""
+    for r in sorted_cases:
+        cid = r.get("case_id", "")
+        meta = _find_metadata(cid)
+        diff = meta.get("difficulty", "—")
+        diff_badge = f'<span class="badge badge-{diff}">{diff}</span>' if diff in ("easy", "medium", "hard") else diff
+        sdk_label = meta.get("sdk", "—")
+        category = meta.get("category", "—")
+        title = meta.get("title", "")
+        passed_badge = _pass_badge(r.get("passed", False))
+        score = _bar_cell(r.get("total_score", 0))
+        layer = r.get("failed_at_layer")
+        layer_str = f"L{layer}" if layer is not None else "—"
+        detail_url = f"/case/{cid}/{filter_model}"
+        rows += f"""<tr>
+          <td><a href="{detail_url}">{cid}</a></td>
+          <td style="color:#718096;font-size:0.8rem">{sdk_label}</td>
+          <td>{diff_badge}</td>
+          <td style="color:#718096;font-size:0.8rem">{category}</td>
+          <td style="color:#a0aec0;font-size:0.8rem">{title}</td>
+          <td>{passed_badge}</td>
+          <td>{score}</td>
+          <td style="color:#718096;font-size:0.8rem">{layer_str}</td>
+          <td style="color:#718096;font-size:0.8rem">{r.get('attempt', 1)}</td>
+        </tr>"""
+
+    total = len(sorted_cases)
+    passed = sum(1 for r in sorted_cases if r.get("passed"))
+    model_short = filter_model.split("/")[-1]
+
+    body = f"""
+<div style="margin-bottom:1rem">
+  <a href="/" style="color:#718096;font-size:0.85rem">← Leaderboard</a>
+</div>
+<div class="card" style="margin-bottom:1rem">
+  <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+    <h1 style="font-family:monospace">{model_short}</h1>
+    <span style="color:#718096;font-size:0.85rem" title="{filter_model}">{filter_model}</span>
+    <span style="color:#718096;font-size:0.85rem">{passed}/{total} passed</span>
+    {_bar_cell(passed / total if total else 0)}
+  </div>
+</div>
+{filter_form}
+<div class="card" style="padding:0;overflow:auto;margin-top:1rem">
+  <table>
+    <thead><tr>
+      <th>Case</th><th>SDK</th><th>Difficulty</th><th>Category</th>
+      <th>Title</th><th>Result</th><th>Score</th><th>Failed at</th><th>Attempt</th>
+    </tr></thead>
+    <tbody>{rows}</tbody>
+  </table>
+</div>
+"""
+    return _page(f"Review — {model_short}", body)
 
 
 @app.get("/history", response_class=HTMLResponse)
