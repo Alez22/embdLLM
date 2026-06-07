@@ -2,7 +2,7 @@
 
 from enum import Enum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class CaseCategory(str, Enum):
@@ -164,6 +164,8 @@ class LLMResponse(BaseModel):
     duration_seconds: float = Field(ge=0.0)
     # Non-empty when the model emitted a <think>...</think> block (reasoning models).
     thinking_content: str = ""
+    # True when the first response looked like prose and a code-only hint retry was issued.
+    prose_retry: bool = False
 
 
 class CheckDetail(BaseModel):
@@ -187,6 +189,13 @@ class LayerResult(BaseModel):
     error: str | None = None
     duration_seconds: float = Field(ge=0.0)
     score: float = Field(default=1.0, ge=0.0, le=1.0)
+
+    @model_validator(mode="after")
+    def _score_consistent_with_passed(self) -> "LayerResult":
+        """A failed layer with score=1.0 (the default) is always a bug — clamp to 0."""
+        if not self.passed and self.score == 1.0:
+            self.score = 0.0
+        return self
 
 
 class EvalResult(BaseModel):
@@ -213,6 +222,8 @@ class EvalResult(BaseModel):
     # Defaults keep older EvalResult JSON files valid on load.
     temperature: float = Field(default=0.0, ge=0.0)
     generation_params: dict = Field(default_factory=dict)
+    # True when the LLM returned prose on the first attempt and was retried with code-only hint.
+    prose_retry: bool = False
 
 
 class PerCheckStat(BaseModel):

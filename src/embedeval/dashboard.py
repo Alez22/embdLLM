@@ -1165,10 +1165,16 @@ def history_detail(run_id: str) -> str:
         gen_esc = generated.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
         attempt = result.get("attempt", 1)
+        prose_retry_badge = (
+            '<span title="First response was prose; retried with code-only hint" '
+            'style="font-size:0.75rem;background:#744210;color:#fefcbf;padding:2px 6px;'
+            'border-radius:4px;margin-left:0.25rem">prose-retry</span>'
+            if result.get("prose_retry") else ""
+        )
         sections += f"""
 <div id="case-{case_id}-att{attempt}" class="card" style="margin-bottom:1.5rem">
   <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
-    <h2 style="margin:0"><a href="/case/{case_id}">{case_id}</a> <span style="color:#718096;font-size:0.9rem;font-weight:normal">attempt {attempt}</span></h2>
+    <h2 style="margin:0"><a href="/case/{case_id}">{case_id}</a> <span style="color:#718096;font-size:0.9rem;font-weight:normal">attempt {attempt}</span>{prose_retry_badge}</h2>
     {overall} {score}
   </div>
   <div class="split">

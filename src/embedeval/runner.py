@@ -260,6 +260,7 @@ def _make_error_result(
                 ],
                 error=error_msg[:500],
                 duration_seconds=0.0,
+                score=0.0,
             )
         ],
         failed_at_layer=0,
@@ -324,6 +325,7 @@ def _build_result_from_grade(
     temperature: float,
     gen_params: dict,
     used_thinking: bool,
+    prose_retry: bool = False,
     llm_duration_seconds: float = 0.0,
 ) -> EvalResult:
     """Reconstruct an EvalResult from a cached GradeCell + current call metadata.
@@ -351,6 +353,7 @@ def _build_result_from_grade(
         tier=meta.tier,
         reasoning_types=meta.reasoning_types,
         used_thinking=used_thinking,
+        prose_retry=prose_retry,
         temperature=temperature,
         generation_params=gen_params,
     )
@@ -493,6 +496,7 @@ def _run_single_case(
                 temperature=temperature,
                 gen_params=gen_params,
                 used_thinking=bool(llm_response.thinking_content),
+                prose_retry=llm_response.prose_retry,
                 llm_duration_seconds=llm_response.duration_seconds,
             )
             # Skip feedback loop: a cached grade means we already know the
@@ -512,6 +516,7 @@ def _run_single_case(
     result.tier = meta.tier
     result.reasoning_types = meta.reasoning_types
     result.used_thinking = bool(llm_response.thinking_content)
+    result.prose_retry = llm_response.prose_retry
     result.temperature = temperature
     result.generation_params = gen_params
     result.duration_seconds = llm_response.duration_seconds

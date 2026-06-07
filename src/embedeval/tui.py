@@ -166,6 +166,11 @@ _PRESET_MODELS: list[str] = [
 ]
 
 
+def _model_to_id(model: str) -> str:
+    """Convert model slug to a valid Textual widget ID (no dots, slashes, etc.)."""
+    return model.replace("/", "__").replace(".", "_").replace("-", "_")
+
+
 def _known_models() -> list[str]:
     """Return the verified preset model list only."""
     return _PRESET_MODELS
@@ -280,7 +285,7 @@ class RunFormScreen(ModalScreen[dict | None]):
                 yield Button("None", variant="default", id="btn-models-none")
             with ScrollableContainer(id="models-list"):
                 for model in known:
-                    yield Checkbox(model, id=f"model-{model.replace('/', '__')}")
+                    yield Checkbox(model, id=f"model-{_model_to_id(model)}")
             with Container(id="custom-model-row"):
                 yield Input(
                     placeholder="Additional model (e.g. groq/llama-3.3-70b-versatile)",
@@ -358,12 +363,12 @@ class RunFormScreen(ModalScreen[dict | None]):
     @on(Button.Pressed, "#btn-models-all")
     def on_models_select_all(self) -> None:
         for model in _known_models():
-            self.query_one(f"#model-{model.replace('/', '__')}", Checkbox).value = True
+            self.query_one(f"#model-{_model_to_id(model)}", Checkbox).value = True
 
     @on(Button.Pressed, "#btn-models-none")
     def on_models_select_none(self) -> None:
         for model in _known_models():
-            self.query_one(f"#model-{model.replace('/', '__')}", Checkbox).value = False
+            self.query_one(f"#model-{_model_to_id(model)}", Checkbox).value = False
 
     @on(Button.Pressed, "#btn-cancel")
     def cancel(self) -> None:
@@ -374,7 +379,7 @@ class RunFormScreen(ModalScreen[dict | None]):
         # Collect selected preset models.
         models: list[str] = []
         for model in _known_models():
-            cb = self.query_one(f"#model-{model.replace('/', '__')}", Checkbox)
+            cb = self.query_one(f"#model-{_model_to_id(model)}", Checkbox)
             if cb.value:
                 models.append(model)
         # Add custom model if provided.

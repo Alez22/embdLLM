@@ -97,6 +97,7 @@ def call_model(
             len(response.generated_code),
         )
         response = _dispatch(full_prompt + _PROSE_RETRY_SUFFIX)
+        response.prose_retry = True
 
     return response
 
