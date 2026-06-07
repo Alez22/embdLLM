@@ -111,6 +111,7 @@ def _looks_like_prose(text: str) -> bool:
     if not text or not text.strip():
         return True
     code_markers = (
+        # C / C++ markers
         "#include",
         "int main",
         "void main",
@@ -120,6 +121,9 @@ def _looks_like_prose(text: str) -> bool:
         "return ",
         "printk(",
         "printf(",
+        # Kconfig / defconfig markers (KEY=value or # CONFIG_X is not set)
+        "CONFIG_",
+        "# CONFIG_",
     )
     return not any(m in text for m in code_markers)
 
