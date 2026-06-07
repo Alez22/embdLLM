@@ -694,6 +694,12 @@ def generate_run_archive(
     details_dir = run_dir / "details"
     details_dir.mkdir(parents=True, exist_ok=True)
 
+    # Remove stale detail files from a previous run that used the same directory
+    # (same date + model). Without this, old attempt2-5 files survive a 1-attempt
+    # rerun and pollute the history detail view with results from a different run.
+    for stale in details_dir.glob("*.json"):
+        stale.unlink()
+
     # Save per-case detailed results
     for r in results:
         case_data = r.model_dump(mode="json")
