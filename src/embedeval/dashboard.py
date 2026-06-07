@@ -1081,7 +1081,7 @@ def history_detail(run_id: str) -> str:
   <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:0.75rem">
     <h1 style="font-size:1rem;font-family:monospace">{run_id}</h1>
     <span style="color:#a0aec0" title="{model}">{model.split('/')[-1]}</span>
-    {_bar_cell(passed / total if total else 0)}
+    {_bar_cell(sum(c.get("total_score", 0) for c in cases) / total if total else 0)}
     <span style="color:#718096;font-size:0.85rem">{passed}/{total} passed</span>
   </div>
   <div style="display:flex;gap:2rem;font-size:0.8rem;color:#718096;flex-wrap:wrap">
