@@ -292,9 +292,13 @@ def _layer_score_cell(case: dict, layer_num: int) -> str:
             continue
         error = ly.get("error") or ""
         details = ly.get("details") or []
-        # Layer has no checks defined for this case: no details and not a
-        # "Skipped: layer N failed" error → treat as not applicable.
-        if not details and not error.startswith("Skipped:"):
+        # Layer skipped because an earlier one failed → always 0%, regardless
+        # of the score value stored in the JSON (old runs stored 1.0 by mistake).
+        if error.startswith("Skipped:"):
+            return _bar_cell(0.0)
+        # Layer has no checks defined for this case: no details and no error
+        # → not applicable, show dash.
+        if not details:
             return '<span style="color:#4a5568;font-size:0.8rem">—</span>'
         score = ly.get("score", 0.0)
         return _bar_cell(score)
