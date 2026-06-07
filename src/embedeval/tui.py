@@ -455,6 +455,11 @@ def _format_log_line(line: str) -> str | None:
         msg = _re.sub(r"^[A-Z]+:[^:]+:", "", line).strip()
         return f"[warn ] {msg}"
 
+    # Generation cache hit — show so the operator knows no LLM call was made.
+    mc = _re.search(r"Corpus hit: (\S+) attempt (\d+)", line)
+    if mc:
+        return f"[cache] {mc.group(1)} #{mc.group(2)}"
+
     return None
 
 
