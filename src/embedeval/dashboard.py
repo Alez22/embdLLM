@@ -835,11 +835,22 @@ def history() -> str:
         else:
             status_html = f'<span class="badge badge-fail">partial ({total - incomplete}/{total})</span>'
 
+        # Run parameters: temperature and attempts (from first case with data)
+        temperatures = {c.get("temperature", 0.0) for c in cases}
+        temp_str = ", ".join(f"{t:.1f}" for t in sorted(temperatures))
+        attempts = {c.get("attempt", 1) for c in cases}
+        max_attempt = max(attempts) if attempts else 1
+        sdks = {c.get("sdk", "") for c in cases if c.get("sdk")}
+        sdk_tags = " ".join(f'<span class="tag">{s}</span>' for s in sorted(sdks))
+
         rows += f"""<tr>
           <td style="font-family:monospace;font-size:0.8rem">
             <a href="/history/{run['run_id']}">{run['run_id']}</a>
           </td>
           <td>{model_tags}</td>
+          <td>{sdk_tags}</td>
+          <td style="color:#a0aec0;font-variant-numeric:tabular-nums;text-align:center">{temp_str}</td>
+          <td style="color:#a0aec0;text-align:center">{max_attempt}</td>
           <td>{status_html}</td>
           <td style="color:#a0aec0;text-align:right;font-variant-numeric:tabular-nums">{tokens_str}</td>
           <td>{bar}</td>
@@ -850,7 +861,12 @@ def history() -> str:
 <h1 style="margin-bottom:1rem">Run History</h1>
 <div class="card" style="padding:0;overflow:auto">
   <table>
-    <thead><tr><th>Run</th><th>Models</th><th>Status</th><th style="text-align:right">Tokens out</th><th>Score</th><th>Passed</th></tr></thead>
+    <thead><tr>
+      <th>Run</th><th>Model</th><th>SDKs</th>
+      <th style="text-align:center">Temp</th><th style="text-align:center">Att.</th>
+      <th>Status</th><th style="text-align:right">Tokens out</th>
+      <th>Score</th><th>Passed</th>
+    </tr></thead>
     <tbody>{rows}</tbody>
   </table>
 </div>
@@ -880,6 +896,36 @@ def history_detail(run_id: str) -> str:
     model = cases[0].get("model", "")
     total = len(cases)
     passed = sum(1 for c in cases if c.get("passed"))
+
+    # Run parameters from the cases themselves
+    temperature = cases[0].get("temperature", 0.0)
+    max_attempt = max(c.get("attempt", 1) for c in cases)
+    gen_params = cases[0].get("generation_params", {})
+    force_str = "yes" if gen_params.get("force") else "—"
+    no_think_str = "yes" if gen_params.get("no_think") else "—"
+    sdks = sorted({c.get("sdk", "") for c in cases if c.get("sdk")})
+    sdk_tags = " ".join(f'<span class="tag">{s}</span>' for s in sdks)
+    output_tokens = sum(c.get("token_usage", {}).get("output_tokens", 0) for c in cases)
+
+    # Summary table of all cases in this run
+    summary_rows = ""
+    for c in sorted(cases, key=lambda x: x.get("case_id", "")):
+        cid = c.get("case_id", "")
+        status_badge = _status_badge(c)
+        score = _bar_cell(c.get("total_score", 0)) if _result_status(c) != "error" else '<span style="color:#4a5568;font-size:0.8rem">n/a</span>'
+        layer = c.get("failed_at_layer")
+        layer_str = f"L{layer}" if layer is not None else "—"
+        diff = _find_metadata(cid).get("difficulty", "—")
+        diff_badge = f'<span class="badge badge-{diff}">{diff}</span>' if diff in ("easy", "medium", "hard") else diff
+        summary_rows += f"""<tr>
+          <td><a href="#case-{cid}">{cid}</a></td>
+          <td style="color:#718096;font-size:0.8rem">{c.get('sdk','—')}</td>
+          <td>{diff_badge}</td>
+          <td>{status_badge}</td>
+          <td>{score}</td>
+          <td style="color:#718096;font-size:0.8rem">{layer_str}</td>
+          <td style="color:#718096;font-size:0.8rem">{c.get('attempt',1)}</td>
+        </tr>"""
 
     sections = ""
     for result in cases:
@@ -932,7 +978,7 @@ def history_detail(run_id: str) -> str:
         gen_esc = generated.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
         sections += f"""
-<div class="card" style="margin-bottom:1.5rem">
+<div id="case-{case_id}" class="card" style="margin-bottom:1.5rem">
   <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
     <h2 style="margin:0"><a href="/case/{case_id}">{case_id}</a></h2>
     {overall} {score}
@@ -963,12 +1009,29 @@ def history_detail(run_id: str) -> str:
 <div style="margin-bottom:1rem">
   <a href="/history" style="color:#718096;font-size:0.85rem">← Run History</a>
 </div>
-<div class="card" style="margin-bottom:1.5rem">
-  <div style="display:flex;align-items:center;gap:1rem">
+<div class="card" style="margin-bottom:1rem">
+  <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:0.75rem">
     <h1 style="font-size:1rem;font-family:monospace">{run_id}</h1>
-    <span style="color:#718096;font-size:0.85rem">{model.split('/')[-1]}</span>
+    <span style="color:#a0aec0" title="{model}">{model.split('/')[-1]}</span>
+    {_bar_cell(passed / total if total else 0)}
     <span style="color:#718096;font-size:0.85rem">{passed}/{total} passed</span>
   </div>
+  <div style="display:flex;gap:2rem;font-size:0.8rem;color:#718096;flex-wrap:wrap">
+    <span>Temperature: <b style="color:#e2e8f0">{temperature:.1f}</b></span>
+    <span>Attempts: <b style="color:#e2e8f0">{max_attempt}</b></span>
+    <span>No-think: <b style="color:#e2e8f0">{no_think_str}</b></span>
+    <span>Output tokens: <b style="color:#e2e8f0">{output_tokens:,}</b></span>
+    <span>SDKs: {sdk_tags}</span>
+  </div>
+</div>
+<div class="card" style="padding:0;overflow:auto;margin-bottom:1.5rem">
+  <table>
+    <thead><tr>
+      <th>Case</th><th>SDK</th><th>Difficulty</th>
+      <th>Result</th><th>Score</th><th>Failed at</th><th>Att.</th>
+    </tr></thead>
+    <tbody>{summary_rows}</tbody>
+  </table>
 </div>
 {sections}
 """
