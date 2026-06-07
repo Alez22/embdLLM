@@ -56,75 +56,73 @@ def _discover_cases(cases_dir: Path) -> list[dict]:
     return cases
 
 
-def _load_results() -> list[dict]:
-    """Load all EvalResult detail JSONs, attaching _run_date from directory name."""
-    results: list[dict] = []
+def _load_runs_summary() -> list[dict]:
+    """Return one dict per run dir, built from summary.json + detail stats."""
+    runs: list[dict] = []
     runs_root = RESULTS_DIR / "runs"
     if not runs_root.is_dir():
-        return results
+        return runs
     for run_dir in sorted(runs_root.iterdir(), reverse=True):
+        summary_file = run_dir / "summary.json"
+        if not summary_file.is_file():
+            continue
+        try:
+            summary = json.loads(summary_file.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+
+        # Collect per-case scores from detail files to compute total_score.
         details_dir = run_dir / "details"
-        if not details_dir.is_dir():
-            continue
-        # Date is the first 10 chars of the run dir name (YYYY-MM-DD).
-        run_date = run_dir.name[:10]
-        for detail_file in sorted(details_dir.glob("*.json")):
-            try:
-                data = json.loads(detail_file.read_text(encoding="utf-8"))
-                data["_run_date"] = run_date
-                results.append(data)
-            except Exception:
-                pass
-    return results
+        scores: list[float] = []
+        sdks: set[str] = set()
+        if details_dir.is_dir():
+            for f in details_dir.glob("*.json"):
+                try:
+                    d = json.loads(f.read_text(encoding="utf-8"))
+                    s = d.get("total_score")
+                    if s is not None:
+                        scores.append(float(s))
+                    sdk = d.get("sdk", "")
+                    if sdk:
+                        sdks.add(sdk)
+                except Exception:
+                    pass
+
+        avg_score = sum(scores) / len(scores) if scores else 0.0
+        total = summary.get("total_results", len(scores))
+        passed = summary.get("passed", 0)
+        model = summary.get("model", "")
+        run_date = summary.get("run_timestamp", run_dir.name[:10])
+        run_time = summary.get("run_time", "")
+        timestamp = f"{run_date} {run_time}".strip() if run_time else run_date
+
+        # Derive attempts and think from the run dir name or summary fields.
+        gen_params = summary.get("generation_params", {})
+        no_think = gen_params.get("no_think", False)
+        temperature = summary.get("temperature", 0.0)
+        max_attempt = max(
+            (d.get("attempt", 1) for d in [summary]),
+            default=summary.get("n_samples_per_case", 1),
+        )
+        # n_samples_per_case is the configured attempts count.
+        attempts = summary.get("n_samples_per_case", 1)
+
+        runs.append({
+            "run_id": run_dir.name,
+            "timestamp": timestamp,
+            "model": model,
+            "total": total,
+            "passed": passed,
+            "avg_score": avg_score,
+            "attempts": attempts,
+            "temperature": temperature,
+            "no_think": no_think,
+            "sdks": sorted(sdks),
+        })
+    return runs
 
 
-def _best_results(raw: list[dict]) -> list[dict]:
-    """Keep the most recent result per (case_id, model), excluding mock runs.
 
-    Most recent = highest _run_date string (ISO format sorts correctly).
-    """
-    best: dict[tuple[str, str], dict] = {}
-    for r in raw:
-        if r.get("model") == "mock":
-            continue
-        key = (r.get("case_id", ""), r.get("model", ""))
-        prev = best.get(key)
-        if prev is None or r.get("_run_date", "") > prev.get("_run_date", ""):
-            best[key] = r
-    return list(best.values())
-
-
-def _not_run_rows(
-    cases: list[dict], results: list[dict]
-) -> list[dict]:
-    """Return sentinel rows for cases that have no real result yet."""
-    tested = {r.get("case_id") for r in results}
-    rows = []
-    for case in cases:
-        cid = case.get("id", "")
-        if cid and cid not in tested:
-            rows.append({
-                "case_id": cid,
-                "model": "",
-                "total_score": -1.0,  # sentinel: sorts after real results
-                "passed": None,
-                "failed_at_layer": None,
-                "category": case.get("category", ""),
-                "sdk": case.get("sdk", ""),
-                "_not_run": True,
-            })
-    return rows
-
-
-def _layer_label(r: dict) -> str:
-    """Return a short string like 'L0 FAIL' or 'PASS'."""
-    if r.get("passed"):
-        return "PASS"
-    layer = r.get("failed_at_layer")
-    if layer is None:
-        return "FAIL"
-    names = {0: "L0", 1: "L1", 2: "L2", 3: "L3", 4: "L4"}
-    return f"{names.get(layer, f'L{layer}')} FAIL"
 
 
 def _score_bar(score: float, width: int = 8) -> str:
@@ -464,61 +462,10 @@ class EmbedEvalTUI(App):
         Binding("q", "quit", "Quit"),
     ]
 
-    # Reactive filter state — changes trigger a table refresh.
-    _filter_model: reactive[str] = reactive("all")
-    _filter_category: reactive[str] = reactive("all")
-    _filter_sdk: reactive[str] = reactive("all")
-    _filter_not_run_only: reactive[bool] = reactive(False)
-
-    # Sort state: column key and direction.
-    _sort_col: reactive[str] = reactive("case_id")
-    _sort_desc: reactive[bool] = reactive(False)
-
     def compose(self) -> ComposeResult:
         yield Header()
 
         with Horizontal(id="filter-bar"):
-            yield Label("Model:")
-            yield Select(
-                [("All", "all")],
-                value="all",
-                id="sel-model",
-                allow_blank=False,
-            )
-            yield Label("SDK:")
-            yield Select(
-                [("All", "all")],
-                value="all",
-                id="sel-sdk",
-                allow_blank=False,
-            )
-            yield Label("Category:")
-            yield Select(
-                [("All", "all")],
-                value="all",
-                id="sel-category",
-                allow_blank=False,
-            )
-            yield Checkbox("Not run only", id="chk-not-run-only")
-            yield Label("Sort:")
-            yield Select(
-                [
-                    ("Case", "case_id"),
-                    ("Model", "model"),
-                    ("Score", "score"),
-                    ("Layer", "layer"),
-                    ("Date", "date"),
-                ],
-                value="case_id",
-                id="sel-sort-col",
-                allow_blank=False,
-            )
-            yield Select(
-                [("↑ Asc", "asc"), ("↓ Desc", "desc")],
-                value="asc",
-                id="sel-sort-dir",
-                allow_blank=False,
-            )
             yield Button("New Run", variant="primary", id="btn-new-run")
 
         yield DataTable(id="results-table", cursor_type="row")
@@ -530,188 +477,65 @@ class EmbedEvalTUI(App):
         yield Footer()
 
     def on_mount(self) -> None:
-        self._cases: list[dict] = []
-        self._results: list[dict] = []
+        self._cases: list[dict] = _discover_cases(CASES_DIR)
+        self._runs: list[dict] = []
         self._proc: subprocess.Popen | None = None  # type: ignore[type-arg]
         self._log_queue: Queue[str] = Queue()
         self._log_file: Path = RESULTS_DIR / "tui-run.log"
 
         # Progress tracking during an active run.
-        self._run_total: int = 0      # total case×attempt tasks
-        self._run_done: int = 0       # completed tasks
+        self._run_total: int = 0
+        self._run_done: int = 0
         self._run_pass: int = 0
         self._run_fail: int = 0
         self._run_error: int = 0
-        self._run_current: str = ""   # last case_id seen
+        self._run_current: str = ""
 
         table = self.query_one("#results-table", DataTable)
         table.cursor_type = "row"
-        table.add_column("Case", key="case_id")
+        table.add_column("Run", key="run_id")
         table.add_column("Model", key="model")
-        table.add_column("Score", key="score")
-        table.add_column("Layer", key="layer")
-        table.add_column("Category", key="category")
-        table.add_column("SDK", key="sdk")
-        table.add_column("Date", key="date")
+        table.add_column("Cases", key="cases")
         table.add_column("Att.", key="attempts")
+        table.add_column("Temp", key="temperature")
+        table.add_column("Think", key="think")
+        table.add_column("SDKs", key="sdks")
+        table.add_column("Score", key="score")
+        table.add_column("Passed", key="passed")
 
         self._load_data()
 
     def _load_data(self) -> None:
-        self._cases = _discover_cases(CASES_DIR)
-        real = _best_results(_load_results())
-        self._results = real + _not_run_rows(self._cases, real)
-        self._rebuild_filters()
+        self._runs = _load_runs_summary()
         self._refresh_table()
-
-    def _rebuild_filters(self) -> None:
-        """Repopulate Select widgets from all cases (not just tested ones)."""
-        models = sorted(
-            {r.get("model", "") for r in self._results if r.get("model")}
-        )
-        sdks = sorted(
-            {c.get("sdk", "") for c in self._cases if c.get("sdk")}
-        )
-        cats = sorted(
-            {c.get("category", "") for c in self._cases if c.get("category")}
-        )
-
-        self.query_one("#sel-model", Select).set_options(
-            [("All", "all")] + [(m, m) for m in models]
-        )
-        self.query_one("#sel-sdk", Select).set_options(
-            [("All", "all")] + [(s, s) for s in sdks]
-        )
-        self.query_one("#sel-category", Select).set_options(
-            [("All", "all")] + [(c, c) for c in cats]
-        )
 
     def _refresh_table(self) -> None:
         table = self.query_one("#results-table", DataTable)
         table.clear()
 
-        filtered = [
-            r for r in self._results
-            if (self._filter_model == "all" or r.get("model") == self._filter_model)
-            and (self._filter_sdk == "all" or r.get("sdk") == self._filter_sdk)
-            and (
-                self._filter_category == "all"
-                or r.get("category") == self._filter_category
+        for r in self._runs:
+            score = r.get("avg_score", 0.0)
+            score_str = f"{_score_bar(score)} {score:.2f}"
+            total = r.get("total", 0)
+            passed = r.get("passed", 0)
+            no_think = r.get("no_think", False)
+            think_str = "no" if no_think else "yes"
+            temp = r.get("temperature", 0.0)
+            sdks_str = ", ".join(r.get("sdks", [])) or "—"
+            table.add_row(
+                r.get("run_id", ""),
+                r.get("model", "").split("/")[-1],
+                str(total),
+                str(r.get("attempts", 1)),
+                f"{temp:.1f}",
+                think_str,
+                sdks_str,
+                score_str,
+                f"{passed}/{total}",
             )
-            and (not self._filter_not_run_only or r.get("_not_run"))
-        ]
 
-        # Sort in Python before inserting rows.
-        col = self._sort_col
-        desc = self._sort_desc
-
-        def _sort_key(x: dict) -> tuple[int, object]:
-            # not-run rows always at the bottom regardless of sort.
-            not_run = 1 if x.get("_not_run") else 0
-            if col == "score":
-                val: object = -2.0 if x.get("_not_run") else x.get("total_score", -1.0)
-            elif col == "date":
-                val = x.get("_run_date", "") if not x.get("_not_run") else ""
-            elif col == "model":
-                val = x.get("model", "").split("/")[-1]
-            elif col == "layer":
-                val = x.get("failed_at_layer", 99) if not x.get("_not_run") else 99
-            else:
-                val = x.get("case_id", "")
-            return (not_run, val)
-
-        # not-run rows always at bottom: sort real rows by key (with reverse),
-        # then append not-run rows sorted alphabetically.
-        real_rows = [r for r in filtered if not r.get("_not_run")]
-        not_run_filtered = [r for r in filtered if r.get("_not_run")]
-
-        def _val_key(x: dict) -> object:
-            _, v = _sort_key(x)
-            return v
-
-        sorted_real = sorted(real_rows, key=_val_key, reverse=desc)
-        sorted_not_run = sorted(
-            not_run_filtered, key=lambda x: x.get("case_id", "")
-        )
-
-        for r in sorted_real + sorted_not_run:
-            if r.get("_not_run"):
-                table.add_row(
-                    r.get("case_id", ""),
-                    "—",
-                    "not run",
-                    "—",
-                    r.get("category", ""),
-                    r.get("sdk", ""),
-                    "—",
-                    "—",
-                )
-            else:
-                score = r.get("total_score", 0.0)
-                score_str = f"{_score_bar(score)} {score:.2f}"
-                layer_str = _layer_label(r)
-                attempts = sum(
-                    1 for x in self._results
-                    if x.get("case_id") == r.get("case_id")
-                    and x.get("model") == r.get("model")
-                )
-                table.add_row(
-                    r.get("case_id", ""),
-                    r.get("model", "").split("/")[-1],
-                    score_str,
-                    layer_str,
-                    r.get("category", ""),
-                    r.get("sdk", ""),
-                    r.get("_run_date", "—"),
-                    str(attempts),
-                )
-
-        real = [r for r in filtered if not r.get("_not_run")]
-        not_run_count = sum(1 for r in filtered if r.get("_not_run"))
-        passed = sum(1 for r in real if r.get("passed"))
         summary = self.query_one("#summary-bar", Static)
-        summary.update(
-            f"  {len(real)} results | {passed} passed | "
-            f"{len(real) - passed} failed | {not_run_count} not run"
-        )
-
-    # -----------------------------------------------------------------------
-    # Sort
-    # -----------------------------------------------------------------------
-
-    @on(Select.Changed, "#sel-sort-col")
-    def on_sort_col_changed(self, event: Select.Changed) -> None:
-        self._sort_col = str(event.value)
-        self._refresh_table()
-
-    @on(Select.Changed, "#sel-sort-dir")
-    def on_sort_dir_changed(self, event: Select.Changed) -> None:
-        self._sort_desc = event.value == "desc"
-        self._refresh_table()
-
-    # -----------------------------------------------------------------------
-    # Filter changes
-    # -----------------------------------------------------------------------
-
-    @on(Select.Changed, "#sel-model")
-    def on_model_changed(self, event: Select.Changed) -> None:
-        self._filter_model = str(event.value)
-        self._refresh_table()
-
-    @on(Select.Changed, "#sel-sdk")
-    def on_sdk_changed(self, event: Select.Changed) -> None:
-        self._filter_sdk = str(event.value)
-        self._refresh_table()
-
-    @on(Select.Changed, "#sel-category")
-    def on_category_changed(self, event: Select.Changed) -> None:
-        self._filter_category = str(event.value)
-        self._refresh_table()
-
-    @on(Checkbox.Changed, "#chk-not-run-only")
-    def on_not_run_only_changed(self, event: Checkbox.Changed) -> None:
-        self._filter_not_run_only = event.value
-        self._refresh_table()
+        summary.update(f"  {len(self._runs)} runs")
 
     # -----------------------------------------------------------------------
     # Actions
