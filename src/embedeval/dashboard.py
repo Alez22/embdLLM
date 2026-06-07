@@ -279,6 +279,28 @@ def _bar_cell(score: float) -> str:
     return f'{_score_bar(score)} <span style="font-size:0.8rem">{pct}%</span>'
 
 
+def _layer_score_cell(case: dict, layer_num: int) -> str:
+    """Return a table cell with the score for a specific layer.
+
+    Returns '—' if the layer has no check files for this case (score=1.0
+    and no details means the layer was skipped as non-applicable).
+    Returns a bar if the layer was executed or skipped due to earlier failure.
+    """
+    layers = case.get("layers") or []
+    for ly in layers:
+        if ly.get("layer") != layer_num:
+            continue
+        error = ly.get("error") or ""
+        details = ly.get("details") or []
+        # Layer has no checks defined for this case: no details and not a
+        # "Skipped: layer N failed" error → treat as not applicable.
+        if not details and not error.startswith("Skipped:"):
+            return '<span style="color:#4a5568;font-size:0.8rem">—</span>'
+        score = ly.get("score", 0.0)
+        return _bar_cell(score)
+    return '<span style="color:#4a5568;font-size:0.8rem">—</span>'
+
+
 def _diff_html(a: str, b: str, fromfile: str = "reference", tofile: str = "generated") -> str:
     """Return unified diff as HTML with syntax coloring."""
     a_lines = a.splitlines(keepends=True)
@@ -909,21 +931,26 @@ def history_detail(run_id: str) -> str:
 
     # Summary table of all cases in this run
     summary_rows = ""
-    for c in sorted(cases, key=lambda x: x.get("case_id", "")):
+    for c in sorted(cases, key=lambda x: (x.get("case_id", ""), x.get("attempt", 1))):
         cid = c.get("case_id", "")
         status_badge = _status_badge(c)
-        score = _bar_cell(c.get("total_score", 0)) if _result_status(c) != "error" else '<span style="color:#4a5568;font-size:0.8rem">n/a</span>'
-        layer = c.get("failed_at_layer")
-        layer_str = f"L{layer}" if layer is not None else "—"
+        total_cell = _bar_cell(c.get("total_score", 0)) if _result_status(c) != "error" else '<span style="color:#4a5568;font-size:0.8rem">n/a</span>'
         diff = _find_metadata(cid).get("difficulty", "—")
         diff_badge = f'<span class="badge badge-{diff}">{diff}</span>' if diff in ("easy", "medium", "hard") else diff
+        l0 = _layer_score_cell(c, 0)
+        l1 = _layer_score_cell(c, 1)
+        l2 = _layer_score_cell(c, 2)
+        l3 = _layer_score_cell(c, 3)
         summary_rows += f"""<tr>
-          <td><a href="#case-{cid}">{cid}</a></td>
+          <td><a href="#case-{cid}-att{c.get('attempt',1)}">{cid}</a></td>
           <td style="color:#718096;font-size:0.8rem">{c.get('sdk','—')}</td>
           <td>{diff_badge}</td>
           <td>{status_badge}</td>
-          <td>{score}</td>
-          <td style="color:#718096;font-size:0.8rem">{layer_str}</td>
+          <td>{l0}</td>
+          <td>{l1}</td>
+          <td>{l2}</td>
+          <td>{l3}</td>
+          <td>{total_cell}</td>
           <td style="color:#718096;font-size:0.8rem">{c.get('attempt',1)}</td>
         </tr>"""
 
@@ -977,10 +1004,11 @@ def history_detail(run_id: str) -> str:
         ref_esc = reference.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         gen_esc = generated.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
+        attempt = result.get("attempt", 1)
         sections += f"""
-<div id="case-{case_id}" class="card" style="margin-bottom:1.5rem">
+<div id="case-{case_id}-att{attempt}" class="card" style="margin-bottom:1.5rem">
   <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
-    <h2 style="margin:0"><a href="/case/{case_id}">{case_id}</a></h2>
+    <h2 style="margin:0"><a href="/case/{case_id}">{case_id}</a> <span style="color:#718096;font-size:0.9rem;font-weight:normal">attempt {attempt}</span></h2>
     {overall} {score}
   </div>
   <div class="split">
@@ -1028,7 +1056,7 @@ def history_detail(run_id: str) -> str:
   <table>
     <thead><tr>
       <th>Case</th><th>SDK</th><th>Difficulty</th>
-      <th>Result</th><th>Score</th><th>Failed at</th><th>Att.</th>
+      <th>Result</th><th>L0</th><th>L1</th><th>L2</th><th>L3</th><th>Total</th><th>Att.</th>
     </tr></thead>
     <tbody>{summary_rows}</tbody>
   </table>

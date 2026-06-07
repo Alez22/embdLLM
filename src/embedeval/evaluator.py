@@ -178,6 +178,7 @@ def evaluate(
                         details=[],
                         error=f"Skipped: layer {failed_at_layer} failed",
                         duration_seconds=0.0,
+                        score=0.0,
                     )
                 )
                 continue
@@ -222,12 +223,20 @@ def evaluate(
     elapsed = time.monotonic() - start
     all_passed = failed_at_layer is None
 
-    scored_layers = [ly for ly in layers if ly.details and ly.layer != 4]
-    total_score = (
-        sum(ly.score for ly in scored_layers) / len(scored_layers)
-        if scored_layers
-        else 1.0
-    )
+    # Total score: average over all layers that exist for this case (have check
+    # files). Skipped layers contribute 0 so a run that fails at L0 scores lower
+    # than one that passes L0 and reaches L3, making attempts comparable.
+    scorable_count = _count_scorable_layers(case_dir)
+    if scorable_count > 0:
+        scored_layers = [ly for ly in layers if ly.layer != 4]
+        total_score = sum(ly.score for ly in scored_layers if _layer_exists_for_case(ly.layer, case_dir)) / scorable_count
+    else:
+        executed_layers = [ly for ly in layers if ly.details and ly.layer != 4]
+        total_score = (
+            sum(ly.score for ly in executed_layers) / len(executed_layers)
+            if executed_layers
+            else 1.0
+        )
 
     return EvalResult(
         case_id=case_dir.name,
@@ -946,6 +955,25 @@ class _CheckModuleError(Exception):
     Callers must turn this into a FAIL layer result so broken checks
     are never silently treated as passing.
     """
+
+
+def _layer_exists_for_case(layer_num: int, case_dir: Path) -> bool:
+    """Return True if the given layer has checks defined for this case."""
+    if layer_num == 0:
+        return (case_dir / "checks" / "static.py").is_file()
+    if layer_num == 1:
+        return (case_dir / "CMakeLists.txt").is_file() and not _is_l1_skipped(case_dir)
+    if layer_num == 2:
+        # L2 runtime only exists when L1 exists and is not environment-skipped
+        return (case_dir / "CMakeLists.txt").is_file() and not _is_l1_skipped(case_dir)
+    if layer_num == 3:
+        return (case_dir / "checks" / "behavior.py").is_file()
+    return False  # L4 excluded from scoring
+
+
+def _count_scorable_layers(case_dir: Path) -> int:
+    """Return how many layers have checks defined for this case (L4 excluded)."""
+    return sum(1 for ln in range(4) if _layer_exists_for_case(ln, case_dir))
 
 
 def _load_check_module(case_dir: Path, module_name: str) -> ModuleType | None:
