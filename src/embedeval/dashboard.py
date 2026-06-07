@@ -256,6 +256,24 @@ def _recompute_total_score(result: dict, applicable: set[int]) -> float:
     return total / len(applicable)
 
 
+def _consistency_score(scores: list[float]) -> float | None:
+    """Compute consistency as 1 - CV (coefficient of variation).
+
+    Returns None when fewer than 5 attempts are available (not enough data).
+    Returns 1.0 when mean == 0 (model consistently scores zero — perfectly
+    consistent in its failure).
+    Returns max(0.0, 1 - std/mean) otherwise, clamped to [0, 1].
+    """
+    if len(scores) < 5:
+        return None
+    mean = sum(scores) / len(scores)
+    if mean == 0.0:
+        return 1.0
+    variance = sum((s - mean) ** 2 for s in scores) / len(scores)
+    std = variance ** 0.5
+    return max(0.0, 1.0 - std / mean)
+
+
 def _result_status(r: dict) -> str:
     """Derive 'pass' | 'fail' | 'error' from a result dict without touching saved JSON.
 
@@ -928,6 +946,29 @@ def history() -> str:
         sdks = {c.get("sdk", "") for c in cases if c.get("sdk")}
         sdk_tags = " ".join(f'<span class="tag">{s}</span>' for s in sorted(sdks))
 
+        # Consistency aggregated over cases with ≥5 attempts.
+        hist_cases_by_id: dict[str, list[dict]] = {}
+        for c in cases:
+            hist_cases_by_id.setdefault(c.get("case_id", ""), []).append(c)
+        hist_applicable = {
+            cid: _applicable_layers(atts) for cid, atts in hist_cases_by_id.items()
+        }
+        cons_vals = [
+            v for v in (
+                _consistency_score([
+                    _recompute_total_score(c, hist_applicable.get(cid, set()))
+                    for c in atts
+                ])
+                for cid, atts in hist_cases_by_id.items()
+            )
+            if v is not None
+        ]
+        if cons_vals:
+            cons_avg = sum(cons_vals) / len(cons_vals)
+            consistency_cell = f'{_bar_cell(cons_avg)} <span style="font-size:0.75rem;color:#718096">({len(cons_vals)})</span>'
+        else:
+            consistency_cell = '<span style="color:#4a5568;font-size:0.8rem">n/a</span>'
+
         rows += f"""<tr>
           <td style="font-family:monospace;font-size:0.8rem">
             <a href="/history/{run['run_id']}">{run['run_id']}</a>
@@ -940,6 +981,7 @@ def history() -> str:
           <td style="color:#a0aec0;text-align:right;font-variant-numeric:tabular-nums">{tokens_str}</td>
           <td>{score_bar}</td>
           <td>{passed_str}</td>
+          <td>{consistency_cell}</td>
         </tr>"""
 
     body = f"""
@@ -950,7 +992,7 @@ def history() -> str:
       <th>Run</th><th>Model</th><th>SDKs</th>
       <th style="text-align:center">Temp</th><th style="text-align:center">Att.</th>
       <th>Status</th><th style="text-align:right">Tokens out</th>
-      <th>Score</th><th>Passed</th>
+      <th>Score</th><th>Passed</th><th>Consistency</th>
     </tr></thead>
     <tbody>{rows}</tbody>
   </table>
@@ -1002,9 +1044,22 @@ def history_detail(run_id: str) -> str:
         for cid, attempts in cases_by_id.items()
     }
 
+    # Consistency per case_id: 1-CV over recomputed total_scores across attempts.
+    # None when fewer than 5 attempts are available.
+    consistency_by_case: dict[str, float | None] = {
+        cid: _consistency_score([
+            _recompute_total_score(c, applicable_by_case.get(cid, set()))
+            for c in attempts
+        ])
+        for cid, attempts in cases_by_id.items()
+    }
+
     # Summary table of all cases in this run
+    sorted_cases = sorted(cases, key=lambda x: (x.get("case_id", ""), x.get("attempt", 1)))
+    # Track first-row of each case_id to emit the consistency cell with rowspan.
+    first_attempt_seen: set[str] = set()
     summary_rows = ""
-    for c in sorted(cases, key=lambda x: (x.get("case_id", ""), x.get("attempt", 1))):
+    for c in sorted_cases:
         cid = c.get("case_id", "")
         applicable = applicable_by_case.get(cid, set())
         status_badge = _status_badge(c)
@@ -1016,6 +1071,21 @@ def history_detail(run_id: str) -> str:
         l1 = _layer_score_cell(c, 1, applicable)
         l2 = _layer_score_cell(c, 2, applicable)
         l3 = _layer_score_cell(c, 3, applicable)
+
+        # Consistency cell: emitted once per case_id using rowspan.
+        if cid not in first_attempt_seen:
+            first_attempt_seen.add(cid)
+            n_attempts = len(cases_by_id.get(cid, []))
+            consistency = consistency_by_case.get(cid)
+            if consistency is None:
+                cons_content = f'<span style="color:#4a5568;font-size:0.8rem" title="Needs ≥5 attempts (got {n_attempts})">n/a</span>'
+            else:
+                cons_pct = int(consistency * 100)
+                cons_content = f'{_score_bar(consistency)} <span style="font-size:0.8rem">{cons_pct}%</span>'
+            consistency_cell = f'<td rowspan="{n_attempts}" style="vertical-align:middle;border-left:1px solid #2d3748">{cons_content}</td>'
+        else:
+            consistency_cell = ""
+
         summary_rows += f"""<tr>
           <td><a href="#case-{cid}-att{c.get('attempt',1)}">{cid}</a></td>
           <td style="color:#718096;font-size:0.8rem">{c.get('sdk','—')}</td>
@@ -1027,6 +1097,7 @@ def history_detail(run_id: str) -> str:
           <td>{l3}</td>
           <td>{total_cell}</td>
           <td style="color:#718096;font-size:0.8rem">{c.get('attempt',1)}</td>
+          {consistency_cell}
         </tr>"""
 
     sections = ""
@@ -1120,6 +1191,8 @@ def history_detail(run_id: str) -> str:
     {_bar_cell(sum(_recompute_total_score(c, applicable_by_case.get(c.get("case_id",""), set())) for c in cases) / total if total else 0)}
     <span style="color:#718096;font-size:0.8rem;margin-left:0.5rem">Passed:</span>
     <span style="color:#e2e8f0;font-size:0.85rem">{passed}/{total}</span>
+    <span style="color:#718096;font-size:0.8rem;margin-left:0.5rem">Consistency:</span>
+    {(lambda vals: _bar_cell(sum(vals)/len(vals)) + f' <span style="font-size:0.75rem;color:#718096">({len(vals)} cases)</span>' if vals else '<span style="color:#4a5568;font-size:0.8rem">n/a — needs ≥5 attempts per case</span>')([v for v in consistency_by_case.values() if v is not None])}
   </div>
   <div style="display:flex;gap:2rem;font-size:0.8rem;color:#718096;flex-wrap:wrap">
     <span>Temperature: <b style="color:#e2e8f0">{temperature:.1f}</b></span>
@@ -1134,6 +1207,7 @@ def history_detail(run_id: str) -> str:
     <thead><tr>
       <th>Case</th><th>SDK</th><th>Difficulty</th>
       <th>Result</th><th>L0</th><th>L1</th><th>L2</th><th>L3</th><th>Total</th><th>Att.</th>
+      <th style="border-left:1px solid #2d3748">Consistency</th>
     </tr></thead>
     <tbody>{summary_rows}</tbody>
   </table>
