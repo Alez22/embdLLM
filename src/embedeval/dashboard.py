@@ -1109,12 +1109,22 @@ def history_detail(run_id: str) -> str:
         score = _bar_cell(result.get("total_score", 0))
 
         # Checks
+        applicable = applicable_by_case.get(case_id, set())
         checks_html = ""
         for layer in result.get("layers", []):
+            layer_num = layer.get("layer")
             layer_name = layer.get("name", "")
             layer_passed = layer.get("passed", False)
             layer_error = layer.get("error")
-            details = layer.get("details", [])
+            details = layer.get("details") or []
+
+            # Skip layers not applicable for this case (env-skip sentinels only).
+            if layer_num not in applicable and layer_num != 4:
+                continue
+            # Also skip L4 skipped-due-to-earlier-failure silently.
+            if (layer_error or "").startswith("Skipped:") and layer_num not in applicable:
+                continue
+
             layer_score = layer.get("score")
             badge = _pass_badge(layer_passed)
             score_pct = f'<span style="font-size:0.8rem;color:#718096;margin-left:0.5rem">{int(layer_score * 100)}%</span>' if layer_score is not None and details else ""
