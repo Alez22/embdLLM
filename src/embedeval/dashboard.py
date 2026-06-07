@@ -296,9 +296,14 @@ def _layer_score_cell(case: dict, layer_num: int) -> str:
         # of the score value stored in the JSON (old runs stored 1.0 by mistake).
         if error.startswith("Skipped:"):
             return _bar_cell(0.0)
-        # Layer has no checks defined for this case: no details and no error
-        # → not applicable, show dash.
-        if not details:
+        # Layer has no checks or only environment-skip sentinels (e.g. L1/L2
+        # on a non-compilable case emitting check_type="environment") → not
+        # applicable for this case, show dash.
+        real_checks = [
+            d for d in details
+            if not (d.get("check_type") == "environment" and "skipped" in str(d.get("actual", "")))
+        ]
+        if not real_checks:
             return '<span style="color:#4a5568;font-size:0.8rem">—</span>'
         score = ly.get("score", 0.0)
         return _bar_cell(score)
