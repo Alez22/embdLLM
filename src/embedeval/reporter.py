@@ -680,9 +680,11 @@ def generate_run_archive(
 
     Returns the run directory path.
     """
-    timestamp = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d")
+    now = datetime.now(tz=timezone.utc)
+    timestamp = now.strftime("%Y-%m-%d")
+    time_slug = now.strftime("%H%M")
     model_slug = model.replace("/", "_").replace(":", "_")
-    dir_name = f"{timestamp}_{model_slug}"
+    dir_name = f"{timestamp}_{time_slug}_{model_slug}"
     safe_run_id: str | None = None
     if run_id:
         safe_run_id = _sanitize_run_id(run_id)
@@ -713,6 +715,7 @@ def generate_run_archive(
     summary_file = run_dir / "summary.json"
     summary = report.model_dump(mode="json")
     summary["run_timestamp"] = timestamp
+    summary["run_time"] = time_slug
     summary["model"] = model
     summary["scenario"] = report.scenario
     summary["total_results"] = len(results)
