@@ -144,16 +144,23 @@ _CUSTOM_MODEL = "__custom__"
 
 
 # Models available in the New Run form regardless of past results.
+# Only providers with API keys in .env: Groq and OpenRouter.
 _PRESET_MODELS: list[str] = [
+    # Groq — fast inference, free tier
     "groq/llama-3.3-70b-versatile",
     "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+    "groq/meta-llama/llama-4-maverick-17b-128e-instruct",
     "groq/qwen-qwen3-32b",
+    # OpenRouter — OSS models
+    "openrouter/deepseek/deepseek-r1-0528",
+    "openrouter/deepseek/deepseek-v3-0324",
     "openrouter/deepseek/deepseek-v4-flash",
+    "openrouter/meta-llama/llama-3.3-70b-instruct",
+    "openrouter/qwen/qwen3-235b-a22b",
+    "openrouter/qwen/qwen3-30b-a3b",
     "openrouter/google/gemini-2.5-flash",
-    "anthropic/claude-haiku-4-5-20251001",
-    "openai/gpt-4o-mini",
-    "openai/gpt-4o",
-    "openai/o4-mini",
+    "openrouter/google/gemini-2.5-pro",
+    "openrouter/mistralai/mistral-small-3.2-24b-instruct",
 ]
 
 
