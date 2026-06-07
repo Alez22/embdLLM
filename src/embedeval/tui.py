@@ -304,11 +304,11 @@ class RunFormScreen(ModalScreen[dict | None]):
                         id=f"case-{case.get('id', '')}",
                     )
 
-            yield Label("Attempts (1-5)")
-            yield Input("1", id="input-attempts")
+            yield Label("Attempts  (min 5 for consistency metric)")
+            yield Input("5", id="input-attempts")
 
             yield Label("Temperature (0.0 = deterministic)")
-            yield Input("0.0", id="input-temperature")
+            yield Input("0.5", id="input-temperature")
 
             yield Checkbox("--force (bypass cache)", id="check-force")
             yield Checkbox("--no-think", id="check-no-think")
