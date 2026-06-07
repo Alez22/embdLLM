@@ -140,9 +140,21 @@ def _score_bar(score: float, width: int = 8) -> str:
 _CUSTOM_MODEL = "__custom__"
 
 
+# Models available in the New Run form regardless of past results.
+_PRESET_MODELS: list[str] = [
+    "groq/llama-3.3-70b-versatile",
+    "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+    "groq/qwen-qwen3-32b",
+    "openrouter/deepseek/deepseek-v4-flash",
+    "openrouter/google/gemini-2.5-flash",
+    "anthropic/claude-haiku-4-5-20251001",
+    "mock",
+]
+
+
 def _known_models() -> list[str]:
-    """Return model names found in past result JSONs, sorted."""
-    models: set[str] = set()
+    """Return preset models merged with any model found in past results."""
+    models: set[str] = set(_PRESET_MODELS)
     runs_root = RESULTS_DIR / "runs"
     if runs_root.is_dir():
         for detail_file in runs_root.rglob("details/*.json"):
@@ -153,7 +165,10 @@ def _known_models() -> list[str]:
                     models.add(m)
             except Exception:
                 pass
-    return sorted(models)
+    # Preserve preset order first, then any extra models from results.
+    preset_set = set(_PRESET_MODELS)
+    extras = sorted(m for m in models if m not in preset_set)
+    return _PRESET_MODELS + extras
 
 
 class RunFormScreen(ModalScreen[dict | None]):
