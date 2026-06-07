@@ -574,7 +574,7 @@ def run(
     generate_leaderboard(leaderboard_reports, leaderboard_path)
 
     run_dir = generate_run_archive(
-        comprehensive_results, report, output_dir, model, run_id=run_id, no_think=no_think
+        results, report, output_dir, model, run_id=run_id, no_think=no_think
     )
 
     # REQ-04: emit per-(TC, check, model) metrics for external consumers
