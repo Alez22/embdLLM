@@ -150,7 +150,9 @@ _PRESET_MODELS: list[str] = [
     "groq/llama-3.3-70b-versatile",
     "groq/meta-llama/llama-4-scout-17b-16e-instruct",
     "groq/meta-llama/llama-4-maverick-17b-128e-instruct",
-    "groq/qwen-qwen3-32b",
+    "groq/qwen/qwen3-32b",
+    "groq/openai/gpt-oss-20b",
+    "groq/openai/gpt-oss-120b",
     # OpenRouter — OSS models
     "openrouter/deepseek/deepseek-r1-0528",
     "openrouter/deepseek/deepseek-v3-0324",
