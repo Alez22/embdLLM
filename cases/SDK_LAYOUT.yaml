@@ -398,6 +398,30 @@ cases:
     sdk: zephyr
   uart-002:
     sdk: zephyr
+  nxp-mcxc-flash-001:
+    sdk: mcuxpresso-sdk
+  nxp-mcxc-flash-002:
+    sdk: mcuxpresso-sdk
+  nxp-mcxc-gpio-001:
+    sdk: mcuxpresso-sdk
+  nxp-mcxc-gpio-002:
+    sdk: mcuxpresso-sdk
+  nxp-mcxc-i2c-001:
+    sdk: mcuxpresso-sdk
+  nxp-mcxc-i2c-002:
+    sdk: mcuxpresso-sdk
+  nxp-mcxc-isr-001:
+    sdk: mcuxpresso-sdk
+  nxp-mcxc-spi-001:
+    sdk: mcuxpresso-sdk
+  nxp-mcxc-timer-001:
+    sdk: mcuxpresso-sdk
+  nxp-mcxc-uart-001:
+    sdk: mcuxpresso-sdk
+  nxp-mcxc-uart-002:
+    sdk: mcuxpresso-sdk
+  nxp-mcxc-watchdog-001:
+    sdk: mcuxpresso-sdk
   watchdog-001:
     sdk: zephyr
   watchdog-002:

@@ -63,6 +63,8 @@ class TestContextQualityModeE2E:
             "mock",
             "--category",
             "uart",
+            "--sdk",
+            "zephyr",
             "--output-dir",
             str(out),
         ]

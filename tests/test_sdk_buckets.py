@@ -44,7 +44,7 @@ MANIFEST = CASES_DIR / "SDK_LAYOUT.yaml"
 def test_cases_dir_has_only_sdk_buckets() -> None:
     """Top level of cases/ must be the 5 bucket dirs plus the manifest."""
     top = {p.name for p in CASES_DIR.iterdir() if not p.name.startswith(".")}
-    expected = {s.value for s in Sdk} | {"SDK_LAYOUT.yaml"}
+    expected = {s.value for s in Sdk} | {"SDK_LAYOUT.yaml", "SDK_LAYOUT_NXP.yaml"}
     assert top == expected, f"unexpected entries: {top - expected}"
 
 
