@@ -14,7 +14,7 @@ from embedeval.evaluator import (
     _run_mutant_checks,
     evaluate,
 )
-from embedeval.models import TokenUsage
+from embedeval.models import LayerResult, TokenUsage
 
 
 @pytest.fixture()
@@ -731,3 +731,46 @@ class TestL2SkipFlag:
     def test_l2_skip_not_present(self, tmp_path: Path):
         _write_full_metadata(tmp_path)
         assert _is_l2_skipped(tmp_path) is False
+
+
+class TestLayerResultScoreValidator:
+    """LayerResult.score must never be 1.0 when passed=False.
+
+    This was a real production bug: a model call that failed with HTTP 402
+    (out of credits) produced a LayerResult with passed=False but score=1.0
+    (Pydantic field default), making the case appear to pass L0 in the
+    dashboard. The model_validator clamps it to 0.0.
+    """
+
+    def test_failed_layer_without_explicit_score_is_clamped_to_zero(self) -> None:
+        layer = LayerResult(
+            layer=0,
+            name="static_analysis",
+            passed=False,
+            details=[],
+            duration_seconds=0.0,
+            # score intentionally omitted — must not stay at default 1.0
+        )
+        assert layer.score == 0.0
+
+    def test_passed_layer_without_explicit_score_keeps_default_one(self) -> None:
+        layer = LayerResult(
+            layer=0,
+            name="static_analysis",
+            passed=True,
+            details=[],
+            duration_seconds=0.0,
+        )
+        assert layer.score == 1.0
+
+    def test_failed_layer_with_explicit_partial_score_is_preserved(self) -> None:
+        """Explicit score on a failed layer (partial credit) must not be overwritten."""
+        layer = LayerResult(
+            layer=0,
+            name="static_analysis",
+            passed=False,
+            details=[],
+            duration_seconds=0.0,
+            score=0.5,
+        )
+        assert layer.score == 0.5

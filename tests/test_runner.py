@@ -9,6 +9,7 @@ from embedeval.models import CaseCategory, DifficultyTier, EvalPlatform
 from embedeval.runner import (
     Filters,
     _inject_board_target,
+    _make_error_result,
     discover_cases,
     filter_cases,
     load_case_metadata,
@@ -613,3 +614,44 @@ class TestMetadataNewFields:
         assert meta.build_board is None
         assert meta.l1_skip is False
         assert meta.l2_skip is False
+
+
+class TestMakeErrorResult:
+    """_make_error_result must produce a well-formed FAIL@L0 result.
+
+    Infrastructure errors (HTTP 402, timeout, non-retryable exceptions) go
+    through this path. A wrong score here would inflate per-model averages
+    silently.
+    """
+
+    def test_error_result_is_failed_at_layer_zero(self, tmp_path: Path) -> None:
+        case_dir = _create_case(tmp_path, "uart-001")
+        meta = load_case_metadata(case_dir)
+        assert meta is not None
+        result = _make_error_result(meta, "groq/llama-3.3-70b-versatile", 1, RuntimeError("boom"))
+        assert result.passed is False
+        assert result.failed_at_layer == 0
+        assert result.total_score == 0.0
+
+    def test_error_result_layer_score_is_zero(self, tmp_path: Path) -> None:
+        """The LayerResult inside the error result must have score=0.0.
+
+        Before the LayerResult validator was added, the default score=1.0
+        caused a failed LLM call (e.g. HTTP 402) to show as passing L0.
+        """
+        case_dir = _create_case(tmp_path, "uart-001")
+        meta = load_case_metadata(case_dir)
+        assert meta is not None
+        result = _make_error_result(meta, "groq/llama-3.3-70b-versatile", 1, RuntimeError("boom"))
+        assert result.layers[0].score == 0.0
+        assert result.layers[0].passed is False
+
+    def test_error_result_check_name_is_llm_call(self, tmp_path: Path) -> None:
+        case_dir = _create_case(tmp_path, "uart-001")
+        meta = load_case_metadata(case_dir)
+        assert meta is not None
+        result = _make_error_result(meta, "mock", 2, RuntimeError("timeout"))
+        detail = result.layers[0].details[0]
+        assert detail.check_name == "llm_call"
+        assert detail.passed is False
+        assert "timeout" in detail.actual

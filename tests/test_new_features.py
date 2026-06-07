@@ -1,8 +1,10 @@
 """Tests for v3 features: after_date filter, feedback loop, agent mode."""
 
+import re
 from pathlib import Path
 
 from embedeval.models import CaseCategory, CaseMetadata, DifficultyTier, Sdk
+from embedeval.tui import _PRESET_MODELS, _model_to_id
 from embedeval.runner import Filters, filter_cases
 
 
@@ -219,3 +221,31 @@ class TestAgentResult:
         )
         assert result.passed is False
         assert result.turns_used == result.max_turns
+
+
+class TestModelToId:
+    """_model_to_id must produce valid Textual widget IDs for all preset models.
+
+    Textual rejects IDs containing dots or slashes — these appear naturally
+    in model slugs like 'groq/llama-3.3-70b-versatile'. A BadIdentifier
+    crash was triggered in production when the TUI New Run form was opened.
+    """
+
+    _VALID_ID_RE = re.compile(r"^[a-zA-Z0-9_-]+$")
+
+    def test_all_preset_models_produce_valid_ids(self) -> None:
+        for model in _PRESET_MODELS:
+            widget_id = _model_to_id(model)
+            assert self._VALID_ID_RE.match(widget_id), (
+                f"_model_to_id({model!r}) = {widget_id!r} contains invalid characters"
+            )
+
+    def test_slash_replaced(self) -> None:
+        assert "/" not in _model_to_id("groq/llama-3.3-70b-versatile")
+
+    def test_dot_replaced(self) -> None:
+        assert "." not in _model_to_id("openrouter/google/gemini-2.5-pro")
+
+    def test_two_models_produce_distinct_ids(self) -> None:
+        ids = [_model_to_id(m) for m in _PRESET_MODELS]
+        assert len(ids) == len(set(ids)), "two preset models map to the same widget ID"

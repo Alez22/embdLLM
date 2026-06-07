@@ -305,3 +305,44 @@ class TestProseRetry:
         # Single retry, then whatever came back is returned (caller sees prose)
         assert mock_litellm.completion.call_count == 2
         assert "Sorry" in response.generated_code
+
+    @patch("embedeval.llm_client.litellm")
+    def test_prose_retry_sets_flag_on_response(self, mock_litellm: MagicMock) -> None:
+        """prose_retry must be True when the first response was prose and a
+        code-only hint retry was issued. Guards against the flag being dropped
+        during a future refactor of call_model()."""
+        prose_resp = MagicMock()
+        prose_resp.choices = [MagicMock()]
+        prose_resp.choices[0].message.content = "Here is some explanation text."
+        prose_resp.usage.prompt_tokens = 5
+        prose_resp.usage.completion_tokens = 3
+
+        code_resp = MagicMock()
+        code_resp.choices = [MagicMock()]
+        code_resp.choices[0].message.content = "```c\n#include <stdio.h>\nint main(void){}\n```"
+        code_resp.usage.prompt_tokens = 10
+        code_resp.usage.completion_tokens = 8
+
+        mock_litellm.completion.side_effect = [prose_resp, code_resp]
+        mock_litellm.completion_cost.return_value = 0.0
+
+        response = call_model(model="gpt-4", prompt="test", rate_limit_delay=0.0)
+        assert response.prose_retry is True
+
+    @patch("embedeval.llm_client.litellm")
+    def test_no_prose_retry_flag_when_first_response_is_code(
+        self, mock_litellm: MagicMock
+    ) -> None:
+        """prose_retry must be False when the model returns code on first attempt."""
+        code_resp = MagicMock()
+        code_resp.choices = [MagicMock()]
+        code_resp.choices[0].message.content = "```c\n#include <stdio.h>\nint main(void){}\n```"
+        code_resp.usage.prompt_tokens = 10
+        code_resp.usage.completion_tokens = 8
+
+        mock_litellm.completion.return_value = code_resp
+        mock_litellm.completion_cost.return_value = 0.0
+
+        response = call_model(model="gpt-4", prompt="test", rate_limit_delay=0.0)
+        assert response.prose_retry is False
+        assert mock_litellm.completion.call_count == 1
