@@ -279,35 +279,55 @@ def _bar_cell(score: float) -> str:
     return f'{_score_bar(score)} <span style="font-size:0.8rem">{pct}%</span>'
 
 
-def _layer_score_cell(case: dict, layer_num: int) -> str:
+_DASH = '<span style="color:#4a5568;font-size:0.8rem">—</span>'
+
+
+def _applicable_layers(all_attempts: list[dict]) -> set[int]:
+    """Return the set of layer numbers that have real checks for this case.
+
+    A layer is applicable if any attempt actually executed it (not skipped due
+    to earlier failure) and produced at least one non-environment-skip check.
+    Scanning all attempts finds layers that only some attempts reached.
+    """
+    applicable: set[int] = set()
+    for attempt in all_attempts:
+        for ly in (attempt.get("layers") or []):
+            layer_num = ly.get("layer")
+            if layer_num == 4:
+                continue
+            error = ly.get("error") or ""
+            if error.startswith("Skipped:"):
+                continue
+            details = ly.get("details") or []
+            real = [
+                d for d in details
+                if not (d.get("check_type") == "environment" and "skipped" in str(d.get("actual", "")))
+            ]
+            if real:
+                applicable.add(layer_num)
+    return applicable
+
+
+def _layer_score_cell(case: dict, layer_num: int, applicable: set[int]) -> str:
     """Return a table cell with the score for a specific layer.
 
-    Returns '—' if the layer has no check files for this case (score=1.0
-    and no details means the layer was skipped as non-applicable).
-    Returns a bar if the layer was executed or skipped due to earlier failure.
+    Shows '—' when the layer is not applicable for this case (no check files).
+    Shows 0% when the layer exists but was skipped due to earlier failure.
+    Shows a bar when the layer was executed.
     """
-    layers = case.get("layers") or []
-    for ly in layers:
+    if layer_num not in applicable:
+        return _DASH
+
+    for ly in (case.get("layers") or []):
         if ly.get("layer") != layer_num:
             continue
         error = ly.get("error") or ""
-        details = ly.get("details") or []
-        # Layer skipped because an earlier one failed → always 0%, regardless
-        # of the score value stored in the JSON (old runs stored 1.0 by mistake).
+        # Layer exists but was skipped → 0%. Ignore stored score value
+        # (old runs had 1.0 as default for skipped layers).
         if error.startswith("Skipped:"):
             return _bar_cell(0.0)
-        # Layer has no checks or only environment-skip sentinels (e.g. L1/L2
-        # on a non-compilable case emitting check_type="environment") → not
-        # applicable for this case, show dash.
-        real_checks = [
-            d for d in details
-            if not (d.get("check_type") == "environment" and "skipped" in str(d.get("actual", "")))
-        ]
-        if not real_checks:
-            return '<span style="color:#4a5568;font-size:0.8rem">—</span>'
-        score = ly.get("score", 0.0)
-        return _bar_cell(score)
-    return '<span style="color:#4a5568;font-size:0.8rem">—</span>'
+        return _bar_cell(ly.get("score", 0.0))
+    return _DASH
 
 
 def _diff_html(a: str, b: str, fromfile: str = "reference", tofile: str = "generated") -> str:
@@ -938,18 +958,29 @@ def history_detail(run_id: str) -> str:
     sdk_tags = " ".join(f'<span class="tag">{s}</span>' for s in sdks)
     output_tokens = sum(c.get("token_usage", {}).get("output_tokens", 0) for c in cases)
 
+    # Pre-compute which layers are applicable per case_id across all attempts.
+    # A layer is applicable if any attempt actually executed it with real checks.
+    cases_by_id: dict[str, list[dict]] = {}
+    for c in cases:
+        cases_by_id.setdefault(c.get("case_id", ""), []).append(c)
+    applicable_by_case: dict[str, set[int]] = {
+        cid: _applicable_layers(attempts)
+        for cid, attempts in cases_by_id.items()
+    }
+
     # Summary table of all cases in this run
     summary_rows = ""
     for c in sorted(cases, key=lambda x: (x.get("case_id", ""), x.get("attempt", 1))):
         cid = c.get("case_id", "")
+        applicable = applicable_by_case.get(cid, set())
         status_badge = _status_badge(c)
         total_cell = _bar_cell(c.get("total_score", 0)) if _result_status(c) != "error" else '<span style="color:#4a5568;font-size:0.8rem">n/a</span>'
         diff = _find_metadata(cid).get("difficulty", "—")
         diff_badge = f'<span class="badge badge-{diff}">{diff}</span>' if diff in ("easy", "medium", "hard") else diff
-        l0 = _layer_score_cell(c, 0)
-        l1 = _layer_score_cell(c, 1)
-        l2 = _layer_score_cell(c, 2)
-        l3 = _layer_score_cell(c, 3)
+        l0 = _layer_score_cell(c, 0, applicable)
+        l1 = _layer_score_cell(c, 1, applicable)
+        l2 = _layer_score_cell(c, 2, applicable)
+        l3 = _layer_score_cell(c, 3, applicable)
         summary_rows += f"""<tr>
           <td><a href="#case-{cid}-att{c.get('attempt',1)}">{cid}</a></td>
           <td style="color:#718096;font-size:0.8rem">{c.get('sdk','—')}</td>
