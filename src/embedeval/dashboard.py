@@ -870,7 +870,9 @@ def history() -> str:
         model_tags = " ".join(
             f'<span class="tag">{m.split("/")[-1]}</span>' for m in models
         )
-        bar = _bar_cell(passed / total if total else 0)
+        avg_score = sum(c.get("total_score", 0) for c in cases) / total if total else 0.0
+        score_bar = _bar_cell(avg_score)
+        passed_str = f'<span style="color:#718096;font-size:0.8rem">{passed}/{total}</span>'
 
         # Total output tokens for the run
         output_tokens = sum(
@@ -879,14 +881,12 @@ def history() -> str:
         tokens_str = f"{output_tokens:,}"
 
         # A run is complete if every case produced generated_code (non-empty).
-        # Cases that errored before the LLM call have empty generated_code.
         incomplete = sum(1 for c in cases if not c.get("generated_code", "").strip())
         if incomplete == 0:
             status_html = '<span class="badge badge-pass">complete</span>'
         else:
             status_html = f'<span class="badge badge-fail">partial ({total - incomplete}/{total})</span>'
 
-        # Run parameters: temperature and attempts (from first case with data)
         temperatures = {c.get("temperature", 0.0) for c in cases}
         temp_str = ", ".join(f"{t:.1f}" for t in sorted(temperatures))
         attempts = {c.get("attempt", 1) for c in cases}
@@ -904,8 +904,8 @@ def history() -> str:
           <td style="color:#a0aec0;text-align:center">{max_attempt}</td>
           <td>{status_html}</td>
           <td style="color:#a0aec0;text-align:right;font-variant-numeric:tabular-nums">{tokens_str}</td>
-          <td>{bar}</td>
-          <td style="color:#718096">{passed}/{total}</td>
+          <td>{score_bar}</td>
+          <td>{passed_str}</td>
         </tr>"""
 
     body = f"""
@@ -1081,8 +1081,10 @@ def history_detail(run_id: str) -> str:
   <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:0.75rem">
     <h1 style="font-size:1rem;font-family:monospace">{run_id}</h1>
     <span style="color:#a0aec0" title="{model}">{model.split('/')[-1]}</span>
+    <span style="color:#718096;font-size:0.8rem">Avg score:</span>
     {_bar_cell(sum(c.get("total_score", 0) for c in cases) / total if total else 0)}
-    <span style="color:#718096;font-size:0.85rem">{passed}/{total} passed</span>
+    <span style="color:#718096;font-size:0.8rem;margin-left:0.5rem">Passed:</span>
+    <span style="color:#e2e8f0;font-size:0.85rem">{passed}/{total}</span>
   </div>
   <div style="display:flex;gap:2rem;font-size:0.8rem;color:#718096;flex-wrap:wrap">
     <span>Temperature: <b style="color:#e2e8f0">{temperature:.1f}</b></span>
