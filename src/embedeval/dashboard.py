@@ -202,6 +202,7 @@ _NAV = """
   <a href="/history">Run History</a>
   <a href="/review">Review</a>
   <a href="/docs/layers">Docs</a>
+  <a href="/docs/models">Models</a>
 </nav>
 """
 
@@ -1573,4 +1574,141 @@ def docs_layers() -> str:
   </p>
 </div>
 """
+
+
+@app.get("/docs/models", response_class=HTMLResponse)
+def docs_models() -> str:
+    """Reference page with technical specs for all preset benchmark models."""
+    body = """
+<h1>Model Reference</h1>
+<p>Technical specifications for all preset models available in the benchmark runner.
+Specs sourced from official model cards and provider documentation (verified 2026-06-07).</p>
+
+<style>
+.models-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.models-table th { background: #1e293b; color: #94a3b8; font-weight: 600;
+  text-align: left; padding: 8px 12px; border-bottom: 2px solid #334155; }
+.models-table td { padding: 7px 12px; border-bottom: 1px solid #1e293b; vertical-align: middle; }
+.models-table tr:hover td { background: #0f172a; }
+.models-table .section-header td { background: #0f172a; color: #64748b;
+  font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; padding: 6px 12px; }
+.tag { display: inline-block; padding: 1px 7px; border-radius: 4px;
+  font-size: 0.78rem; font-weight: 600; }
+.tag-moe  { background: #1e3a5f; color: #60a5fa; }
+.tag-dense { background: #1e3b2e; color: #4ade80; }
+.think-yes { color: #4ade80; font-weight: 700; }
+.think-no  { color: #475569; }
+.model-id  { font-family: monospace; font-size: 0.82rem; color: #e2e8f0; }
+.provider  { color: #94a3b8; font-size: 0.82rem; }
+</style>
+
+<table class="models-table">
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Params total</th>
+      <th>Params active</th>
+      <th>Architecture</th>
+      <th>Think</th>
+      <th>Context</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="section-header"><td colspan="6">Groq</td></tr>
+    <tr>
+      <td class="model-id">llama-3.3-70b-versatile</td>
+      <td>70 B</td><td>70 B</td>
+      <td><span class="tag tag-dense">Dense</span></td>
+      <td class="think-no">—</td><td>128 K</td>
+    </tr>
+    <tr>
+      <td class="model-id">llama-4-scout-17b-16e-instruct</td>
+      <td>109 B</td><td>17 B</td>
+      <td><span class="tag tag-moe">MoE</span> 16 experts</td>
+      <td class="think-no">—</td><td>10 M</td>
+    </tr>
+    <tr>
+      <td class="model-id">qwen3-32b</td>
+      <td>32.8 B</td><td>32.8 B</td>
+      <td><span class="tag tag-dense">Dense</span></td>
+      <td class="think-yes">✓ hybrid</td><td>128 K</td>
+    </tr>
+    <tr>
+      <td class="model-id">gpt-oss-20b</td>
+      <td>21 B</td><td>3.6 B</td>
+      <td><span class="tag tag-moe">MoE</span> 32 exp, top-4</td>
+      <td class="think-no">—</td><td>128 K</td>
+    </tr>
+    <tr>
+      <td class="model-id">gpt-oss-120b</td>
+      <td>120 B</td><td>5.1 B</td>
+      <td><span class="tag tag-moe">MoE</span> 128 exp, top-4</td>
+      <td class="think-no">—</td><td>128 K</td>
+    </tr>
+    <tr class="section-header"><td colspan="6">OpenRouter</td></tr>
+    <tr>
+      <td class="model-id">deepseek-r1-0528</td>
+      <td>685 B</td><td>37 B</td>
+      <td><span class="tag tag-moe">MoE</span></td>
+      <td class="think-yes">✓ CoT</td><td>128 K</td>
+    </tr>
+    <tr>
+      <td class="model-id">deepseek-chat-v3-0324</td>
+      <td>671 B</td><td>37 B</td>
+      <td><span class="tag tag-moe">MoE</span></td>
+      <td class="think-no">—</td><td>128 K</td>
+    </tr>
+    <tr>
+      <td class="model-id">deepseek-v4-flash</td>
+      <td>284 B</td><td>13 B</td>
+      <td><span class="tag tag-moe">MoE</span> hybrid attn</td>
+      <td class="think-yes">✓ 3 modes</td><td>1 M</td>
+    </tr>
+    <tr>
+      <td class="model-id">llama-4-maverick</td>
+      <td>~400 B</td><td>17 B</td>
+      <td><span class="tag tag-moe">MoE</span> 128 experts</td>
+      <td class="think-no">—</td><td>1 M</td>
+    </tr>
+    <tr>
+      <td class="model-id">llama-3.3-70b-instruct</td>
+      <td>70 B</td><td>70 B</td>
+      <td><span class="tag tag-dense">Dense</span></td>
+      <td class="think-no">—</td><td>128 K</td>
+    </tr>
+    <tr>
+      <td class="model-id">qwen3-235b-a22b</td>
+      <td>235 B</td><td>22 B</td>
+      <td><span class="tag tag-moe">MoE</span> 128 exp, top-8</td>
+      <td class="think-yes">✓ hybrid</td><td>128 K</td>
+    </tr>
+    <tr>
+      <td class="model-id">qwen3-30b-a3b</td>
+      <td>30 B</td><td>3 B</td>
+      <td><span class="tag tag-moe">MoE</span> 128 exp, top-8</td>
+      <td class="think-yes">✓ hybrid</td><td>128 K</td>
+    </tr>
+    <tr>
+      <td class="model-id">gemini-2.5-flash</td>
+      <td>proprietary</td><td>proprietary</td>
+      <td><span class="tag tag-moe">MoE</span> proprietary</td>
+      <td class="think-yes">✓</td><td>1 M</td>
+    </tr>
+    <tr>
+      <td class="model-id">gemini-2.5-pro</td>
+      <td>proprietary</td><td>proprietary</td>
+      <td><span class="tag tag-moe">MoE</span> proprietary</td>
+      <td class="think-yes">✓</td><td>1 M</td>
+    </tr>
+    <tr>
+      <td class="model-id">mistral-small-3.2-24b-instruct</td>
+      <td>23.6 B</td><td>23.6 B</td>
+      <td><span class="tag tag-dense">Dense</span></td>
+      <td class="think-no">—</td><td>128 K</td>
+    </tr>
+  </tbody>
+</table>
+"""
+    return _page("Docs — Models", body)
     return _page("Docs — Evaluation Layers", body)
