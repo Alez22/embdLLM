@@ -425,6 +425,43 @@ class RunFormScreen(ModalScreen[dict | None]):
 
 
 # ---------------------------------------------------------------------------
+# Log filtering helpers
+# ---------------------------------------------------------------------------
+
+import re as _re
+
+_CASE_RESULT_RE = _re.compile(r"Case (\S+) attempt (\d+): (PASS|FAIL@L(\S+)|FAIL)")
+
+
+def _format_log_line(line: str) -> str | None:
+    """Return a human-readable widget line, or None to suppress the line.
+
+    The full raw output is always written to the log file; this function
+    controls what appears in the TUI log panel.
+    """
+    # Launch and done markers.
+    if line.startswith("[launch]") or line.startswith("[done]"):
+        return line
+
+    # Per-attempt result: reformat into a compact, aligned line.
+    m = _CASE_RESULT_RE.search(line)
+    if m:
+        case_id, attempt, status = m.group(1), m.group(2), m.group(3)
+        if status == "PASS":
+            return f"[ PASS ] {case_id} #{attempt}"
+        layer = m.group(4) or "?"
+        tag = "[ERROR]" if layer in ("0", "None") else "[ FAIL ]"
+        return f"{tag} {case_id} #{attempt}  →  L{layer}"
+
+    # Rate-limit warnings worth surfacing.
+    low = line.lower()
+    if "rate limit" in low or "ratelimiterror" in low:
+        return f"[warn ] rate limit — {line.strip()}"
+
+    return None
+
+
+# ---------------------------------------------------------------------------
 # Main app
 # ---------------------------------------------------------------------------
 
@@ -676,7 +713,11 @@ class EmbedEvalTUI(App):
             self.call_from_thread(self._append_log, line.rstrip())
         self._proc.wait()
         rc = self._proc.returncode
-        self.call_from_thread(self._append_log, f"[done] exit code {rc}")
+        self.call_from_thread(
+            self._append_log,
+            f"[done] exit {rc}  —  {self._run_pass} pass  "
+            f"{self._run_fail} fail  {self._run_error} error",
+        )
         # Auto-refresh results after a run completes.
         self.call_from_thread(self._finish_run)
 
@@ -689,12 +730,16 @@ class EmbedEvalTUI(App):
         self._run_done = 0
 
     def _append_log(self, line: str) -> None:
-        log = self.query_one("#run-log", Log)
-        log.write_line(line)
+        # Always write full output to file for debugging.
         if hasattr(self, "_log_file"):
             with self._log_file.open("a", encoding="utf-8") as f:
                 f.write(line + "\n")
         self._parse_progress(line)
+        # Write only human-relevant events to the widget.
+        widget_line = _format_log_line(line)
+        if widget_line is not None:
+            log = self.query_one("#run-log", Log)
+            log.write_line(widget_line)
 
     def _parse_progress(self, line: str) -> None:
         """Extract case completion events from verbose runner output.
