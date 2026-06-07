@@ -231,6 +231,31 @@ def _page(title: str, body: str, highlight: bool = False) -> str:
 </html>"""
 
 
+def _recompute_total_score(result: dict, applicable: set[int]) -> float:
+    """Recompute total_score using the fixed-denominator method.
+
+    Denominator = applicable layer set (computed across all attempts for the case).
+    Skipped layers that are in the applicable set contribute 0 to the numerator.
+    Corrects stale values in old JSON files computed with a different formula.
+    """
+    if not applicable:
+        return result.get("total_score", 0.0)
+    layers = result.get("layers") or []
+    score_by_layer: dict[int, float] = {}
+    for ly in layers:
+        ln = ly.get("layer")
+        if ln not in applicable:
+            continue
+        error = ly.get("error") or ""
+        if error.startswith("Skipped:"):
+            score_by_layer[ln] = 0.0
+        else:
+            score_by_layer[ln] = ly.get("score", 0.0)
+    # Layers not present in the JSON at all default to 0.
+    total = sum(score_by_layer.get(ln, 0.0) for ln in applicable)
+    return total / len(applicable)
+
+
 def _result_status(r: dict) -> str:
     """Derive 'pass' | 'fail' | 'error' from a result dict without touching saved JSON.
 
@@ -870,7 +895,16 @@ def history() -> str:
         model_tags = " ".join(
             f'<span class="tag">{m.split("/")[-1]}</span>' for m in models
         )
-        avg_score = sum(c.get("total_score", 0) for c in cases) / total if total else 0.0
+        cases_by_id_hist: dict[str, list[dict]] = {}
+        for c in cases:
+            cases_by_id_hist.setdefault(c.get("case_id", ""), []).append(c)
+        applicable_hist = {
+            cid: _applicable_layers(atts) for cid, atts in cases_by_id_hist.items()
+        }
+        avg_score = sum(
+            _recompute_total_score(c, applicable_hist.get(c.get("case_id", ""), set()))
+            for c in cases
+        ) / total if total else 0.0
         score_bar = _bar_cell(avg_score)
         passed_str = f'<span style="color:#718096;font-size:0.8rem">{passed}/{total}</span>'
 
@@ -974,7 +1008,8 @@ def history_detail(run_id: str) -> str:
         cid = c.get("case_id", "")
         applicable = applicable_by_case.get(cid, set())
         status_badge = _status_badge(c)
-        total_cell = _bar_cell(c.get("total_score", 0)) if _result_status(c) != "error" else '<span style="color:#4a5568;font-size:0.8rem">n/a</span>'
+        recomputed = _recompute_total_score(c, applicable)
+        total_cell = _bar_cell(recomputed) if _result_status(c) != "error" else '<span style="color:#4a5568;font-size:0.8rem">n/a</span>'
         diff = _find_metadata(cid).get("difficulty", "—")
         diff_badge = f'<span class="badge badge-{diff}">{diff}</span>' if diff in ("easy", "medium", "hard") else diff
         l0 = _layer_score_cell(c, 0, applicable)
@@ -1082,7 +1117,7 @@ def history_detail(run_id: str) -> str:
     <h1 style="font-size:1rem;font-family:monospace">{run_id}</h1>
     <span style="color:#a0aec0" title="{model}">{model.split('/')[-1]}</span>
     <span style="color:#718096;font-size:0.8rem">Avg score:</span>
-    {_bar_cell(sum(c.get("total_score", 0) for c in cases) / total if total else 0)}
+    {_bar_cell(sum(_recompute_total_score(c, applicable_by_case.get(c.get("case_id",""), set())) for c in cases) / total if total else 0)}
     <span style="color:#718096;font-size:0.8rem;margin-left:0.5rem">Passed:</span>
     <span style="color:#e2e8f0;font-size:0.85rem">{passed}/{total}</span>
   </div>
