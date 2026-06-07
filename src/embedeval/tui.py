@@ -417,6 +417,7 @@ class RunFormScreen(ModalScreen[dict | None]):
 import re as _re
 
 _CASE_RESULT_RE = _re.compile(r"Case (\S+) attempt (\d+): (PASS|FAIL@L(\S+)|FAIL)")
+_CASE_UNHANDLED_RE = _re.compile(r"Case (\S+) attempt (\d+): unhandled (\S+)")
 
 
 def _format_log_line(line: str) -> str | None:
@@ -429,6 +430,11 @@ def _format_log_line(line: str) -> str | None:
     if line.startswith("[launch]") or line.startswith("[done]"):
         return line
 
+    # Infrastructure error: unhandled exception in runner (API failure, timeout, etc.)
+    u = _CASE_UNHANDLED_RE.search(line)
+    if u:
+        return f"[ERROR] {u.group(1)} #{u.group(2)}  ({u.group(3)})"
+
     # Per-attempt result: reformat into a compact, aligned line.
     m = _CASE_RESULT_RE.search(line)
     if m:
@@ -436,8 +442,7 @@ def _format_log_line(line: str) -> str | None:
         if status == "PASS":
             return f"[ PASS ] {case_id} #{attempt}"
         layer = m.group(4) or "?"
-        tag = "[ERROR]" if layer in ("0", "None") else "[ FAIL ]"
-        return f"{tag} {case_id} #{attempt}  →  L{layer}"
+        return f"[ FAIL ] {case_id} #{attempt}  →  L{layer}"
 
     # Rate-limit warnings worth surfacing.
     low = line.lower()
