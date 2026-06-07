@@ -6,127 +6,124 @@ Mark done with `[x]`. Add notes inline after `—`.
 ## Priority order (next 2-4 weeks)
 
 1. **Phase 4** — Dashboard: improvements (bug --attempts done)
-2. **Phase 6** — Cloud model runs: completare modelli mancanti + docs
-3. **Phase 3** — Nuovi task types (refactoring, doxygen, test gen, arch)
+2. **Phase 6** — Cloud model runs: complete missing models + docs
+3. **Phase 3** — New task types (refactoring, doxygen, test gen, arch)
 4. **Phase 5** — Human Review workflow
-5. **Phase 1** — Infrastruttura rimanente (SDK_LAYOUT, Docker)
+5. **Phase 1** — Remaining infrastructure (SDK_LAYOUT, Docker)
 6. **Phase 7** — Knowledge Currency Probing
 7. **Phase 8** — Language-variant evaluation
 8. **Backlog** — Hardware-in-the-loop, trap prompts, upstream PR
 
 ## Code health (from review 2026-05-26)
 
-Punti emersi dalla review del 2026-05-26 — alcuni risolti, altri tracciati come debito.
+Issues from the 2026-05-26 review — some resolved, others tracked as debt.
 
 ### Resolved
-- [x] **Bug #1**: feedback loop crashava con `failed_at_layer = None` o `> 1`
-  dopo il primo round. Fix in commit `82932cb` (while + bounds check + test).
-- [x] **Bug #2**: grade cache memorizzava l'intero `EvalResult` keyed solo su
-  `(code_hash, checks_hash)` → leak di metadata cross-model. Fix in commit
-  `6e61fd7`: nuovo `GradeCell` con solo campi pure-function; runner ricostruisce
-  l'`EvalResult` dai metadati della call corrente. Caching rimosso dai feedback
-  round (chiave non distinguente).
-- [x] **Smoke regression test** end-to-end: commit `e67d1c1`. 6 scenari di
-  caching coperti con mock model.
+- [x] **Bug #1**: feedback loop crashed with `failed_at_layer = None` or `> 1`
+  after the first round. Fixed in commit `82932cb` (while + bounds check + test).
+- [x] **Bug #2**: grade cache stored the entire `EvalResult` keyed only on
+  `(code_hash, checks_hash)` → cross-model metadata leak. Fixed in commit
+  `6e61fd7`: new `GradeCell` with pure-function fields only; runner rebuilds
+  `EvalResult` from current call metadata. Caching removed from feedback rounds
+  (key is not distinguishing).
+- [x] **Smoke regression test** end-to-end: commit `e67d1c1`. 6 caching
+  scenarios covered with mock model.
 
-### Aperti — priorità media
+### Open — medium priority
 
-- [ ] **`_extract_code` su fence non chiusi** (`src/embedeval/llm_client.py`).
-  Se il modello tronca a metà output (limite token), nessun fence di chiusura →
-  `_extract_code` ritorna l'intero testo incluso ragionamento. Fix proposto:
-  se trovi `\`\`\`(c|cpp)?` di apertura ma nessun match completo, prendi tutto
-  dall'apertura alla fine come fallback.
-- [ ] **`_call_litellm` swallowa errori non-retryable**: converte qualsiasi
-  `Exception` in `RuntimeError`, perdendo classe specifica
-  (`BadRequestError`, `AuthenticationError`). Il caller `_make_error_result`
-  già usa `type(exc).__name__`, quindi propagare le eccezioni tipizzate dà più
-  informazione. Lasciare `except (RateLimitError, ...)` come ora; rimuovere il
-  catch-all `except Exception`.
-- [ ] **MOCK_C_CODE usa Zephyr**: `llm_client.py:24` ha `#include <zephyr/kernel.h>`
-  che fa fallire `no_cross_platform_hallucination` su casi NXP. Probabile
-  residuo upstream. Cambiare in un main.c stile bare-metal NXP, o renderlo
-  configurabile per SDK.
-- [ ] **Allineamento `Platform` enum vs `metadata.yaml`**: il CLAUDE.md mostra
-  `platform: nxp_bare_metal` mentre `EvalPlatform.NXP_BARE_METAL = "nxp_bare_metal"`
-  esiste. Verificare se il campo `platform` in `CaseMetadata` è ancora vivo o
-  deprecated rispetto a `sdk`. Se deprecated, rimuovere dai metadata.
+- [ ] **`_extract_code` on unclosed fences** (`src/embedeval/llm_client.py`).
+  If the model truncates mid-output (token limit), no closing fence →
+  `_extract_code` returns the entire text including reasoning. Proposed fix:
+  if an opening ` ```(c|cpp)?` is found but no complete match, take everything
+  from the opening to the end as a fallback.
+- [ ] **`_call_litellm` swallows non-retryable errors**: converts any
+  `Exception` to `RuntimeError`, losing the specific class
+  (`BadRequestError`, `AuthenticationError`). The caller `_make_error_result`
+  already uses `type(exc).__name__`, so propagating typed exceptions gives more
+  information. Keep `except (RateLimitError, ...)` as-is; remove the catch-all
+  `except Exception`.
+- [ ] **MOCK_C_CODE uses Zephyr**: `llm_client.py:24` has `#include <zephyr/kernel.h>`
+  which fails `no_cross_platform_hallucination` on NXP cases. Likely an upstream
+  leftover. Replace with a bare-metal NXP-style main.c, or make it SDK-configurable.
+- [ ] **`Platform` enum vs `metadata.yaml` alignment**: CLAUDE.md shows
+  `platform: nxp_bare_metal` and `EvalPlatform.NXP_BARE_METAL = "nxp_bare_metal"`
+  exists. Verify whether the `platform` field in `CaseMetadata` is still active or
+  deprecated in favour of `sdk`. If deprecated, remove from metadata.
 
-### Aperti — priorità bassa (debito strutturale)
+### Open — low priority (structural debt)
 
-- [ ] **File enormi senza single responsibility**: `cli.py` 1439 righe,
+- [ ] **Oversized files with no single responsibility**: `cli.py` 1439 lines,
   `check_utils.py` 1430, `evaluator.py` 1180, `reporter.py` 1148,
-  `safety_guide.py` 976, `dashboard.py` 943. Quando uno di questi diventa
-  doloroso da modificare, estrarre sub-moduli. Non prioritario in assoluto,
-  ma il costo cresce nel tempo.
-- [ ] **`_RETRY_AFTER_RE` cattura solo "try again in"**: OpenRouter usa
-  formati diversi ("retry after Xs"). Quando Phase 6 attiverà OpenRouter,
-  estendere il pattern o renderlo provider-aware.
-- [ ] **Nessun retry budget complessivo**: `max_retries=6` è per-call.
-  Su run di 12 casi × 5 attempt × 3 feedback con rate limit pesante, il
-  benchmark può silenziosamente diventare ore di wait. Aggiungere
-  `--run-deadline=2h` o accumulatore di wait globale.
-- [ ] **Test pre-esistenti fragili**: `test_three_runs_cover_same_case_set`
-  (test_context_quality_mode_e2e.py) trova 4 casi UART invece di 2,
-  `test_sdk_buckets` fallisce su 2 casi. Non causati da modifiche recenti
-  ma indicano fixture che drifta con i casi nuovi.
-- [ ] **Semantica `feedback_rounds` vs `attempt`**: il `token_usage` finale
-  riflette solo l'ultima call LLM, non la somma su tutti i round. Confronti
-  di costo tra modelli con feedback attivo sono sottostimati. Decidere se
-  sommare o documentare la convenzione.
+  `safety_guide.py` 976, `dashboard.py` 943. When one becomes painful to modify,
+  extract sub-modules. Not immediately critical but cost grows over time.
+- [ ] **`_RETRY_AFTER_RE` only captures "try again in"**: OpenRouter uses different
+  formats ("retry after Xs"). When Phase 6 activates OpenRouter, extend the pattern
+  or make it provider-aware.
+- [ ] **No global retry budget**: `max_retries=6` is per-call. On a run of
+  12 cases × 5 attempts × 3 feedback rounds under heavy rate limiting, the benchmark
+  can silently stretch to hours. Add `--run-deadline=2h` or a global wait accumulator.
+- [ ] **Brittle pre-existing tests**: `test_three_runs_cover_same_case_set`
+  (test_context_quality_mode_e2e.py) finds 4 UART cases instead of 2,
+  `test_sdk_buckets` fails on 2 cases. Not caused by recent changes but indicate
+  fixtures drifting as new cases are added.
+- [ ] **`feedback_rounds` vs `attempt` semantics**: final `token_usage` reflects
+  only the last LLM call, not the sum across all rounds. Cost comparisons between
+  models with feedback enabled are underestimated. Decide whether to sum or document
+  the convention.
 
 ---
 
 ## Phase 4 — Results Dashboard
 
-Web dashboard locale per esplorare i risultati del benchmark: confronto
-codice generato vs reference, check pass/fail, leaderboard visiva, storico run.
+Local web dashboard for exploring benchmark results: generated vs reference diff,
+check pass/fail, visual leaderboard, run history.
 
-**Dipendenze:** `fastapi`, `uvicorn` (da aggiungere a `pyproject.toml`).
-**Avvio:** `uv run embedeval dashboard` → apre `http://localhost:7860`.
-**Fonte dati:** legge direttamente i JSON esistenti in `results/` e i file
-`reference/main.c` + `metadata.yaml` dei casi — nessun DB aggiuntivo.
+**Dependencies:** `fastapi`, `uvicorn` (added to `pyproject.toml`).
+**Start:** `uv run embedeval dashboard` → opens `http://localhost:7860`.
+**Data source:** reads existing JSONs in `results/` and case `reference/main.c` +
+`metadata.yaml` files directly — no additional DB.
 
-- [x] **Aggiungere `fastapi` e `uvicorn`** a `pyproject.toml`.
-- [x] **`src/embedeval/dashboard.py`** — server FastAPI:
-  - `GET /` → leaderboard: tabella modelli × casi, celle colorate pass/fail/non-runnato
-  - `GET /case/<case_id>/<model>` → dettaglio: check list + diff side-by-side generato vs reference
-  - `GET /history` → lista run ordinata per data con Status e Tokens out; click apre dettaglio
-  - `GET /history/<run_id>` → per-run detail: checks pass/fail + diff side-by-side per ogni caso
-  - `GET /cases` → elenco casi con sdk, difficulty, category, tier, tags
-  - `GET /cases/<id>` → prompt e reference editabili (POST per salvare con conferma)
-  - `GET /cases/<id>/checks` → static.py e behavior.py read-only con syntax highlight (Python ok, C noto issue)
-- [x] **Aggiungere `dashboard` subcommand a `src/embedeval/cli.py`**.
-- [x] **Verificare che con `--attempts N` tutti gli attempt vengano salvati**
-  come file separati in `results/runs/*/details/` — fix: nome file ora include
-  `_attempt{N}` (`reporter.py:698`), era `{case_id}.json` → ogni attempt sovrascriveva.
+- [x] **Add `fastapi` and `uvicorn`** to `pyproject.toml`.
+- [x] **`src/embedeval/dashboard.py`** — FastAPI server:
+  - `GET /` → leaderboard: models × cases table, colored pass/fail/not-run cells
+  - `GET /case/<case_id>/<model>` → detail: check list + side-by-side diff generated vs reference
+  - `GET /history` → run list sorted by date with status and tokens out; click opens detail
+  - `GET /history/<run_id>` → per-run detail: checks pass/fail + side-by-side diff per case
+  - `GET /cases` → case list with sdk, difficulty, category, tier, tags
+  - `GET /cases/<id>` → editable prompt and reference (POST to save with confirmation)
+  - `GET /cases/<id>/checks` → static.py and behavior.py read-only with syntax highlight (Python ok, C known issue)
+- [x] **Add `dashboard` subcommand to `src/embedeval/cli.py`**.
+- [x] **Verify that with `--attempts N` all attempts are saved** as separate files
+  in `results/runs/*/details/` — fix: filename now includes `_attempt{N}`
+  (`reporter.py:698`), was `{case_id}.json` → each attempt overwrote the previous.
 
-### Dashboard — Miglioramenti futuri
+### Dashboard — Future improvements
 
-Miglioramenti noti alla dashboard non ancora risolti, in ordine di utilità:
+Known dashboard improvements not yet resolved, in order of usefulness:
 
-- [ ] **Verbosity check in L0** — aggiungere un `CheckDetail` con `check_name="verbosity_ratio"`
-  calcolato in `_run_static_checks()` (evaluator.py) dove `case_dir` è già disponibile.
-  Formula: `gen_lines / ref_lines` (righe non vuote e non commento). PASS se ≤ 2.0x.
-  Environment-skip se non esiste reference. Nessun impatto sui 231 check file esistenti.
-  Segnala modelli che "sparano" output sperando che la risposta giusta sia inclusa.
+- [ ] **Verbosity check in L0** — add a `CheckDetail` with `check_name="verbosity_ratio"`
+  computed in `_run_static_checks()` (evaluator.py) where `case_dir` is already available.
+  Formula: `gen_lines / ref_lines` (non-empty, non-comment lines). PASS if ≤ 2.0x.
+  Environment-skip if no reference exists. No impact on the 231 existing check files.
+  Flags models that "spray" output hoping the correct answer is included.
 
-- [ ] **Syntax highlight codice C** — `highlight.js` funziona sul Python ma non sul C.
-  Il bundle `highlight.min.js` da CDN sembra non includere il language pack C.
-  Opzioni: usare Pygments lato server (genera HTML colorato senza JS),
-  oppure trovare la URL CDN corretta che include tutti i language pack.
-- [ ] **Selettore attempt** nella pagina detail `/history/<run_id>` — oggi viene mostrato
-  sempre l'attempt più recente. Con `--attempts N > 1` sarebbe utile poter scegliere
-  quale attempt visualizzare.
-- [x] **Filtri leaderboard** — filtrare per SDK e difficulty via query params (`?sdk=zephyr&difficulty=medium`).
-- [x] **Tempo medio di risposta per modello** — visualizzare nella leaderboard il tempo medio
-  per caso (avg `duration_seconds` sui result). Un modello lento anche se accurato ha un costo
-  operativo reale. Mostrare come colonna aggiuntiva nella leaderboard dashboard e nel
-  leaderboard markdown. Il campo `duration_seconds` è già presente in `EvalResult`.
-  Fix: `llm_response.duration_seconds` ora propagato a `EvalResult` in tutti i path di `runner.py`.
-- [ ] **Editor checks** — i file `checks/static.py` e `checks/behavior.py` sono oggi
-  read-only. Aggiungere la possibilità di editarli dalla dashboard (POST `/cases/<id>/checks/<file>`).
-- [ ] **Link diretto** dalla leaderboard alla pagina caso (`/cases/<id>`) oltre che
-  al dettaglio run.
+- [ ] **C syntax highlight** — `highlight.js` works for Python but not C.
+  The CDN `highlight.min.js` bundle appears to exclude the C language pack.
+  Options: use Pygments server-side (generates coloured HTML without JS),
+  or find the correct CDN URL that includes all language packs.
+- [ ] **Attempt selector** on the `/history/<run_id>` detail page — currently always shows
+  the most recent attempt. With `--attempts N > 1` it would be useful to choose which
+  attempt to display.
+- [x] **Leaderboard filters** — filter by SDK and difficulty via query params (`?sdk=zephyr&difficulty=medium`).
+- [x] **Average response time per model** — show average time per case (avg `duration_seconds`
+  across results) in the leaderboard. A slow but accurate model has a real operational cost.
+  Show as an extra column in the dashboard leaderboard and in the markdown leaderboard.
+  The `duration_seconds` field is already present in `EvalResult`.
+  Fix: `llm_response.duration_seconds` now propagated to `EvalResult` in all paths of `runner.py`.
+- [ ] **Check editor** — `checks/static.py` and `checks/behavior.py` are currently read-only.
+  Add the ability to edit them from the dashboard (POST `/cases/<id>/checks/<file>`).
+- [ ] **Direct link** from the leaderboard to the case page (`/cases/<id>`) in addition
+  to the run detail.
 
 ---
 
@@ -134,7 +131,7 @@ Miglioramenti noti alla dashboard non ancora risolti, in ordine di utilità:
 
 - [x] **Verify Groq provider** works end-to-end with embedeval LiteLLM client:
   - `groq/llama-3.3-70b-versatile` ✓
-  - `groq/qwen/qwen3-32b` ✓ (con `--no-think` per il limite TPM)
+  - `groq/qwen/qwen3-32b` ✓ (with `--no-think` due to TPM limit)
   - `groq/openai/gpt-oss-20b` ✓
   - `groq/openai/gpt-oss-120b` ✓
   - `groq/meta-llama/llama-4-scout-17b-16e-instruct` ✓
@@ -148,13 +145,13 @@ Miglioramenti noti alla dashboard non ancora risolti, in ordine di utilità:
   context window, notes on embedded code quality.
 - [ ] **Re-run baseline on all Phase 2 cases** — previous results wiped in
   commit `6b4ac0b` because the runs predated the cache + reporter fixes
-  (bugs #1, #2, attempt-file overwrite). Numeri attesi storici per
-  riferimento prima del wipe:
+  (bugs #1, #2, attempt-file overwrite). Historical expected numbers for
+  reference before the wipe:
   - `groq/llama-3.3-70b-versatile`: 0/12 pass, 61% avg — omits fsl_clock.h/fsl_port.h
   - `groq/openai/gpt-oss-120b`: 3/12 pass, 84% avg — best overall
   - `groq/openai/gpt-oss-20b`: 1/12 pass, 51% avg — inconsistent on ISR cases
-- [ ] **Re-publish leaderboard** in `results/LEADERBOARD.md` dopo la prima
-  run pulita.
+- [ ] **Re-publish leaderboard** in `results/LEADERBOARD.md` after the first
+  clean run.
 
 ---
 
@@ -375,10 +372,10 @@ All 12 core NXP generation cases done. Each prompt omits safety requirements —
 - NXP include pattern: llama-3.3-70b and gpt-oss-20b consistently use `board.h` instead
   of explicit `fsl_clock.h` / `fsl_port.h` — fails L0 on every case. Consider whether
   to relax the check (accept transitive includes) or keep it strict (explicit headers required).
-- Fix retry delay per modelli thinking (Qwen3): `_parse_retry_after` non gestisce il formato
-  "350ms" — aggiungere il parsing dei millisecondi.
-- Indagare perché `gpt-oss-20b` (63%) batte `gpt-oss-120b` (45%) — possibile che il modello
-  più grande sia più prolisso e triggeri check negativi (no_zephyr_apis, no_cross_platform_hallucination).
+- Fix retry delay for thinking models (Qwen3): `_parse_retry_after` does not handle the
+  "350ms" format — add millisecond parsing.
+- Investigate why `gpt-oss-20b` (63%) outscores `gpt-oss-120b` (45%) — the larger model
+  may be more verbose and trigger negative checks (no_zephyr_apis, no_cross_platform_hallucination).
 - Document in `docs/INCREMENTAL-EXECUTION.md` the non-determinism note from corpus.py docstring.
 - **Quantized local model variants**: investigate how to benchmark the same base model across
   multiple quantization levels (e.g. Q4_K_M, Q5_K_M, Q8_0, F16) running locally via Ollama.
