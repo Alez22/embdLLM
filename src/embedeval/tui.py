@@ -746,7 +746,16 @@ class EmbedEvalTUI(App):
         """
         # e.g. "INFO:embedeval.runner:Case nxp-mcxc-i2c-001 attempt 1: PASS"
         import re
-        m = re.search(r"Case (\S+) attempt \d+: (PASS|FAIL@L\S+)", line)
+        # Infrastructure errors use a different log format — handled separately below.
+        u = _CASE_UNHANDLED_RE.search(line)
+        if u:
+            self._run_done += 1
+            self._run_current = u.group(1)
+            self._run_error += 1
+            self._update_progress_bar()
+            return
+
+        m = re.search(r"Case (\S+) attempt \d+: (PASS|FAIL@L\S+|FAIL)", line)
         if not m:
             return
         case_id, status = m.group(1), m.group(2)
@@ -754,12 +763,8 @@ class EmbedEvalTUI(App):
         self._run_current = case_id
         if status == "PASS":
             self._run_pass += 1
-        elif "FAIL" in status:
-            # Distinguish infra errors (output_tokens unknown here — use layer 0)
-            if status == "FAIL@LNone" or status == "FAIL@L0":
-                self._run_error += 1
-            else:
-                self._run_fail += 1
+        else:
+            self._run_fail += 1
         self._update_progress_bar()
 
     def _update_progress_bar(self) -> None:
