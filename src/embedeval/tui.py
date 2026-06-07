@@ -95,6 +95,8 @@ def _load_runs_summary() -> list[dict]:
         avg_score = sum(scores) / len(scores) if scores else 0.0
         total = len(scores)
         model = summary.get("model", "")
+        if model == "mock":
+            continue
         run_date = summary.get("run_timestamp", run_dir.name[:10])
         run_time = summary.get("run_time", "")
         timestamp = f"{run_date} {run_time}".strip() if run_time else run_date
