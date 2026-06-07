@@ -151,7 +151,9 @@ _PRESET_MODELS: list[str] = [
     "openrouter/deepseek/deepseek-v4-flash",
     "openrouter/google/gemini-2.5-flash",
     "anthropic/claude-haiku-4-5-20251001",
-    "mock",
+    "openai/gpt-4o-mini",
+    "openai/gpt-4o",
+    "openai/o4-mini",
 ]
 
 
