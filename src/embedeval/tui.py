@@ -71,9 +71,11 @@ def _load_runs_summary() -> list[dict]:
         except Exception:
             continue
 
-        # Collect per-case scores from detail files to compute total_score.
+        # Derive total, passed, score from detail files — the ground truth.
+        # summary.json totals can be stale if the run was partially overwritten.
         details_dir = run_dir / "details"
         scores: list[float] = []
+        passed = 0
         sdks: set[str] = set()
         if details_dir.is_dir():
             for f in details_dir.glob("*.json"):
@@ -82,6 +84,8 @@ def _load_runs_summary() -> list[dict]:
                     s = d.get("total_score")
                     if s is not None:
                         scores.append(float(s))
+                    if d.get("passed"):
+                        passed += 1
                     sdk = d.get("sdk", "")
                     if sdk:
                         sdks.add(sdk)
@@ -89,8 +93,7 @@ def _load_runs_summary() -> list[dict]:
                     pass
 
         avg_score = sum(scores) / len(scores) if scores else 0.0
-        total = summary.get("total_results", len(scores))
-        passed = summary.get("passed", 0)
+        total = len(scores)
         model = summary.get("model", "")
         run_date = summary.get("run_timestamp", run_dir.name[:10])
         run_time = summary.get("run_time", "")
