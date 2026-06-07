@@ -167,22 +167,8 @@ _PRESET_MODELS: list[str] = [
 
 
 def _known_models() -> list[str]:
-    """Return preset models merged with any model found in past results."""
-    models: set[str] = set(_PRESET_MODELS)
-    runs_root = RESULTS_DIR / "runs"
-    if runs_root.is_dir():
-        for detail_file in runs_root.rglob("details/*.json"):
-            try:
-                data = json.loads(detail_file.read_text(encoding="utf-8"))
-                m = data.get("model", "")
-                if m and m != "mock":
-                    models.add(m)
-            except Exception:
-                pass
-    # Preserve preset order first, then any extra models from results.
-    preset_set = set(_PRESET_MODELS)
-    extras = sorted(m for m in models if m not in preset_set)
-    return _PRESET_MODELS + extras
+    """Return the verified preset model list only."""
+    return _PRESET_MODELS
 
 
 class RunFormScreen(ModalScreen[dict | None]):
