@@ -188,12 +188,28 @@ class RunFormScreen(ModalScreen[dict | None]):
     #run-form Label {
         margin-top: 1;
     }
+    #models-list {
+        height: 8;
+        border: solid $primary-darken-2;
+        overflow-y: auto;
+        padding: 0 1;
+    }
+    #models-header {
+        height: auto;
+        margin-top: 1;
+        align: left middle;
+    }
+    #models-header Label {
+        margin-top: 0;
+        width: 1fr;
+    }
+    #models-header Button {
+        margin-left: 1;
+        min-width: 14;
+    }
     #custom-model-row {
         height: auto;
-        display: none;
-    }
-    #custom-model-row.visible {
-        display: block;
+        margin-top: 1;
     }
     #form-filter-row {
         height: auto;
@@ -254,25 +270,20 @@ class RunFormScreen(ModalScreen[dict | None]):
 
     def compose(self) -> ComposeResult:
         known = _known_models()
-        model_options: list[tuple[str, str]] = [(m, m) for m in known]
-        model_options.append(("Other (type below)...", _CUSTOM_MODEL))
-
-        # Pre-select first known model, or custom if none known.
-        default_model = known[0] if known else _CUSTOM_MODEL
 
         with Container(id="run-form"):
             yield Label("New Run", id="form-title")
 
-            yield Label("Model")
-            yield Select(
-                model_options,
-                value=default_model,
-                id="sel-run-model",
-                allow_blank=False,
-            )
+            with Horizontal(id="models-header"):
+                yield Label("Models (select one or more)")
+                yield Button("All", variant="default", id="btn-models-all")
+                yield Button("None", variant="default", id="btn-models-none")
+            with ScrollableContainer(id="models-list"):
+                for model in known:
+                    yield Checkbox(model, id=f"model-{model.replace('/', '__')}")
             with Container(id="custom-model-row"):
                 yield Input(
-                    placeholder="e.g. groq/llama-3.3-70b-versatile",
+                    placeholder="Additional model (e.g. groq/llama-3.3-70b-versatile)",
                     id="input-custom-model",
                 )
 
@@ -344,15 +355,15 @@ class RunFormScreen(ModalScreen[dict | None]):
             cid = case.get("id", "")
             self.query_one(f"#case-{cid}", Checkbox).value = False
 
-    @on(Select.Changed, "#sel-run-model")
-    def on_model_select_changed(self, event: Select.Changed) -> None:
-        """Show/hide the custom model input depending on selection."""
-        custom_row = self.query_one("#custom-model-row")
-        if event.value == _CUSTOM_MODEL:
-            custom_row.add_class("visible")
-            self.query_one("#input-custom-model", Input).focus()
-        else:
-            custom_row.remove_class("visible")
+    @on(Button.Pressed, "#btn-models-all")
+    def on_models_select_all(self) -> None:
+        for model in _known_models():
+            self.query_one(f"#model-{model.replace('/', '__')}", Checkbox).value = True
+
+    @on(Button.Pressed, "#btn-models-none")
+    def on_models_select_none(self) -> None:
+        for model in _known_models():
+            self.query_one(f"#model-{model.replace('/', '__')}", Checkbox).value = False
 
     @on(Button.Pressed, "#btn-cancel")
     def cancel(self) -> None:
@@ -360,15 +371,18 @@ class RunFormScreen(ModalScreen[dict | None]):
 
     @on(Button.Pressed, "#btn-run")
     def confirm(self) -> None:
-        sel = self.query_one("#sel-run-model", Select)
-        if sel.value == _CUSTOM_MODEL:
-            model = self.query_one("#input-custom-model", Input).value.strip()
-            if not model:
-                self.query_one("#input-custom-model", Input).focus()
-                return
-        else:
-            model = str(sel.value)
-        if not model:
+        # Collect selected preset models.
+        models: list[str] = []
+        for model in _known_models():
+            cb = self.query_one(f"#model-{model.replace('/', '__')}", Checkbox)
+            if cb.value:
+                models.append(model)
+        # Add custom model if provided.
+        custom = self.query_one("#input-custom-model", Input).value.strip()
+        if custom and custom not in models:
+            models.append(custom)
+        if not models:
+            self.query_one("#input-custom-model", Input).focus()
             return
 
         cases_dir = self.query_one("#input-cases-dir", Input).value.strip()
@@ -387,7 +401,6 @@ class RunFormScreen(ModalScreen[dict | None]):
         sdk_filter = str(self.query_one("#sel-form-sdk", Select).value)
         cat_filter = str(self.query_one("#sel-form-category", Select).value)
 
-        # Collect explicitly checked cases; fall back to all visible ones.
         selected_cases: list[str] = []
         for case in self._cases:
             cid = case.get("id", "")
@@ -397,7 +410,7 @@ class RunFormScreen(ModalScreen[dict | None]):
 
         self.dismiss(
             {
-                "model": model,
+                "models": models,
                 "cases_dir": cases_dir,
                 "attempts": attempts,
                 "temperature": temperature,
@@ -535,6 +548,7 @@ class EmbedEvalTUI(App):
         self._cases: list[dict] = _discover_cases(CASES_DIR)
         self._runs: list[dict] = []
         self._proc: subprocess.Popen | None = None  # type: ignore[type-arg]
+        self._pending_runs: list[dict] = []  # queued configs waiting for current run to finish
         self._log_queue: Queue[str] = Queue()
         self._log_file: Path = RESULTS_DIR / "tui-run.log"
 
@@ -611,7 +625,18 @@ class EmbedEvalTUI(App):
     def _on_run_config(self, config: dict | None) -> None:
         if config is None:
             return
-        self._launch_run(config)
+        models = config.pop("models")
+        # Build one config per model and queue them all.
+        configs = [{**config, "model": m} for m in models]
+        if self._proc is not None and self._proc.poll() is None:
+            # A run is already active — queue everything for later.
+            self._pending_runs.extend(configs)
+            log = self.query_one("#run-log", Log)
+            log.write_line(f"[queued] {len(configs)} model run(s) queued.")
+            return
+        # Launch first immediately, queue the rest.
+        self._pending_runs.extend(configs[1:])
+        self._launch_run(configs[0])
 
     # -----------------------------------------------------------------------
     # Subprocess run (background thread + worker)
@@ -726,10 +751,18 @@ class EmbedEvalTUI(App):
     def _finish_run(self) -> None:
         """Called on the main thread when the subprocess exits."""
         self._load_data()
-        # Summary bar will be repopulated by _refresh_table via _load_data.
-        # Reset run state so stale progress isn't shown on next run.
         self._run_total = 0
         self._run_done = 0
+        # Launch next queued run if any.
+        if self._pending_runs:
+            next_config = self._pending_runs.pop(0)
+            log = self.query_one("#run-log", Log)
+            remaining = len(self._pending_runs)
+            log.write_line(
+                f"[queue] Starting next run: {next_config['model']}"
+                + (f"  ({remaining} more queued)" if remaining else "")
+            )
+            self._launch_run(next_config)
 
     def _append_log(self, line: str) -> None:
         # Always write full output to file for debugging.
