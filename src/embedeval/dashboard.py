@@ -201,6 +201,7 @@ _NAV = """
   <a href="/cases">Cases</a>
   <a href="/history">Run History</a>
   <a href="/review">Review</a>
+  <a href="/docs/layers">Docs</a>
 </nav>
 """
 
@@ -1446,3 +1447,130 @@ def save_reference(case_id: str, payload: _FilePayload) -> JSONResponse:
     except Exception as exc:
         return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
     return JSONResponse({"ok": True})
+
+
+@app.get("/docs/layers", response_class=HTMLResponse)
+def docs_layers() -> str:
+    """Documentation page describing the 5-layer evaluation pipeline."""
+    body = """
+<h1 style="margin-bottom:1.5rem">Evaluation Layers</h1>
+
+<p style="color:#a0aec0;margin-bottom:2rem">
+  Each case is evaluated through up to 5 layers in order. A failure at any layer
+  (L0–L3) stops evaluation for that attempt — subsequent layers are skipped.
+  L4 is a benchmark quality audit and never affects the case pass/fail result.
+</p>
+
+<div class="card" style="margin-bottom:1.5rem">
+  <h2 style="margin-bottom:0.5rem">L0 — Static Analysis</h2>
+  <p style="color:#718096;font-size:0.85rem;margin-bottom:0.75rem">
+    Pattern-matching on the raw generated source text. No compilation needed.
+  </p>
+  <ul style="color:#a0aec0;font-size:0.85rem;line-height:1.8">
+    <li>Checks defined in <code>checks/static.py</code> for each case.</li>
+    <li>Verifies required includes, API names, function signatures, constants.</li>
+    <li>Anti-hallucination: rejects STM32/Zephyr/Arduino APIs on NXP cases.</li>
+    <li>Present on every case. If absent, the layer passes automatically.</li>
+  </ul>
+  <p style="margin-top:0.75rem;font-size:0.8rem;color:#718096">
+    <b>Score:</b> weighted fraction of checks passed (each check has a weight, default 1.0).
+  </p>
+</div>
+
+<div class="card" style="margin-bottom:1.5rem">
+  <h2 style="margin-bottom:0.5rem">L1 — Compile Gate</h2>
+  <p style="color:#718096;font-size:0.85rem;margin-bottom:0.75rem">
+    Attempts to compile the generated code against the real SDK.
+  </p>
+  <ul style="color:#a0aec0;font-size:0.85rem;line-height:1.8">
+    <li>Only runs when a <code>CMakeLists.txt</code> is present in the case directory.</li>
+    <li>Dispatches to the appropriate toolchain: Zephyr (west), ESP-IDF (idf.py), STM32 (arm-none-eabi-gcc).</li>
+    <li>Docker mode: compiles in an isolated container with the full SDK image.</li>
+    <li>Local mode: compiles on the host (requires SDK + toolchain installed).</li>
+    <li>Cases without <code>CMakeLists.txt</code> (e.g. defconfig, scripts) show <b>—</b> for this layer.</li>
+  </ul>
+  <p style="margin-top:0.75rem;font-size:0.8rem;color:#718096">
+    <b>Score:</b> binary — 100% if compilation succeeds, 0% otherwise.
+  </p>
+</div>
+
+<div class="card" style="margin-bottom:1.5rem">
+  <h2 style="margin-bottom:0.5rem">L2 — Runtime Execution</h2>
+  <p style="color:#718096;font-size:0.85rem;margin-bottom:0.75rem">
+    Runs the compiled binary on a simulator and captures output.
+  </p>
+  <ul style="color:#a0aec0;font-size:0.85rem;line-height:1.8">
+    <li>Uses the build artifacts from L1 (shared build directory).</li>
+    <li>Zephyr: <code>west build -t run</code> on <code>native_sim</code> board target only.</li>
+    <li>Hardware targets (nrf52840dk, etc.) are skipped — no physical hardware available.</li>
+    <li>Checks that expected output appears in stdout within a timeout window.</li>
+    <li>Cases without <code>CMakeLists.txt</code> show <b>—</b> for this layer.</li>
+  </ul>
+  <p style="margin-top:0.75rem;font-size:0.8rem;color:#718096">
+    <b>Score:</b> fraction of runtime output checks passed.
+  </p>
+</div>
+
+<div class="card" style="margin-bottom:1.5rem">
+  <h2 style="margin-bottom:0.5rem">L3 — Static Heuristic (Behavioral)</h2>
+  <p style="color:#718096;font-size:0.85rem;margin-bottom:0.75rem">
+    Domain-knowledge checks that verify implicit correctness — things the model
+    must know without being told in the prompt.
+  </p>
+  <ul style="color:#a0aec0;font-size:0.85rem;line-height:1.8">
+    <li>Checks defined in <code>checks/behavior.py</code> for each case.</li>
+    <li>Examples: clock enable before peripheral init, volatile on ISR-shared variables,
+        error return values checked, correct I2C address bit-shifting.</li>
+    <li>These checks are never mentioned in the prompt — the model must apply
+        domain knowledge autonomously.</li>
+    <li>Present only when a <code>checks/behavior.py</code> file exists.</li>
+  </ul>
+  <p style="margin-top:0.75rem;font-size:0.8rem;color:#718096">
+    <b>Score:</b> weighted fraction of behavioral checks passed.
+  </p>
+</div>
+
+<div class="card" style="margin-bottom:1.5rem;border-left:3px solid #4a5568">
+  <h2 style="margin-bottom:0.5rem;color:#a0aec0">L4 — Test Quality Proof <span style="font-size:0.75rem;font-weight:normal;color:#718096">(benchmark audit, not model score)</span></h2>
+  <p style="color:#718096;font-size:0.85rem;margin-bottom:0.75rem">
+    Mutation testing: verifies that the case checks are rigorous enough to detect seeded bugs.
+  </p>
+  <ul style="color:#a0aec0;font-size:0.85rem;line-height:1.8">
+    <li>Loads deliberately broken code variants from <code>checks/negatives.py</code>.</li>
+    <li>Applies each mutation to the generated code and runs L0+L3 checks on it.</li>
+    <li>If the checks <em>pass</em> on a broken variant, L4 fails — the checks are too lenient.</li>
+    <li>L4 failure <b>does not affect</b> the case pass/fail or total score — it only signals
+        that the benchmark itself needs improvement.</li>
+    <li>Optional: cases without <code>checks/negatives.py</code> skip L4 automatically (PASS).</li>
+  </ul>
+  <p style="margin-top:0.75rem;font-size:0.8rem;color:#718096">
+    <b>Score:</b> fraction of mutations correctly rejected by checks.
+  </p>
+</div>
+
+<div class="card">
+  <h2 style="margin-bottom:1rem">Scoring Summary</h2>
+  <table>
+    <thead><tr>
+      <th>Layer</th><th>Name</th><th>Affects pass/fail</th><th>Shown when</th><th>Score</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>L0</td><td>static_analysis</td><td>Yes</td><td>checks/static.py present</td><td>Weighted check fraction</td></tr>
+      <tr><td>L1</td><td>compile_gate</td><td>Yes</td><td>CMakeLists.txt present</td><td>Binary (compile success)</td></tr>
+      <tr><td>L2</td><td>runtime_execution</td><td>Yes</td><td>CMakeLists.txt + native_sim</td><td>Output check fraction</td></tr>
+      <tr><td>L3</td><td>static_heuristic</td><td>Yes</td><td>checks/behavior.py present</td><td>Weighted check fraction</td></tr>
+      <tr style="color:#718096"><td>L4</td><td>test_quality_proof</td><td><b>No</b></td><td>checks/negatives.py present</td><td>Mutation rejection rate</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:1rem;font-size:0.8rem;color:#718096">
+    <b>Total score</b> = mean of applicable layer scores (L0–L3 only, L4 excluded).
+    Layers skipped due to earlier failure contribute 0 to the numerator.
+    Layers not defined for a case are excluded from the denominator.
+    <br><br>
+    <b>Consistency</b> = 1 − CV = 1 − (std / mean) across ≥5 attempts.
+    Measures how predictable the model is across repeated calls.
+    1.0 = perfectly consistent, 0.0 = highly variable.
+  </p>
+</div>
+"""
+    return _page("Docs — Evaluation Layers", body)
