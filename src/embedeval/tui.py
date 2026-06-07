@@ -193,6 +193,19 @@ class RunFormScreen(ModalScreen[dict | None]):
         overflow-y: auto;
         padding: 0 1;
     }
+    #cases-header {
+        height: auto;
+        margin-top: 1;
+        align: left middle;
+    }
+    #cases-header Label {
+        margin-top: 0;
+        width: 1fr;
+    }
+    #cases-header Button {
+        margin-left: 1;
+        min-width: 14;
+    }
     #form-buttons {
         margin-top: 1;
         align: right middle;
@@ -265,7 +278,10 @@ class RunFormScreen(ModalScreen[dict | None]):
                     allow_blank=False,
                 )
 
-            yield Label("Cases (leave empty = all matching filters)")
+            with Horizontal(id="cases-header"):
+                yield Label("Cases (leave empty = all matching filters)")
+                yield Button("Select all", variant="default", id="btn-select-all")
+                yield Button("Clear", variant="default", id="btn-clear-all")
             with ScrollableContainer(id="cases-list"):
                 for case in self._cases:
                     yield Checkbox(
@@ -295,6 +311,20 @@ class RunFormScreen(ModalScreen[dict | None]):
     @on(Select.Changed, "#sel-form-category")
     def on_form_filter_changed(self, event: Select.Changed) -> None:
         self._update_case_visibility()
+
+    @on(Button.Pressed, "#btn-select-all")
+    def on_select_all(self) -> None:
+        """Check all currently visible case checkboxes."""
+        for case in self._visible_cases():
+            cid = case.get("id", "")
+            self.query_one(f"#case-{cid}", Checkbox).value = True
+
+    @on(Button.Pressed, "#btn-clear-all")
+    def on_clear_all(self) -> None:
+        """Uncheck all case checkboxes."""
+        for case in self._cases:
+            cid = case.get("id", "")
+            self.query_one(f"#case-{cid}", Checkbox).value = False
 
     @on(Select.Changed, "#sel-run-model")
     def on_model_select_changed(self, event: Select.Changed) -> None:
