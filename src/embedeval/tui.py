@@ -292,6 +292,9 @@ class RunFormScreen(ModalScreen[dict | None]):
             yield Label("Attempts (1-5)")
             yield Input("1", id="input-attempts")
 
+            yield Label("Temperature (0.0 = deterministic)")
+            yield Input("0.0", id="input-temperature")
+
             yield Checkbox("--force (bypass cache)", id="check-force")
             yield Checkbox("--no-think", id="check-no-think")
 
@@ -359,6 +362,11 @@ class RunFormScreen(ModalScreen[dict | None]):
             attempts = max(1, min(5, int(attempts_raw)))
         except ValueError:
             attempts = 1
+        temperature_raw = self.query_one("#input-temperature", Input).value.strip()
+        try:
+            temperature = max(0.0, min(2.0, float(temperature_raw)))
+        except ValueError:
+            temperature = 0.0
         force = self.query_one("#check-force", Checkbox).value
         no_think = self.query_one("#check-no-think", Checkbox).value
         sdk_filter = str(self.query_one("#sel-form-sdk", Select).value)
@@ -377,6 +385,7 @@ class RunFormScreen(ModalScreen[dict | None]):
                 "model": model,
                 "cases_dir": cases_dir,
                 "attempts": attempts,
+                "temperature": temperature,
                 "force": force,
                 "no_think": no_think,
                 "selected_cases": selected_cases,
@@ -740,6 +749,9 @@ class EmbedEvalTUI(App):
             if config.get("cat_filter", "all") != "all":
                 cmd += ["--category", config["cat_filter"]]
 
+        temperature = config.get("temperature", 0.0)
+        if temperature != 0.0:
+            cmd += ["--temperature", str(temperature)]
         if config["force"]:
             cmd.append("--force")
         if config["no_think"]:
