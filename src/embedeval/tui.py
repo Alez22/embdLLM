@@ -187,17 +187,43 @@ class RunFormScreen(ModalScreen[dict | None]):
         background: $surface;
         border: thick $primary;
         padding: 1 2;
-        width: 70;
+        width: 90%;
+        max-width: 160;
+        height: 80%;
+        overflow-y: auto;
+    }
+    #form-columns {
+        height: auto;
+        margin-top: 1;
+    }
+    #col-model {
+        width: 1fr;
+        padding-right: 2;
         height: auto;
     }
-    #run-form Label {
+    #col-cases {
+        width: 1fr;
+        padding-left: 2;
+        border-left: solid $primary-darken-2;
+        height: auto;
+    }
+    #col-model Label, #col-cases Label {
         margin-top: 1;
     }
     #models-list {
-        height: 8;
+        height: 12;
         border: solid $primary-darken-2;
         overflow-y: auto;
         padding: 0 1;
+    }
+    #provider-filter {
+        height: auto;
+        margin-top: 1;
+        align: left middle;
+    }
+    #provider-filter Button {
+        margin-right: 1;
+        min-width: 12;
     }
     #models-header {
         height: auto;
@@ -210,7 +236,7 @@ class RunFormScreen(ModalScreen[dict | None]):
     }
     #models-header Button {
         margin-left: 1;
-        min-width: 14;
+        min-width: 6;
     }
     #custom-model-row {
         height: auto;
@@ -224,7 +250,7 @@ class RunFormScreen(ModalScreen[dict | None]):
         width: 1fr;
     }
     #cases-list {
-        height: 10;
+        height: 16;
         border: solid $primary-darken-2;
         overflow-y: auto;
         padding: 0 1;
@@ -240,7 +266,7 @@ class RunFormScreen(ModalScreen[dict | None]):
     }
     #cases-header Button {
         margin-left: 1;
-        min-width: 14;
+        min-width: 8;
     }
     #form-buttons {
         margin-top: 1;
@@ -252,6 +278,7 @@ class RunFormScreen(ModalScreen[dict | None]):
     def __init__(self, cases: list[dict]) -> None:
         super().__init__()
         self._cases = cases
+        self._provider_filter: str = "all"
 
     def _sdk_options(self) -> list[tuple[str, str]]:
         sdks = sorted({c.get("sdk", "") for c in self._cases if c.get("sdk")})
@@ -262,6 +289,15 @@ class RunFormScreen(ModalScreen[dict | None]):
             {c.get("category", "") for c in self._cases if c.get("category")}
         )
         return [("All categories", "all")] + [(c, c) for c in cats]
+
+    def _provider_of(self, model: str) -> str:
+        """Return the top-level provider name from a model slug (e.g. 'groq')."""
+        return model.split("/")[0]
+
+    def _visible_models(self) -> list[str]:
+        """Return preset models matching the active provider filter."""
+        active = getattr(self, "_provider_filter", "all")
+        return [m for m in _known_models() if active == "all" or self._provider_of(m) == active]
 
     def _visible_cases(self) -> list[dict]:
         """Return cases matching the current SDK/category filter in the form."""
@@ -279,55 +315,65 @@ class RunFormScreen(ModalScreen[dict | None]):
         with Container(id="run-form"):
             yield Label("New Run", id="form-title")
 
-            with Horizontal(id="models-header"):
-                yield Label("Models (select one or more)")
-                yield Button("All", variant="default", id="btn-models-all")
-                yield Button("None", variant="default", id="btn-models-none")
-            with ScrollableContainer(id="models-list"):
-                for model in known:
-                    yield Checkbox(model, id=f"model-{_model_to_id(model)}")
-            with Container(id="custom-model-row"):
-                yield Input(
-                    placeholder="Additional model (e.g. groq/llama-3.3-70b-versatile)",
-                    id="input-custom-model",
-                )
+            with Horizontal(id="form-columns"):
 
-            yield Label("Cases dir")
-            yield Input(str(CASES_DIR), id="input-cases-dir")
+                # --- Left column: model config ---
+                with Container(id="col-model"):
+                    with Horizontal(id="provider-filter"):
+                        yield Button("All providers", variant="primary", id="btn-prov-all")
+                        yield Button("Groq", variant="default", id="btn-prov-groq")
+                        yield Button("OpenRouter", variant="default", id="btn-prov-openrouter")
+                    with Horizontal(id="models-header"):
+                        yield Label("Models (select one or more)")
+                        yield Button("All", variant="default", id="btn-models-all")
+                        yield Button("None", variant="default", id="btn-models-none")
+                    with ScrollableContainer(id="models-list"):
+                        for model in known:
+                            yield Checkbox(model, id=f"model-{_model_to_id(model)}")
+                    with Container(id="custom-model-row"):
+                        yield Input(
+                            placeholder="Custom model (e.g. groq/llama-3.3-70b-versatile)",
+                            id="input-custom-model",
+                        )
 
-            with Horizontal(id="form-filter-row"):
-                yield Select(
-                    self._sdk_options(),
-                    value="all",
-                    id="sel-form-sdk",
-                    allow_blank=False,
-                )
-                yield Select(
-                    self._category_options(),
-                    value="all",
-                    id="sel-form-category",
-                    allow_blank=False,
-                )
+                    yield Label("Attempts  (min 5 for consistency metric)")
+                    yield Input("5", id="input-attempts")
 
-            with Horizontal(id="cases-header"):
-                yield Label("Cases (leave empty = all matching filters)")
-                yield Button("Select all", variant="default", id="btn-select-all")
-                yield Button("Clear", variant="default", id="btn-clear-all")
-            with ScrollableContainer(id="cases-list"):
-                for case in self._cases:
-                    yield Checkbox(
-                        case.get("id", ""),
-                        id=f"case-{case.get('id', '')}",
-                    )
+                    yield Label("Temperature (0.0 = deterministic)")
+                    yield Input("0.5", id="input-temperature")
 
-            yield Label("Attempts  (min 5 for consistency metric)")
-            yield Input("5", id="input-attempts")
+                    yield Checkbox("--force (bypass cache)", id="check-force")
+                    yield Checkbox("--no-think", id="check-no-think")
 
-            yield Label("Temperature (0.0 = deterministic)")
-            yield Input("0.5", id="input-temperature")
+                # --- Right column: case selection ---
+                with Container(id="col-cases"):
+                    yield Label("Cases dir")
+                    yield Input(str(CASES_DIR), id="input-cases-dir")
 
-            yield Checkbox("--force (bypass cache)", id="check-force")
-            yield Checkbox("--no-think", id="check-no-think")
+                    with Horizontal(id="form-filter-row"):
+                        yield Select(
+                            self._sdk_options(),
+                            value="all",
+                            id="sel-form-sdk",
+                            allow_blank=False,
+                        )
+                        yield Select(
+                            self._category_options(),
+                            value="all",
+                            id="sel-form-category",
+                            allow_blank=False,
+                        )
+
+                    with Horizontal(id="cases-header"):
+                        yield Label("Cases (empty = all matching filters)")
+                        yield Button("All", variant="default", id="btn-select-all")
+                        yield Button("Clear", variant="default", id="btn-clear-all")
+                    with ScrollableContainer(id="cases-list"):
+                        for case in self._cases:
+                            yield Checkbox(
+                                case.get("id", ""),
+                                id=f"case-{case.get('id', '')}",
+                            )
 
             with Horizontal(id="form-buttons"):
                 yield Button("Cancel", variant="default", id="btn-cancel")
@@ -360,14 +406,44 @@ class RunFormScreen(ModalScreen[dict | None]):
             cid = case.get("id", "")
             self.query_one(f"#case-{cid}", Checkbox).value = False
 
+    def _apply_provider_filter(self, provider: str) -> None:
+        """Show only models belonging to provider; update button variants."""
+        self._provider_filter = provider
+        for model in _known_models():
+            cb = self.query_one(f"#model-{_model_to_id(model)}", Checkbox)
+            cb.display = (provider == "all" or self._provider_of(model) == provider)
+        # Highlight the active button
+        for btn_id, prov in [
+            ("btn-prov-all", "all"),
+            ("btn-prov-groq", "groq"),
+            ("btn-prov-openrouter", "openrouter"),
+        ]:
+            self.query_one(f"#{btn_id}", Button).variant = (
+                "primary" if prov == provider else "default"
+            )
+
+    @on(Button.Pressed, "#btn-prov-all")
+    def on_prov_all(self) -> None:
+        self._apply_provider_filter("all")
+
+    @on(Button.Pressed, "#btn-prov-groq")
+    def on_prov_groq(self) -> None:
+        self._apply_provider_filter("groq")
+
+    @on(Button.Pressed, "#btn-prov-openrouter")
+    def on_prov_openrouter(self) -> None:
+        self._apply_provider_filter("openrouter")
+
     @on(Button.Pressed, "#btn-models-all")
     def on_models_select_all(self) -> None:
-        for model in _known_models():
+        """Check all currently visible model checkboxes."""
+        for model in self._visible_models():
             self.query_one(f"#model-{_model_to_id(model)}", Checkbox).value = True
 
     @on(Button.Pressed, "#btn-models-none")
     def on_models_select_none(self) -> None:
-        for model in _known_models():
+        """Uncheck all currently visible model checkboxes."""
+        for model in self._visible_models():
             self.query_one(f"#model-{_model_to_id(model)}", Checkbox).value = False
 
     @on(Button.Pressed, "#btn-cancel")
