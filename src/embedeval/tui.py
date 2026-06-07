@@ -444,6 +444,12 @@ def _format_log_line(line: str) -> str | None:
     if "rate limit" in low or "ratelimiterror" in low:
         return f"[warn ] rate limit — {line.strip()}"
 
+    # Prose response warning: model returned text instead of code.
+    if "returned prose" in low:
+        # Strip log prefix (e.g. "WARNING:embedeval.llm_client:LLM ...")
+        msg = _re.sub(r"^[A-Z]+:[^:]+:", "", line).strip()
+        return f"[warn ] {msg}"
+
     return None
 
 
