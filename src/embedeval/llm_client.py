@@ -433,6 +433,8 @@ def _build_context(context_files: list[str]) -> str:
     parts: list[str] = []
     for file_path in context_files:
         path = Path(file_path)
+        if path.name == ".gitkeep":
+            continue  # placeholder for empty dirs, not real context
         if path.is_file():
             content = path.read_text(encoding="utf-8")
             parts.append(f"--- {path.name} ---\n{content}")
