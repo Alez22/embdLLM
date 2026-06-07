@@ -377,8 +377,10 @@ def _layer_score_cell(case: dict, layer_num: int, applicable: set[int]) -> str:
 
 def _diff_html(a: str, b: str, fromfile: str = "reference", tofile: str = "generated") -> str:
     """Return unified diff as HTML with syntax coloring."""
-    a_lines = a.splitlines(keepends=True)
-    b_lines = b.splitlines(keepends=True)
+    # Normalize line endings and trailing whitespace so \r\n vs \n or a
+    # missing final newline don't produce spurious diff lines.
+    a_lines = [ln + "\n" for ln in a.strip().splitlines()]
+    b_lines = [ln + "\n" for ln in b.strip().splitlines()]
     diff = difflib.unified_diff(a_lines, b_lines, fromfile=fromfile, tofile=tofile, lineterm="")
     parts = []
     for line in diff:
