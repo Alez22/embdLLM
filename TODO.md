@@ -104,6 +104,12 @@ codice generato vs reference, check pass/fail, leaderboard visiva, storico run.
 
 Miglioramenti noti alla dashboard non ancora risolti, in ordine di utilità:
 
+- [ ] **Verbosity check in L0** — aggiungere un `CheckDetail` con `check_name="verbosity_ratio"`
+  calcolato in `_run_static_checks()` (evaluator.py) dove `case_dir` è già disponibile.
+  Formula: `gen_lines / ref_lines` (righe non vuote e non commento). PASS se ≤ 2.0x.
+  Environment-skip se non esiste reference. Nessun impatto sui 231 check file esistenti.
+  Segnala modelli che "sparano" output sperando che la risposta giusta sia inclusa.
+
 - [ ] **Syntax highlight codice C** — `highlight.js` funziona sul Python ma non sul C.
   Il bundle `highlight.min.js` da CDN sembra non includere il language pack C.
   Opzioni: usare Pygments lato server (genera HTML colorato senza JS),
