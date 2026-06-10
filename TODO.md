@@ -455,6 +455,24 @@ All 12 core NXP generation cases done. Each prompt omits safety requirements —
   impact: tightening the scope may flip the result of checks that previously
   matched inside comments.
 
+### Reporting rewrite
+
+- **Rewrite the markdown leaderboard generation** — `results/LEADERBOARD.md` is
+  produced by `generate_leaderboard()` in `reporter.py`, rewritten at the end of
+  each `embedeval run` from the *tracker* state (not by scanning `results/runs/`).
+  Problem: it drifts — the committed file shows `Total: 18` while the latest
+  6/7 runs cover 40 cases, because runs that don't go through the main path (or
+  don't update the tracker) leave it stale. The web dashboard (`dashboard.py`)
+  already renders a live leaderboard directly from `results/runs/*/details/*.json`,
+  so the markdown is a second, fragile view of the same data.
+  **Decide:** either (a) rewrite `generate_leaderboard()` to scan `results/runs/`
+  directly (single source of truth, no tracker dependency), or (b) drop the
+  markdown leaderboard entirely and rely on the dashboard + a small exporter.
+  Note: `LEADERBOARD.md` carries `SCHEMA_VERSION` and was consumed by Hiloop
+  (`interop.leaderboard`, REQ-04) — confirm that contract is dead before removing.
+  Already removed as part of this cleanup: the cross-benchmark comparison table
+  and its `external_benchmarks.yaml` source (HumanEval/SWE-bench static scores).
+
 ### New CLI features
 
 - **`embedeval run --context-pack`** + **`embedeval context-compare`** — measure

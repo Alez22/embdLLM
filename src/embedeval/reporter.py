@@ -7,8 +7,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-import yaml
-
 from embedeval.models import BenchmarkReport, EvalResult
 
 logger = logging.getLogger(__name__)
@@ -226,8 +224,6 @@ def generate_leaderboard(
     lines.extend(_failure_distribution(reports))
     lines.append("")
     lines.extend(_category_breakdown(reports))
-    lines.append("")
-    lines.extend(_cross_benchmark_comparison(reports))
 
     output.write_text("\n".join(lines) + "\n", encoding="utf-8")
     logger.info("Leaderboard written to %s", output)
@@ -558,94 +554,6 @@ def _category_breakdown(reports: list[BenchmarkReport]) -> list[str]:
                 f"| {cat_score.total_cases} |"
             )
 
-    return lines
-
-
-def _load_external_benchmarks() -> dict[str, dict[str, float | str]]:
-    """Load external benchmark scores from external_benchmarks.yaml.
-
-    Searches: package data dir → CWD → repo root (relative to source).
-    """
-    candidates = [
-        Path.cwd() / "external_benchmarks.yaml",
-        Path(__file__).parent / "external_benchmarks.yaml",
-        Path(__file__).parent.parent.parent / "external_benchmarks.yaml",
-    ]
-    for yaml_path in candidates:
-        if yaml_path.exists():
-            break
-    else:
-        return {}
-    try:
-        data = yaml.safe_load(yaml_path.read_text(encoding="utf-8"))
-        return data.get("models", {}) if isinstance(data, dict) else {}
-    except Exception:
-        return {}
-
-
-def _match_external(
-    model_name: str, externals: dict[str, Any]
-) -> dict[str, Any] | None:
-    """Find matching external benchmark entry.
-
-    Uses longest-match to avoid ambiguity (e.g., "gpt-4o" vs "gpt-4o-mini").
-    """
-    model_lower = model_name.lower()
-    best_match: tuple[int, dict[str, Any]] | None = None
-    for key, scores in externals.items():
-        key_lower = key.lower()
-        if key_lower in model_lower:
-            if best_match is None or len(key_lower) > best_match[0]:
-                best_match = (len(key_lower), scores)
-    return best_match[1] if best_match else None
-
-
-def _cross_benchmark_comparison(reports: list[BenchmarkReport]) -> list[str]:
-    """Generate cross-benchmark comparison table (EmbedEval vs HumanEval/SWE-bench)."""
-    externals = _load_external_benchmarks()
-    if not externals:
-        return []
-
-    lines: list[str] = [
-        "## Cross-Benchmark Comparison",
-        "",
-        "| Model | HumanEval | SWE-bench | EmbedEval (full)"
-        " | EmbedEval (quality) | Embed Gap |",
-        "|-------|-----------|-----------|------------------"
-        "|---------------------|-----------|",
-    ]
-
-    has_data = False
-    for report in reports:
-        for model_score in report.models:
-            ext = _match_external(model_score.model, externals)
-            if ext is None:
-                continue
-            has_data = True
-            humaneval = ext.get("humaneval", 0)
-            swe_bench = ext.get("swe_bench", 0)
-            embed_full = model_score.pass_at_1 * 100
-            embed_quality = model_score.pass_at_1_quality * 100
-            gap = embed_full - humaneval
-            lines.append(
-                f"| {model_score.model} "
-                f"| {humaneval:.1f}% "
-                f"| {swe_bench:.1f}% "
-                f"| {embed_full:.1f}% "
-                f"| {embed_quality:.1f}% "
-                f"| {gap:+.1f}%p |"
-            )
-
-    if not has_data:
-        return []
-
-    lines.extend(
-        [
-            "",
-            "*Embed Gap = EmbedEval pass@1 - HumanEval. "
-            "Negative = harder than general coding.*",
-        ]
-    )
     return lines
 
 
