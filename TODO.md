@@ -14,6 +14,75 @@ Mark done with `[x]`. Add notes inline after `—`.
 7. **Phase 8** — Language-variant evaluation
 8. **Backlog** — Hardware-in-the-loop, trap prompts, upstream PR
 
+## Negatives coverage debt (upstream Zephyr + Embedded Linux cases)
+
+30 upstream cases have `negatives.py` written before the ≥80% coverage gate existed.
+They are currently exempted via `plans/coverage-grandfather.txt`. Until fixed,
+`--strict-coverage` cannot be trusted as a meaningful gate on the full case suite.
+
+**How to fix:** for each case in the grandfather list, bring coverage to ≥80% then
+remove it from the list. When the list is empty, the file and the grandfather logic
+in `verify_negatives_oracle.py` can be deleted.
+
+**Work per case:**
+1. Run `uv run python scripts/verify_negatives_oracle.py --case <case_id> --coverage`
+   to see which checks are uncovered (`uncovered=` field in output).
+2. For each uncovered check, add a new entry to `NEGATIVES` in `checks/negatives.py`:
+   a mutation of `reference/main.c` that removes or corrupts exactly that check's
+   target pattern, plus `"should_fail": ["<check_name>"]`.
+3. Re-run the oracle to confirm coverage ≥80% and all mutations PASS (i.e. the
+   mutated code is correctly rejected by the check).
+4. Remove the case_id from `plans/coverage-grandfather.txt`.
+
+**Cases to fix (30 total, all upstream):**
+
+| case_id | sdk bucket | current coverage |
+|---------|------------|-----------------|
+| dma-001 | zephyr | 23% (3/13 checks) |
+| dma-008 | zephyr | unknown — run oracle |
+| dma-009 | zephyr | unknown — run oracle |
+| ble-008 | zephyr | unknown — run oracle |
+| boot-001 | zephyr | unknown — run oracle |
+| device-tree-001 | zephyr | unknown — run oracle |
+| esp-gpio-001 | esp-idf | unknown — run oracle |
+| gpio-basic-001 | zephyr | unknown — run oracle |
+| gpio-basic-006 | zephyr | unknown — run oracle |
+| isr-concurrency-003 | zephyr | unknown — run oracle |
+| isr-concurrency-008 | zephyr | unknown — run oracle |
+| kconfig-001 | zephyr | unknown — run oracle |
+| linux-driver-001 | embedded-linux | unknown — run oracle |
+| linux-driver-002 | embedded-linux | unknown — run oracle |
+| memory-opt-001 | zephyr | unknown — run oracle |
+| memory-opt-012 | zephyr | unknown — run oracle |
+| networking-001 | zephyr | unknown — run oracle |
+| ota-001 | zephyr | unknown — run oracle |
+| power-mgmt-001 | zephyr | unknown — run oracle |
+| pwm-001 | zephyr | unknown — run oracle |
+| security-001 | zephyr | unknown — run oracle |
+| sensor-driver-001 | zephyr | unknown — run oracle |
+| storage-001 | zephyr | unknown — run oracle |
+| threading-001 | zephyr | unknown — run oracle |
+| timer-001 | zephyr | unknown — run oracle |
+| timer-007 | zephyr | unknown — run oracle |
+| uart-001 | zephyr | unknown — run oracle |
+| watchdog-005 | zephyr | unknown — run oracle |
+| yocto-001 | embedded-linux | unknown — run oracle |
+| yocto-008 | embedded-linux | unknown — run oracle |
+
+**First step:** run the oracle su tutti e 30 per avere i numeri reali:
+
+```bash
+uv run python scripts/verify_negatives_oracle.py --coverage \
+  $(grep -v "^#\|^$" plans/coverage-grandfather.txt | \
+    while read id; do find cases/ -type d -name "$id" -printf "--cases %p "; done)
+```
+
+**Suggested order:** tackle by SDK bucket — zephyr first (26 cases), then
+embedded-linux (2), then esp-idf (1 + 1 already done by zephyr pass).
+Each bucket shares similar check patterns so mutations can be written faster.
+
+---
+
 ## Code health (from review 2026-05-26)
 
 Issues from the 2026-05-26 review — some resolved, others tracked as debt.
