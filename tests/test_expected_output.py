@@ -19,8 +19,14 @@ def _get_all_print_strings(code: str) -> str:
 
 def _discover_cases_with_expected_output() -> list[tuple[str, Path]]:
     """Find all cases that have expected_output.txt."""
+    # Cases live at cases/<sdk>/<case>/ (current) or cases/<case>/ (legacy
+    # flat layout) — glob both levels so neither is silently skipped.
+    eo_files = sorted(
+        list(CASES_DIR.glob("*/checks/expected_output.txt"))
+        + list(CASES_DIR.glob("*/*/checks/expected_output.txt"))
+    )
     items = []
-    for eo in sorted(CASES_DIR.glob("*/checks/expected_output.txt")):
+    for eo in eo_files:
         case_id = eo.parent.parent.name
         items.append((case_id, eo))
     return items
