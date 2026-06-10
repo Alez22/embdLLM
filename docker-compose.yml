@@ -2,7 +2,7 @@ services:
   embedeval:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     volumes:
       - ./cases:/app/cases:ro
       - ./results:/app/results
@@ -15,7 +15,7 @@ services:
   worker:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     volumes:
       - ./cases:/app/cases:ro
       - ./results:/app/results
