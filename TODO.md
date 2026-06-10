@@ -69,7 +69,7 @@ in `verify_negatives_oracle.py` can be deleted.
 | yocto-001 | embedded-linux | unknown — run oracle |
 | yocto-008 | embedded-linux | unknown — run oracle |
 
-**First step:** run the oracle su tutti e 30 per avere i numeri reali:
+**First step:** run the oracle on all 30 to get the real coverage numbers:
 
 ```bash
 uv run python scripts/verify_negatives_oracle.py --coverage \
@@ -418,81 +418,81 @@ All 12 core NXP generation cases done. Each prompt omits safety requirements —
 
 ### Check quality improvements
 
-- **Deep embedded checks** — i casi esistenti raggiungono pass rate >90% con i
-  modelli migliori perché i check coprono solo conoscenza embedded di base. Per
-  alzare la difficoltà: aggiungere check avanzati ai casi `hard` già esistenti
-  (007-010 per categoria) senza creare nuovi casi. Target: HW memory model,
-  vincoli ISR context, real-time timing, resource alignment. Nessun nuovo caso
-  da creare — solo nuovi check in `behavior.py` di quelli esistenti.
+- **Deep embedded checks** — existing cases reach >90% pass rate with the best
+  models because the checks only cover basic embedded knowledge. To raise
+  difficulty: add advanced checks to the existing `hard` cases (007-010 per
+  category) without creating new cases. Targets: HW memory model, ISR context
+  constraints, real-time timing, resource alignment. No new cases to create —
+  only new checks in the `behavior.py` of existing ones.
 
-- **Subtle negatives** — i `negatives.py` attuali usano mutation ovvie (rimozione
-  completa di un pattern). Aggiungere mutation "sottili" che aggirano il check
-  mantenendo il bug semantico (es. `key = k_spin_lock(...)` → `k_spin_lock(...); key = {0}`).
-  Obiettivo: ~50% delle mutation sottili non dovrebbe essere catturato dai check
-  attuali — queste diventano la roadmap per rafforzare i check. Dettaglio in
-  `plans/PLAN-subtle-negatives.md` (15 mutation candidate identificate).
+- **Subtle negatives** — the current `negatives.py` use obvious mutations (full
+  removal of a pattern). Add "subtle" mutations that bypass the check while
+  keeping the semantic bug (e.g. `key = k_spin_lock(...)` → `k_spin_lock(...); key = {0}`).
+  Goal: ~50% of subtle mutations should NOT be caught by the current checks —
+  the uncaught ones become the roadmap for strengthening checks. Details in
+  `plans/PLAN-subtle-negatives.md` (15 candidate mutations identified).
 
-- **Remaining check blind spots** — 6 check specifici già identificati con la fix
-  esatta da applicare. Dettaglio in `plans/PLAN-remaining-blindspots.md`:
+- **Remaining check blind spots** — 6 specific checks already identified with the
+  exact fix to apply. Details in `plans/PLAN-remaining-blindspots.md`:
   `dma-008/error_detected_but_no_return`, `isr-003/spinlock_key_hardcoded_zero`,
-  `linux-001/partial_cleanup_only` e altri 3. Lavoro puntuale, bassa complessità.
+  `linux-001/partial_cleanup_only` and 3 others. Targeted work, low complexity.
 
 ### Scope discipline for anti-hallucination loops
 
-- **`scoped_contains_any` helper** — i ~151 check anti-hallucination usano il
-  pattern `any(api in generated_code for api in api_list)` (es. lista di API
-  Zephyr/Arduino/STM32 proibite). Questi loop NON applicano scope discipline:
-  un'API proibita scritta dentro un commento (es. `// non usare k_thread_create`)
-  o una stringa di log darebbe un falso positivo di "contaminazione cross-platform".
-  La migrazione `scoped_contains` (REQ-03) ha già coperto i substring check a
-  singola stringa costante, ma i loop su lista sono rimasti scoperti perché
-  iterano una lista.
-  **Fix proposta:** aggiungere `scoped_contains_any(code, needles, *, scope=...)`
-  in `check_utils.py` che applica lo stesso strip di commenti/stringhe a ogni
-  elemento, e sostituire i loop `any(x in generated_code for x in LIST)`.
-  Nota: è un miglioramento di design nuovo, non il completamento di REQ-03
-  (quella migrazione è completa — `apply_scope_migration.py` rimosso). Da
-  valutare l'impatto sui verdetti: stringere lo scope può far cambiare il
-  risultato di check che prima matchavano dentro commenti.
+- **`scoped_contains_any` helper** — the ~151 anti-hallucination checks use the
+  pattern `any(api in generated_code for api in api_list)` (e.g. a list of
+  forbidden Zephyr/Arduino/STM32 APIs). These loops do NOT apply scope discipline:
+  a forbidden API written inside a comment (e.g. `// do not use k_thread_create`)
+  or a log string would produce a false positive for "cross-platform contamination".
+  The `scoped_contains` migration (REQ-03) already covered single constant-string
+  substring checks, but the list loops were left uncovered because they iterate
+  over a list.
+  **Proposed fix:** add `scoped_contains_any(code, needles, *, scope=...)` to
+  `check_utils.py` that applies the same comment/string stripping to each element,
+  and replace the `any(x in generated_code for x in LIST)` loops.
+  Note: this is a new design improvement, not the completion of REQ-03 (that
+  migration is complete — `apply_scope_migration.py` removed). Assess the verdict
+  impact: tightening the scope may flip the result of checks that previously
+  matched inside comments.
 
 ### New CLI features
 
-- **`embedeval run --context-pack`** + **`embedeval context-compare`** — misurare
-  quanto il contesto iniettato nel prompt (bare / team CLAUDE.md / expert pack)
-  impatta il pass rate. Output: *Context Lift* (effetto del contesto team) e
-  *Context Gap* (distanza dall'expert). Per ogni caso: classificare l'effetto come
-  helpful / harmful / no-effect. Utile per validare oggettivamente se un CLAUDE.md
-  migliora i risultati. Dettaglio in `plans/PLAN-context-quality-mode.md` e
+- **`embedeval run --context-pack`** + **`embedeval context-compare`** — measure
+  how much the context injected into the prompt (bare / team CLAUDE.md / expert
+  pack) affects the pass rate. Output: *Context Lift* (effect of the team context)
+  and *Context Gap* (distance from the expert). Per case: classify the effect as
+  helpful / harmful / no-effect. Useful to objectively validate whether a CLAUDE.md
+  improves results. Details in `plans/PLAN-context-quality-mode.md` and
   `plans/PLAN-per-case-effect-classification.md`.
 
-- **`embedeval context-diagnose`** — nuovo comando che legge i risultati di un run
-  e mappa ogni check fallito alla sua categoria in `FAILURE-FACTORS.md`, segnalando
-  le categorie dove il team è sotto l'expert di ≥10pp. Output: lista di factor ID
-  ad alta priorità da aggiungere al CLAUDE.md. Dettaglio in
+- **`embedeval context-diagnose`** — new command that reads the results of a run
+  and maps each failed check to its category in `FAILURE-FACTORS.md`, flagging
+  the categories where the team trails the expert by ≥10pp. Output: list of
+  high-priority factor IDs to add to the CLAUDE.md. Details in
   `plans/PLAN-context-diagnose.md`.
 
-- **Bug-fix scenario** (`task_type: bugfix`) — nuovo scenario di valutazione: il
-  modello riceve codice con un bug deliberato (preso da `negatives.py`) e deve
-  identificarlo e correggerlo. Il codice corretto viene poi valutato con i check
-  esistenti. Riusa tutto il lavoro L4 già fatto senza nuova infrastruttura. Dettaglio
-  in `plans/PLAN-bugfix-scenario.md`.
+- **Bug-fix scenario** (`task_type: bugfix`) — new evaluation scenario: the model
+  receives code with a deliberate bug (taken from `negatives.py`) and must
+  identify and fix it. The fixed code is then evaluated with the existing checks.
+  Reuses all the L4 work already done without new infrastructure. Details in
+  `plans/PLAN-bugfix-scenario.md`.
 
 ### Embedded Linux case expansion
 
-- **Linux OTA — SWUpdate + RAUC** (6-8 casi): testare la capacità del modello
-  di scrivere manifest e configurazioni per i due sistemi OTA più diffusi
-  nell'embedded Linux industriale. SWUpdate: `sw-description` con layout
-  dual-bank, signed update, embedded scripts. RAUC: `manifest.raucm`,
-  slot config, atomic switchover. Zero cambiamenti infrastrutturali — riusa
-  i pattern dei casi Yocto/systemd già esistenti. Alta priorità perché copre
-  un dominio produttivo reale non ancora rappresentato.
+- **Linux OTA — SWUpdate + RAUC** (6-8 cases): test the model's ability to write
+  manifests and configurations for the two most common OTA systems in industrial
+  embedded Linux. SWUpdate: `sw-description` with dual-bank layout, signed update,
+  embedded scripts. RAUC: `manifest.raucm`, slot config, atomic switchover. Zero
+  infrastructure changes — reuses the patterns of the existing Yocto/systemd
+  cases. High priority because it covers a real production domain not yet
+  represented.
 
-- **Linux networking kernel — netfilter / socket / netlink** (5-7 casi):
-  hook netfilter (`NF_INET_PRE_ROUTING`), gestione `sk_buff`, socket netlink,
-  packet filter BPF classico (`AF_PACKET` + `sock_filter`). Aggiunge il
-  contesto di concorrenza softirq — distinto da IRQ/process/ISR — che i casi
-  `linux-driver` esistenti non coprono. Buon complemento alla suite
-  embedded-linux dopo OTA.
+- **Linux networking kernel — netfilter / socket / netlink** (5-7 cases):
+  netfilter hook (`NF_INET_PRE_ROUTING`), `sk_buff` handling, netlink socket,
+  classic BPF packet filter (`AF_PACKET` + `sock_filter`). Adds the softirq
+  concurrency context — distinct from IRQ/process/ISR — that the existing
+  `linux-driver` cases do not cover. A good complement to the embedded-linux
+  suite after OTA.
 
 ### Future directions — to investigate
 
