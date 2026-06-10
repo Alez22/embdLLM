@@ -1,0 +1,27 @@
+id: nxp-rt1170-sai-001
+category: audio
+difficulty: hard
+title: NXP RT1170 SAI I2S Sine Playback with Codec Setup
+description: Stream a 1 kHz sine over SAI1 I2S at 48kHz/16-bit after configuring an external DAC via LPI2C
+tags:
+- nxp
+- bare-metal
+- audio
+- sai
+- i2s
+- lpi2c
+- mcuxpresso
+- rt1170
+- cortex-m7
+platform: nxp_bare_metal
+sdk: mcuxpresso-sdk
+estimated_tokens: 800
+sdk_version: SDK2_x_MIMXRT1170
+visibility: public
+created_date: '2026-06-09'
+tier: core
+l1_skip: true
+reasoning_types:
+- system_reasoning
+- api_recall
+- rule_application

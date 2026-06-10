@@ -1,0 +1,27 @@
+id: nxp-rt1170-audio-001
+category: audio
+difficulty: hard
+title: NXP RT1170 SAI Full-Duplex Audio Pass-Through
+description: Capture I2S audio on SAI1 RX and play it back on SAI1 TX sharing the same clocks on i.MX RT1170
+tags:
+- nxp
+- bare-metal
+- audio
+- sai
+- i2s
+- full-duplex
+- mcuxpresso
+- rt1170
+- cortex-m7
+platform: nxp_bare_metal
+sdk: mcuxpresso-sdk
+estimated_tokens: 650
+sdk_version: SDK2_x_MIMXRT1170
+visibility: public
+created_date: '2026-06-10'
+tier: core
+l1_skip: true
+reasoning_types:
+- system_reasoning
+- api_recall
+- rule_application

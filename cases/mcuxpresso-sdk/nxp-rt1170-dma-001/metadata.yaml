@@ -1,0 +1,26 @@
+id: nxp-rt1170-dma-001
+category: dma
+difficulty: hard
+title: NXP RT1170 eDMA Memory Copy with Cache Coherency
+description: Memory-to-memory eDMA transfer on Cortex-M7 requiring D-cache maintenance
+tags:
+- nxp
+- bare-metal
+- dma
+- edma
+- cache
+- mcuxpresso
+- rt1170
+- cortex-m7
+platform: nxp_bare_metal
+sdk: mcuxpresso-sdk
+estimated_tokens: 600
+sdk_version: SDK2_x_MIMXRT1170
+visibility: public
+created_date: '2026-06-09'
+tier: core
+l1_skip: true
+reasoning_types:
+- system_reasoning
+- api_recall
+- rule_application

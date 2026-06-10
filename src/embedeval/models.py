@@ -23,6 +23,7 @@ class CaseCategory(str, Enum):
     BLE = "ble"
     SECURITY = "security"
     STORAGE = "storage"
+    AUDIO = "audio"
 
     # Tier 2: System-level (build/boot/update)
     KCONFIG = "kconfig"

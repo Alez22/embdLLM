@@ -422,6 +422,30 @@ cases:
     sdk: mcuxpresso-sdk
   nxp-mcxc-watchdog-001:
     sdk: mcuxpresso-sdk
+  nxp-rt1170-audio-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt1170-dma-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt1170-gpio-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt1170-gpio-002:
+    sdk: mcuxpresso-sdk
+  nxp-rt1170-gpt-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt1170-isr-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt1170-lpi2c-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt1170-lpspi-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt1170-lpuart-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt1170-rtwdog-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt1170-sai-001:
+    sdk: mcuxpresso-sdk
+  nxp-rt1170-sai-002:
+    sdk: mcuxpresso-sdk
   watchdog-001:
     sdk: zephyr
   watchdog-002:

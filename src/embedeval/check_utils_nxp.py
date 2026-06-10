@@ -135,6 +135,78 @@ def has_clock_gate_before(code: str, peripheral_init: str) -> bool:
     return clock_match.start() < init_match.start()
 
 
+def has_iomuxc_before_init(code: str, peripheral_init: str) -> bool:
+    """Check that an IOMUXC_*SetPinMux call appears before peripheral init.
+
+    @brief RT1170 (i.MX RT) variant of the pin-mux-before-init invariant:
+           pads are muxed via IOMUXC_SetPinMux / IOMUXC_LPSR_SetPinMux,
+           not the Kinetis PORT_SetPinMux API.
+    @param code             Raw C source string.
+    @param peripheral_init  Function name to check ordering against,
+                            e.g. "GPIO_PinInit", "LPI2C_MasterInit".
+    @return True if IOMUXC mux appears before peripheral_init,
+            True if peripheral_init is absent (nothing to check),
+            False if IOMUXC mux is absent or appears after.
+    """
+    stripped = strip_comments(code)
+
+    mux_match = re.search(r"\bIOMUXC\w*_SetPinMux\s*\(", stripped)
+    init_match = re.search(
+        rf"\b{re.escape(peripheral_init)}\s*\(", stripped
+    )
+
+    if init_match is None:
+        return True
+
+    if mux_match is None:
+        return False
+
+    return mux_match.start() < init_match.start()
+
+
+# ---------------------------------------------------------------------------
+# Cortex-M7 (RT1170) D-cache coherency tokens.
+#
+# DMA on a cached core requires either explicit cache maintenance or
+# buffers placed in a non-cacheable section. Case checks accept any of
+# these strategies via dcache_tokens_found().
+# ---------------------------------------------------------------------------
+
+DCACHE_CLEAN_APIS: list[str] = [
+    "SCB_CleanDCache_by_Addr",
+    "SCB_CleanInvalidateDCache_by_Addr",
+    "L1CACHE_CleanDCacheByRange",
+    "DCACHE_CleanByRange",
+]
+
+DCACHE_INVALIDATE_APIS: list[str] = [
+    "SCB_InvalidateDCache_by_Addr",
+    "SCB_CleanInvalidateDCache_by_Addr",
+    "L1CACHE_InvalidateDCacheByRange",
+    "DCACHE_InvalidateByRange",
+]
+
+NONCACHEABLE_MACROS: list[str] = [
+    "AT_NONCACHEABLE_SECTION",
+]
+
+
+def dcache_tokens_found(code: str) -> dict[str, bool]:
+    """Report which D-cache coherency strategies appear in the code.
+
+    @brief Scans comment-stripped code for cache clean / invalidate calls
+           and non-cacheable section macros.
+    @param code  Raw C source string.
+    @return dict with keys "clean", "invalidate", "noncacheable".
+    """
+    stripped = strip_comments(code)
+    return {
+        "clean": any(api in stripped for api in DCACHE_CLEAN_APIS),
+        "invalidate": any(api in stripped for api in DCACHE_INVALIDATE_APIS),
+        "noncacheable": any(m in stripped for m in NONCACHEABLE_MACROS),
+    }
+
+
 def has_pinmux_before_init(code: str, peripheral_init: str) -> bool:
     """Check that a PORT_SetPin* call appears before peripheral init.
 
