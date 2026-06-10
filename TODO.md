@@ -437,6 +437,24 @@ All 12 core NXP generation cases done. Each prompt omits safety requirements —
   `dma-008/error_detected_but_no_return`, `isr-003/spinlock_key_hardcoded_zero`,
   `linux-001/partial_cleanup_only` e altri 3. Lavoro puntuale, bassa complessità.
 
+### Scope discipline for anti-hallucination loops
+
+- **`scoped_contains_any` helper** — i ~151 check anti-hallucination usano il
+  pattern `any(api in generated_code for api in api_list)` (es. lista di API
+  Zephyr/Arduino/STM32 proibite). Questi loop NON applicano scope discipline:
+  un'API proibita scritta dentro un commento (es. `// non usare k_thread_create`)
+  o una stringa di log darebbe un falso positivo di "contaminazione cross-platform".
+  La migrazione `scoped_contains` (REQ-03) ha già coperto i substring check a
+  singola stringa costante, ma i loop su lista sono rimasti scoperti perché
+  iterano una lista.
+  **Fix proposta:** aggiungere `scoped_contains_any(code, needles, *, scope=...)`
+  in `check_utils.py` che applica lo stesso strip di commenti/stringhe a ogni
+  elemento, e sostituire i loop `any(x in generated_code for x in LIST)`.
+  Nota: è un miglioramento di design nuovo, non il completamento di REQ-03
+  (quella migrazione è completa — `apply_scope_migration.py` rimosso). Da
+  valutare l'impatto sui verdetti: stringere lo scope può far cambiare il
+  risultato di check che prima matchavano dentro commenti.
+
 ### New CLI features
 
 - **`embedeval run --context-pack`** + **`embedeval context-compare`** — misurare
