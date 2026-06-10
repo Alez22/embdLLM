@@ -56,3 +56,6 @@ LAUNCH-COPY.md
 
 # Obsidian workspace
 .obsidian/
+
+# Claude Code local config (agents, settings)
+.claude/
