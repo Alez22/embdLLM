@@ -416,6 +416,23 @@ All 12 core NXP generation cases done. Each prompt omits safety requirements —
 
 ## Backlog (not scheduled)
 
+### Embedded Linux case expansion
+
+- **Linux OTA — SWUpdate + RAUC** (6-8 casi): testare la capacità del modello
+  di scrivere manifest e configurazioni per i due sistemi OTA più diffusi
+  nell'embedded Linux industriale. SWUpdate: `sw-description` con layout
+  dual-bank, signed update, embedded scripts. RAUC: `manifest.raucm`,
+  slot config, atomic switchover. Zero cambiamenti infrastrutturali — riusa
+  i pattern dei casi Yocto/systemd già esistenti. Alta priorità perché copre
+  un dominio produttivo reale non ancora rappresentato.
+
+- **Linux networking kernel — netfilter / socket / netlink** (5-7 casi):
+  hook netfilter (`NF_INET_PRE_ROUTING`), gestione `sk_buff`, socket netlink,
+  packet filter BPF classico (`AF_PACKET` + `sock_filter`). Aggiunge il
+  contesto di concorrenza softirq — distinto da IRQ/process/ISR — che i casi
+  `linux-driver` esistenti non coprono. Buon complemento alla suite
+  embedded-linux dopo OTA.
+
 ### Future directions — to investigate
 
 - **Agentic capability evaluation**: investigate how to benchmark the agentic capabilities of
