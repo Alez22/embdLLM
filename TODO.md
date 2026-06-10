@@ -457,21 +457,64 @@ All 12 core NXP generation cases done. Each prompt omits safety requirements —
 
 ### Reporting rewrite
 
-- **Rewrite the markdown leaderboard generation** — `results/LEADERBOARD.md` is
-  produced by `generate_leaderboard()` in `reporter.py`, rewritten at the end of
-  each `embedeval run` from the *tracker* state (not by scanning `results/runs/`).
-  Problem: it drifts — the committed file shows `Total: 18` while the latest
-  6/7 runs cover 40 cases, because runs that don't go through the main path (or
-  don't update the tracker) leave it stale. The web dashboard (`dashboard.py`)
-  already renders a live leaderboard directly from `results/runs/*/details/*.json`,
-  so the markdown is a second, fragile view of the same data.
-  **Decide:** either (a) rewrite `generate_leaderboard()` to scan `results/runs/`
-  directly (single source of truth, no tracker dependency), or (b) drop the
-  markdown leaderboard entirely and rely on the dashboard + a small exporter.
-  Note: `LEADERBOARD.md` carries `SCHEMA_VERSION` and was consumed by Hiloop
-  (`interop.leaderboard`, REQ-04) — confirm that contract is dead before removing.
-  Already removed as part of this cleanup: the cross-benchmark comparison table
-  and its `external_benchmarks.yaml` source (HumanEval/SWE-bench static scores).
+The current reporting lives in `reporter.py` (~1067 lines) and mixes two
+distinct concerns: **data persistence** (what the dashboard and pipeline read)
+and **markdown reporting** (human-readable summaries). The plan is to keep the
+persistence, rewrite the markdown reporting from scratch, and likely split the
+file so the two no longer share a module.
+
+**Keep as-is — data persistence the dashboard/pipeline depend on (do NOT delete):**
+- `generate_run_archive()` → writes `results/runs/<ts>/details/*.json` +
+  `summary.json`. The dashboard reads these directly. Source of truth.
+- `_append_history()` → `results/history.json` (run history list).
+- `_sanitize_run_id()` → helper for the run dir naming.
+- `generate_json()` → `<model>-results.json` structured dump.
+- `generate_per_check_metrics()` JSON half → `per_check_metrics.json`
+  (Hiloop `interop` contract, REQ-04). Confirm the contract is still live;
+  if dead, this can go too.
+- The dashboard does NOT import `reporter` — it only reads files on disk, so
+  rewriting the markdown side cannot break it.
+
+**Rewrite from scratch — markdown reporting (the part that drifts / is stale):**
+- `generate_leaderboard()` + its ~11 private helpers. Today it is rebuilt from
+  the *tracker* state at the end of each run, not by scanning `results/runs/`,
+  so it drifts (committed file showed `Total: 18` while the latest runs cover
+  40 cases). New version should scan `results/runs/` as the single source of
+  truth, OR be dropped in favour of the dashboard + a small exporter.
+- `generate_failure_report()` → the per-run `report.md`.
+- `generate_safe_guide()` → `SAFE_GUIDE.md`.
+- Already removed in cleanup: the cross-benchmark table +
+  `external_benchmarks.yaml` (HumanEval/SWE-bench static scores).
+
+**Worth preserving from the old reporting (good ideas to carry over):**
+- **`pass@1 (quality)`** = L0+L3 only (code quality, ignoring build/runtime) as
+  a column next to full pass@1 — separates "writes good code" from "compiles".
+- **`pass@1 (comparable)`** = score on the common case set across models, for
+  fair cross-model comparison when models ran different case subsets, with a
+  `case_set_warning` banner when sets differ.
+- **95% CI (Wilson)** column on pass@1 — honest about sample size.
+- **Thin-bucket caveat** — SDK/category buckets with n<8 cases get a
+  "thin bucket (n<8)" note instead of being compared head-to-head.
+- **Tier breakdown** with sanity tier marked "(not scored)".
+- **Reasoning-type breakdown** with a reliability label
+  (Reliable ≥90% / Review recommended ≥70% / Expert review required <70%).
+- **Layer pass-rate heatmap** (per layer per model) — shows where models fail
+  (L0 static vs L3 behavior etc.).
+- **Failure-pattern aggregation** — group failures by `check_name` to see which
+  check fails most often and on which cases (top-5 + "N more").
+- **SAFE_GUIDE risk tiers** — classify categories by worst-model pass rate into
+  critical (<50%) / caution (50-79%) / moderate (80-89%) / reliable (≥90%) as
+  practical "can I trust the LLM here?" guidance for engineers.
+- **Prose/format-failure classification** — separate genuine code errors from
+  responses where the model returned prose instead of code, and report an
+  "adjusted pass@1" excluding format failures. (Note: the current heuristic in
+  `generate_failure_report` is crude — `code.startswith(("I ","Here",...))` —
+  reuse the idea, not the implementation.)
+
+**Drop / don't carry over:**
+- Dead code in `generate_failure_report` (the `by_diff` loop with `for layer …: pass`
+  at lines ~707-718 computes nothing).
+- The tracker-driven leaderboard refresh path (the cause of the drift).
 
 ### New CLI features
 
