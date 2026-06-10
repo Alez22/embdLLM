@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "61695d0d513a3f1a",
+  "model": "groq/openai/gpt-oss-20b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 2,
+  "generated_code": "#include <zephyr/kernel.h>\n#include <zephyr/drivers/adc.h>\n#include <zephyr/device.h>\n\n/* Get the ADC device and channel specifications from the devicetree */\nstatic const struct adc_dt_spec adc_cfg = ADC_DT_SPEC_GET(DT_PATH(zephyr_user));\n\nint main(void)\n{\n\t/* Verify the ADC device is ready */\n\tif (!device_is_ready(adc_cfg.dev)) {\n\t\tprintk(\"ADC device not ready\\n\");\n\t\treturn -ENODEV;\n\t}\n\n\t/* Set up the ADC channel */\n\tif (adc_channel_setup_dt(&adc_cfg) < 0) {\n\t\tprintk(\"Failed to configure ADC channel\\n\");\n\t\treturn -EINVAL;\n\t}\n\n\t/* Sample buffer and ADC sequence */\n\tstatic int16_t buf[1];\n\tstatic const struct adc_sequence seq = {\n\t\t.channels = BIT(adc_cfg.channel_id),\n\t\t.buffer = buf,\n\t\t.buffer_size = sizeof(buf),\n\t\t.resolution = adc_cfg.resolution,\n\t};\n\n\t/* Main loop: read and convert to millivolts */\n\twhile (1) {\n\t\tif (adc_read_dt(&adc_cfg, &seq) < 0) {\n\t\t\tprintk(\"ADC read failed\\n\");\n\t\t\tcontinue;\n\t\t}\n\n\t\tint32_t millivolts = adc_raw_to_millivolts_dt(&adc_cfg, buf[0]);\n\n\t\tprintk(\"ADC raw: %d, millivolts: %d mV\\n\", buf[0], millivolts);\n\n\t\tk_msleep(1000);\n\t}\n\n\treturn 0;\n}",
+  "input_tokens": 340,
+  "output_tokens": 1103,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:57:12.355318+00:00"
+}

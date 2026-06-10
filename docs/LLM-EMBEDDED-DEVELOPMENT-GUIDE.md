@@ -1134,7 +1134,7 @@ significant performance gaps between model tiers.
 
 **Gap: 11.1 percentage points overall; largest category split on DMA (31% vs 8% pass@1).**
 
-See [BENCHMARK-COMPARISON-2026-04-05.md](BENCHMARK-COMPARISON-2026-04-05.md) for detailed per-case analysis.
+See [results/LEADERBOARD.md](../results/LEADERBOARD.md) for aggregate per-model results.
 
 ### 5.2 Category Risk Tiers
 

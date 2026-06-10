@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "4e52ae23e3b85f35",
+  "model": "groq/openai/gpt-oss-120b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 1,
+  "generated_code": "/*\n * Zephyr RTOS ADC example with hardware oversampling.\n *\n * Board: nrf52840dk/nrf52840\n *\n * This program:\n *  - Obtains the ADC device using the alias \"adc0\".\n *  - Configures channel 0 with gain = 1, internal reference and default acquisition time.\n *  - Sets up a sequence that uses hardware oversampling (2^4 = 16 samples) and 12‑bit resolution.\n *  - Reads the ADC in a loop, printing the raw sample value each second.\n */\n\n#include <zephyr/kernel.h>\n#include <zephyr/device.h>\n#include <zephyr/drivers/adc.h>\n#include <zephyr/sys/util.h>   /* BIT() macro */\n\n/* ADC device (alias must be defined in the board's devicetree) */\n#define ADC_NODE DT_ALIAS(adc0)\nstatic const struct device *adc_dev = DEVICE_DT_GET(ADC_NODE);\n\n/* Buffer to hold a single sample */\nstatic int16_t sample_buffer[1];\n\nvoid main(void)\n{\n    int ret;\n\n    if (!device_is_ready(adc_dev)) {\n        printk(\"ADC device %s is not ready\\n\", adc_dev->name);\n        return;\n    }\n\n    /* Channel configuration */\n    struct adc_channel_cfg channel_cfg = {\n        .gain = ADC_GAIN_1,\n        .reference = ADC_REF_INTERNAL,\n        .acquisition_time = ADC_ACQ_TIME_DEFAULT,\n        .channel_id = 0,\n        /* nRF specific: select AIN0 as the positive input */\n        .input_positive = NRF_SAADC_INPUT_AIN0,\n        .input_negative = NRF_SAADC_INPUT_DISABLED,\n    };\n\n    ret = adc_channel_setup(adc_dev, &channel_cfg);\n    if (ret) {\n        printk(\"Failed to setup ADC channel (err %d)\\n\", ret);\n        return;\n    }\n\n    /* Sequence configuration */\n    struct adc_sequence sequence = {\n        .channels = BIT(0),                     /* Use channel 0 */\n        .buffer = sample_buffer,\n        .buffer_size = sizeof(sample_buffer),\n        .resolution = 12,                       /* 12‑bit resolution */\n        .oversampling = 4,                      /* 2^4 = 16 samples averaged */\n    };\n\n    printk(\"Starting ADC read loop (hardware oversampling 16x)...\\n\");\n\n    while (1) {\n        ret = adc_read(adc_dev, &sequence);\n        if (ret) {\n            printk(\"ADC read error (err %d)\\n\", ret);\n        } else {\n            printk(\"Raw sample: %d\\n\", sample_buffer[0]);\n        }\n\n        k_sleep(K_SECONDS(1));\n    }\n}",
+  "input_tokens": 360,
+  "output_tokens": 1257,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:59:17.615058+00:00"
+}

@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "0c562ee483913b04",
+  "model": "groq/openai/gpt-oss-20b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 5,
+  "generated_code": "# Enable the generic SPI bus subsystem\nCONFIG_SPI=y\n\n# Enable DMA-backed SPI transfers (requires the DMA subsystem)\nCONFIG_SPI_DMA=y\n\n# Enable the DMA subsystem itself\nCONFIG_DMA=y",
+  "input_tokens": 159,
+  "output_tokens": 762,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:31:43.365971+00:00"
+}

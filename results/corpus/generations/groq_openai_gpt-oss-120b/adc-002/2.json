@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "4e52ae23e3b85f35",
+  "model": "groq/openai/gpt-oss-120b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 2,
+  "generated_code": "/* SPDX-License-Identifier: Apache-2.0\n *\n * Zephyr ADC example with hardware oversampling.\n * Target board: nrf52840dk/nrf52840\n */\n\n#include <zephyr/kernel.h>\n#include <zephyr/device.h>\n#include <zephyr/drivers/adc.h>\n#include <zephyr/sys/util.h>\n\n#define ADC_RESOLUTION      12\n#define ADC_OVERSAMPLING    4   /* 2^4 = 16 samples */\n#define ADC_CHANNEL_ID      0\n\n/* Sample buffer – one 16‑bit sample is enough for 12‑bit resolution */\nstatic int16_t sample_buffer[1];\n\nvoid main(void)\n{\n    const struct device *adc_dev = DEVICE_DT_GET(DT_ALIAS(adc0));\n    int ret;\n\n    if (!device_is_ready(adc_dev)) {\n        printk(\"ADC device not ready\\n\");\n        return;\n    }\n\n    /* Channel configuration */\n    struct adc_channel_cfg channel_cfg = {\n        .gain = ADC_GAIN_1,\n        .reference = ADC_REF_INTERNAL,\n        .acquisition_time = ADC_ACQ_TIME_DEFAULT,\n        .channel_id = ADC_CHANNEL_ID,\n    };\n\n    ret = adc_channel_setup(adc_dev, &channel_cfg);\n    if (ret) {\n        printk(\"Failed to configure ADC channel (%d)\\n\", ret);\n        return;\n    }\n\n    /* Sequence configuration */\n    struct adc_sequence sequence = {\n        .channels = BIT(ADC_CHANNEL_ID),\n        .buffer = sample_buffer,\n        .buffer_size = sizeof(sample_buffer),\n        .resolution = ADC_RESOLUTION,\n        .oversampling = ADC_OVERSAMPLING,\n        .calibrate = false,\n    };\n\n    printk(\"Starting ADC read loop (oversampling = %d)\\n\", ADC_OVERSAMPLING);\n\n    while (1) {\n        ret = adc_read(adc_dev, &sequence);\n        if (ret) {\n            printk(\"ADC read error (%d)\\n\", ret);\n        } else {\n            int16_t raw = sample_buffer[0];\n            printk(\"ADC raw sample: %d\\n\", raw);\n        }\n\n        k_sleep(K_SECONDS(1));\n    }\n}",
+  "input_tokens": 360,
+  "output_tokens": 1152,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:59:28.549607+00:00"
+}

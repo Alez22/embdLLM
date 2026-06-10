@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "4e52ae23e3b85f35",
+  "model": "groq/openai/gpt-oss-20b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 3,
+  "generated_code": "/*\n * Zephyr ADC example for nrf52840dk/nrf52840\n * Reads channel 0 with hardware oversampling (2^4 = 16 samples)\n * and prints the averaged 12‑bit raw value every second.\n */\n\n#include <zephyr/kernel.h>\n#include <zephyr/device.h>\n#include <zephyr/drivers/adc.h>\n#include <zephyr/sys/util.h>\n#include <zephyr/devicetree.h>\n\n#define ADC_NODE DT_ALIAS(adc0)\n\n/* Static buffer for ADC sample(s) */\nstatic int16_t adc_sample[1];\n\n/* ADC sequence configuration */\nstatic const struct adc_sequence adc_seq = {\n\t.channels = BIT(0),                 /* channel 0 */\n\t.buffer   = (uint8_t *)adc_sample,\n\t.buffer_size = sizeof(adc_sample),\n\t.resolution = 12,\n\t.oversampling = 4,                  /* hardware averaging over 16 samples */\n};\n\n/* ADC channel configuration */\nstatic const struct adc_channel_cfg adc_chan_cfg = {\n\t.gain           = ADC_GAIN_1,\n\t.reference      = ADC_REF_INTERNAL,\n\t.acquisition_time = ADC_ACQ_TIME_DEFAULT,\n\t.channel_id     = 0,\n};\n\nvoid main(void)\n{\n\tconst struct device *adc_dev;\n\tint ret;\n\n\t/* Get ADC device from device tree */\n\tadc_dev = DEVICE_DT_GET(ADC_NODE);\n\tif (!device_is_ready(adc_dev)) {\n\t\tprintk(\"ADC device not ready\\n\");\n\t\treturn;\n\t}\n\n\t/* Configure ADC channel */\n\tret = adc_channel_setup(adc_dev, &adc_chan_cfg);\n\tif (ret) {\n\t\tprintk(\"adc_channel_setup failed: %d\\n\", ret);\n\t\treturn;\n\t}\n\n\tprintk(\"ADC initialized. Reading channel 0 with 12-bit resolution and \"\n\t       \"oversampling 2^4...\\n\");\n\n\twhile (1) {\n\t\tret = adc_read(adc_dev, &adc_seq);\n\t\tif (ret == 0) {\n\t\t\tprintk(\"ADC raw: %d\\n\", adc_sample[0]);\n\t\t} else {\n\t\t\tprintk(\"adc_read failed: %d\\n\", ret);\n\t\t}\n\t\tk_msleep(1000);\n\t}\n}",
+  "input_tokens": 360,
+  "output_tokens": 1308,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:58:18.716572+00:00"
+}

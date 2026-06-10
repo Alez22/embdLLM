@@ -1,0 +1,101 @@
+{
+  "layers": [
+    {
+      "layer": 0,
+      "name": "static_analysis",
+      "passed": false,
+      "details": [
+        {
+          "check_name": "adc_header_included",
+          "passed": true,
+          "expected": "zephyr/drivers/adc.h included",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "kernel_header_included",
+          "passed": true,
+          "expected": "zephyr/kernel.h included",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "uses_adc_dt_spec",
+          "passed": false,
+          "expected": "ADC_DT_SPEC_GET macro used for devicetree binding",
+          "actual": "missing",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "adc_sequence_defined",
+          "passed": true,
+          "expected": "struct adc_sequence defined with buffer",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "sample_buffer_declared",
+          "passed": true,
+          "expected": "int16_t (or uint16_t) sample buffer declared",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_raw_register_access",
+          "passed": true,
+          "expected": "Uses ADC API, not raw register access",
+          "actual": "API only",
+          "check_type": "constraint",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.00014614200335927308,
+      "score": 0.8333333333333334
+    },
+    {
+      "layer": 1,
+      "name": "compile_gate",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 2,
+      "name": "runtime_execution",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 3,
+      "name": "static_heuristic",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 4,
+      "name": "test_quality_proof",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    }
+  ],
+  "failed_at_layer": 0,
+  "passed": false,
+  "total_score": 0.4166666666666667
+}

@@ -1,0 +1,85 @@
+{
+  "layers": [
+    {
+      "layer": 0,
+      "name": "static_analysis",
+      "passed": false,
+      "details": [
+        {
+          "check_name": "braces_balanced",
+          "passed": true,
+          "expected": "Matching opening/closing braces",
+          "actual": "open=1, close=1",
+          "check_type": "syntax",
+          "weight": 1.0
+        },
+        {
+          "check_name": "assigned_clocks_present",
+          "passed": true,
+          "expected": "assigned-clocks property present",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "assigned_clock_rates_present",
+          "passed": true,
+          "expected": "assigned-clock-rates property present",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "status_present",
+          "passed": false,
+          "expected": "status = \"...\" property",
+          "actual": "missing",
+          "check_type": "exact_match",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.00012918100401293486,
+      "score": 0.75
+    },
+    {
+      "layer": 1,
+      "name": "compile_gate",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 2,
+      "name": "runtime_execution",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 3,
+      "name": "static_heuristic",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 4,
+      "name": "test_quality_proof",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    }
+  ],
+  "failed_at_layer": 0,
+  "passed": false,
+  "total_score": 0.375
+}

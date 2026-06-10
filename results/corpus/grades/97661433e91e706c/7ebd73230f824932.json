@@ -1,0 +1,101 @@
+{
+  "layers": [
+    {
+      "layer": 0,
+      "name": "static_analysis",
+      "passed": false,
+      "details": [
+        {
+          "check_name": "kconfig_format",
+          "passed": false,
+          "expected": "All lines start with CONFIG_ and contain =",
+          "actual": "21 lines, format valid: False",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "userspace_enabled",
+          "passed": false,
+          "expected": "CONFIG_USERSPACE=y",
+          "actual": "missing",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "mpu_enabled",
+          "passed": false,
+          "expected": "CONFIG_MPU=y",
+          "actual": "missing",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "arm_mpu_enabled",
+          "passed": false,
+          "expected": "CONFIG_ARM_MPU=y",
+          "actual": "missing",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_mpu_platform_conflict",
+          "passed": true,
+          "expected": "CONFIG_ARM_MPU and CONFIG_ARC_MPU not both enabled",
+          "actual": "no conflict",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "memory_sizing_configured",
+          "passed": false,
+          "expected": "CONFIG_HEAP_MEM_POOL_SIZE or CONFIG_MAX_DOMAIN_PARTITIONS configured",
+          "actual": "missing (userspace needs memory sizing)",
+          "check_type": "exact_match",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.0001561190001666546,
+      "score": 0.16666666666666666
+    },
+    {
+      "layer": 1,
+      "name": "compile_gate",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 2,
+      "name": "runtime_execution",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 3,
+      "name": "static_heuristic",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 4,
+      "name": "test_quality_proof",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    }
+  ],
+  "failed_at_layer": 0,
+  "passed": false,
+  "total_score": 0.08333333333333333
+}

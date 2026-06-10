@@ -1,0 +1,184 @@
+{
+  "layers": [
+    {
+      "layer": 0,
+      "name": "static_analysis",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "braces_balanced",
+          "passed": true,
+          "expected": "Matching opening/closing braces",
+          "actual": "open=2, close=2",
+          "check_type": "syntax",
+          "weight": 1.0
+        },
+        {
+          "check_name": "compatible_present",
+          "passed": true,
+          "expected": "compatible = \"...\" property",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "status_property_present",
+          "passed": true,
+          "expected": "status = \"...\" property",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "bus_speed_present",
+          "passed": true,
+          "expected": "bus-speed property",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "can0_node_referenced",
+          "passed": true,
+          "expected": "can0 node reference",
+          "actual": "present",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "transceiver_child_node",
+          "passed": true,
+          "expected": "At least 2 brace levels (can0 + child transceiver node)",
+          "actual": "2 opening braces found",
+          "check_type": "constraint",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.0002993710004375316,
+      "score": 1.0
+    },
+    {
+      "layer": 1,
+      "name": "compile_gate",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "build_env",
+          "passed": true,
+          "expected": "CMakeLists.txt present",
+          "actual": "skipped (not a compilable case)",
+          "check_type": "environment",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.004528767000010703,
+      "score": 1.0
+    },
+    {
+      "layer": 2,
+      "name": "runtime_execution",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "build_env",
+          "passed": true,
+          "expected": "CMakeLists.txt present",
+          "actual": "skipped (not a compilable case)",
+          "check_type": "environment",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.003298843999800738,
+      "score": 1.0
+    },
+    {
+      "layer": 3,
+      "name": "static_heuristic",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "no_fake_dt_properties",
+          "passed": true,
+          "expected": "No hallucinated DT properties (pin-config, mux-config, clock-speed)",
+          "actual": "clean",
+          "check_type": "hallucination",
+          "weight": 1.0
+        },
+        {
+          "check_name": "can0_node_present",
+          "passed": true,
+          "expected": "&can0 node reference",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "status_okay",
+          "passed": true,
+          "expected": "status = \"okay\"",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "bus_speed_125kbps",
+          "passed": true,
+          "expected": "bus-speed = <125000>",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "sample_point_875_permille",
+          "passed": true,
+          "expected": "sample-point = <875> (permille, i.e. 87.5%)",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "transceiver_compatible",
+          "passed": true,
+          "expected": "compatible = \"microchip,mcp2562fd\"",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "transceiver_nested_in_can0",
+          "passed": true,
+          "expected": "Transceiver child node nested inside can0 block",
+          "actual": "nested correctly",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_spurious_interrupt_map",
+          "passed": true,
+          "expected": "interrupt-map should not be present in simple CAN controller overlay",
+          "actual": "clean",
+          "check_type": "hallucination",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.00030803300614934415,
+      "score": 1.0
+    },
+    {
+      "layer": 4,
+      "name": "test_quality_proof",
+      "passed": true,
+      "details": [],
+      "error": null,
+      "duration_seconds": 0.00010867699893424287,
+      "score": 1.0
+    }
+  ],
+  "failed_at_layer": null,
+  "passed": true,
+  "total_score": 1.0
+}

@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "3c21c07920969afb",
+  "model": "groq/openai/gpt-oss-120b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 2,
+  "generated_code": "# Enable user space thread support\nCONFIG_USERSPACE=y\n\n# Memory Protection Unit support (required for USERSPACE)\nCONFIG_MPU=y\nCONFIG_ARM_MPU=y\n\n# Platform‑specific MPU (ARC) must remain disabled\n# CONFIG_ARC_MPU is not set\n\n# Maximum number of memory domain partitions\nCONFIG_MAX_DOMAIN_PARTITIONS=16\n\n# Heap size needed for user thread stacks\nCONFIG_HEAP_MEM_POOL_SIZE=16384\n\n# Ensure a valid thread stack size (must be >= 1)\nCONFIG_MAX_THREAD_BYTES=64",
+  "input_tokens": 258,
+  "output_tokens": 396,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:39:55.737288+00:00"
+}

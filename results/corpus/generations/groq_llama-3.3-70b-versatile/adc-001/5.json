@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "61695d0d513a3f1a",
+  "model": "groq/llama-3.3-70b-versatile",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 5,
+  "generated_code": "#include <zephyr/kernel.h>\n#include <zephyr/drivers/adc.h>\n\n#define ADC_DEVICE_NODE DT_PATH(zephyr_user)\n\nvoid main(void)\n{\n    const struct device *adc_dev = device_get_binding(ADC_DEVICE_NODE);\n\n    if (!adc_dev) {\n        printk(\"ADC device not found\\n\");\n        return;\n    }\n\n    if (!device_is_ready(adc_dev)) {\n        printk(\"ADC device not ready\\n\");\n        return;\n    }\n\n    int16_t buf;\n    struct adc_sequence sequence = {\n        .channels = BIT(0),  /* channel 0 */\n        .buffer = &buf,\n        .buffer_length = 1,\n    };\n\n    adc_channel_setup_dt(ADC_DEVICE_NODE, &sequence);\n\n    while (1) {\n        adc_read_dt(adc_dev, &sequence);\n        int32_t raw = sequence.buffer[0];\n        int32_t millivolts = adc_raw_to_millivolts_dt(ADC_DEVICE_NODE, raw, &sequence);\n\n        printk(\"ADC channel 0: %d mV\\n\", millivolts);\n\n        k_sleep(K_MSEC(1000));\n    }\n}",
+  "input_tokens": 271,
+  "output_tokens": 243,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:49:54.378687+00:00"
+}

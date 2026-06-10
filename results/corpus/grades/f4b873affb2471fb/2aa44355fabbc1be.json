@@ -1,0 +1,192 @@
+{
+  "layers": [
+    {
+      "layer": 0,
+      "name": "static_analysis",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "kconfig_format",
+          "passed": true,
+          "expected": "All lines start with CONFIG_ and contain =",
+          "actual": "9 lines, format valid: True",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "stack_canaries_enabled",
+          "passed": true,
+          "expected": "CONFIG_STACK_CANARIES=y",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "hw_stack_protection_enabled",
+          "passed": true,
+          "expected": "CONFIG_HW_STACK_PROTECTION=y",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "secure_boot_enabled",
+          "passed": true,
+          "expected": "CONFIG_SECURE_BOOT=y",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "debug_not_enabled",
+          "passed": true,
+          "expected": "CONFIG_DEBUG=y absent in production config",
+          "actual": "not present",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "assert_not_enabled",
+          "passed": true,
+          "expected": "CONFIG_ASSERT=y absent in production config",
+          "actual": "not present",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_hallucinated_secure_mode",
+          "passed": true,
+          "expected": "CONFIG_SECURE_MODE not present (does not exist in Zephyr)",
+          "actual": "not present",
+          "check_type": "constraint",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.00034264600253663957,
+      "score": 1.0
+    },
+    {
+      "layer": 1,
+      "name": "compile_gate",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "build_env",
+          "passed": true,
+          "expected": "CMakeLists.txt present",
+          "actual": "skipped (not a compilable case)",
+          "check_type": "environment",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.0056996759958565235,
+      "score": 1.0
+    },
+    {
+      "layer": 2,
+      "name": "runtime_execution",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "build_env",
+          "passed": true,
+          "expected": "CMakeLists.txt present",
+          "actual": "skipped (not a compilable case)",
+          "check_type": "environment",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.0037069309983053245,
+      "score": 1.0
+    },
+    {
+      "layer": 3,
+      "name": "static_heuristic",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "no_hallucinated_config_options",
+          "passed": true,
+          "expected": "No hallucinated Zephyr CONFIG options (e.g. CONFIG_SECURE_MODE does not exist)",
+          "actual": "clean",
+          "check_type": "hallucination",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_newlib_minimal_libc_conflict",
+          "passed": true,
+          "expected": "CONFIG_NEWLIB_LIBC and CONFIG_MINIMAL_LIBC are mutually exclusive",
+          "actual": "no conflict",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "secure_boot_requires_fw_info",
+          "passed": true,
+          "expected": "SECURE_BOOT requires FW_INFO=y",
+          "actual": "SECURE_BOOT=y, FW_INFO=y",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_debug_in_production",
+          "passed": true,
+          "expected": "CONFIG_DEBUG=y absent (production security hardening)",
+          "actual": "CONFIG_DEBUG not set",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_assert_in_production",
+          "passed": true,
+          "expected": "CONFIG_ASSERT=y absent (exposes internal state in production)",
+          "actual": "CONFIG_ASSERT not set",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "defense_in_depth_stack_protection",
+          "passed": true,
+          "expected": "Both STACK_CANARIES=y and HW_STACK_PROTECTION=y for defense-in-depth",
+          "actual": "STACK_CANARIES=y, HW_STACK_PROTECTION=y",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_debug_optimizations_in_production",
+          "passed": true,
+          "expected": "CONFIG_DEBUG_OPTIMIZATIONS=y absent in hardened production config",
+          "actual": "not present",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "all_required_security_configs_enabled",
+          "passed": true,
+          "expected": "STACK_CANARIES, HW_STACK_PROTECTION, SECURE_BOOT all =y",
+          "actual": "{'CONFIG_STACK_CANARIES': 'y', 'CONFIG_HW_STACK_PROTECTION': 'y', 'CONFIG_SECURE_BOOT': 'y'}",
+          "check_type": "exact_match",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.0003089160018134862,
+      "score": 1.0
+    },
+    {
+      "layer": 4,
+      "name": "test_quality_proof",
+      "passed": true,
+      "details": [],
+      "error": null,
+      "duration_seconds": 0.00011661800090223551,
+      "score": 1.0
+    }
+  ],
+  "failed_at_layer": null,
+  "passed": true,
+  "total_score": 1.0
+}

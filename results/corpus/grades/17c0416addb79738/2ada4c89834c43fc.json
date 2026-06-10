@@ -1,0 +1,93 @@
+{
+  "layers": [
+    {
+      "layer": 0,
+      "name": "static_analysis",
+      "passed": false,
+      "details": [
+        {
+          "check_name": "braces_balanced",
+          "passed": true,
+          "expected": "Matching opening/closing braces",
+          "actual": "open=4, close=4",
+          "check_type": "syntax",
+          "weight": 1.0
+        },
+        {
+          "check_name": "uart0_node_referenced",
+          "passed": true,
+          "expected": "&uart0 node reference present",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "pinctrl_names_present",
+          "passed": true,
+          "expected": "pinctrl-names property present",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "pinctrl_0_present",
+          "passed": true,
+          "expected": "pinctrl-0 property present",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_fake_pinctrl_properties",
+          "passed": false,
+          "expected": "No non-existent pin-config or mux-config properties",
+          "actual": "fake properties: pin-config=True, mux-config=False",
+          "check_type": "hallucination",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.00014684699999634176,
+      "score": 0.8
+    },
+    {
+      "layer": 1,
+      "name": "compile_gate",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 2,
+      "name": "runtime_execution",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 3,
+      "name": "static_heuristic",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 4,
+      "name": "test_quality_proof",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    }
+  ],
+  "failed_at_layer": 0,
+  "passed": false,
+  "total_score": 0.4
+}

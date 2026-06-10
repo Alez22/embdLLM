@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "caca8edcd3754fc8",
+  "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 4,
+  "generated_code": "/dts-v1/;\n\n/* Overlay for native_sim board */\n\n&uart0 {\n    status = \"okay\";\n    dmas = <&dma0 4 2>, <&dma0 5 2>;\n    dma-names = \"tx\", \"rx\";\n};",
+  "input_tokens": 180,
+  "output_tokens": 62,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T21:14:38.699310+00:00"
+}

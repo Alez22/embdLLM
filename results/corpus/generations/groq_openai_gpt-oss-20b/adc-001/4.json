@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "61695d0d513a3f1a",
+  "model": "groq/openai/gpt-oss-20b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 4,
+  "generated_code": "/*\n * Zephyr RTOS ADC example: read one channel and print the value in millivolts.\n *\n * Target board: nrf52840dk/nrf52840\n *\n * Requirements:\n * 1. Get the ADC device from devicetree using ADC_DT_SPEC_GET(DT_PATH(zephyr_user)).\n * 2. Verify the device is initialized and ready before use.\n * 3. Call adc_channel_setup_dt() to configure the channel before any read.\n * 4. Define a sample buffer (int16_t buf) and an adc_sequence struct that references it.\n * 5. Call adc_read_dt() to perform the acquisition.\n * 6. Call adc_raw_to_millivolts_dt() to convert the raw value to millivolts.\n * 7. Print the millivolt value using printk().\n * 8. Read in a loop with k_sleep(K_MSEC(1000)) between samples.\n *\n * Compile with: `west build -b nrf52840dk/nrf52840`\n */\n\n#include <zephyr/kernel.h>\n#include <zephyr/devicetree.h>\n#include <zephyr/drivers/adc.h>\n\n/* Get the ADC device tree spec for the node alias \"zephyr_user\" */\nstatic const struct adc_dt_spec adc_spec = ADC_DT_SPEC_GET(DT_PATH(zephyr_user));\n\nint main(void)\n{\n    int ret;\n    int16_t buf;          /* buffer for the raw ADC sample */\n\n    /* Ensure the ADC device is ready */\n    if (!device_is_ready(adc_spec.dev)) {\n        printk(\"ADC device not ready\\n\");\n        return 1;\n    }\n\n    /* Configure the ADC channel */\n    ret = adc_channel_setup_dt(&adc_spec);\n    if (ret < 0) {\n        printk(\"adc_channel_setup_dt() failed (%d)\\n\", ret);\n        return 1;\n    }\n\n    /* Prepare the ADC sequence */\n    const struct adc_sequence seq = {\n        .channels = BIT(adc_spec.channel),\n        .buffer   = &buf,\n        .buffer_size = sizeof(buf),\n        .resolution = adc_spec.resolution,\n        .oversample = 0,\n        .calibrate  = 0,\n        .options    = NULL,\n        .flags      = 0,\n    };\n\n    while (1) {\n        /* Perform ADC read */\n        ret = adc_read_dt(&adc_spec, &seq);\n        if (ret < 0) {\n            printk(\"adc_read_dt() failed (%d)\\n\", ret);\n            /* In a real application you might want to retry or handle errors differently */\n            k_sleep(K_MSEC(1000));\n            continue;\n        }\n\n        /* Convert raw value to millivolts */\n        int32_t millivolts = adc_raw_to_millivolts_dt(&adc_spec, buf);\n\n        /* Print the result */\n        printk(\"ADC value: %d mV\\n\", millivolts);\n\n        /* Wait before next sample */\n        k_sleep(K_MSEC(1000));\n    }\n\n    return 0; /* Never reached */\n}",
+  "input_tokens": 308,
+  "output_tokens": 1829,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:57:15.992731+00:00"
+}

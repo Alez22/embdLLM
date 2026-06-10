@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "b09c58adebb2d1d5",
+  "model": "groq/llama-3.3-70b-versatile",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 3,
+  "generated_code": "/ {\n\t&pwm0 {\n\t\tpwm-leds {\n\t\t\tcompatible = \"pwm-leds\";\n\t\t\tled@0 {\n\t\t\t\tlabel = \"green-led\";\n\t\t\t\tpwms = <&pwm0 0 20000000>;\n\t\t\t\tmax-brightness = <255>;\n\t\t\t};\n\t\t};\n\t};\n};",
+  "input_tokens": 152,
+  "output_tokens": 75,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T21:09:49.007391+00:00"
+}

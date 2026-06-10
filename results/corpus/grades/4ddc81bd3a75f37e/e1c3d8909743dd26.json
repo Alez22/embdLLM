@@ -1,0 +1,200 @@
+{
+  "layers": [
+    {
+      "layer": 0,
+      "name": "static_analysis",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "braces_balanced",
+          "passed": true,
+          "expected": "Matching opening/closing braces",
+          "actual": "open=7, close=7",
+          "check_type": "syntax",
+          "weight": 1.0
+        },
+        {
+          "check_name": "multiple_compatible_strings",
+          "passed": true,
+          "expected": "At least 2 compatible = \"...\" properties (sensor + flash)",
+          "actual": "2 compatible properties found",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "all_three_buses_present",
+          "passed": true,
+          "expected": "i2c0, spi0, and gpio0 all referenced",
+          "actual": "i2c0=yes, spi0=yes, gpio0=yes",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "multiple_status_okay",
+          "passed": true,
+          "expected": "At least 3 status = \"okay\" entries (one per bus + child nodes)",
+          "actual": "5 status = \"okay\" entries found",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "sufficient_node_count",
+          "passed": true,
+          "expected": "At least 5 opening braces (3 buses + child nodes, gpio0 may use property-based config)",
+          "actual": "7 opening braces found",
+          "check_type": "constraint",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.0001352600011159666,
+      "score": 1.0
+    },
+    {
+      "layer": 1,
+      "name": "compile_gate",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "build_env",
+          "passed": true,
+          "expected": "CMakeLists.txt present",
+          "actual": "skipped (not a compilable case)",
+          "check_type": "environment",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.0020736329970532097,
+      "score": 1.0
+    },
+    {
+      "layer": 2,
+      "name": "runtime_execution",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "build_env",
+          "passed": true,
+          "expected": "CMakeLists.txt present",
+          "actual": "skipped (not a compilable case)",
+          "check_type": "environment",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.001268498002900742,
+      "score": 1.0
+    },
+    {
+      "layer": 3,
+      "name": "static_heuristic",
+      "passed": false,
+      "details": [
+        {
+          "check_name": "no_fake_dt_properties",
+          "passed": true,
+          "expected": "No hallucinated DT properties (pin-config, mux-config, clock-speed)",
+          "actual": "clean",
+          "check_type": "hallucination",
+          "weight": 1.0
+        },
+        {
+          "check_name": "parent_buses_all_enabled",
+          "passed": true,
+          "expected": "At least 3 status = \"okay\" entries (i2c0 + spi0 + gpio0 minimum)",
+          "actual": "5 status = \"okay\" entries found",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "i2c0_enabled",
+          "passed": false,
+          "expected": "&i2c0 node reference present",
+          "actual": "missing — parent bus not enabled",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "bme680_compatible",
+          "passed": true,
+          "expected": "compatible = \"bosch,bme680\"",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "bme680_address_0x77",
+          "passed": true,
+          "expected": "BME680 at address 0x77 (reg = <0x77> or bme680@77)",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "spi0_enabled",
+          "passed": false,
+          "expected": "&spi0 node reference present",
+          "actual": "missing — parent SPI bus not enabled",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "spi_nor_compatible",
+          "passed": true,
+          "expected": "compatible = \"jedec,spi-nor\"",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "spi_flash_chip_select_0",
+          "passed": true,
+          "expected": "reg = <0> for SPI flash chip select 0",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "gpio0_enabled",
+          "passed": true,
+          "expected": "&gpio0 node reference present",
+          "actual": "present",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "two_gpio_pins_configured",
+          "passed": true,
+          "expected": "At least 2 GPIO pin references (<&gpio0 ...>)",
+          "actual": "2 GPIO pin references found",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "bme680_no_wrong_address",
+          "passed": true,
+          "expected": "BME680 must use 0x77, not 0x76 (0x76 is BME280)",
+          "actual": "correct",
+          "check_type": "constraint",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.00012731499737128615,
+      "score": 0.8181818181818182
+    },
+    {
+      "layer": 4,
+      "name": "test_quality_proof",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 3 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    }
+  ],
+  "failed_at_layer": 3,
+  "passed": false,
+  "total_score": 0.9090909090909092
+}

@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "61695d0d513a3f1a",
+  "model": "groq/openai/gpt-oss-20b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 5,
+  "generated_code": "/* Zephyr ADC example – reads a single channel and prints the result in millivolts */\n\n#include <zephyr/kernel.h>\n#include <zephyr/drivers/adc.h>\n\n/* Get the ADC device and channel defined in the devicetree under the\n * node \"zephyr_user\".  The node must contain the needed properties\n * for the ADC channel.\n */\n#define ADC_NODE DT_PATH(zephyr_user)\nstatic const struct adc_dt_spec adc_spec = ADC_DT_SPEC_GET(ADC_NODE);\n\n/* The ADC sequence that will be used for each read.  The buffer\n * contains a single sample.\n */\nstatic int16_t buf;\nstatic const struct adc_sequence seq = {\n    .channels = BIT(adc_spec.channel_cfg.channel_id),\n    .buffer   = &buf,\n    .buffer_size = sizeof(buf),\n    .no_of_values = 1,\n    .resolution = adc_spec.channel_cfg.resolution,\n    .oversampling = adc_spec.channel_cfg.oversampling,\n};\n\nint main(void)\n{\n    int rc;\n\n    /* Ensure the ADC device is ready before attempting any work. */\n    if (!adc_spec.ready) {\n        printk(\"ADC device not ready\\n\");\n        return 0;\n    }\n\n    /* Configure the channel. */\n    rc = adc_channel_setup_dt(&adc_spec, &adc_spec.channel_cfg);\n    if (rc < 0) {\n        printk(\"adc_channel_setup_dt failed: %d\\n\", rc);\n        return rc;\n    }\n\n    while (1) {\n        /* Perform the read. */\n        rc = adc_read_dt(&adc_spec, &seq);\n        if (rc < 0) {\n            printk(\"adc_read_dt failed: %d\\n\", rc);\n            continue;\n        }\n\n        /* Convert raw value to millivolts. */\n        int32_t mv = adc_raw_to_millivolts_dt(&adc_spec, &seq, buf);\n        printk(\"%d mV\\n\", mv);\n\n        /* Wait a second before the next sample. */\n        k_sleep(K_MSEC(1000));\n    }\n\n    return 0;\n}",
+  "input_tokens": 308,
+  "output_tokens": 1824,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:57:42.463245+00:00"
+}

@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "b1aa7fa6846003fb",
+  "model": "groq/openai/gpt-oss-20b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 3,
+  "generated_code": "/* Device Tree overlay for native_sim board */\n\n/* Enable UART0 and set its pin configuration */\n&uart0 {\n    status = \"okay\";\n    pinctrl-0 = <&uart0_default>;\n    pinctrl-names = \"default\";\n};\n\n/* Define pinctrl state for UART0 TX and RX pins */\n&pinctrl0 {\n    uart0_default: uart0_default {\n        /* Pin configuration for TX and RX (example pin numbers) */\n        pinmux = <0 0>, <0 1>;\n    };\n};",
+  "input_tokens": 221,
+  "output_tokens": 1640,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T21:46:52.244524+00:00"
+}

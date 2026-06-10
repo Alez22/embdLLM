@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "4e52ae23e3b85f35",
+  "model": "groq/openai/gpt-oss-20b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 2,
+  "generated_code": "/* ADC sample averaging example – Zephyr RTOS\n *\n * Target board: nrf52840dk/nrf52840\n *\n * This application configures ADC channel 0 with a gain of 1, internal\n * reference, default acquisition time, and performs a 12‑bit conversion\n * with hardware oversampling (2^4 = 16 samples). The averaged result\n * is read and printed once per second.\n */\n\n#include <zephyr/kernel.h>\n#include <zephyr/device.h>\n#include <zephyr/drivers/adc.h>\n\nint main(void)\n{\n    /* Get the ADC device defined in the devicetree alias */\n    const struct device *adc = DEVICE_DT_GET(DT_ALIAS(adc0));\n\n    if (!device_is_ready(adc)) {\n        printk(\"ADC device not ready\\n\");\n        return -ENODEV;\n    }\n\n    /* Configure ADC channel 0 */\n    struct adc_channel_cfg channel_cfg = {\n        .gain              = ADC_GAIN_1,\n        .reference         = ADC_REF_INTERNAL,\n        .acquisition_time = ADC_ACQ_TIME_DEFAULT,\n        .channel_id        = 0,\n    };\n\n    int ret = adc_channel_setup(adc, &channel_cfg);\n    if (ret) {\n        printk(\"adc_channel_setup failed: %d\\n\", ret);\n        return ret;\n    }\n\n    /* Static buffer for one 12‑bit sample */\n    static int16_t sample[1] = {0};\n\n    /* ADC sequence configuration */\n    struct adc_sequence sequence = {\n        .channels     = BIT(0),\n        .buffer       = sample,\n        .buffer_size  = sizeof(sample),\n        .resolution   = 12,\n        .oversampling = 4,  /* 2^4 = 16 hardware averaged samples */\n    };\n\n    while (1) {\n        ret = adc_read(adc, &sequence);\n        if (ret) {\n            printk(\"adc_read failed: %d\\n\", ret);\n        } else {\n            printk(\"Raw sample: %d\\n\", sample[0]);\n        }\n\n        k_sleep(K_SECONDS(1));\n    }\n\n    return 0; /* Never reached */\n}",
+  "input_tokens": 360,
+  "output_tokens": 1631,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:58:10.282247+00:00"
+}

@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "b09c58adebb2d1d5",
+  "model": "groq/openai/gpt-oss-20b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 2,
+  "generated_code": "pwm_leds {\n    compatible = \"pwm-leds\";\n    status = \"okay\";\n\n    green-led {\n        label = \"green-led\";\n        pwms = <&pwm0 0 20000000>;\n    };\n};",
+  "input_tokens": 187,
+  "output_tokens": 1100,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T21:40:33.369558+00:00"
+}

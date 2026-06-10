@@ -1,0 +1,376 @@
+{
+  "schema_version": 1,
+  "run_id": null,
+  "generated": "2026-06-07T19:59:56Z",
+  "rows": [
+    {
+      "case_id": "kconfig-003",
+      "category": "kconfig",
+      "check_name": "uart_line_ctrl_enabled",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_mode_deferred_enabled",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "llm_call",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "llm_call",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "llm_call",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "llm_call",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "spi_dma_enabled",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 1,
+      "pass_rate": 0.2
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 2,
+      "pass_rate": 0.4
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "bt_hci_enabled",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 3,
+      "pass_rate": 0.6
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_backend_uart_enabled",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 3,
+      "pass_rate": 0.6
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "bt_mesh_enabled",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "bt_mesh_relay_enabled",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "kconfig-003",
+      "category": "kconfig",
+      "check_name": "usb_cdc_acm_enabled",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "kconfig-003",
+      "category": "kconfig",
+      "check_name": "usb_device_stack_enabled",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "all_required_configs_enabled",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "build_env",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "dependency_chain_complete",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "dependency_chain_consistent",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "dma_dependency_chain",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "dma_enabled",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "no_conflicting_configs",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "no_conflicting_options",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_config_options",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "no_newlib_minimal_libc_conflict",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "spi_enabled",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "all_required_configs_enabled",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "bt_enabled",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "bt_requires_hci",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "build_env",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "friend_low_power_mutual_exclusion",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "mesh_requires_bt",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "no_friend_low_power_conflict",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_config_options",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "no_newlib_minimal_libc_conflict",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "relay_requires_mesh",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-003",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_buffer_size_set",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_enabled",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "no_log_mode_immediate_conflict",
+      "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    }
+  ]
+}

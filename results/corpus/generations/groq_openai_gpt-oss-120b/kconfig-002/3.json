@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "a308bd033e3bd24b",
+  "model": "groq/openai/gpt-oss-120b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 3,
+  "generated_code": "# Enable the full Bluetooth host stack\nCONFIG_BT=y\nCONFIG_BT_HCI=y\nCONFIG_BT_HCI_RAW=y\nCONFIG_BT_CONN=y\nCONFIG_BT_GATT=y\n\n# Enable BLE Mesh networking\nCONFIG_BT_MESH=y\nCONFIG_BT_MESH_PROVISIONING=y\nCONFIG_BT_MESH_RELAY=y\nCONFIG_BT_MESH_GATT_PROXY=y   # optional, useful for provisioning over GATT\n\n# Do NOT enable Friend or Low Power (mutually exclusive)\n# CONFIG_BT_MESH_FRIEND is not set\n# CONFIG_BT_MESH_LOW_POWER is not set",
+  "input_tokens": 184,
+  "output_tokens": 522,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:37:50.589530+00:00"
+}

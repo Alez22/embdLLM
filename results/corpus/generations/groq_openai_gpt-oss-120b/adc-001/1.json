@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "61695d0d513a3f1a",
+  "model": "groq/openai/gpt-oss-120b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 1,
+  "generated_code": "/* SPDX-License-Identifier: Apache-2.0\n *\n * Zephyr RTOS ADC example for nrf52840dk/nrf52840\n * Reads a single ADC channel, converts the raw value to millivolts,\n * and prints the result once per second.\n */\n\n#include <zephyr/kernel.h>\n#include <zephyr/drivers/adc.h>\n#include <zephyr/devicetree.h>\n#include <zephyr/logging/log.h>\n\nLOG_MODULE_REGISTER(adc_example, LOG_LEVEL_INF);\n\n/* Get the ADC DT spec from the node /zephyr,user (defined in an overlay) */\nstatic const struct adc_dt_spec adc_spec = ADC_DT_SPEC_GET(DT_PATH(zephyr_user));\n\nint main(void)\n{\n    int ret;\n\n    if (!device_is_ready(adc_spec.dev)) {\n        LOG_ERR(\"ADC device not ready\");\n        return 0;\n    }\n\n    /* Configure the ADC channel described by the DT node */\n    ret = adc_channel_setup_dt(&adc_spec);\n    if (ret) {\n        LOG_ERR(\"Failed to setup ADC channel (err %d)\", ret);\n        return 0;\n    }\n\n    while (1) {\n        int16_t sample_buf;          /* Sample buffer */\n        int32_t millivolts;          /* Converted value */\n\n        /* Perform a single conversion */\n        ret = adc_read_dt(&adc_spec, &sample_buf);\n        if (ret) {\n            LOG_ERR(\"ADC read error (%d)\", ret);\n        } else {\n            /* Convert raw reading to millivolts */\n            millivolts = adc_raw_to_millivolts_dt(&adc_spec,\n                                                  (int32_t)sample_buf);\n            printk(\"ADC reading: %d mV\\n\", millivolts);\n        }\n\n        k_sleep(K_MSEC(1000));\n    }\n\n    /* Unreachable */\n    return 0;\n}",
+  "input_tokens": 308,
+  "output_tokens": 1295,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:59:02.752252+00:00"
+}

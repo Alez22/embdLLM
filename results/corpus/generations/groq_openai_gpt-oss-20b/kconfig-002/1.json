@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "a308bd033e3bd24b",
+  "model": "groq/openai/gpt-oss-20b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 1,
+  "generated_code": "# Enable core Bluetooth stack\nCONFIG_BT=y\nCONFIG_BT_HCIUART=y\nCONFIG_BT_HCIUART_LOOPBACK=y\nCONFIG_BT_HCIUART_TX_BUF_COUNT=8\nCONFIG_BT_HCIUART_RX_BUF_COUNT=8\nCONFIG_BT_L2CAP=y\nCONFIG_BT_GATT=y\nCONFIG_BT_SMP=y\n\n# Enable Mesh and required features\nCONFIG_BT_MESH=y\nCONFIG_BT_MESH_PROV=y\nCONFIG_BT_MESH_RELAY=y\n\n# Disable mutually exclusive Friend and Low Power features\nCONFIG_BT_MESH_FRIEND=n\nCONFIG_BT_MESH_LPN=n",
+  "input_tokens": 184,
+  "output_tokens": 1290,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:31:45.004435+00:00"
+}

@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "15734f716e56f204",
+  "model": "groq/openai/gpt-oss-120b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 1,
+  "generated_code": "# Secure boot hardening configuration for production firmware (native_sim)\n\nCONFIG_STACK_CANARIES=y\nCONFIG_HW_STACK_PROTECTION=y\nCONFIG_SECURE_BOOT=y\nCONFIG_FW_INFO=y\nCONFIG_BOOTLOADER_MCUBOOT=y\n\n# Explicitly disable debug/diagnostic options for production\nCONFIG_DEBUG=n\nCONFIG_ASSERT=n\nCONFIG_SECURE_MODE=n\nCONFIG_DEBUG_OPTIMIZATIONS=n",
+  "input_tokens": 260,
+  "output_tokens": 247,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:39:11.486540+00:00"
+}

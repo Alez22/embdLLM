@@ -1,0 +1,853 @@
+{
+  "schema_version": 1,
+  "run_id": null,
+  "generated": "2026-06-07T21:37:51Z",
+  "rows": [
+    {
+      "case_id": "device-tree-001",
+      "category": "device-tree",
+      "check_name": "code_extracted",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 2,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "device-tree-001",
+      "category": "device-tree",
+      "check_name": "interrupt_gpio_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "device-tree-002",
+      "category": "device-tree",
+      "check_name": "code_extracted",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "device-tree-003",
+      "category": "device-tree",
+      "check_name": "code_extracted",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 2,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "device-tree-003",
+      "category": "device-tree",
+      "check_name": "pwm_polarity_specified",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "device-tree-004",
+      "category": "device-tree",
+      "check_name": "code_extracted",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "device-tree-005",
+      "category": "device-tree",
+      "check_name": "code_extracted",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "device-tree-006",
+      "category": "device-tree",
+      "check_name": "code_extracted",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "device-tree-007",
+      "category": "device-tree",
+      "check_name": "code_extracted",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 2,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "device-tree-003",
+      "category": "device-tree",
+      "check_name": "pwms_property_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 1,
+      "pass_rate": 0.3333333333333333
+    },
+    {
+      "case_id": "device-tree-002",
+      "category": "device-tree",
+      "check_name": "spi0_parent_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 3,
+      "pass_rate": 0.75
+    },
+    {
+      "case_id": "device-tree-004",
+      "category": "device-tree",
+      "check_name": "can0_node_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 3,
+      "pass_rate": 0.75
+    },
+    {
+      "case_id": "device-tree-001",
+      "category": "device-tree",
+      "check_name": "braces_balanced",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-001",
+      "category": "device-tree",
+      "check_name": "build_env",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 6,
+      "passed": 6,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-001",
+      "category": "device-tree",
+      "check_name": "compatible_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-001",
+      "category": "device-tree",
+      "check_name": "compatible_string_valid",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-001",
+      "category": "device-tree",
+      "check_name": "gpio_active_low",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-001",
+      "category": "device-tree",
+      "check_name": "i2c_bus_parent",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-001",
+      "category": "device-tree",
+      "check_name": "no_clock_speed_property",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-001",
+      "category": "device-tree",
+      "check_name": "no_fake_dt_properties",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-001",
+      "category": "device-tree",
+      "check_name": "node_at_address_format",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-001",
+      "category": "device-tree",
+      "check_name": "reg_address_0x76",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-001",
+      "category": "device-tree",
+      "check_name": "reg_property_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-001",
+      "category": "device-tree",
+      "check_name": "sensor_compatible",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-001",
+      "category": "device-tree",
+      "check_name": "status_okay",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-001",
+      "category": "device-tree",
+      "check_name": "status_okay_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-001",
+      "category": "device-tree",
+      "check_name": "status_property_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-002",
+      "category": "device-tree",
+      "check_name": "braces_balanced",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-002",
+      "category": "device-tree",
+      "check_name": "build_env",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 8,
+      "passed": 8,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-002",
+      "category": "device-tree",
+      "check_name": "compatible_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-002",
+      "category": "device-tree",
+      "check_name": "flash_node_at_address_format",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-002",
+      "category": "device-tree",
+      "check_name": "jedec_spi_nor_compatible",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-002",
+      "category": "device-tree",
+      "check_name": "no_fake_dt_properties",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-002",
+      "category": "device-tree",
+      "check_name": "reg_chip_select_0",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-002",
+      "category": "device-tree",
+      "check_name": "reg_property_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-002",
+      "category": "device-tree",
+      "check_name": "size_1mb",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-002",
+      "category": "device-tree",
+      "check_name": "spi_bus_referenced",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-002",
+      "category": "device-tree",
+      "check_name": "spi_max_frequency_1mhz",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-002",
+      "category": "device-tree",
+      "check_name": "spi_max_frequency_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-002",
+      "category": "device-tree",
+      "check_name": "status_okay",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-002",
+      "category": "device-tree",
+      "check_name": "status_property_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-003",
+      "category": "device-tree",
+      "check_name": "braces_balanced",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-003",
+      "category": "device-tree",
+      "check_name": "build_env",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-003",
+      "category": "device-tree",
+      "check_name": "compatible_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-003",
+      "category": "device-tree",
+      "check_name": "green_led_label",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-003",
+      "category": "device-tree",
+      "check_name": "label_property_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-003",
+      "category": "device-tree",
+      "check_name": "nested_node_structure",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-003",
+      "category": "device-tree",
+      "check_name": "no_fake_dt_properties",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-003",
+      "category": "device-tree",
+      "check_name": "period_20ms",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-003",
+      "category": "device-tree",
+      "check_name": "pwm0_controller_referenced",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-003",
+      "category": "device-tree",
+      "check_name": "pwm_channel_0",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-003",
+      "category": "device-tree",
+      "check_name": "pwm_leds_compatible",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-003",
+      "category": "device-tree",
+      "check_name": "pwms_cell_syntax",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-004",
+      "category": "device-tree",
+      "check_name": "braces_balanced",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-004",
+      "category": "device-tree",
+      "check_name": "build_env",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 8,
+      "passed": 8,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-004",
+      "category": "device-tree",
+      "check_name": "bus_speed_125kbps",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-004",
+      "category": "device-tree",
+      "check_name": "bus_speed_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-004",
+      "category": "device-tree",
+      "check_name": "can0_node_referenced",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-004",
+      "category": "device-tree",
+      "check_name": "compatible_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-004",
+      "category": "device-tree",
+      "check_name": "no_fake_dt_properties",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-004",
+      "category": "device-tree",
+      "check_name": "no_spurious_interrupt_map",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-004",
+      "category": "device-tree",
+      "check_name": "sample_point_875_permille",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-004",
+      "category": "device-tree",
+      "check_name": "status_okay",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-004",
+      "category": "device-tree",
+      "check_name": "status_property_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-004",
+      "category": "device-tree",
+      "check_name": "transceiver_child_node",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-004",
+      "category": "device-tree",
+      "check_name": "transceiver_compatible",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-004",
+      "category": "device-tree",
+      "check_name": "transceiver_nested_in_can0",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-007",
+      "category": "device-tree",
+      "check_name": "assigned_clock_rates_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 6,
+      "passed": 6,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-007",
+      "category": "device-tree",
+      "check_name": "assigned_clocks_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-007",
+      "category": "device-tree",
+      "check_name": "assigned_clocks_valid_reference",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-007",
+      "category": "device-tree",
+      "check_name": "braces_balanced",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-007",
+      "category": "device-tree",
+      "check_name": "build_env",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 6,
+      "passed": 6,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-007",
+      "category": "device-tree",
+      "check_name": "clock_rate_not_zero",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-007",
+      "category": "device-tree",
+      "check_name": "clock_rate_value_reasonable",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-007",
+      "category": "device-tree",
+      "check_name": "no_fake_dt_properties",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-007",
+      "category": "device-tree",
+      "check_name": "no_frequency_in_assigned_clocks",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-007",
+      "category": "device-tree",
+      "check_name": "peripheral_node_referenced",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-007",
+      "category": "device-tree",
+      "check_name": "status_okay",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-007",
+      "category": "device-tree",
+      "check_name": "status_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-008",
+      "category": "device-tree",
+      "check_name": "braces_balanced",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-008",
+      "category": "device-tree",
+      "check_name": "build_env",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-008",
+      "category": "device-tree",
+      "check_name": "dma_channels_distinct",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-008",
+      "category": "device-tree",
+      "check_name": "dma_names_has_rx",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-008",
+      "category": "device-tree",
+      "check_name": "dma_names_has_tx",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-008",
+      "category": "device-tree",
+      "check_name": "dma_names_property_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-008",
+      "category": "device-tree",
+      "check_name": "dma_phandle_format",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-008",
+      "category": "device-tree",
+      "check_name": "dma_slot_values_reasonable",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-008",
+      "category": "device-tree",
+      "check_name": "dma_three_cell_format",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-008",
+      "category": "device-tree",
+      "check_name": "dmas_count_matches_names",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-008",
+      "category": "device-tree",
+      "check_name": "dmas_property_present",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-008",
+      "category": "device-tree",
+      "check_name": "no_fake_dt_properties",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-008",
+      "category": "device-tree",
+      "check_name": "tx_rx_ordering_in_dma_names",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-008",
+      "category": "device-tree",
+      "check_name": "uart0_node_referenced",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "device-tree-008",
+      "category": "device-tree",
+      "check_name": "uart0_status_okay",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    }
+  ]
+}

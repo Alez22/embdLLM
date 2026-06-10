@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "a308bd033e3bd24b",
+  "model": "groq/openai/gpt-oss-120b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 2,
+  "generated_code": "# Enable the core Bluetooth stack\nCONFIG_BT=y\nCONFIG_BT_HOST=y\nCONFIG_BT_HCI=y\nCONFIG_BT_HCI_VS=y\n\n# Native simulation uses the host‑only stack (no separate controller)\nCONFIG_BT_CTLR=n\n\n# Enable BLE Mesh and required features\nCONFIG_BT_MESH=y\nCONFIG_BT_MESH_PROV=y          # provisioning support\nCONFIG_BT_MESH_RELAY=y         # relay functionality\nCONFIG_BT_MESH_SETTINGS=y     # persistent storage for provisioning data\n\n# Explicitly disable mutually exclusive features\nCONFIG_BT_MESH_FRIEND=n\nCONFIG_BT_MESH_LOW_POWER=n",
+  "input_tokens": 184,
+  "output_tokens": 583,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:37:49.362813+00:00"
+}

@@ -1,0 +1,185 @@
+{
+  "layers": [
+    {
+      "layer": 0,
+      "name": "static_analysis",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "kconfig_format",
+          "passed": true,
+          "expected": "All lines start with CONFIG_ and contain =",
+          "actual": "4 lines, format valid: True",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "spi_enabled",
+          "passed": true,
+          "expected": "CONFIG_SPI=y",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "dma_enabled",
+          "passed": true,
+          "expected": "CONFIG_DMA=y",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "spi_dma_enabled",
+          "passed": true,
+          "expected": "CONFIG_SPI_DMA=y",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_conflicting_options",
+          "passed": true,
+          "expected": "CONFIG_SPI_SLAVE not enabled",
+          "actual": "not present",
+          "check_type": "constraint",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.00026005700055975467,
+      "score": 1.0
+    },
+    {
+      "layer": 1,
+      "name": "compile_gate",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "build_env",
+          "passed": true,
+          "expected": "CMakeLists.txt present",
+          "actual": "skipped (not a compilable case)",
+          "check_type": "environment",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.004587946001265664,
+      "score": 1.0
+    },
+    {
+      "layer": 2,
+      "name": "runtime_execution",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "build_env",
+          "passed": true,
+          "expected": "CMakeLists.txt present",
+          "actual": "skipped (not a compilable case)",
+          "check_type": "environment",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.002079211000818759,
+      "score": 1.0
+    },
+    {
+      "layer": 3,
+      "name": "static_heuristic",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "no_hallucinated_config_options",
+          "passed": true,
+          "expected": "No hallucinated Zephyr CONFIG options",
+          "actual": "clean",
+          "check_type": "hallucination",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_newlib_minimal_libc_conflict",
+          "passed": true,
+          "expected": "CONFIG_NEWLIB_LIBC and CONFIG_MINIMAL_LIBC are mutually exclusive",
+          "actual": "no conflict",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "dependency_chain_consistent",
+          "passed": true,
+          "expected": "SPI_DMA requires SPI=y",
+          "actual": "SPI=y, SPI_DMA=y",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "dma_dependency_chain",
+          "passed": true,
+          "expected": "SPI_DMA requires DMA=y",
+          "actual": "DMA=y, SPI_DMA=y",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "all_required_configs_enabled",
+          "passed": true,
+          "expected": "SPI, DMA, SPI_DMA all =y",
+          "actual": "{'CONFIG_SPI': 'y', 'CONFIG_DMA': 'y', 'CONFIG_SPI_DMA': 'y'}",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_conflicting_configs",
+          "passed": true,
+          "expected": "No mutually exclusive CONFIG options both enabled",
+          "actual": "clean",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "dependency_chain_complete",
+          "passed": true,
+          "expected": "SPI with DMA requires CONFIG_DMA dependency",
+          "actual": "dependencies satisfied",
+          "check_type": "constraint",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.00020210499496897683,
+      "score": 1.0
+    },
+    {
+      "layer": 4,
+      "name": "test_quality_proof",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "mutation_missing_spi_config",
+          "passed": true,
+          "expected": "checks ['spi_enabled'] detect mutation",
+          "actual": "caught",
+          "check_type": "mutation",
+          "weight": 1.0
+        },
+        {
+          "check_name": "mutation_missing_spi_dma_config",
+          "passed": true,
+          "expected": "checks ['spi_dma_enabled'] detect mutation",
+          "actual": "caught",
+          "check_type": "mutation",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.0005760449930676259,
+      "score": 1.0
+    }
+  ],
+  "failed_at_layer": null,
+  "passed": true,
+  "total_score": 1.0
+}

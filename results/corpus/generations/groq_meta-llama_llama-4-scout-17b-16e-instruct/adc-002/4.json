@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "4e52ae23e3b85f35",
+  "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 4,
+  "generated_code": "#include <zephyr/kernel.h>\n#include <zephyr/device.h>\n#include <zephyr/drivers/adc.h>\n\nint main(void)\n{\n    /* Get the ADC device */\n    const struct device *adc_dev = DEVICE_DT_GET(DT_ALIAS(adc0), NULL);\n\n    if (!adc_dev || !device_is_ready(adc_dev)) {\n        printk(\"ADC device not ready\\n\");\n        return 0;\n    }\n\n    /* Define ADC channel configuration */\n    struct adc_channel_cfg channel_cfg = {\n        .gain = ADC_GAIN_1,\n        .reference = ADC_REF_INTERNAL,\n        .acquisition_time = ADC_ACQ_TIME_DEFAULT,\n        .channel_id = 0,\n    };\n\n    /* Configure the ADC channel */\n    int err = adc_channel_setup(adc_dev, &channel_cfg);\n    if (err) {\n        printk(\"Failed to setup ADC channel\\n\");\n        return 0;\n    }\n\n    /* Define ADC sequence configuration */\n    struct adc_sequence sequence = {\n        .channels = BIT(0),\n        .buffer = (int16_t[1]){},\n        .buffer_size = sizeof(int16_t),\n        .resolution = 12,\n        .oversampling = 4,\n    };\n\n    while (1) {\n        /* Read the ADC */\n        err = adc_read(adc_dev, &sequence);\n        if (err) {\n            printk(\"Failed to read ADC\\n\");\n            continue;\n        }\n\n        /* Print the raw sample value */\n        printk(\"Sample: %d\\n\", sequence.buffer[0]);\n\n        /* Sleep for 1 second */\n        k_sleep(K_SECONDS(1));\n    }\n\n    return 0;\n}",
+  "input_tokens": 300,
+  "output_tokens": 348,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:50:10.558418+00:00"
+}

@@ -1,0 +1,152 @@
+{
+  "layers": [
+    {
+      "layer": 0,
+      "name": "static_analysis",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "kconfig_format",
+          "passed": true,
+          "expected": "All lines start with CONFIG_ and contain =",
+          "actual": "4 lines, format valid: True",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "usb_device_stack_enabled",
+          "passed": true,
+          "expected": "CONFIG_USB_DEVICE_STACK=y",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "usb_cdc_acm_enabled",
+          "passed": true,
+          "expected": "CONFIG_USB_CDC_ACM=y",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "uart_line_ctrl_enabled",
+          "passed": true,
+          "expected": "CONFIG_UART_LINE_CTRL=y",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.00013164600386517122,
+      "score": 1.0
+    },
+    {
+      "layer": 1,
+      "name": "compile_gate",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "build_env",
+          "passed": true,
+          "expected": "CMakeLists.txt present",
+          "actual": "skipped (not a compilable case)",
+          "check_type": "environment",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.0038077729986980557,
+      "score": 1.0
+    },
+    {
+      "layer": 2,
+      "name": "runtime_execution",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "build_env",
+          "passed": true,
+          "expected": "CMakeLists.txt present",
+          "actual": "skipped (not a compilable case)",
+          "check_type": "environment",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.0027534999971976504,
+      "score": 1.0
+    },
+    {
+      "layer": 3,
+      "name": "static_heuristic",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "no_hallucinated_config_options",
+          "passed": true,
+          "expected": "No hallucinated Zephyr CONFIG options",
+          "actual": "clean",
+          "check_type": "hallucination",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_newlib_minimal_libc_conflict",
+          "passed": true,
+          "expected": "CONFIG_NEWLIB_LIBC and CONFIG_MINIMAL_LIBC are mutually exclusive",
+          "actual": "no conflict",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "cdc_acm_requires_usb_device_stack",
+          "passed": true,
+          "expected": "USB_CDC_ACM requires USB_DEVICE_STACK=y",
+          "actual": "USB_DEVICE_STACK=y, USB_CDC_ACM=y",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "uart_line_ctrl_requires_cdc_acm",
+          "passed": true,
+          "expected": "UART_LINE_CTRL is only useful when USB_CDC_ACM=y",
+          "actual": "USB_CDC_ACM=y, UART_LINE_CTRL=y",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "all_required_configs_enabled",
+          "passed": true,
+          "expected": "USB_DEVICE_STACK, USB_CDC_ACM, UART_LINE_CTRL all =y",
+          "actual": "{'CONFIG_USB_DEVICE_STACK': 'y', 'CONFIG_USB_CDC_ACM': 'y', 'CONFIG_UART_LINE_CTRL': 'y'}",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_fake_usb_serial_option",
+          "passed": true,
+          "expected": "CONFIG_USB_SERIAL does not exist; use CONFIG_USB_CDC_ACM",
+          "actual": "not present",
+          "check_type": "hallucination",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.0010367610011599027,
+      "score": 1.0
+    },
+    {
+      "layer": 4,
+      "name": "test_quality_proof",
+      "passed": true,
+      "details": [],
+      "error": null,
+      "duration_seconds": 0.00010612599726300687,
+      "score": 1.0
+    }
+  ],
+  "failed_at_layer": null,
+  "passed": true,
+  "total_score": 1.0
+}

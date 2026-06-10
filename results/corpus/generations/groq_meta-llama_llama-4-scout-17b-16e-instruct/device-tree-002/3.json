@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "85b595b91d5d62c0",
+  "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 3,
+  "generated_code": "/dts-v1/;\n\n/* Add spi0 node if it does not exist */\n&spi0 {\n    status = \"okay\";\n\n    /* Add SPI NOR flash node */\n    nor_flash@0 {\n        compatible = \"jedec,spi-nor\";\n        reg = <0>;\n        spi-max-frequency = <1000000>;\n        size = <0x100000>;\n        status = \"okay\";\n    };\n};",
+  "input_tokens": 157,
+  "output_tokens": 93,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T21:12:15.890985+00:00"
+}

@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "64af15312062d04d",
+  "model": "groq/openai/gpt-oss-120b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 1,
+  "generated_code": "&i2c0 {\n    status = \"okay\";\n\n    bme280@76 {\n        compatible = \"bosch,bme280\";\n        reg = <0x76>;\n        status = \"okay\";\n        int-gpios = <&gpio0 15 GPIO_ACTIVE_LOW>;\n    };\n};",
+  "input_tokens": 181,
+  "output_tokens": 353,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T21:50:06.188584+00:00"
+}

@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "b09c58adebb2d1d5",
+  "model": "groq/qwen/qwen3-32b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 3,
+  "generated_code": "/dts-v1/;\n/plugin/;\n\n/ {\n        pwm-leds {\n                compatible = \"pwm-leds\";\n\n                green-led {\n                        compatible = \"pwm-led\";\n                        pwms = <&pwm0 0 20000000>;\n                        label = \"green-led\";\n                };\n        };\n};",
+  "input_tokens": 131,
+  "output_tokens": 1589,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T21:21:33.229123+00:00"
+}

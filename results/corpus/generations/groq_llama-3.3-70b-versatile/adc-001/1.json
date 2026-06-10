@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "61695d0d513a3f1a",
+  "model": "groq/llama-3.3-70b-versatile",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 1,
+  "generated_code": "#include <zephyr/kernel.h>\n#include <zephyr/drivers/adc.h>\n\n#define ADC_DEVICE DT_SPEC_INST_GET(0, adc)\n#define ADC_CHANNEL DT_SPEC_INST_PROP(0, channel)\n#define ADC_RESOLUTION DT_SPEC_INST_PROP(0, resolution)\n\nvoid main(void)\n{\n    const struct device *adc_dev;\n    int16_t buf[1];\n    struct adc_sequence sequence = {\n        .channels = ADC_CHANNEL,\n        .buffer = buf,\n        .buffer_size = 1,\n        .resolution = ADC_RESOLUTION,\n    };\n\n    adc_dev = DEVICE_DT_GET(ADC_DEVICE);\n    if (!device_is_ready(adc_dev)) {\n        printk(\"ADC device not ready\\n\");\n        return;\n    }\n\n    if (adc_channel_setup_dt(adc_dev, &sequence) < 0) {\n        printk(\"Failed to setup ADC channel\\n\");\n        return;\n    }\n\n    while (1) {\n        if (adc_read_dt(adc_dev, &sequence) < 0) {\n            printk(\"Failed to read ADC value\\n\");\n        } else {\n            int16_t raw_value = sequence.buffer[0];\n            int32_t millivolts = adc_raw_to_millivolts_dt(adc_dev, raw_value);\n            printk(\"%d mV\\n\", millivolts);\n        }\n        k_sleep(K_MSEC(1000));\n    }\n}",
+  "input_tokens": 271,
+  "output_tokens": 287,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:49:50.901380+00:00"
+}

@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "ea88561e7472b13f",
+  "model": "groq/openai/gpt-oss-20b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 2,
+  "generated_code": "# Enable the networking stack with BSD socket support\nCONFIG_NET=y\nCONFIG_NET_SOCKETS=y\nCONFIG_NET_SOCKETS_BSD=y\n\n# Enable TLS socket options for secure sockets\nCONFIG_NET_SOCKETS_TLS=y\n\n# Use the built‑in MbedTLS TLS backend\nCONFIG_TLS_MBEDTLS=y\n\n# Disable other TLS backends to avoid conflicts\nCONFIG_TLS_OPENSSL=n\nCONFIG_TLS_SCHANNEL=n\nCONFIG_TLS_NSS=n\n\n# Enable TLS credential management for loading certificates\nCONFIG_TLS_CREDENTIALS=y\nCONFIG_TLS_CREDENTIALS_FILE=y",
+  "input_tokens": 218,
+  "output_tokens": 1179,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:35:18.826771+00:00"
+}

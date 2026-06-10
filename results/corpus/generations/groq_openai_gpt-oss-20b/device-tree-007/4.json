@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "0104d8ad52939b64",
+  "model": "groq/openai/gpt-oss-20b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 4,
+  "generated_code": "/ {\n    &uart0 {\n        status = \"okay\";\n        assigned-clocks = <&clk_1>;\n        assigned-clock-rates = <16000000>;\n    };\n};",
+  "input_tokens": 241,
+  "output_tokens": 936,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T21:48:41.311074+00:00"
+}

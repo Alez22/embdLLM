@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "9e0a22287555429b",
+  "model": "groq/openai/gpt-oss-20b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 1,
+  "generated_code": "CONFIG_USB_DEVICE_STACK=y\nCONFIG_USB_DEVICE=y\nCONFIG_USB_CDC_ACM=y\nCONFIG_USB_CDC_ACM_LINE_CODING=y\nCONFIG_USB_CDC_ACM_LINE_CONTROL=y\nCONFIG_UART_LINE_CONTROL=y",
+  "input_tokens": 194,
+  "output_tokens": 1231,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:33:17.988526+00:00"
+}

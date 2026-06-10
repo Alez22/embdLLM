@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "run_id": null,
+  "generated": "2026-06-07T20:13:08Z",
+  "rows": [
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "llm_call",
+      "model": "openrouter/qwen/qwen3-30b-a3b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "llm_call",
+      "model": "openrouter/qwen/qwen3-30b-a3b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "kconfig-003",
+      "category": "kconfig",
+      "check_name": "llm_call",
+      "model": "openrouter/qwen/qwen3-30b-a3b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "llm_call",
+      "model": "openrouter/qwen/qwen3-30b-a3b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "llm_call",
+      "model": "openrouter/qwen/qwen3-30b-a3b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "llm_call",
+      "model": "openrouter/qwen/qwen3-30b-a3b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "llm_call",
+      "model": "openrouter/qwen/qwen3-30b-a3b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "llm_call",
+      "model": "openrouter/qwen/qwen3-30b-a3b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    }
+  ]
+}

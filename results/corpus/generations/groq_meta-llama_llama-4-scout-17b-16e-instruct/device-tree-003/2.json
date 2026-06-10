@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "b09c58adebb2d1d5",
+  "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 2,
+  "generated_code": "/dts-v1/;\n\n&{/soc} {\n    pwm_led: pwm_led {\n        compatible = \"pwm-leds\";\n        green_led: led {\n            pwms = <&pwm0 0 20000000>;\n            label = \"green-led\";\n        };\n    };\n};",
+  "input_tokens": 126,
+  "output_tokens": 66,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T21:12:19.640951+00:00"
+}

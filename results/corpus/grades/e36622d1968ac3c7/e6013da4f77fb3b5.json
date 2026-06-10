@@ -1,0 +1,192 @@
+{
+  "layers": [
+    {
+      "layer": 0,
+      "name": "static_analysis",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "braces_balanced",
+          "passed": true,
+          "expected": "Matching opening/closing braces",
+          "actual": "open=4, close=4",
+          "check_type": "syntax",
+          "weight": 1.0
+        },
+        {
+          "check_name": "dmas_property_present",
+          "passed": true,
+          "expected": "dmas property present",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "dma_names_property_present",
+          "passed": true,
+          "expected": "dma-names property present",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "uart0_node_referenced",
+          "passed": true,
+          "expected": "&uart0 node reference present",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "dma_phandle_format",
+          "passed": true,
+          "expected": "DMA phandle reference format <&dma...>",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.0001295990005019121,
+      "score": 1.0
+    },
+    {
+      "layer": 1,
+      "name": "compile_gate",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "build_env",
+          "passed": true,
+          "expected": "CMakeLists.txt present",
+          "actual": "skipped (not a compilable case)",
+          "check_type": "environment",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.001991450000787154,
+      "score": 1.0
+    },
+    {
+      "layer": 2,
+      "name": "runtime_execution",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "build_env",
+          "passed": true,
+          "expected": "CMakeLists.txt present",
+          "actual": "skipped (not a compilable case)",
+          "check_type": "environment",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.0011958469985984266,
+      "score": 1.0
+    },
+    {
+      "layer": 3,
+      "name": "static_heuristic",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "no_fake_dt_properties",
+          "passed": true,
+          "expected": "No hallucinated DT properties (pin-config, mux-config, clock-speed)",
+          "actual": "clean",
+          "check_type": "hallucination",
+          "weight": 1.0
+        },
+        {
+          "check_name": "dma_names_has_tx",
+          "passed": true,
+          "expected": "dma-names includes \"tx\" entry",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "dma_names_has_rx",
+          "passed": true,
+          "expected": "dma-names includes \"rx\" entry",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "dmas_count_matches_names",
+          "passed": true,
+          "expected": "dmas entry count equals dma-names entry count",
+          "actual": "dmas=2, dma-names=2",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "dma_three_cell_format",
+          "passed": true,
+          "expected": "DMA entries use <&controller channel slot> 3-cell format",
+          "actual": "present",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "uart0_status_okay",
+          "passed": true,
+          "expected": "status = \"okay\"",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "uart0_node_referenced",
+          "passed": true,
+          "expected": "&uart0 node referenced",
+          "actual": "present",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "dma_channels_distinct",
+          "passed": true,
+          "expected": "TX and RX DMA channels must be different channel numbers",
+          "actual": "distinct",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "dma_slot_values_reasonable",
+          "passed": true,
+          "expected": "All DMA slot values between 0 and 127 (valid STM32 DMA/DMAMUX request slots)",
+          "actual": "valid",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "tx_rx_ordering_in_dma_names",
+          "passed": true,
+          "expected": "\"tx\" appears before \"rx\" in dma-names (matches dmas property TX-first ordering)",
+          "actual": "correct",
+          "check_type": "constraint",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.00015909899957478046,
+      "score": 1.0
+    },
+    {
+      "layer": 4,
+      "name": "test_quality_proof",
+      "passed": true,
+      "details": [],
+      "error": null,
+      "duration_seconds": 0.00005230699753155932,
+      "score": 1.0
+    }
+  ],
+  "failed_at_layer": null,
+  "passed": true,
+  "total_score": 1.0
+}

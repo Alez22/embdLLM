@@ -20,7 +20,6 @@ assignees: []
 <!-- Link to specific lines in:
      - docs/METHODOLOGY.md
      - docs/LLM-EMBEDDED-CONSIDERATIONS.md
-     - docs/BENCHMARK-COMPARISON-2026-04-05.md
      - src/embedeval/checks/  -->
 
 ## What would change my mind

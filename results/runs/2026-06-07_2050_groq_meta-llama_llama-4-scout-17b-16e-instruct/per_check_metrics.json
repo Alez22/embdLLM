@@ -1,0 +1,268 @@
+{
+  "schema_version": 1,
+  "run_id": null,
+  "generated": "2026-06-07T20:50:11Z",
+  "rows": [
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "sample_buffer_nonzero",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 1,
+      "pass_rate": 0.2
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "uses_adc_dt_spec",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 2,
+      "pass_rate": 0.4
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "device_ready_check",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 2,
+      "passed": 1,
+      "pass_rate": 0.5
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "adc_header_included",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "adc_sequence_defined",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "buffer_linked_to_sequence",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "build_env",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "channel_setup_before_read",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "kernel_header_included",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "millivolt_conversion_called",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "no_cross_platform_apis",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "no_raw_register_access",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "periodic_sampling_loop",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "read_return_value_checked",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "sample_buffer_declared",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "adc_channel_setup_called",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "adc_header_included",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "adc_read_called",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "build_env",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "device_ready_check",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "kernel_header_included",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "no_arduino_analogread",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "no_cross_platform_apis",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "no_stm32_hal_adc",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "oversampling_before_read",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "oversampling_configured",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "periodic_read_with_sleep",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "setup_before_read",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "valid_adc_resolution",
+      "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    }
+  ]
+}

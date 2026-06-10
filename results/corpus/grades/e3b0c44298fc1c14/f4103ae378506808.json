@@ -1,0 +1,61 @@
+{
+  "layers": [
+    {
+      "layer": 0,
+      "name": "static_analysis",
+      "passed": false,
+      "details": [
+        {
+          "check_name": "code_extracted",
+          "passed": false,
+          "expected": "LLM output contains a C source file",
+          "actual": "empty — model returned prose or no code",
+          "check_type": "constraint",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.00002905500150518492,
+      "score": 0.0
+    },
+    {
+      "layer": 1,
+      "name": "compile_gate",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed (no code extracted)",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 2,
+      "name": "runtime_execution",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed (no code extracted)",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 3,
+      "name": "static_heuristic",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed (no code extracted)",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 4,
+      "name": "test_quality_proof",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed (no code extracted)",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    }
+  ],
+  "failed_at_layer": 0,
+  "passed": false,
+  "total_score": 0.0
+}

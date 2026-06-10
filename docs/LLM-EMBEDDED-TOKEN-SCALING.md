@@ -921,7 +921,6 @@ EmbedEval can serve as a key tool for this token-scaling research:
 
 ### EmbedEval Internal Data
 - [results/LEADERBOARD.md](../results/LEADERBOARD.md) — n=3 aggregate pass@1, CIs, layer heatmap (233 TCs)
-- [BENCHMARK-COMPARISON-2026-04-05.md](./BENCHMARK-COMPARISON-2026-04-05.md) — Haiku vs Sonnet comparison (historical write-up)
 - [LLM-EMBEDDED-FAILURE-FACTORS.md](./LLM-EMBEDDED-FAILURE-FACTORS.md) — 42 failure factors
 - [LLM-EMBEDDED-CONSIDERATIONS.md](./LLM-EMBEDDED-CONSIDERATIONS.md) — 14 production-scale failure patterns
 - [LLM-EMBEDDED-DEVELOPMENT-GUIDE.md](./LLM-EMBEDDED-DEVELOPMENT-GUIDE.md) — 7-phase workflow

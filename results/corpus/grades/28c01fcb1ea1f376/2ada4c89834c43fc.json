@@ -1,0 +1,184 @@
+{
+  "layers": [
+    {
+      "layer": 0,
+      "name": "static_analysis",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "braces_balanced",
+          "passed": true,
+          "expected": "Matching opening/closing braces",
+          "actual": "open=6, close=6",
+          "check_type": "syntax",
+          "weight": 1.0
+        },
+        {
+          "check_name": "uart0_node_referenced",
+          "passed": true,
+          "expected": "&uart0 node reference present",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "pinctrl_names_present",
+          "passed": true,
+          "expected": "pinctrl-names property present",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "pinctrl_0_present",
+          "passed": true,
+          "expected": "pinctrl-0 property present",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_fake_pinctrl_properties",
+          "passed": true,
+          "expected": "No non-existent pin-config or mux-config properties",
+          "actual": "clean",
+          "check_type": "hallucination",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.00026818100013770163,
+      "score": 1.0
+    },
+    {
+      "layer": 1,
+      "name": "compile_gate",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "build_env",
+          "passed": true,
+          "expected": "CMakeLists.txt present",
+          "actual": "skipped (not a compilable case)",
+          "check_type": "environment",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.004539173998637125,
+      "score": 1.0
+    },
+    {
+      "layer": 2,
+      "name": "runtime_execution",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "build_env",
+          "passed": true,
+          "expected": "CMakeLists.txt present",
+          "actual": "skipped (not a compilable case)",
+          "check_type": "environment",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.0029086400027154014,
+      "score": 1.0
+    },
+    {
+      "layer": 3,
+      "name": "static_heuristic",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "no_fake_dt_properties",
+          "passed": true,
+          "expected": "No hallucinated DT properties; pin-config does not exist (use pinctrl-0)",
+          "actual": "clean",
+          "check_type": "hallucination",
+          "weight": 1.0
+        },
+        {
+          "check_name": "pinctrl_0_references_phandle",
+          "passed": true,
+          "expected": "pinctrl-0 references a phandle (e.g. <&uart0_default>)",
+          "actual": "present",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "pinctrl_state_defined",
+          "passed": true,
+          "expected": "pinctrl state node defined (e.g. uart0_default)",
+          "actual": "present",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "uart0_status_okay",
+          "passed": true,
+          "expected": "status = \"okay\" on uart0",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_linux_pinctrl_style",
+          "passed": true,
+          "expected": "Zephyr DT pinctrl syntax, not Linux kernel PIN_MAP style",
+          "actual": "clean",
+          "check_type": "hallucination",
+          "weight": 1.0
+        },
+        {
+          "check_name": "uart0_node_referenced",
+          "passed": true,
+          "expected": "&uart0 node referenced in overlay",
+          "actual": "present",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "pinctrl_pair_present",
+          "passed": true,
+          "expected": "Both pinctrl-0 and pinctrl-names must be specified together",
+          "actual": "present",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "pinctrl_binding_present",
+          "passed": true,
+          "expected": "pinctrl-0 = <&xxx> binding for pin muxing",
+          "actual": "present",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "pinctrl_names_default",
+          "passed": true,
+          "expected": "pinctrl-names = \"default\" for standard pin state",
+          "actual": "present",
+          "check_type": "constraint",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.00029781199555145577,
+      "score": 1.0
+    },
+    {
+      "layer": 4,
+      "name": "test_quality_proof",
+      "passed": true,
+      "details": [],
+      "error": null,
+      "duration_seconds": 0.00010649600153556094,
+      "score": 1.0
+    }
+  ],
+  "failed_at_layer": null,
+  "passed": true,
+  "total_score": 1.0
+}

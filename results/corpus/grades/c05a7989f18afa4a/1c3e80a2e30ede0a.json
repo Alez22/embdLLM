@@ -1,0 +1,101 @@
+{
+  "layers": [
+    {
+      "layer": 0,
+      "name": "static_analysis",
+      "passed": false,
+      "details": [
+        {
+          "check_name": "kconfig_format",
+          "passed": true,
+          "expected": "All lines start with CONFIG_ and contain =",
+          "actual": "11 lines, format valid: True",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "bt_enabled",
+          "passed": true,
+          "expected": "CONFIG_BT=y",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "bt_hci_enabled",
+          "passed": false,
+          "expected": "CONFIG_BT_HCI=y",
+          "actual": "missing",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "bt_mesh_enabled",
+          "passed": true,
+          "expected": "CONFIG_BT_MESH=y",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "bt_mesh_relay_enabled",
+          "passed": true,
+          "expected": "CONFIG_BT_MESH_RELAY=y",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_friend_low_power_conflict",
+          "passed": true,
+          "expected": "BT_MESH_FRIEND and BT_MESH_LOW_POWER not both enabled",
+          "actual": "no conflict present",
+          "check_type": "constraint",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.00013889499678043649,
+      "score": 0.8333333333333334
+    },
+    {
+      "layer": 1,
+      "name": "compile_gate",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 2,
+      "name": "runtime_execution",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 3,
+      "name": "static_heuristic",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    },
+    {
+      "layer": 4,
+      "name": "test_quality_proof",
+      "passed": false,
+      "details": [],
+      "error": "Skipped: layer 0 failed",
+      "duration_seconds": 0.0,
+      "score": 0.0
+    }
+  ],
+  "failed_at_layer": 0,
+  "passed": false,
+  "total_score": 0.4166666666666667
+}

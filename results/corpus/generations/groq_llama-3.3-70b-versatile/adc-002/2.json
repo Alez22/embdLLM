@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "4e52ae23e3b85f35",
+  "model": "groq/llama-3.3-70b-versatile",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 2,
+  "generated_code": "#include <zephyr/kernel.h>\n#include <zephyr/device.h>\n#include <zephyr/drivers/adc.h>\n\n#define BUFFER_SIZE 1\nstatic int16_t sample_buf[BUFFER_SIZE];\n\nvoid main(void)\n{\n    const struct device *adc_dev = DEVICE_DT_GET(DT_ALIAS(adc0));\n\n    if (!device_is_ready(adc_dev)) {\n        printk(\"ADC device is not ready\\n\");\n        return;\n    }\n\n    struct adc_channel_cfg cfg = {\n        .gain = ADC_GAIN_1,\n        .reference = ADC_REF_INTERNAL,\n        .acquisition_time = ADC_ACQ_TIME_DEFAULT,\n        .channel_id = 0,\n    };\n\n    if (adc_channel_setup(adc_dev, &cfg) < 0) {\n        printk(\"Failed to setup ADC channel\\n\");\n        return;\n    }\n\n    struct adc_sequence seq = {\n        .channels = BIT(0),\n        .buffer = sample_buf,\n        .buffer_size = BUFFER_SIZE * sizeof(sample_buf[0]),\n        .resolution = 12,\n        .oversampling = 4,\n    };\n\n    while (1) {\n        if (adc_read(adc_dev, &seq) < 0) {\n            printk(\"Failed to read ADC\\n\");\n            break;\n        }\n\n        printk(\"Raw sample value: %d\\n\", sample_buf[0]);\n        k_sleep(K_MSEC(1000));\n    }\n}",
+  "input_tokens": 328,
+  "output_tokens": 295,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:49:56.015874+00:00"
+}

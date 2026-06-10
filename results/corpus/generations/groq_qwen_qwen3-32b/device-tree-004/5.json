@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "8e2a779f1b564a10",
+  "model": "groq/qwen/qwen3-32b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 5,
+  "generated_code": "/ {\n\t&can0 {\n\t\tstatus = \"okay\";\n\t\tbus-speed = <125000>;\n\t\tsample-point = <875>;\n\n\t\tcan-transceiver {\n\t\t\tcompatible = \"microchip,mcp2562fd\";\n\t\t\tstatus = \"okay\";\n\t\t};\n\t};\n};",
+  "input_tokens": 142,
+  "output_tokens": 894,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T21:25:30.801459+00:00"
+}

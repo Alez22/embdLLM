@@ -18,7 +18,7 @@ Usage:
     uv run python scripts/aggregate_n_runs.py \\
         --model claude-code://sonnet \\
         --run-ids n1,n2,n3 \\
-        --output docs/BENCHMARK-n3-sonnet.md
+        --output results/BENCHMARK-n3-sonnet.md
 """
 
 from __future__ import annotations

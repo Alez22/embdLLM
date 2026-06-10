@@ -1,0 +1,168 @@
+{
+  "layers": [
+    {
+      "layer": 0,
+      "name": "static_analysis",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "braces_balanced",
+          "passed": true,
+          "expected": "Matching opening/closing braces",
+          "actual": "open=2, close=2",
+          "check_type": "syntax",
+          "weight": 1.0
+        },
+        {
+          "check_name": "assigned_clocks_present",
+          "passed": true,
+          "expected": "assigned-clocks property present",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "assigned_clock_rates_present",
+          "passed": true,
+          "expected": "assigned-clock-rates property present",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "status_present",
+          "passed": true,
+          "expected": "status = \"...\" property",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.0002670009998837486,
+      "score": 1.0
+    },
+    {
+      "layer": 1,
+      "name": "compile_gate",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "build_env",
+          "passed": true,
+          "expected": "CMakeLists.txt present",
+          "actual": "skipped (not a compilable case)",
+          "check_type": "environment",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.004546559001028072,
+      "score": 1.0
+    },
+    {
+      "layer": 2,
+      "name": "runtime_execution",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "build_env",
+          "passed": true,
+          "expected": "CMakeLists.txt present",
+          "actual": "skipped (not a compilable case)",
+          "check_type": "environment",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.0027931110016652383,
+      "score": 1.0
+    },
+    {
+      "layer": 3,
+      "name": "static_heuristic",
+      "passed": true,
+      "details": [
+        {
+          "check_name": "no_fake_dt_properties",
+          "passed": true,
+          "expected": "No hallucinated DT properties; clock-speed does not exist (use clock-frequency)",
+          "actual": "clean",
+          "check_type": "hallucination",
+          "weight": 1.0
+        },
+        {
+          "check_name": "clock_rate_value_reasonable",
+          "passed": true,
+          "expected": "Clock rate > 0 and <= 1000000000 (1 GHz)",
+          "actual": "rate=16000000",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "assigned_clocks_valid_reference",
+          "passed": true,
+          "expected": "assigned-clocks references a phandle (e.g. <&rcc ...>)",
+          "actual": "present",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "status_okay",
+          "passed": true,
+          "expected": "status = \"okay\"",
+          "actual": "present",
+          "check_type": "exact_match",
+          "weight": 1.0
+        },
+        {
+          "check_name": "clock_rate_not_zero",
+          "passed": true,
+          "expected": "Clock rate must not be 0",
+          "actual": "valid",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "no_frequency_in_assigned_clocks",
+          "passed": true,
+          "expected": "assigned-clocks must contain phandle, not raw frequency",
+          "actual": "clean",
+          "check_type": "hallucination",
+          "weight": 1.0
+        },
+        {
+          "check_name": "peripheral_node_referenced",
+          "passed": true,
+          "expected": "Peripheral node (e.g. &uart0) referenced for clock assignment",
+          "actual": "present",
+          "check_type": "constraint",
+          "weight": 1.0
+        },
+        {
+          "check_name": "assigned_clock_rates_present",
+          "passed": true,
+          "expected": "assigned-clock-rates property present alongside assigned-clocks",
+          "actual": "present",
+          "check_type": "constraint",
+          "weight": 1.0
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.0002790770013234578,
+      "score": 1.0
+    },
+    {
+      "layer": 4,
+      "name": "test_quality_proof",
+      "passed": true,
+      "details": [],
+      "error": null,
+      "duration_seconds": 0.00010161600221181288,
+      "score": 1.0
+    }
+  ],
+  "failed_at_layer": null,
+  "passed": true,
+  "total_score": 1.0
+}

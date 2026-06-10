@@ -1,0 +1,645 @@
+{
+  "version": "0.1.0",
+  "date": "2026-06-07",
+  "models": [
+    {
+      "model": "groq/qwen/qwen3-32b",
+      "pass_at_1": 0.43333333333333335,
+      "pass_at_1_quality": 0.5,
+      "pass_at_1_comparable": null,
+      "pass_at_3": 0.5,
+      "pass_at_5": 0.5,
+      "avg_score": 0.43333333333333335,
+      "check_coverage": 0.5095227272727273,
+      "avg_duration_seconds": 4.02053452954031,
+      "total_cases": 18,
+      "passed_cases": 9,
+      "passed_cases_quality": 9,
+      "comparable_cases": null,
+      "layer_pass_rates": {
+        "compile_gate": 1.0,
+        "runtime_execution": 1.0,
+        "static_analysis": 0.5,
+        "static_heuristic": 0.76,
+        "test_quality_proof": 1.0
+      },
+      "pass_at_1_ci": [
+        0.23690777718122097,
+        0.6532101628964291
+      ],
+      "n_samples": 5,
+      "per_check_stats": [
+        {
+          "check_name": "assigned_clock_rates_present",
+          "category": "device-tree",
+          "total_runs": 6,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "assigned_clocks_present",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "assigned_clocks_valid_reference",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "braces_balanced",
+          "category": "device-tree",
+          "total_runs": 22,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "build_env",
+          "category": "device-tree",
+          "total_runs": 40,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "bus_speed_125kbps",
+          "category": "device-tree",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "bus_speed_present",
+          "category": "device-tree",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "can0_node_present",
+          "category": "device-tree",
+          "total_runs": 4,
+          "fail_count": 1,
+          "pass_rate": 0.75,
+          "failing_tc_ids": [
+            "device-tree-004"
+          ]
+        },
+        {
+          "check_name": "can0_node_referenced",
+          "category": "device-tree",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "clock_rate_not_zero",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "clock_rate_value_reasonable",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "code_extracted",
+          "category": "device-tree",
+          "total_runs": 18,
+          "fail_count": 18,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "device-tree-001",
+            "device-tree-002",
+            "device-tree-003",
+            "device-tree-004",
+            "device-tree-005",
+            "device-tree-006",
+            "device-tree-007"
+          ]
+        },
+        {
+          "check_name": "compatible_present",
+          "category": "device-tree",
+          "total_runs": 14,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "compatible_string_valid",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_channels_distinct",
+          "category": "device-tree",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_names_has_rx",
+          "category": "device-tree",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_names_has_tx",
+          "category": "device-tree",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_names_property_present",
+          "category": "device-tree",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_phandle_format",
+          "category": "device-tree",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_slot_values_reasonable",
+          "category": "device-tree",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_three_cell_format",
+          "category": "device-tree",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dmas_count_matches_names",
+          "category": "device-tree",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dmas_property_present",
+          "category": "device-tree",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "flash_node_at_address_format",
+          "category": "device-tree",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "gpio_active_low",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "green_led_label",
+          "category": "device-tree",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "i2c_bus_parent",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "interrupt_gpio_present",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 3,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "device-tree-001"
+          ]
+        },
+        {
+          "check_name": "jedec_spi_nor_compatible",
+          "category": "device-tree",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "label_property_present",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "nested_node_structure",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_clock_speed_property",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_fake_dt_properties",
+          "category": "device-tree",
+          "total_runs": 20,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_frequency_in_assigned_clocks",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_spurious_interrupt_map",
+          "category": "device-tree",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "node_at_address_format",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "period_20ms",
+          "category": "device-tree",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "peripheral_node_referenced",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pwm0_controller_referenced",
+          "category": "device-tree",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pwm_channel_0",
+          "category": "device-tree",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pwm_leds_compatible",
+          "category": "device-tree",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pwm_polarity_specified",
+          "category": "device-tree",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "device-tree-003"
+          ]
+        },
+        {
+          "check_name": "pwms_cell_syntax",
+          "category": "device-tree",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pwms_property_present",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 2,
+          "pass_rate": 0.3333333333333333,
+          "failing_tc_ids": [
+            "device-tree-003"
+          ]
+        },
+        {
+          "check_name": "reg_address_0x76",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "reg_chip_select_0",
+          "category": "device-tree",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "reg_property_present",
+          "category": "device-tree",
+          "total_runs": 7,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "sample_point_875_permille",
+          "category": "device-tree",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "sensor_compatible",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "size_1mb",
+          "category": "device-tree",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "spi0_parent_enabled",
+          "category": "device-tree",
+          "total_runs": 4,
+          "fail_count": 1,
+          "pass_rate": 0.75,
+          "failing_tc_ids": [
+            "device-tree-002"
+          ]
+        },
+        {
+          "check_name": "spi_bus_referenced",
+          "category": "device-tree",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "spi_max_frequency_1mhz",
+          "category": "device-tree",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "spi_max_frequency_present",
+          "category": "device-tree",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "status_okay",
+          "category": "device-tree",
+          "total_runs": 14,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "status_okay_present",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "status_present",
+          "category": "device-tree",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "status_property_present",
+          "category": "device-tree",
+          "total_runs": 11,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "transceiver_child_node",
+          "category": "device-tree",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "transceiver_compatible",
+          "category": "device-tree",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "transceiver_nested_in_can0",
+          "category": "device-tree",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "tx_rx_ordering_in_dma_names",
+          "category": "device-tree",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "uart0_node_referenced",
+          "category": "device-tree",
+          "total_runs": 10,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "uart0_status_okay",
+          "category": "device-tree",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "category": "adc",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    },
+    {
+      "category": "device-tree",
+      "pass_at_1": 0.5,
+      "total_cases": 8,
+      "passed_cases": 4
+    },
+    {
+      "category": "kconfig",
+      "pass_at_1": 0.625,
+      "total_cases": 8,
+      "passed_cases": 5
+    }
+  ],
+  "tier_scores": [
+    {
+      "tier": "sanity",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    },
+    {
+      "tier": "core",
+      "pass_at_1": 0.6666666666666666,
+      "total_cases": 9,
+      "passed_cases": 6
+    },
+    {
+      "tier": "challenge",
+      "pass_at_1": 0.42857142857142855,
+      "total_cases": 7,
+      "passed_cases": 3
+    }
+  ],
+  "reasoning_scores": [
+    {
+      "reasoning_type": "api_recall",
+      "pass_at_1": 0.5,
+      "total_cases": 18,
+      "passed_cases": 9
+    },
+    {
+      "reasoning_type": "rule_application",
+      "pass_at_1": 0.5,
+      "total_cases": 18,
+      "passed_cases": 9
+    }
+  ],
+  "sdk_scores": [
+    {
+      "sdk": "zephyr",
+      "pass_at_1": 0.5,
+      "total_cases": 18,
+      "passed_cases": 9
+    }
+  ],
+  "overall": {
+    "total_cases": 18,
+    "total_models": 1,
+    "best_model": "groq/qwen/qwen3-32b",
+    "best_pass_at_1": 0.43333333333333335,
+    "common_cases": null,
+    "case_set_warning": null
+  },
+  "scenario": "generation",
+  "temperature": 0.5,
+  "n_samples_per_case": 5,
+  "n_runs": 1,
+  "run_timestamp": "2026-06-07",
+  "run_time": "2137",
+  "model": "groq/qwen/qwen3-32b",
+  "total_results": 40,
+  "passed": 14,
+  "failed": 26
+}

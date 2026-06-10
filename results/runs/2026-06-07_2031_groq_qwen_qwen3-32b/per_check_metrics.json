@@ -1,0 +1,871 @@
+{
+  "schema_version": 1,
+  "run_id": null,
+  "generated": "2026-06-07T20:31:35Z",
+  "rows": [
+    {
+      "case_id": "kconfig-003",
+      "category": "kconfig",
+      "check_name": "code_extracted",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "mbedtls_builtin_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "net_sockets_sockopt_tls_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "spi_dma_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 1,
+      "pass_rate": 0.2
+    },
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "tls_credentials_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 1,
+      "pass_rate": 0.2
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "bt_mesh_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 3,
+      "pass_rate": 0.6
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "bt_mesh_relay_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 3,
+      "pass_rate": 0.6
+    },
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 3,
+      "pass_rate": 0.6
+    },
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "mbedtls_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 3,
+      "pass_rate": 0.6
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "bt_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "bt_hci_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_backend_uart_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "net_sockets_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "networking_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_config_options",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "all_required_configs_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "build_env",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "dependency_chain_complete",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "dependency_chain_consistent",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "dma_dependency_chain",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "dma_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "no_conflicting_configs",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "no_conflicting_options",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_config_options",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "no_newlib_minimal_libc_conflict",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "spi_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "all_required_configs_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "bt_requires_hci",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "build_env",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 6,
+      "passed": 6,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "friend_low_power_mutual_exclusion",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "mesh_requires_bt",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "no_friend_low_power_conflict",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_config_options",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "no_newlib_minimal_libc_conflict",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "relay_requires_mesh",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "all_required_configs_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "build_env",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 8,
+      "passed": 8,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_backend_requires_log",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_buffer_size_positive",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_buffer_size_power_of_2",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_buffer_size_set",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_mode_deferred_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_mode_mutual_exclusion",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_config_options",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "no_log_mode_immediate_conflict",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "no_newlib_minimal_libc_conflict",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "no_conflicting_tls_backend",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "all_required_security_configs_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "assert_not_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "build_env",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "debug_not_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "defense_in_depth_stack_protection",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "hw_stack_protection_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "no_assert_in_production",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "no_debug_in_production",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "no_debug_optimizations_in_production",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_config_options",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_secure_mode",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "no_newlib_minimal_libc_conflict",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "secure_boot_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "secure_boot_requires_fw_info",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "stack_canaries_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "all_required_configs_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "bt_coex_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "bt_coex_requires_bt_and_wifi",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "bt_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "build_env",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "networking_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_wifi_ble_coex",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "no_newlib_minimal_libc_conflict",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "wifi_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "wifi_mgmt_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "wifi_mgmt_requires_wifi",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "wifi_requires_networking",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "all_required_configs_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "arm_mpu_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "build_env",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "heap_mem_pool_adequate",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "max_domain_partitions_positive",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "memory_sizing_configured",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "mpu_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "mpu_has_platform_implementation",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "mpu_platform_mutual_exclusion",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "no_conflicting_duplicate_config_keys",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_config_options",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "no_mpu_platform_conflict",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "no_newlib_minimal_libc_conflict",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "userspace_enabled",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "userspace_requires_mpu",
+      "model": "groq/qwen/qwen3-32b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    }
+  ]
+}

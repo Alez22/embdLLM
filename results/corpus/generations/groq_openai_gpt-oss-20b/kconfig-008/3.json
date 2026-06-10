@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "3c21c07920969afb",
+  "model": "groq/openai/gpt-oss-20b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 3,
+  "generated_code": "CONFIG_USERSPACE=y\nCONFIG_MPU=y\nCONFIG_ARM_MPU=y\nCONFIG_MAX_DOMAIN_PARTITIONS=16\nCONFIG_HEAP_MEM_POOL_SIZE=16384\nCONFIG_MAX_THREAD_BYTES=1",
+  "input_tokens": 258,
+  "output_tokens": 525,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:37:22.881635+00:00"
+}

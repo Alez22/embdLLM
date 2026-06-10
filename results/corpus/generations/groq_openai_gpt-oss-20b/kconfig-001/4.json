@@ -1,0 +1,15 @@
+{
+  "prompt_hash": "0c562ee483913b04",
+  "model": "groq/openai/gpt-oss-20b",
+  "temperature": 0.5,
+  "generation_params": {
+    "feedback_rounds": 0,
+    "no_think": false
+  },
+  "attempt": 4,
+  "generated_code": "CONFIG_SPI=y\nCONFIG_DMA=y\nCONFIG_SPI_DMA=y",
+  "input_tokens": 159,
+  "output_tokens": 730,
+  "cost_usd": 0.0,
+  "generated_at": "2026-06-07T20:31:42.346535+00:00"
+}
