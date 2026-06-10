@@ -42,7 +42,7 @@ from embedeval.failure_factors import (
     load_check_category_map,
     load_factors,
 )
-from embedeval.test_tracker import TrackerData, load_tracker
+from embedeval.result_tracker import TrackerData, load_tracker
 
 logger = logging.getLogger(__name__)
 

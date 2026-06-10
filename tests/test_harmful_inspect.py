@@ -11,7 +11,7 @@ from embedeval.harmful_inspect import (
     format_harmful_table,
     inspect_harmful,
 )
-from embedeval.test_tracker import (
+from embedeval.result_tracker import (
     CaseResult,
     TrackerData,
     save_tracker,

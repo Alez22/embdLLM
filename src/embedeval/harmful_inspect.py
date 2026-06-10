@@ -33,7 +33,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 
 from embedeval.context_compare import CaseEffect, classify_effect
-from embedeval.test_tracker import TrackerData, load_tracker
+from embedeval.result_tracker import TrackerData, load_tracker
 
 
 class HarmfulClassification(str, Enum):

@@ -37,7 +37,7 @@ def _parse_sdk_filter(raw: str | None) -> list[Sdk]:
 
 if TYPE_CHECKING:
     from embedeval.models import CaseMetadata, EvalResult
-    from embedeval.test_tracker import TrackerData
+    from embedeval.result_tracker import TrackerData
 
 app = typer.Typer(help="EmbedEval: Embedded firmware LLM benchmark")
 
@@ -383,7 +383,7 @@ def run(
     # Retest-only filtering
     if retest_only:
         from embedeval.runner import filter_cases as _filter
-        from embedeval.test_tracker import (
+        from embedeval.result_tracker import (
             find_cases_needing_retest,
             load_tracker,
         )
@@ -517,7 +517,7 @@ def run(
     # comprehensive per-model state, not just this run's (possibly partial)
     # slice. --retest-only runs would otherwise clobber LEADERBOARD.md
     # with the 3-case view.
-    from embedeval.test_tracker import (
+    from embedeval.result_tracker import (
         generate_results_doc,
         load_tracker,
         save_tracker,
@@ -596,7 +596,7 @@ def run(
 
     # Update tracker after building comprehensive_results so the "prior"
     # snapshot used for merging reflects the state *before* this run.
-    from embedeval.test_tracker import ContextPackMismatchError
+    from embedeval.result_tracker import ContextPackMismatchError
 
     try:
         tracker = update_tracker(
@@ -1327,7 +1327,7 @@ def refresh_tracker(
     ] = Path("results"),
 ) -> None:
     """Refresh test tracker after TC changes (used by /wrapup)."""
-    from embedeval.test_tracker import (
+    from embedeval.result_tracker import (
         detect_changed_cases_from_git,
         generate_results_doc,
         load_tracker,

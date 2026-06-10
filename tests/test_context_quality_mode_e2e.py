@@ -24,7 +24,7 @@ import pytest
 from typer.testing import CliRunner
 
 from embedeval.cli import app
-from embedeval.test_tracker import TRACKER_FILENAME, load_tracker
+from embedeval.result_tracker import TRACKER_FILENAME, load_tracker
 
 cli = CliRunner()
 

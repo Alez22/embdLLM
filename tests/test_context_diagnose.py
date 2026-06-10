@@ -19,7 +19,7 @@ from embedeval.context_diagnose import (
     format_diagnosis,
 )
 from embedeval.failure_factors import load_check_category_map
-from embedeval.test_tracker import CaseResult, TrackerData, save_tracker
+from embedeval.result_tracker import CaseResult, TrackerData, save_tracker
 
 
 def _mapped_count(letter: str) -> int:

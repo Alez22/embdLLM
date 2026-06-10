@@ -1,4 +1,4 @@
-"""Tests for test_tracker — especially the case_dir_map path resolution."""
+"""Tests for result_tracker — especially the case_dir_map path resolution."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from embedeval.models import EvalResult, LayerResult, TokenUsage
-from embedeval.test_tracker import (
+from embedeval.result_tracker import (
     TrackerData,
     _case_content_hash,
     update_tracker,

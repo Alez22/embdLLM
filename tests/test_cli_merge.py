@@ -17,7 +17,7 @@ from embedeval.models import (
     TokenUsage,
     Visibility,
 )
-from embedeval.test_tracker import CaseResult, TrackerData
+from embedeval.result_tracker import CaseResult, TrackerData
 
 MODEL = "test-model"
 

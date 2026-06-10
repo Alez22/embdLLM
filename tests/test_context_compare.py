@@ -13,7 +13,7 @@ from embedeval.context_compare import (
     compare_runs,
     format_comparison_table,
 )
-from embedeval.test_tracker import (
+from embedeval.result_tracker import (
     CaseResult,
     TrackerData,
     save_tracker,

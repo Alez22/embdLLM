@@ -20,7 +20,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field, computed_field
 
-from embedeval.test_tracker import TrackerData, load_tracker
+from embedeval.result_tracker import TrackerData, load_tracker
 
 logger = logging.getLogger(__name__)
 

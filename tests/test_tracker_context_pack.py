@@ -11,7 +11,7 @@ from embedeval.models import (
     LayerResult,
     TokenUsage,
 )
-from embedeval.test_tracker import (
+from embedeval.result_tracker import (
     ContextPackMismatchError,
     TrackerData,
     update_tracker,
@@ -104,7 +104,7 @@ def test_legacy_bare_tracker_rejects_pack_run(tmp_path: Path) -> None:
     """Bare tracker with results MUST refuse a new packed run. Otherwise the
     pre-existing bare results would be misattributed as 'expert' runs."""
     tracker = TrackerData()
-    from embedeval.test_tracker import CaseResult
+    from embedeval.result_tracker import CaseResult
 
     tracker.results.setdefault("mock", {})
     tracker.results["mock"]["isr-concurrency-001"] = CaseResult(
