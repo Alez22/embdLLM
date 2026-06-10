@@ -18,34 +18,33 @@ embedeval-nxp/
 ├── README.md
 ├── TODO.md
 ├── cases/
-│   ├── nxp-bare-metal/     # New: NXP MCUXpresso SDK cases (bare-metal, no RTOS)
-│   │   ├── nxp-i2c-001/
-│   │   │   ├── metadata.yaml
-│   │   │   ├── prompt.md
-│   │   │   ├── reference/main.c
-│   │   │   └── checks/
-│   │   │       ├── static.py
-│   │   │       ├── behavior.py
-│   │   │       └── negatives.py   # optional, L4 mutation
-│   │   └── ...
-│   └── (upstream cases from embedeval fork)
+│   ├── mcuxpresso-sdk/     # NXP MCUXpresso SDK cases (bare-metal, no RTOS)
+│   ├── stm32-hal/          # STM32 HAL cases
+│   └── (other upstream sdk buckets from embedeval fork)
 ├── src/embedeval/
-│   ├── check_utils_nxp.py  # New: NXP SDK pattern helpers
-│   ├── review.py           # New: human-in-the-loop review workflow
+│   ├── check_utils_nxp.py  # NXP SDK pattern helpers
+│   ├── review.py           # human-in-the-loop review workflow
 │   └── (upstream modules)
 ├── docs/
-│   └── NXP-CONSIDERATIONS.md
 └── results/
 ```
 
-## Target Platform Context
+## Platform Coverage
 
-- **MCU family:** NXP Kinetis / MCX (MCXC144, ARM Cortex-M0+)
+This repo covers multiple embedded platforms. Each SDK bucket lives under `cases/<sdk-bucket>/`.
+
+### NXP MCUXpresso SDK
+- **MCU family:** NXP Kinetis / MCX (MCXC144, ARM Cortex-M0+) and RT1170 (Cortex-M7)
 - **SDK:** MCUXpresso SDK (SDK2_x_xxx naming convention)
 - **Toolchain:** arm-none-eabi-gcc
 - **RTOS:** None — bare-metal only
 - **Project:** SpeakerMate — speaker device configuration + flash memory management
 - **Key domain:** power-loss safe flash (WAL, scratch areas, metadata validation, recovery)
+
+### Other platforms
+- STM32 HAL (stm32-hal bucket)
+- ESP-IDF (esp-* categories)
+- Zephyr / Linux driver / Yocto / device-tree (upstream embedeval cases)
 
 ## Case Format
 
