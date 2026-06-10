@@ -416,6 +416,49 @@ All 12 core NXP generation cases done. Each prompt omits safety requirements —
 
 ## Backlog (not scheduled)
 
+### Check quality improvements
+
+- **Deep embedded checks** — i casi esistenti raggiungono pass rate >90% con i
+  modelli migliori perché i check coprono solo conoscenza embedded di base. Per
+  alzare la difficoltà: aggiungere check avanzati ai casi `hard` già esistenti
+  (007-010 per categoria) senza creare nuovi casi. Target: HW memory model,
+  vincoli ISR context, real-time timing, resource alignment. Nessun nuovo caso
+  da creare — solo nuovi check in `behavior.py` di quelli esistenti.
+
+- **Subtle negatives** — i `negatives.py` attuali usano mutation ovvie (rimozione
+  completa di un pattern). Aggiungere mutation "sottili" che aggirano il check
+  mantenendo il bug semantico (es. `key = k_spin_lock(...)` → `k_spin_lock(...); key = {0}`).
+  Obiettivo: ~50% delle mutation sottili non dovrebbe essere catturato dai check
+  attuali — queste diventano la roadmap per rafforzare i check. Dettaglio in
+  `plans/PLAN-subtle-negatives.md` (15 mutation candidate identificate).
+
+- **Remaining check blind spots** — 6 check specifici già identificati con la fix
+  esatta da applicare. Dettaglio in `plans/PLAN-remaining-blindspots.md`:
+  `dma-008/error_detected_but_no_return`, `isr-003/spinlock_key_hardcoded_zero`,
+  `linux-001/partial_cleanup_only` e altri 3. Lavoro puntuale, bassa complessità.
+
+### New CLI features
+
+- **`embedeval run --context-pack`** + **`embedeval context-compare`** — misurare
+  quanto il contesto iniettato nel prompt (bare / team CLAUDE.md / expert pack)
+  impatta il pass rate. Output: *Context Lift* (effetto del contesto team) e
+  *Context Gap* (distanza dall'expert). Per ogni caso: classificare l'effetto come
+  helpful / harmful / no-effect. Utile per validare oggettivamente se un CLAUDE.md
+  migliora i risultati. Dettaglio in `plans/PLAN-context-quality-mode.md` e
+  `plans/PLAN-per-case-effect-classification.md`.
+
+- **`embedeval context-diagnose`** — nuovo comando che legge i risultati di un run
+  e mappa ogni check fallito alla sua categoria in `FAILURE-FACTORS.md`, segnalando
+  le categorie dove il team è sotto l'expert di ≥10pp. Output: lista di factor ID
+  ad alta priorità da aggiungere al CLAUDE.md. Dettaglio in
+  `plans/PLAN-context-diagnose.md`.
+
+- **Bug-fix scenario** (`task_type: bugfix`) — nuovo scenario di valutazione: il
+  modello riceve codice con un bug deliberato (preso da `negatives.py`) e deve
+  identificarlo e correggerlo. Il codice corretto viene poi valutato con i check
+  esistenti. Riusa tutto il lavoro L4 già fatto senza nuova infrastruttura. Dettaglio
+  in `plans/PLAN-bugfix-scenario.md`.
+
 ### Embedded Linux case expansion
 
 - **Linux OTA — SWUpdate + RAUC** (6-8 casi): testare la capacità del modello
