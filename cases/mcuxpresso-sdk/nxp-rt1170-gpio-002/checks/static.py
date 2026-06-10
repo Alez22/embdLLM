@@ -1,4 +1,4 @@
-"""Static checks for nxp-mcxc-isr-001.
+"""Static checks for nxp-rt1170-gpio-002.
 
 L0: pattern matching on generated source text, no compilation needed.
 """
@@ -11,10 +11,11 @@ from embedeval.models import CheckDetail
 
 
 def run_checks(generated_code: str) -> list[CheckDetail]:
-    """Validate MCXC144 ISR-to-main data transfer code structure."""
+    """Validate RT1170 GPIO interrupt code structure."""
     details: list[CheckDetail] = []
+    stripped = strip_comments(generated_code)
 
-    for header in ("fsl_pit.h", "fsl_gpio.h", "fsl_clock.h"):
+    for header in ("fsl_gpio.h", "fsl_iomuxc.h"):
         present = scoped_contains(generated_code, header, scope="code_only")
         details.append(CheckDetail(
             check_name=f"header_{header.replace('.', '_')}",
@@ -24,33 +25,37 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
             check_type="exact_match",
         ))
 
-    has_isr = bool(re.search(r"\bPIT_IRQHandler\s*\(", generated_code))
+    has_isr = bool(re.search(r"\bGPIO\w+_IRQHandler\s*\(", stripped))
     details.append(CheckDetail(
-        check_name="pit_isr_defined",
+        check_name="isr_handler_defined",
         passed=has_isr,
-        expected="PIT_IRQHandler defined",
+        expected="GPIO*_IRQHandler defined (matches vector table entry)",
         actual="present" if has_isr else "missing",
         check_type="exact_match",
     ))
 
-    # Shared flag or variable between ISR and main.
-    # Search comment-stripped code: the word "volatile" in a comment must
-    # not satisfy this check (found by L4 mutation no_volatile_at_all).
-    has_volatile = bool(re.search(r"\bvolatile\b", strip_comments(generated_code)))
+    has_clear = (
+        scoped_contains(generated_code, "GPIO_PortClearInterruptFlags", scope="stripped")
+        or scoped_contains(generated_code, "GPIO_ClearPinsInterruptFlags", scope="stripped")
+    )
     details.append(CheckDetail(
-        check_name="volatile_shared_data",
-        passed=has_volatile,
-        expected="volatile qualifier on ISR-shared variable(s)",
-        actual="present" if has_volatile else "missing",
+        check_name="interrupt_flag_cleared",
+        passed=has_clear,
+        expected="GPIO interrupt flag clear API used",
+        actual="present" if has_clear else "missing",
         check_type="exact_match",
     ))
 
-    has_gpio_read = scoped_contains(generated_code, "GPIO_PinRead", scope="stripped")
+    # Stated requirement (prompt req. 3): falling-edge interrupt.
+    # Functional correctness check, NOT implicit knowledge — kept in L0.
+    has_falling = scoped_contains(
+        generated_code, "kGPIO_IntFallingEdge", scope="stripped"
+    )
     details.append(CheckDetail(
-        check_name="gpio_pin_read_in_code",
-        passed=has_gpio_read,
-        expected="GPIO_PinRead called to sample input",
-        actual="present" if has_gpio_read else "missing",
+        check_name="falling_edge_configured",
+        passed=has_falling,
+        expected="kGPIO_IntFallingEdge interrupt mode",
+        actual="present" if has_falling else "missing",
         check_type="exact_match",
     ))
 
