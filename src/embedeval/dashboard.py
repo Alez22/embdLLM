@@ -204,7 +204,6 @@ _NAV = """
   <a href="/report">Report</a>
   <a href="/cases">Cases</a>
   <a href="/history">Run History</a>
-  <a href="/review">Review</a>
   <a href="/docs/layers">Docs</a>
   <a href="/docs/models">Models</a>
 </nav>
@@ -1597,6 +1596,7 @@ def docs_layers() -> str:
   </p>
 </div>
 """
+    return _page("Layers", body)
 
 
 @app.get("/docs/models", response_class=HTMLResponse)
