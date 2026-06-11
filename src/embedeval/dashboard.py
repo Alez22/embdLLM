@@ -140,6 +140,9 @@ a:hover { text-decoration: underline; }
 h1 { font-size: 1.4rem; font-weight: 600; }
 h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.75rem; }
 h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: #a0aec0; }
+.desc { color: #a0aec0; font-size: 0.85rem; line-height: 1.5;
+        margin-bottom: 1rem; max-width: 80ch; }
+.desc strong { color: #e2e8f0; }
 .nav { background: #1a1d2e; padding: 0.75rem 1.5rem;
        display: flex; align-items: center; gap: 2rem;
        border-bottom: 1px solid #2d3748; }
@@ -198,6 +201,7 @@ _NAV = """
 <nav class="nav">
   <h1>EmbedEval</h1>
   <a href="/">Leaderboard</a>
+  <a href="/report">Report</a>
   <a href="/cases">Cases</a>
   <a href="/history">Run History</a>
   <a href="/review">Review</a>
@@ -405,6 +409,17 @@ def _diff_html(a: str, b: str, fromfile: str = "reference", tofile: str = "gener
 # ---------------------------------------------------------------------------
 
 _DIFFICULTIES = ["easy", "medium", "hard"]
+
+
+@app.get("/report", response_class=HTMLResponse)
+def report() -> str:
+    """Visual benchmark report: aggregated per-model charts (Plotly)."""
+    from embedeval.report import generate_report_body
+
+    # include_plotly_js=True: the dashboard pages do not otherwise load plotly.
+    body = generate_report_body(RESULTS_DIR, include_plotly_js=True,
+                                cases_dir=CASES_DIR)
+    return _page("Report", body)
 
 
 @app.get("/", response_class=HTMLResponse)

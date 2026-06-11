@@ -1467,3 +1467,36 @@ def list_cases(
             f"  [{meta.difficulty.value:6s}] {meta.id:20s} "
             f"{meta.sdk.value:15s} {meta.category.value:15s} — {meta.title}"
         )
+
+
+@app.command(name="report-html")
+def report_html(
+    results_dir: Annotated[
+        Path,
+        typer.Option("--results", help="Directory containing runs/ result files"),
+    ] = Path("results"),
+    output: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--output", "-o",
+            help="Output HTML path (default: <results>/report.html)",
+        ),
+    ] = None,
+    cases_dir: Annotated[
+        Path,
+        typer.Option("--cases", help="Case root used to count cases for coverage"),
+    ] = Path("cases"),
+    total_cases: Annotated[
+        Optional[int],
+        typer.Option(
+            "--total-cases",
+            help="Override coverage denominator (default: all implemented cases)",
+        ),
+    ] = None,
+) -> None:
+    """Generate a standalone visual benchmark report (interactive HTML)."""
+    from embedeval.report import write_standalone_report
+
+    out = output or (results_dir / "report.html")
+    path = write_standalone_report(results_dir, out, total_cases, cases_dir)
+    typer.echo(f"Report written to {path}")

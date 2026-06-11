@@ -39,6 +39,7 @@ twister-out*/
 # Results — track summaries, ignore per-TC detail JSONs and the run history log
 results/runs/*/details/
 results/history.json
+results/report.html
 
 # Environment
 .env
