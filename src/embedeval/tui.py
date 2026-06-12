@@ -714,6 +714,7 @@ class EmbedEvalTUI(App):
     BINDINGS: ClassVar[list[Binding]] = [
         Binding("r", "refresh", "Refresh"),
         Binding("n", "new_run", "New Run"),
+        Binding("s", "stop_run", "Stop Run"),
         Binding("q", "quit", "Quit"),
     ]
 
@@ -722,6 +723,7 @@ class EmbedEvalTUI(App):
 
         with Horizontal(id="filter-bar"):
             yield Button("New Run", variant="primary", id="btn-new-run")
+            yield Button("Stop", variant="error", id="btn-stop-run")
 
         yield DataTable(id="results-table", cursor_type="row")
         yield Static("", id="summary-bar")
@@ -745,6 +747,10 @@ class EmbedEvalTUI(App):
         self._run_fail: int = 0
         self._run_error: int = 0
         self._run_current: str = ""
+        # Track (case_id, attempt) already counted: the runner can emit both an
+        # "unhandled" retry line and a final PASS/FAIL for the same attempt, so
+        # counting every matching line double-counts and the bar overshoots 100%.
+        self._run_seen: set[tuple[str, str]] = set()
 
         # Leaderboard columns are built dynamically once SDKs are known.
         self._sdk_list: list[str] = []
@@ -816,6 +822,31 @@ class EmbedEvalTUI(App):
     @on(Button.Pressed, "#btn-new-run")
     def on_new_run_button(self) -> None:
         self.action_new_run()
+
+    def action_stop_run(self) -> None:
+        """Terminate the active run and drop any queued runs."""
+        log = self.query_one("#run-log", Log)
+        dropped = len(self._pending_runs)
+        self._pending_runs.clear()
+        if self._proc is None or self._proc.poll() is not None:
+            log.write_line("[stop] No run is currently active.")
+            return
+        # Ask the child to stop, then force-kill if it ignores SIGTERM.
+        self._proc.terminate()
+        try:
+            self._proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            self._proc.kill()
+        msg = "[stop] Run interrupted by user."
+        if dropped:
+            msg += f" Dropped {dropped} queued run(s)."
+        log.write_line(msg)
+        # _stream_output will observe the exit and call _finish_run, which
+        # refreshes the leaderboard and clears the progress bar.
+
+    @on(Button.Pressed, "#btn-stop-run")
+    def on_stop_run_button(self) -> None:
+        self.action_stop_run()
 
     def _on_run_config(self, config: dict | None) -> None:
         if config is None:
@@ -894,6 +925,7 @@ class EmbedEvalTUI(App):
         self._run_fail = 0
         self._run_error = 0
         self._run_current = ""
+        self._run_seen = set()
 
         log = self.query_one("#run-log", Log)
         log.write_line(f"[log] {self._log_file}")
@@ -958,6 +990,10 @@ class EmbedEvalTUI(App):
                 + (f"  ({remaining} more queued)" if remaining else "")
             )
             self._launch_run(next_config)
+        else:
+            # No more runs: replace the progress bar with the leaderboard
+            # summary so a stale "Running…" line does not linger.
+            self._refresh_table()
 
     def _append_log(self, line: str) -> None:
         # Always write full output to file for debugging.
@@ -982,18 +1018,26 @@ class EmbedEvalTUI(App):
         # Infrastructure errors use a different log format — handled separately below.
         u = _CASE_UNHANDLED_RE.search(line)
         if u:
+            case_id, attempt = u.group(1), u.group(2)
+            self._run_current = case_id
+            # Count each (case, attempt) only once — see _run_seen note.
+            if (case_id, attempt) in self._run_seen:
+                return
+            self._run_seen.add((case_id, attempt))
             self._run_done += 1
-            self._run_current = u.group(1)
             self._run_error += 1
             self._update_progress_bar()
             return
 
-        m = re.search(r"Case (\S+) attempt \d+: (PASS|FAIL@L\S+|FAIL)", line)
+        m = re.search(r"Case (\S+) attempt (\d+): (PASS|FAIL@L\S+|FAIL)", line)
         if not m:
             return
-        case_id, status = m.group(1), m.group(2)
-        self._run_done += 1
+        case_id, attempt, status = m.group(1), m.group(2), m.group(3)
         self._run_current = case_id
+        if (case_id, attempt) in self._run_seen:
+            return
+        self._run_seen.add((case_id, attempt))
+        self._run_done += 1
         if status == "PASS":
             self._run_pass += 1
         else:
@@ -1007,9 +1051,11 @@ class EmbedEvalTUI(App):
         if total == 0:
             return
         bar_width = 20
-        filled = round(done / total * bar_width)
+        # Clamp so a miscount can never render a bar past 100%.
+        frac = min(done / total, 1.0)
+        filled = round(frac * bar_width)
         bar = "█" * filled + "░" * (bar_width - filled)
-        pct = int(done / total * 100)
+        pct = int(frac * 100)
         summary = self.query_one("#summary-bar", Static)
         summary.update(
             f"  Running  [{bar}]  {done}/{total} ({pct}%)"
