@@ -127,6 +127,112 @@ def _load_runs_summary() -> list[dict]:
     return runs
 
 
+def _load_leaderboard(cases: list[dict]) -> tuple[list[str], list[dict]]:
+    """Aggregate run results into a per-config leaderboard.
+
+    A leaderboard row is identified by the tuple (model, temperature,
+    no_think, attempts) — the same model run with different parameters is a
+    distinct row. Multiple runs sharing that config are merged: for each case
+    the most recent run wins.
+
+    Coverage per SDK = distinct cases tested / total cases of that SDK present
+    on disk (cases/). The total score is the global pass-rate (passed cases /
+    tested cases) across all SDKs.
+
+    @param cases  Discovered case metadata dicts (provides the SDK denominators).
+    @return (sdk_list, rows) where sdk_list is every SDK discovered on disk and
+            rows is the leaderboard sorted by pass-rate descending.
+    """
+    # --- denominator: total cases per SDK from discovery ---
+    total_by_sdk: dict[str, int] = {}
+    for c in cases:
+        sdk = c.get("sdk", "")
+        if sdk:
+            total_by_sdk[sdk] = total_by_sdk.get(sdk, 0) + 1
+    sdk_list = sorted(total_by_sdk)
+
+    runs_root = RESULTS_DIR / "runs"
+    if not runs_root.is_dir():
+        return sdk_list, []
+
+    # config_key -> {meta, cases: {case_id: {passed, sdk}}}
+    groups: dict[tuple, dict] = {}
+
+    # Iterate ascending so later runs overwrite earlier ones per case.
+    for run_dir in sorted(runs_root.iterdir()):
+        summary_file = run_dir / "summary.json"
+        if not summary_file.is_file():
+            continue
+        try:
+            summary = json.loads(summary_file.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+
+        model = summary.get("model", "")
+        if model == "mock" or not model:
+            continue
+
+        gen_params = summary.get("generation_params", {})
+        no_think = bool(gen_params.get("no_think", False))
+        temperature = float(summary.get("temperature", 0.0))
+        attempts = int(summary.get("n_samples_per_case", 1))
+        key = (model, temperature, no_think, attempts)
+
+        group = groups.setdefault(key, {
+            "model": model,
+            "temperature": temperature,
+            "no_think": no_think,
+            "attempts": attempts,
+            "cases": {},
+        })
+
+        details_dir = run_dir / "details"
+        if not details_dir.is_dir():
+            continue
+        for f in details_dir.glob("*.json"):
+            try:
+                d = json.loads(f.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            case_id = d.get("case_id") or f.stem
+            group["cases"][case_id] = {
+                "passed": bool(d.get("passed")),
+                "sdk": d.get("sdk", ""),
+            }
+
+    rows: list[dict] = []
+    for group in groups.values():
+        tested_by_sdk: dict[str, int] = {}
+        tested_total = 0
+        passed_total = 0
+        for info in group["cases"].values():
+            tested_total += 1
+            if info["passed"]:
+                passed_total += 1
+            sdk = info["sdk"]
+            if sdk:
+                tested_by_sdk[sdk] = tested_by_sdk.get(sdk, 0) + 1
+
+        coverage: dict[str, tuple[int, int]] = {}
+        for sdk in sdk_list:
+            coverage[sdk] = (tested_by_sdk.get(sdk, 0), total_by_sdk[sdk])
+
+        pass_rate = passed_total / tested_total if tested_total else 0.0
+        rows.append({
+            "model": group["model"],
+            "temperature": group["temperature"],
+            "no_think": group["no_think"],
+            "attempts": group["attempts"],
+            "coverage": coverage,
+            "tested_total": tested_total,
+            "passed_total": passed_total,
+            "pass_rate": pass_rate,
+        })
+
+    rows.sort(key=lambda r: r["pass_rate"], reverse=True)
+    return sdk_list, rows
+
+
 
 
 
@@ -627,7 +733,6 @@ class EmbedEvalTUI(App):
 
     def on_mount(self) -> None:
         self._cases: list[dict] = _discover_cases(CASES_DIR)
-        self._runs: list[dict] = []
         self._proc: subprocess.Popen | None = None  # type: ignore[type-arg]
         self._pending_runs: list[dict] = []  # queued configs waiting for current run to finish
         self._log_queue: Queue[str] = Queue()
@@ -641,51 +746,60 @@ class EmbedEvalTUI(App):
         self._run_error: int = 0
         self._run_current: str = ""
 
-        table = self.query_one("#results-table", DataTable)
-        table.cursor_type = "row"
-        table.add_column("Run", key="run_id")
-        table.add_column("Model", key="model")
-        table.add_column("Cases", key="cases")
-        table.add_column("Att.", key="attempts")
-        table.add_column("Temp", key="temperature")
-        table.add_column("Think", key="think")
-        table.add_column("SDKs", key="sdks")
-        table.add_column("Score", key="score")
-        table.add_column("Passed", key="passed")
-
+        # Leaderboard columns are built dynamically once SDKs are known.
+        self._sdk_list: list[str] = []
+        self._rows: list[dict] = []
         self._load_data()
 
+    def _build_columns(self, sdk_list: list[str]) -> None:
+        """(Re)build the leaderboard columns for the discovered SDKs."""
+        table = self.query_one("#results-table", DataTable)
+        table.clear(columns=True)
+        table.cursor_type = "row"
+        table.add_column("Model", key="model")
+        table.add_column("Temp", key="temperature")
+        table.add_column("Think", key="think")
+        table.add_column("Att.", key="attempts")
+        for sdk in sdk_list:
+            table.add_column(sdk, key=f"sdk:{sdk}")
+        table.add_column("Score", key="score")
+
     def _load_data(self) -> None:
-        self._runs = _load_runs_summary()
+        self._sdk_list, self._rows = _load_leaderboard(self._cases)
+        self._build_columns(self._sdk_list)
         self._refresh_table()
 
     def _refresh_table(self) -> None:
         table = self.query_one("#results-table", DataTable)
         table.clear()
 
-        for r in self._runs:
-            score = r.get("avg_score", 0.0)
-            score_str = f"{_score_bar(score)} {score:.2f}"
-            total = r.get("total", 0)
-            passed = r.get("passed", 0)
-            no_think = r.get("no_think", False)
-            think_str = "no" if no_think else "yes"
+        for r in self._rows:
+            think_str = "no" if r.get("no_think", False) else "yes"
             temp = r.get("temperature", 0.0)
-            sdks_str = ", ".join(r.get("sdks", [])) or "—"
-            table.add_row(
-                r.get("run_id", ""),
+            cells = [
                 r.get("model", "").split("/")[-1],
-                str(total),
-                str(r.get("attempts", 1)),
                 f"{temp:.1f}",
                 think_str,
-                sdks_str,
-                score_str,
-                f"{passed}/{total}",
-            )
+                str(r.get("attempts", 1)),
+            ]
+            coverage = r.get("coverage", {})
+            for sdk in self._sdk_list:
+                tested, total = coverage.get(sdk, (0, 0))
+                if total == 0:
+                    cells.append("—")
+                else:
+                    pct = int(tested / total * 100)
+                    cells.append(f"{tested}/{total} {pct}%")
+            pass_rate = r.get("pass_rate", 0.0)
+            cells.append(f"{_score_bar(pass_rate)} {pass_rate:.2f}")
+            table.add_row(*cells)
 
         summary = self.query_one("#summary-bar", Static)
-        summary.update(f"  {len(self._runs)} runs")
+        summary.update(
+            f"  {len(self._rows)} model configs  ·  "
+            f"coverage = tested/total cases per SDK  ·  "
+            f"score = global pass-rate"
+        )
 
     # -----------------------------------------------------------------------
     # Actions
