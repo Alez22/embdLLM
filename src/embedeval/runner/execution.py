@@ -1,11 +1,15 @@
-"""EmbedEval benchmark runner."""
+"""Single-case execution and the run_benchmark orchestration loop.
 
-import json
+call_model and evaluate are called through the package module (``_runner``)
+rather than the names imported into this module's globals, so test patches
+of ``embedeval.runner.call_model`` / ``embedeval.runner.evaluate`` are seen
+at call time. The direct imports remain for the package __init__ re-export
+(defining the default, un-patched bindings).
+"""
+
 import logging
-from dataclasses import dataclass, field
 from pathlib import Path
 
-import yaml
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 
@@ -18,215 +22,26 @@ from embedeval.corpus import (
     grade_store,
     hash_prompt,
 )
-from embedeval.evaluator import evaluate
-from embedeval.llm_client import build_full_prompt, call_model
+from embedeval import runner as _runner
+from embedeval.llm_client import build_full_prompt
 from embedeval.models import (
-    CaseCategory,
     CaseMetadata,
-    CaseTier,
     CheckDetail,
-    DifficultyTier,
     EvalResult,
     LayerResult,
-    Sdk,
     TokenUsage,
     Visibility,
 )
 
-# Directory names under cases/ that map to SDK buckets.
-_SDK_BUCKET_DIRS: frozenset[str] = frozenset(sdk.value for sdk in Sdk)
+from embedeval.runner.checkpoint import _append_checkpoint, _load_checkpoint
+from embedeval.runner.discovery import Filters, discover_cases, filter_cases
+from embedeval.runner.prompts import (
+    _collect_context_files,
+    _inject_board_target,
+    _load_prompt,
+)
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class Filters:
-    """Filtering criteria for benchmark case selection."""
-
-    categories: list[CaseCategory] = field(default_factory=list)
-    difficulties: list[DifficultyTier] = field(default_factory=list)
-    tiers: list[CaseTier] = field(default_factory=list)
-    sdks: list[Sdk] = field(default_factory=list)
-    tags: list[str] = field(default_factory=list)
-    visibility: Visibility | None = None
-    # ISO date string; only include cases created after this date
-    after_date: str | None = None
-    case_ids: list[str] | None = None  # explicit case ID whitelist (for retest-only)
-
-
-def iter_case_dirs(cases_root: Path) -> list[Path]:
-    """Yield every case directory under ``cases_root`` in sorted order.
-
-    Understands both the 2-level SDK-bucket layout
-    (``cases/<sdk>/<case-id>/``) and, transitionally, the 1-level flat
-    layout. A directory counts as a case dir if it contains a
-    ``metadata.yaml``. Used by migration/audit scripts that iterate raw
-    paths rather than going through ``discover_cases`` (which parses
-    metadata and would drop malformed entries).
-    """
-    if not cases_root.is_dir():
-        return []
-    out: list[Path] = []
-    for entry in sorted(cases_root.iterdir()):
-        if not entry.is_dir():
-            continue
-        if entry.name in _SDK_BUCKET_DIRS:
-            for case_dir in sorted(entry.iterdir()):
-                if case_dir.is_dir() and (case_dir / "metadata.yaml").is_file():
-                    out.append(case_dir)
-        elif (entry / "metadata.yaml").is_file():
-            out.append(entry)
-    return out
-
-
-def load_case_metadata(case_dir: Path) -> CaseMetadata | None:
-    """Load case metadata from a case directory's metadata.yaml.
-
-    Args:
-        case_dir: Path to the case directory.
-
-    Returns:
-        CaseMetadata if valid, None if metadata is missing or invalid.
-    """
-    metadata_file = case_dir / "metadata.yaml"
-    if not metadata_file.is_file():
-        logger.warning("No metadata.yaml in %s", case_dir)
-        return None
-
-    try:
-        raw = yaml.safe_load(metadata_file.read_text(encoding="utf-8"))
-        if not isinstance(raw, dict):
-            logger.warning("Invalid metadata format in %s", case_dir)
-            return None
-        return CaseMetadata(**raw)
-    except Exception as exc:
-        logger.warning("Failed to parse metadata in %s: %s", case_dir, exc)
-        return None
-
-
-def discover_cases(cases_dir: Path) -> list[tuple[Path, CaseMetadata]]:
-    """Discover all valid case directories under cases_dir.
-
-    Expected layout: ``cases/<sdk>/<case-id>/metadata.yaml`` (2 levels).
-    During the SDK-bucket migration transition we also accept the legacy
-    1-level layout ``cases/<case-id>/metadata.yaml`` and emit a warning so
-    stragglers surface at runtime.
-
-    Args:
-        cases_dir: Root directory containing SDK bucket subdirectories.
-
-    Returns:
-        List of (case_dir, metadata) tuples for valid cases.
-    """
-    if not cases_dir.is_dir():
-        logger.warning("Cases directory does not exist: %s", cases_dir)
-        return []
-
-    cases: list[tuple[Path, CaseMetadata]] = []
-    for entry in sorted(cases_dir.iterdir()):
-        if not entry.is_dir():
-            continue
-        if entry.name in _SDK_BUCKET_DIRS:
-            # SDK bucket — descend one level.
-            for case_dir in sorted(entry.iterdir()):
-                if not case_dir.is_dir():
-                    continue
-                metadata = load_case_metadata(case_dir)
-                if metadata is not None:
-                    cases.append((case_dir, metadata))
-        elif (entry / "metadata.yaml").is_file():
-            # Legacy flat layout — warn but still load.
-            logger.warning(
-                "Case %s found at legacy flat location; expected cases/<sdk>/%s/",
-                entry,
-                entry.name,
-            )
-            metadata = load_case_metadata(entry)
-            if metadata is not None:
-                cases.append((entry, metadata))
-
-    logger.info("Discovered %d cases in %s", len(cases), cases_dir)
-    return cases
-
-
-def filter_cases(
-    cases: list[tuple[Path, CaseMetadata]],
-    filters: Filters,
-) -> list[tuple[Path, CaseMetadata]]:
-    """Filter cases by category, difficulty, and tags.
-
-    Args:
-        cases: List of (case_dir, metadata) tuples.
-        filters: Filtering criteria.
-
-    Returns:
-        Filtered list of cases.
-    """
-    filtered: list[tuple[Path, CaseMetadata]] = []
-    for case_dir, meta in cases:
-        if filters.case_ids is not None and meta.id not in filters.case_ids:
-            continue
-        if filters.categories and meta.category not in filters.categories:
-            continue
-        if filters.difficulties and meta.difficulty not in filters.difficulties:
-            continue
-        if filters.tiers and meta.tier not in filters.tiers:
-            continue
-        if filters.sdks and meta.sdk not in filters.sdks:
-            continue
-        if filters.tags and not any(tag in meta.tags for tag in filters.tags):
-            continue
-        if filters.visibility is not None and meta.visibility != filters.visibility:
-            continue
-        if filters.after_date and meta.created_date:
-            try:
-                from datetime import date as _date
-
-                _date.fromisoformat(filters.after_date)
-                _date.fromisoformat(meta.created_date)
-            except ValueError:
-                pass  # skip filter on invalid format
-            else:
-                if meta.created_date <= filters.after_date:
-                    continue
-        filtered.append((case_dir, meta))
-
-    logger.info(
-        "Filtered %d -> %d cases",
-        len(cases),
-        len(filtered),
-    )
-    return filtered
-
-
-def _load_prompt(case_dir: Path) -> str:
-    """Load the prompt file from a case directory."""
-    prompt_file = case_dir / "prompt.md"
-    if prompt_file.is_file():
-        return prompt_file.read_text(encoding="utf-8")
-
-    prompt_txt = case_dir / "prompt.txt"
-    if prompt_txt.is_file():
-        return prompt_txt.read_text(encoding="utf-8")
-
-    return f"Generate Zephyr RTOS code for case: {case_dir.name}"
-
-
-def _collect_context_files(case_dir: Path) -> list[str]:
-    """Collect context files from the case directory."""
-    context_dir = case_dir / "context"
-    if not context_dir.is_dir():
-        return []
-    return [str(f) for f in sorted(context_dir.iterdir()) if f.is_file()]
-
-
-def _inject_board_target(prompt: str, meta: CaseMetadata) -> str:
-    """Inject build target board information into the prompt.
-
-    Adds a target board line so the LLM knows which board to write code for.
-    """
-    board = meta.build_board or "native_sim"
-    return prompt.rstrip() + "\n\nTarget board: " + board + "\n"
 
 
 def _make_error_result(
@@ -277,40 +92,6 @@ def _make_error_result(
     result.tier = meta.tier
     result.reasoning_types = meta.reasoning_types
     return result
-
-
-def _load_checkpoint(path: Path) -> dict[str, EvalResult]:
-    """Load previously completed results from a JSONL checkpoint file.
-
-    Returns a mapping of case_id -> EvalResult for cases that were
-    already evaluated in a prior (interrupted) invocation.
-    """
-    if not path.is_file():
-        return {}
-    completed: dict[str, EvalResult] = {}
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line:
-            continue
-        try:
-            data = json.loads(line)
-            result = EvalResult.model_validate(data)
-            completed[result.case_id] = result
-        except Exception as exc:  # noqa: BLE001
-            logger.warning("Ignoring bad checkpoint line: %s", exc)
-    logger.info(
-        "Loaded %d completed case(s) from checkpoint %s",
-        len(completed),
-        path,
-    )
-    return completed
-
-
-def _append_checkpoint(path: Path, result: EvalResult) -> None:
-    """Append one EvalResult as a single JSONL line to the checkpoint."""
-    with path.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(result.model_dump(mode="json"), ensure_ascii=False))
-        f.write("\n")
 
 
 def _build_result_from_grade(
@@ -432,7 +213,7 @@ def _run_single_case(
                     used_thinking=False,
                 )
 
-        result = evaluate(
+        result = _runner.evaluate(
             case_dir=case_dir,
             generated_code=cached_code,
             model=model,
@@ -450,7 +231,7 @@ def _run_single_case(
             grade_store(corpus_dir, cached_code, case_dir, result)
         return result
 
-    llm_response = call_model(
+    llm_response = _runner.call_model(
         model=model,
         prompt=prompt,
         context_files=context_files,
@@ -503,7 +284,7 @@ def _run_single_case(
             # outcome; if the user wants to re-run feedback they must --force.
             return result
 
-    result = evaluate(
+    result = _runner.evaluate(
         case_dir=case_dir,
         generated_code=llm_response.generated_code,
         model=model,
@@ -552,7 +333,7 @@ def _run_single_case(
             f"Please fix the code and output ONLY the complete"
             f" corrected C source file."
         )
-        fb_response = call_model(
+        fb_response = _runner.call_model(
             model=model,
             prompt=feedback_prompt,
             context_pack=context_pack,
@@ -565,7 +346,7 @@ def _run_single_case(
         # generation from a feedback-round output, so storing fb_code grades
         # would poison future base lookups (and vice versa). Feedback rounds
         # always re-evaluate.
-        result = evaluate(
+        result = _runner.evaluate(
             case_dir=case_dir,
             generated_code=fb_code,
             model=model,
