@@ -487,6 +487,7 @@ def _leaderboard_table(
     model_stats: dict[str, dict],
     review_sdk: str = "",
     consistency_by_model: dict[str, float | None] | None = None,
+    link_filters: dict[str, str] | None = None,
 ) -> str:
     """Render the shared models×difficulty leaderboard table HTML.
 
@@ -496,8 +497,25 @@ def _leaderboard_table(
     consistency_by_model, when provided, replaces the infra-only "Errors" column
     with a per-model "Consistency" column (1-CV averaged over cases with ≥5
     attempts; None → n/a). Used by the Analysis page.
+
+    link_filters, when provided (Analysis page only), turns the pass@1 cell and
+    each difficulty bucket cell into drill-down links to /review, carrying the
+    active filters so the user lands on that model's matching cases. The keys
+    are query params (category/sdk/difficulty); the difficulty bucket cells
+    additionally pin difficulty to their own column.
     """
     show_consistency = consistency_by_model is not None
+    drill = link_filters is not None
+
+    def _review_link(model: str, extra: dict[str, str]) -> str:
+        params = {"model": model}
+        if link_filters:
+            params.update({k: v for k, v in link_filters.items() if v})
+        params.update(extra)
+        return "/review?" + "&".join(
+            f"{k}={quote(v, safe='')}" for k, v in params.items() if v
+        )
+
     fifth_header = "Consistency" if show_consistency else "Errors"
     diff_headers = "".join(
         f'<th style="text-align:center"><span class="badge badge-{d}">{d.capitalize()}</span></th>'
@@ -532,10 +550,16 @@ def _leaderboard_table(
                 else '<span style="color:#4a5568">—</span>'
             )
             fifth_cell = f"<td style='text-align:center'>{errors_cell}</td>"
+        # pass@1 cell: drill into all matching cases for this model when filtered.
+        passrate_bar = _bar_cell(s['passed'] / s['total'] if s['total'] else 0)
+        if drill and s['total']:
+            passrate_cell = f"<td><a href='{_review_link(model, {})}'>{passrate_bar}</a></td>"
+        else:
+            passrate_cell = f"<td>{passrate_bar}</td>"
         row = (
             f"<td title='{model}' style='font-family:monospace;font-size:0.8rem'>"
             f"<a href='{review_url}'>{short}</a></td>"
-            f"<td>{_bar_cell(s['passed'] / s['total'] if s['total'] else 0)}</td>"
+            f"{passrate_cell}"
             f"<td>{_bar_cell(s['coverage'])}</td>"
             f"<td style='color:{dur_color};font-variant-numeric:tabular-nums'>{dur_str}</td>"
             f"<td style='color:#a0aec0'>{s['passed']}/{s['total']}</td>"
@@ -547,11 +571,15 @@ def _leaderboard_table(
                 row += "<td class='cell-none' style='text-align:center'>—</td>"
             else:
                 color_cls = "cell-pass" if b["pct"] >= 60 else "cell-fail"
-                row += (
-                    f"<td class='{color_cls}'>{b['pct']}% "
-                    f"<span style='font-weight:normal;font-size:0.75rem'>"
-                    f"({b['passed']}/{b['total']})</span></td>"
+                cell_inner = (
+                    f"{b['pct']}% <span style='font-weight:normal;font-size:0.75rem'>"
+                    f"({b['passed']}/{b['total']})</span>"
                 )
+                # Drill into this model's cases for this specific difficulty.
+                if drill:
+                    href = _review_link(model, {"difficulty": diff})
+                    cell_inner = f"<a href='{href}'>{cell_inner}</a>"
+                row += f"<td class='{color_cls}'>{cell_inner}</td>"
         rows += f"<tr>{row}</tr>"
 
     return f"""
@@ -756,6 +784,11 @@ def analysis(request: Request) -> str:
         content = _leaderboard_table(
             models, model_stats, review_sdk=filter_sdk,
             consistency_by_model=consistency_by_model,
+            link_filters={
+                "category": filter_category,
+                "sdk": filter_sdk,
+                "difficulty": filter_diff,
+            },
         )
     else:
         content = "<div class='card' style='margin-top:1rem'><p style='color:#718096;padding:1rem'>No results match the selected filters.</p></div>"
@@ -957,14 +990,21 @@ def case_detail(case_id: str, model: str) -> str:
 
 @app.get("/review", response_class=HTMLResponse)
 def review(request: Request) -> str:
-    """Human review view: all cases for a given model + optional SDK filter.
+    """Human review view: all cases for a given model + optional filters.
 
     Query params:
       ?model=groq/llama-3.3-70b-versatile  — required
-      ?sdk=mcuxpresso-sdk                   — optional, narrows the case list
+      ?sdk=mcuxpresso-sdk                   — optional, narrows by SDK bucket
+      ?category=dma                         — optional, narrows by category
+      ?difficulty=medium                    — optional, narrows by difficulty
+
+    The category/difficulty filters let the Analysis page drill down from a
+    pass-rate cell straight into the matching cases for that model.
     """
     filter_model = request.query_params.get("model", "")
     filter_sdk = request.query_params.get("sdk", "")
+    filter_category = request.query_params.get("category", "")
+    filter_diff = request.query_params.get("difficulty", "")
 
     if not filter_model:
         return _page("Review", "<div class='card'><p>No model selected. Go back to <a href='/'>Leaderboard</a> and click a model name.</p></div>")
@@ -982,14 +1022,14 @@ def review(request: Request) -> str:
         if sdk:
             available_sdks.add(sdk)
 
-    # Apply SDK filter
+    # Apply filters (all combinable, matching the Analysis page semantics).
+    visible = model_results
     if filter_sdk:
-        visible = [
-            r for r in model_results
-            if _find_metadata(r.get("case_id", "")).get("sdk") == filter_sdk
-        ]
-    else:
-        visible = model_results
+        visible = [r for r in visible if _find_metadata(r.get("case_id", "")).get("sdk") == filter_sdk]
+    if filter_category:
+        visible = [r for r in visible if _find_metadata(r.get("case_id", "")).get("category") == filter_category]
+    if filter_diff:
+        visible = [r for r in visible if _find_metadata(r.get("case_id", "")).get("difficulty") == filter_diff]
 
     # Keep only latest attempt per case
     latest: dict[str, dict] = {}
@@ -1020,9 +1060,17 @@ def review(request: Request) -> str:
             f'border-radius:4px;padding:3px 8px;font-size:0.8rem">{opts}</select>'
         )
 
+    # Preserve category/difficulty across the SDK dropdown submit.
+    extra_hidden = ""
+    if filter_category:
+        extra_hidden += f'<input type="hidden" name="category" value="{filter_category}">'
+    if filter_diff:
+        extra_hidden += f'<input type="hidden" name="difficulty" value="{filter_diff}">'
+
     filter_form = f"""
 <form method="get" style="display:flex;align-items:center;gap:1rem;font-size:0.85rem;color:#a0aec0">
   <input type="hidden" name="model" value="{filter_model}">
+  {extra_hidden}
   <span>SDK: {_sdk_options()}</span>
 </form>"""
 
@@ -1063,9 +1111,21 @@ def review(request: Request) -> str:
         if errors > 0 else ""
     )
 
+    # Show the active drill-down filters and badge each one.
+    active_filters = ""
+    for label, val in (("category", filter_category), ("sdk", filter_sdk), ("difficulty", filter_diff)):
+        if val:
+            active_filters += f'<span class="tag">{label}: {val}</span>'
+
+    # Back link points to Analysis when a category/difficulty drill-down is active.
+    if filter_category or filter_diff:
+        back_href, back_label = "/analysis", "← Analysis"
+    else:
+        back_href, back_label = "/", "← Leaderboard"
+
     body = f"""
 <div style="margin-bottom:1rem">
-  <a href="/" style="color:#718096;font-size:0.85rem">← Leaderboard</a>
+  <a href="{back_href}" style="color:#718096;font-size:0.85rem">{back_label}</a>
 </div>
 <div class="card" style="margin-bottom:1rem">
   <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
@@ -1074,6 +1134,7 @@ def review(request: Request) -> str:
     <span style="color:#718096;font-size:0.85rem">{passed}/{total} passed</span>
     {_bar_cell(passed / total if total else 0)}
     {errors_summary}
+    {active_filters}
   </div>
 </div>
 {filter_form}
