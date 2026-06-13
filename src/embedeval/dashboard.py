@@ -201,6 +201,7 @@ _NAV = """
 <nav class="nav">
   <h1>EmbedEval</h1>
   <a href="/">Leaderboard</a>
+  <a href="/analysis">Analysis</a>
   <a href="/report">Report</a>
   <a href="/cases">Cases</a>
   <a href="/history">Run History</a>
@@ -410,6 +411,205 @@ def _diff_html(a: str, b: str, fromfile: str = "reference", tofile: str = "gener
 _DIFFICULTIES = ["easy", "medium", "hard"]
 
 
+def _latest_attempt_lookup(results: list[dict]) -> dict[tuple[str, str], dict]:
+    """Build (case_id, model) → latest-attempt result from a flat result list."""
+    lookup: dict[tuple[str, str], dict] = {}
+    for r in results:
+        key = (r.get("case_id", ""), r.get("model", ""))
+        if key not in lookup or r.get("attempt", 0) > lookup[key].get("attempt", 0):
+            lookup[key] = r
+    return lookup
+
+
+def _model_leaderboard_stats(
+    lookup: dict[tuple[str, str], dict],
+) -> tuple[list[str], dict[str, dict], dict[str, str]]:
+    """Compute per-model leaderboard stats from a latest-attempt lookup.
+
+    Returns (sorted_models, model_stats, case_difficulty). Shared by the global
+    leaderboard and the Analysis page so the scoring logic lives in one place.
+    ERROR results (infra failures, output_tokens==0) are excluded from pass-rate
+    and coverage so they don't penalise the model unfairly.
+    """
+    models: list[str] = []
+    seen_models: set[str] = set()
+    for (_, m) in lookup:
+        if m and m not in seen_models:
+            models.append(m)
+            seen_models.add(m)
+
+    case_difficulty: dict[str, str] = {}
+    for (case_id, _) in lookup:
+        if case_id not in case_difficulty:
+            case_difficulty[case_id] = _find_metadata(case_id).get("difficulty", "unknown")
+
+    def _bucket_stats(model: str, difficulty: str) -> dict:
+        bucket = [
+            r for (cid, m), r in lookup.items()
+            if m == model and case_difficulty.get(cid) == difficulty
+        ]
+        scorable = [r for r in bucket if _result_status(r) != "error"]
+        errors = len(bucket) - len(scorable)
+        total = len(scorable)
+        passed = sum(1 for r in scorable if r.get("passed"))
+        pct = int(passed / total * 100) if total else 0
+        return {"passed": passed, "total": total, "errors": errors, "pct": pct}
+
+    model_stats: dict[str, dict] = {}
+    for model in models:
+        all_for_model = [r for (_, m), r in lookup.items() if m == model]
+        scorable = [r for r in all_for_model if _result_status(r) != "error"]
+        errors = len(all_for_model) - len(scorable)
+        total = len(scorable)
+        passed = sum(1 for r in scorable if r.get("passed"))
+        pct = int(passed / total * 100) if total else 0
+        coverage = (
+            sum(r.get("total_score", 0.0) for r in scorable) / total if total else 0.0
+        )
+        avg_duration = (
+            sum(r.get("duration_seconds", 0.0) for r in scorable) / total if total else 0.0
+        )
+        model_stats[model] = {
+            "passed": passed, "total": total, "errors": errors, "pct": pct,
+            "coverage": coverage,
+            "avg_duration": avg_duration,
+            "buckets": {d: _bucket_stats(model, d) for d in _DIFFICULTIES},
+        }
+
+    models = sorted(
+        models,
+        key=lambda m: (model_stats[m]["pct"], model_stats[m]["coverage"]),
+        reverse=True,
+    )
+    return models, model_stats, case_difficulty
+
+
+def _leaderboard_table(
+    models: list[str],
+    model_stats: dict[str, dict],
+    review_sdk: str = "",
+    consistency_by_model: dict[str, float | None] | None = None,
+) -> str:
+    """Render the shared models×difficulty leaderboard table HTML.
+
+    review_sdk, when set, is forwarded into the per-model review links so the
+    review view opens pre-filtered to the same SDK bucket.
+
+    consistency_by_model, when provided, replaces the infra-only "Errors" column
+    with a per-model "Consistency" column (1-CV averaged over cases with ≥5
+    attempts; None → n/a). Used by the Analysis page.
+    """
+    show_consistency = consistency_by_model is not None
+    fifth_header = "Consistency" if show_consistency else "Errors"
+    diff_headers = "".join(
+        f'<th style="text-align:center"><span class="badge badge-{d}">{d.capitalize()}</span></th>'
+        for d in _DIFFICULTIES
+    )
+    header_cells = (
+        f"<th>Model</th><th>pass@1</th><th>check coverage</th><th>avg time</th>"
+        f"<th>Passed</th><th>{fifth_header}</th>{diff_headers}"
+    )
+
+    rows = ""
+    for model in models:
+        s = model_stats[model]
+        short = model.split("/")[-1]
+        dur = s["avg_duration"]
+        dur_str = f"{dur:.1f}s" if dur < 60 else f"{dur/60:.1f}m"
+        dur_color = "#68d391" if dur < 10 else "#f6ad55" if dur < 30 else "#fc8181"
+        review_url = f"/review?model={quote(model, safe='')}"
+        if review_sdk:
+            review_url += f"&sdk={quote(review_sdk, safe='')}"
+        if show_consistency:
+            cons = consistency_by_model.get(model)
+            if cons is None:
+                fifth_cell = '<td style="text-align:center;color:#4a5568;font-size:0.8rem">n/a</td>'
+            else:
+                fifth_cell = f'<td>{_bar_cell(cons)}</td>'
+        else:
+            errors = s["errors"]
+            errors_cell = (
+                f'<span class="badge badge-error">{errors}</span>'
+                if errors > 0
+                else '<span style="color:#4a5568">—</span>'
+            )
+            fifth_cell = f"<td style='text-align:center'>{errors_cell}</td>"
+        row = (
+            f"<td title='{model}' style='font-family:monospace;font-size:0.8rem'>"
+            f"<a href='{review_url}'>{short}</a></td>"
+            f"<td>{_bar_cell(s['passed'] / s['total'] if s['total'] else 0)}</td>"
+            f"<td>{_bar_cell(s['coverage'])}</td>"
+            f"<td style='color:{dur_color};font-variant-numeric:tabular-nums'>{dur_str}</td>"
+            f"<td style='color:#a0aec0'>{s['passed']}/{s['total']}</td>"
+            f"{fifth_cell}"
+        )
+        for diff in _DIFFICULTIES:
+            b = s["buckets"][diff]
+            if b["total"] == 0:
+                row += "<td class='cell-none' style='text-align:center'>—</td>"
+            else:
+                color_cls = "cell-pass" if b["pct"] >= 60 else "cell-fail"
+                row += (
+                    f"<td class='{color_cls}'>{b['pct']}% "
+                    f"<span style='font-weight:normal;font-size:0.75rem'>"
+                    f"({b['passed']}/{b['total']})</span></td>"
+                )
+        rows += f"<tr>{row}</tr>"
+
+    return f"""
+<div class="card" style="padding:0;overflow:auto;margin-top:1rem">
+  <table>
+    <thead><tr>{header_cells}</tr></thead>
+    <tbody>{rows}</tbody>
+  </table>
+</div>"""
+
+
+def _consistency_by_model(results: list[dict]) -> dict[str, float | None]:
+    """Per-model consistency averaged over its cases with ≥5 attempts.
+
+    Groups the raw (all-attempt) results by model then case_id, computes 1-CV
+    per case via _consistency_score, and averages the non-None values.
+    Returns None for a model when no case reached 5 attempts.
+    """
+    by_model: dict[str, dict[str, list[dict]]] = {}
+    for r in results:
+        model = r.get("model", "")
+        cid = r.get("case_id", "")
+        by_model.setdefault(model, {}).setdefault(cid, []).append(r)
+
+    out: dict[str, float | None] = {}
+    for model, cases_by_id in by_model.items():
+        applicable = {
+            cid: _applicable_layers(attempts) for cid, attempts in cases_by_id.items()
+        }
+        vals = [
+            v for v in (
+                _consistency_score([
+                    _recompute_total_score(c, applicable.get(cid, set()))
+                    for c in attempts
+                ])
+                for cid, attempts in cases_by_id.items()
+            )
+            if v is not None
+        ]
+        out[model] = sum(vals) / len(vals) if vals else None
+    return out
+
+
+def _filter_select(values: set[str], current: str, param: str) -> str:
+    """Render a submit-on-change <select> for a single filter param."""
+    opts = '<option value="">All</option>'
+    for v in sorted(values):
+        sel = ' selected' if v == current else ''
+        opts += f'<option value="{v}"{sel}>{v}</option>'
+    return (
+        f'<select name="{param}" onchange="this.form.submit()" '
+        f'style="background:#2d3748;color:#e2e8f0;border:1px solid #4a5568;'
+        f'border-radius:4px;padding:3px 8px;font-size:0.8rem">{opts}</select>'
+    )
+
+
 @app.get("/report", response_class=HTMLResponse)
 def report() -> str:
     """Visual benchmark report: aggregated per-model charts (Plotly)."""
@@ -457,124 +657,17 @@ def leaderboard(request: Request) -> str:
     if filter_diff:
         results = [r for r in results if _find_metadata(r.get("case_id", "")).get("difficulty") == filter_diff]
 
-    # Collect unique models from filtered results
-    models: list[str] = []
-    seen_models: set[str] = set()
-    for r in results:
-        m = r.get("model", "")
-        if m and m not in seen_models:
-            models.append(m)
-            seen_models.add(m)
-
-    # Build lookup: (case_id, model) → result (keep latest attempt)
-    lookup: dict[tuple[str, str], dict] = {}
-    for r in results:
-        key = (r.get("case_id", ""), r.get("model", ""))
-        if key not in lookup or r.get("attempt", 0) > lookup[key].get("attempt", 0):
-            lookup[key] = r
-
-    # Map case_id → difficulty from metadata
-    case_difficulty: dict[str, str] = {}
-    for (case_id, _) in lookup:
-        if case_id not in case_difficulty:
-            meta = _find_metadata(case_id)
-            case_difficulty[case_id] = meta.get("difficulty", "unknown")
-
-    # Per-model stats: overall + per difficulty bucket.
-    # ERROR results (infra failures, output_tokens==0) are excluded from pass-rate
-    # and coverage so they don't penalise the model unfairly.
-    def _bucket_stats(model: str, difficulty: str) -> dict:
-        bucket = [
-            r for (cid, m), r in lookup.items()
-            if m == model and case_difficulty.get(cid) == difficulty
-        ]
-        scorable = [r for r in bucket if _result_status(r) != "error"]
-        errors = len(bucket) - len(scorable)
-        total = len(scorable)
-        passed = sum(1 for r in scorable if r.get("passed"))
-        pct = int(passed / total * 100) if total else 0
-        return {"passed": passed, "total": total, "errors": errors, "pct": pct}
-
-    model_stats: dict[str, dict] = {}
-    for model in models:
-        all_results_for_model = [r for (_, m), r in lookup.items() if m == model]
-        scorable = [r for r in all_results_for_model if _result_status(r) != "error"]
-        errors = len(all_results_for_model) - len(scorable)
-        total = len(scorable)
-        passed = sum(1 for r in scorable if r.get("passed"))
-        pct = int(passed / total * 100) if total else 0
-        coverage = (
-            sum(r.get("total_score", 0.0) for r in scorable) / total
-            if total else 0.0
-        )
-        avg_duration = (
-            sum(r.get("duration_seconds", 0.0) for r in scorable) / total
-            if total else 0.0
-        )
-        model_stats[model] = {
-            "passed": passed, "total": total, "errors": errors, "pct": pct,
-            "coverage": coverage,
-            "avg_duration": avg_duration,
-            "buckets": {d: _bucket_stats(model, d) for d in _DIFFICULTIES},
-        }
-
-    # Sort by pass rate descending, then check coverage as tiebreaker
-    models = sorted(models, key=lambda m: (model_stats[m]["pct"], model_stats[m]["coverage"]), reverse=True)
-
-    # Filter form
-    def _options(values: set[str], current: str, param: str) -> str:
-        opts = f'<option value="">All</option>'
-        for v in sorted(values):
-            sel = ' selected' if v == current else ''
-            opts += f'<option value="{v}"{sel}>{v}</option>'
-        return f'<select name="{param}" onchange="this.form.submit()" style="background:#2d3748;color:#e2e8f0;border:1px solid #4a5568;border-radius:4px;padding:3px 8px;font-size:0.8rem">{opts}</select>'
+    # Build lookup, then compute shared per-model stats.
+    lookup = _latest_attempt_lookup(results)
+    models, model_stats, case_difficulty = _model_leaderboard_stats(lookup)
 
     filter_form = f"""
 <form method="get" style="display:flex;align-items:center;gap:1rem;font-size:0.85rem;color:#a0aec0">
-  <span>SDK: {_options(all_sdks, filter_sdk, "sdk")}</span>
-  <span>Difficulty: {_options(all_diffs, filter_diff, "difficulty")}</span>
+  <span>SDK: {_filter_select(all_sdks, filter_sdk, "sdk")}</span>
+  <span>Difficulty: {_filter_select(all_diffs, filter_diff, "difficulty")}</span>
 </form>"""
 
-    # Header
-    diff_headers = "".join(
-        f'<th style="text-align:center"><span class="badge badge-{d}">{d.capitalize()}</span></th>'
-        for d in _DIFFICULTIES
-    )
-    header_cells = f"<th>Model</th><th>pass@1</th><th>check coverage</th><th>avg time</th><th>Passed</th><th>Errors</th>{diff_headers}"
-
-    rows = ""
-    for model in models:
-        s = model_stats[model]
-        short = model.split("/")[-1]
-        dur = s["avg_duration"]
-        dur_str = f"{dur:.1f}s" if dur < 60 else f"{dur/60:.1f}m"
-        dur_color = "#68d391" if dur < 10 else "#f6ad55" if dur < 30 else "#fc8181"
-        review_url = f"/review?model={quote(model, safe='')}"
-        if filter_sdk:
-            review_url += f"&sdk={quote(filter_sdk, safe='')}"
-        errors = s["errors"]
-        errors_cell = (
-            f'<span class="badge badge-error">{errors}</span>'
-            if errors > 0
-            else '<span style="color:#4a5568">—</span>'
-        )
-        row = (
-            f"<td title='{model}' style='font-family:monospace;font-size:0.8rem'>"
-            f"<a href='{review_url}'>{short}</a></td>"
-            f"<td>{_bar_cell(s['passed'] / s['total'] if s['total'] else 0)}</td>"
-            f"<td>{_bar_cell(s['coverage'])}</td>"
-            f"<td style='color:{dur_color};font-variant-numeric:tabular-nums'>{dur_str}</td>"
-            f"<td style='color:#a0aec0'>{s['passed']}/{s['total']}</td>"
-            f"<td style='text-align:center'>{errors_cell}</td>"
-        )
-        for diff in _DIFFICULTIES:
-            b = s["buckets"][diff]
-            if b["total"] == 0:
-                row += "<td class='cell-none' style='text-align:center'>—</td>"
-            else:
-                color_cls = "cell-pass" if b["pct"] >= 60 else "cell-fail"
-                row += f"<td class='{color_cls}'>{b['pct']}% <span style='font-weight:normal;font-size:0.75rem'>({b['passed']}/{b['total']})</span></td>"
-        rows += f"<tr>{row}</tr>"
+    table_html = _leaderboard_table(models, model_stats, review_sdk=filter_sdk)
 
     # Case count per difficulty for the subtitle
     diff_counts = {d: sum(1 for v in case_difficulty.values() if v == d) for d in _DIFFICULTIES}
@@ -590,15 +683,99 @@ def leaderboard(request: Request) -> str:
   <span style="color:#718096;font-size:0.85rem">{len(models)} models · {sum(diff_counts.values())} cases ({", ".join(subtitle_parts) or "none"})</span>
 </div>
 {filter_form}
-<div class="card" style="padding:0;overflow:auto;margin-top:1rem">
-  <table>
-    <thead><tr>{header_cells}</tr></thead>
-    <tbody>{rows}</tbody>
-  </table>
-  {no_results_msg}
-</div>
+{table_html if models else "<div class='card' style='margin-top:1rem'>" + no_results_msg + "</div>"}
 """
     return _page("Leaderboard", body)
+
+
+@app.get("/analysis", response_class=HTMLResponse)
+def analysis(request: Request) -> str:
+    """Analysis page: build a leaderboard scoped to a filtered subset of cases.
+
+    Starts with category filtering (e.g. zephyr kconfig) plus SDK and difficulty,
+    all combinable. More analysis types will be added here over time.
+
+    Optional query params:
+      ?category=kconfig   — filter by case category
+      ?sdk=zephyr         — filter by SDK bucket
+      ?difficulty=medium  — filter by difficulty
+    """
+    filter_category = request.query_params.get("category", "")
+    filter_sdk = request.query_params.get("sdk", "")
+    filter_diff = request.query_params.get("difficulty", "")
+
+    all_results = _all_results()
+    if not all_results:
+        return _page(
+            "Analysis",
+            "<div class='card'><p>No results found in results/. Run a benchmark first.</p></div>",
+        )
+
+    # Collect available filter values across all results (for the filter UI).
+    all_categories: set[str] = set()
+    all_sdks: set[str] = set()
+    all_diffs: set[str] = set()
+    for r in all_results:
+        meta = _find_metadata(r.get("case_id", ""))
+        if meta.get("category"):
+            all_categories.add(meta["category"])
+        if meta.get("sdk"):
+            all_sdks.add(meta["sdk"])
+        if meta.get("difficulty"):
+            all_diffs.add(meta["difficulty"])
+
+    # Apply filters. Each narrows the result set by the matching metadata field.
+    results = all_results
+    if filter_category:
+        results = [r for r in results if _find_metadata(r.get("case_id", "")).get("category") == filter_category]
+    if filter_sdk:
+        results = [r for r in results if _find_metadata(r.get("case_id", "")).get("sdk") == filter_sdk]
+    if filter_diff:
+        results = [r for r in results if _find_metadata(r.get("case_id", "")).get("difficulty") == filter_diff]
+
+    lookup = _latest_attempt_lookup(results)
+    models, model_stats, _ = _model_leaderboard_stats(lookup)
+    n_cases = len({cid for (cid, _) in lookup})
+
+    filter_form = f"""
+<form method="get" style="display:flex;align-items:center;gap:1rem;font-size:0.85rem;color:#a0aec0;flex-wrap:wrap">
+  <span>Category: {_filter_select(all_categories, filter_category, "category")}</span>
+  <span>SDK: {_filter_select(all_sdks, filter_sdk, "sdk")}</span>
+  <span>Difficulty: {_filter_select(all_diffs, filter_diff, "difficulty")}</span>
+</form>"""
+
+    active = [
+        f"category={filter_category}" if filter_category else "",
+        f"sdk={filter_sdk}" if filter_sdk else "",
+        f"difficulty={filter_diff}" if filter_diff else "",
+    ]
+    active_str = " · ".join(p for p in active if p) or "no filters (all cases)"
+
+    if models:
+        # Consistency needs all attempts, so compute it from the raw filtered
+        # results rather than the latest-attempt lookup.
+        consistency_by_model = _consistency_by_model(results)
+        content = _leaderboard_table(
+            models, model_stats, review_sdk=filter_sdk,
+            consistency_by_model=consistency_by_model,
+        )
+    else:
+        content = "<div class='card' style='margin-top:1rem'><p style='color:#718096;padding:1rem'>No results match the selected filters.</p></div>"
+
+    body = f"""
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.75rem">
+  <h1>Analysis</h1>
+  <span style="color:#718096;font-size:0.85rem">{len(models)} models · {n_cases} cases · {active_str}</span>
+</div>
+<p class="desc">
+  Slice the benchmark by metadata and rank models on just that subset.
+  Example: pick category <strong>kconfig</strong> and SDK <strong>zephyr</strong> to
+  compare models on Zephyr Kconfig cases only. More analysis types coming.
+</p>
+{filter_form}
+{content}
+"""
+    return _page("Analysis", body)
 
 
 @app.get("/case/{case_id}", response_class=HTMLResponse)
