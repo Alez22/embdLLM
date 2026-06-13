@@ -47,6 +47,8 @@ results/test_tracker.json
 results/tui-run.log
 # TUI run checkpoints (resumable runtime state)
 results/runs/.checkpoint_*.jsonl
+# Model catalog cache (refetched from provider APIs)
+results/.model_catalog_cache.json
 
 # Environment
 .env

@@ -31,8 +31,11 @@ from textual.widgets import (
     Label,
     Log,
     Select,
+    SelectionList,
     Static,
 )
+
+from embedeval.model_catalog import ModelInfo, fetch_models
 
 # Resolved at startup by the CLI command.
 RESULTS_DIR: Path = Path("results")
@@ -249,37 +252,19 @@ def _score_bar(score: float, width: int = 8) -> str:
 _CUSTOM_MODEL = "__custom__"
 
 
-# Models available in the New Run form regardless of past results.
-# Only providers with API keys in .env: Groq and OpenRouter.
-_PRESET_MODELS: list[str] = [
-    # Groq — verified available via /v1/models (2026-06-07)
-    "groq/llama-3.3-70b-versatile",
-    "groq/meta-llama/llama-4-scout-17b-16e-instruct",
-    "groq/qwen/qwen3-32b",
-    "groq/openai/gpt-oss-20b",
-    "groq/openai/gpt-oss-120b",
-    # OpenRouter — verified available via /api/v1/models (2026-06-07)
-    "openrouter/deepseek/deepseek-r1-0528",
-    "openrouter/deepseek/deepseek-chat-v3-0324",
-    "openrouter/deepseek/deepseek-v4-flash",
-    "openrouter/meta-llama/llama-4-maverick",
-    "openrouter/meta-llama/llama-3.3-70b-instruct",
-    "openrouter/qwen/qwen3-235b-a22b",
-    "openrouter/qwen/qwen3-30b-a3b",
-    "openrouter/google/gemini-2.5-flash",
-    "openrouter/google/gemini-2.5-pro",
-    "openrouter/mistralai/mistral-small-3.2-24b-instruct",
-]
+def _model_label(info: ModelInfo) -> str:
+    """Human-readable row label: slug plus price tag.
 
-
-def _model_to_id(model: str) -> str:
-    """Convert model slug to a valid Textual widget ID (no dots, slashes, etc.)."""
-    return model.replace("/", "__").replace(".", "_").replace("-", "_")
-
-
-def _known_models() -> list[str]:
-    """Return the verified preset model list only."""
-    return _PRESET_MODELS
+    Free models are tagged ``[free]``; priced ones show $/Mtok; Groq
+    (unknown price) shows ``[?]``.
+    """
+    if info.price_per_mtok is None:
+        tag = "[?]"
+    elif info.is_free:
+        tag = "[free]"
+    else:
+        tag = f"${info.price_per_mtok:.2f}/Mtok"
+    return f"{info.slug}  {tag}"
 
 
 class RunFormScreen(ModalScreen[dict | None]):
@@ -317,19 +302,19 @@ class RunFormScreen(ModalScreen[dict | None]):
         margin-top: 1;
     }
     #models-list {
-        height: 12;
+        height: 14;
         border: solid $primary-darken-2;
-        overflow-y: auto;
-        padding: 0 1;
     }
-    #provider-filter {
+    #model-filter-row {
         height: auto;
         margin-top: 1;
-        align: left middle;
     }
-    #provider-filter Button {
+    #model-filter-row Select {
+        width: 1fr;
         margin-right: 1;
-        min-width: 12;
+    }
+    #input-model-search {
+        margin-top: 1;
     }
     #models-header {
         height: auto;
@@ -343,6 +328,10 @@ class RunFormScreen(ModalScreen[dict | None]):
     #models-header Button {
         margin-left: 1;
         min-width: 6;
+    }
+    #model-status {
+        height: auto;
+        color: $text-muted;
     }
     #custom-model-row {
         height: auto;
@@ -384,7 +373,10 @@ class RunFormScreen(ModalScreen[dict | None]):
     def __init__(self, cases: list[dict]) -> None:
         super().__init__()
         self._cases = cases
-        self._provider_filter: str = "all"
+        # Full catalog (filled by the background worker) and the slugs the
+        # user has selected so selection survives list rebuilds on filtering.
+        self._catalog: list[ModelInfo] = []
+        self._selected_models: set[str] = set()
 
     def _sdk_options(self) -> list[tuple[str, str]]:
         sdks = sorted({c.get("sdk", "") for c in self._cases if c.get("sdk")})
@@ -396,14 +388,39 @@ class RunFormScreen(ModalScreen[dict | None]):
         )
         return [("All categories", "all")] + [(c, c) for c in cats]
 
-    def _provider_of(self, model: str) -> str:
-        """Return the top-level provider name from a model slug (e.g. 'groq')."""
-        return model.split("/")[0]
+    def _visible_models(self) -> list[ModelInfo]:
+        """Return catalog entries matching the active model filters.
 
-    def _visible_models(self) -> list[str]:
-        """Return preset models matching the active provider filter."""
-        active = getattr(self, "_provider_filter", "all")
-        return [m for m in _known_models() if active == "all" or self._provider_of(m) == active]
+        Combines: sub-provider Select, free/paid Select, and the search
+        substring. Result is sorted by price (unknown last) then slug so
+        cheaper models surface first.
+        """
+        provider = str(self.query_one("#sel-model-provider", Select).value)
+        pricing = str(self.query_one("#sel-model-pricing", Select).value)
+        search = self.query_one("#input-model-search", Input).value.strip().lower()
+
+        def keep(info: ModelInfo) -> bool:
+            if provider != "all" and info.sub_provider != provider:
+                return False
+            if pricing == "free" and not info.is_free:
+                return False
+            if pricing == "paid" and (info.is_free or info.price_per_mtok is None):
+                return False
+            if search and search not in info.slug.lower():
+                return False
+            return True
+
+        def sort_key(info: ModelInfo) -> tuple[float, str]:
+            # Unknown price sorts after all known prices.
+            price = info.price_per_mtok
+            return (price if price is not None else float("inf"), info.slug)
+
+        return sorted((m for m in self._catalog if keep(m)), key=sort_key)
+
+    def _provider_options(self) -> list[tuple[str, str]]:
+        """Build sub-provider Select options from the loaded catalog."""
+        subs = sorted({m.sub_provider for m in self._catalog})
+        return [("All providers", "all")] + [(s, s) for s in subs]
 
     def _visible_cases(self) -> list[dict]:
         """Return cases matching the current SDK/category filter in the form."""
@@ -416,8 +433,6 @@ class RunFormScreen(ModalScreen[dict | None]):
         ]
 
     def compose(self) -> ComposeResult:
-        known = _known_models()
-
         with Container(id="run-form"):
             yield Label("New Run", id="form-title")
 
@@ -425,17 +440,30 @@ class RunFormScreen(ModalScreen[dict | None]):
 
                 # --- Left column: model config ---
                 with Container(id="col-model"):
-                    with Horizontal(id="provider-filter"):
-                        yield Button("All providers", variant="primary", id="btn-prov-all")
-                        yield Button("Groq", variant="default", id="btn-prov-groq")
-                        yield Button("OpenRouter", variant="default", id="btn-prov-openrouter")
+                    with Horizontal(id="model-filter-row"):
+                        yield Select(
+                            [("All providers", "all")],
+                            value="all",
+                            id="sel-model-provider",
+                            allow_blank=False,
+                        )
+                        yield Select(
+                            [("All prices", "all"), ("Free only", "free"),
+                             ("Paid only", "paid")],
+                            value="all",
+                            id="sel-model-pricing",
+                            allow_blank=False,
+                        )
+                    yield Input(
+                        placeholder="Search models (e.g. claude, qwen)",
+                        id="input-model-search",
+                    )
                     with Horizontal(id="models-header"):
                         yield Label("Models (select one or more)")
                         yield Button("All", variant="default", id="btn-models-all")
                         yield Button("None", variant="default", id="btn-models-none")
-                    with ScrollableContainer(id="models-list"):
-                        for model in known:
-                            yield Checkbox(model, id=f"model-{_model_to_id(model)}")
+                    yield SelectionList[str](id="models-list")
+                    yield Label("Loading models…", id="model-status")
                     with Container(id="custom-model-row"):
                         yield Input(
                             placeholder="Custom model (e.g. groq/llama-3.3-70b-versatile)",
@@ -512,45 +540,81 @@ class RunFormScreen(ModalScreen[dict | None]):
             cid = case.get("id", "")
             self.query_one(f"#case-{cid}", Checkbox).value = False
 
-    def _apply_provider_filter(self, provider: str) -> None:
-        """Show only models belonging to provider; update button variants."""
-        self._provider_filter = provider
-        for model in _known_models():
-            cb = self.query_one(f"#model-{_model_to_id(model)}", Checkbox)
-            cb.display = (provider == "all" or self._provider_of(model) == provider)
-        # Highlight the active button
-        for btn_id, prov in [
-            ("btn-prov-all", "all"),
-            ("btn-prov-groq", "groq"),
-            ("btn-prov-openrouter", "openrouter"),
-        ]:
-            self.query_one(f"#{btn_id}", Button).variant = (
-                "primary" if prov == provider else "default"
+    # --- Model catalog: async load and list rebuild ---
+
+    def on_mount(self) -> None:
+        """Kick off the catalog fetch without blocking the UI."""
+        self._load_catalog()
+
+    @work(thread=True, exclusive=True)
+    def _load_catalog(self) -> None:
+        """Fetch the model catalog in a worker thread, then update the UI."""
+        catalog = fetch_models()
+        # Hop back to the UI thread to mutate widgets safely.
+        self.app.call_from_thread(self._on_catalog_loaded, catalog)
+
+    def _on_catalog_loaded(self, catalog: list[ModelInfo]) -> None:
+        """Populate the provider filter and the model list once loaded."""
+        self._catalog = catalog
+        self.query_one("#sel-model-provider", Select).set_options(
+            self._provider_options()
+        )
+        self._rebuild_model_list()
+
+    def _rebuild_model_list(self) -> None:
+        """Refresh the SelectionList from catalog + active filters.
+
+        Preserves prior selections via ``self._selected_models`` so toggling
+        filters does not lose what the user already picked.
+        """
+        sel_list = self.query_one("#models-list", SelectionList)
+        sel_list.clear_options()
+        visible = self._visible_models()
+        for info in visible:
+            sel_list.add_option(
+                (_model_label(info), info.slug, info.slug in self._selected_models)
             )
+        status = self.query_one("#model-status", Label)
+        status.update(
+            f"{len(visible)} of {len(self._catalog)} models  ·  "
+            f"{len(self._selected_models)} selected"
+        )
 
-    @on(Button.Pressed, "#btn-prov-all")
-    def on_prov_all(self) -> None:
-        self._apply_provider_filter("all")
+    @on(SelectionList.SelectedChanged, "#models-list")
+    def on_models_selection_changed(self) -> None:
+        """Track selections so they survive filter-driven rebuilds."""
+        sel_list = self.query_one("#models-list", SelectionList)
+        visible_slugs = {info.slug for info in self._visible_models()}
+        # Keep selections outside the current filter, update the visible ones.
+        self._selected_models -= visible_slugs
+        self._selected_models |= set(sel_list.selected)
+        self.query_one("#model-status", Label).update(
+            f"{len(visible_slugs)} of {len(self._catalog)} models  ·  "
+            f"{len(self._selected_models)} selected"
+        )
 
-    @on(Button.Pressed, "#btn-prov-groq")
-    def on_prov_groq(self) -> None:
-        self._apply_provider_filter("groq")
+    @on(Select.Changed, "#sel-model-provider")
+    @on(Select.Changed, "#sel-model-pricing")
+    def on_model_filter_changed(self) -> None:
+        self._rebuild_model_list()
 
-    @on(Button.Pressed, "#btn-prov-openrouter")
-    def on_prov_openrouter(self) -> None:
-        self._apply_provider_filter("openrouter")
+    @on(Input.Changed, "#input-model-search")
+    def on_model_search_changed(self) -> None:
+        self._rebuild_model_list()
 
     @on(Button.Pressed, "#btn-models-all")
     def on_models_select_all(self) -> None:
-        """Check all currently visible model checkboxes."""
-        for model in self._visible_models():
-            self.query_one(f"#model-{_model_to_id(model)}", Checkbox).value = True
+        """Select every model currently visible under the filters."""
+        for info in self._visible_models():
+            self._selected_models.add(info.slug)
+        self._rebuild_model_list()
 
     @on(Button.Pressed, "#btn-models-none")
     def on_models_select_none(self) -> None:
-        """Uncheck all currently visible model checkboxes."""
-        for model in self._visible_models():
-            self.query_one(f"#model-{_model_to_id(model)}", Checkbox).value = False
+        """Deselect every model currently visible under the filters."""
+        for info in self._visible_models():
+            self._selected_models.discard(info.slug)
+        self._rebuild_model_list()
 
     @on(Button.Pressed, "#btn-cancel")
     def cancel(self) -> None:
@@ -558,13 +622,9 @@ class RunFormScreen(ModalScreen[dict | None]):
 
     @on(Button.Pressed, "#btn-run")
     def confirm(self) -> None:
-        # Collect selected preset models.
-        models: list[str] = []
-        for model in _known_models():
-            cb = self.query_one(f"#model-{_model_to_id(model)}", Checkbox)
-            if cb.value:
-                models.append(model)
-        # Add custom model if provided.
+        # Collect selected catalog models (sorted for stable run order).
+        models: list[str] = sorted(self._selected_models)
+        # Add custom model if provided (escape hatch for off-catalog slugs).
         custom = self.query_one("#input-custom-model", Input).value.strip()
         if custom and custom not in models:
             models.append(custom)
