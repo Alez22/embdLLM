@@ -8,6 +8,7 @@ Then open http://localhost:7860.
 
 import difflib
 import json
+from functools import lru_cache
 from pathlib import Path
 from urllib.parse import quote
 
@@ -66,8 +67,14 @@ def _find_reference(case_id: str) -> str | None:
     return None
 
 
+@lru_cache(maxsize=None)
 def _find_metadata(case_id: str) -> dict:
-    """Load metadata.yaml for a case, return empty dict if missing."""
+    """Load metadata.yaml for a case, return empty dict if missing.
+
+    Memoized: metadata.yaml does not change while the dashboard runs, and the
+    cascading Analysis filters call this thousands of times per request. The
+    returned dict is shared, so all call sites must treat it as read-only.
+    """
     for sdk_dir in CASES_DIR.iterdir():
         if not sdk_dir.is_dir():
             continue
