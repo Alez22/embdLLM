@@ -1,11 +1,11 @@
 """Tests for v3 features: after_date filter, feedback loop, agent mode."""
 
-import re
 from pathlib import Path
 
 from embedeval.models import CaseCategory, CaseMetadata, DifficultyTier, Sdk
-from embedeval.tui import _PRESET_MODELS, _model_to_id
+from embedeval.model_catalog import ModelInfo, _openrouter_price, _preset_catalog
 from embedeval.runner import Filters, filter_cases
+from embedeval.tui.run_form import _model_label
 
 
 # ============================================================
@@ -223,29 +223,34 @@ class TestAgentResult:
         assert result.turns_used == result.max_turns
 
 
-class TestModelToId:
-    """_model_to_id must produce valid Textual widget IDs for all preset models.
+class TestModelCatalog:
+    """Pure-function tests for the dynamic model catalog (no network)."""
 
-    Textual rejects IDs containing dots or slashes — these appear naturally
-    in model slugs like 'groq/llama-3.3-70b-versatile'. A BadIdentifier
-    crash was triggered in production when the TUI New Run form was opened.
-    """
+    def test_openrouter_price_combines_prompt_and_completion(self) -> None:
+        # Prices are per-token USD strings; result is per-million-token USD.
+        price = _openrouter_price({"prompt": "0.000001", "completion": "0.000002"})
+        assert price == 3.0
 
-    _VALID_ID_RE = re.compile(r"^[a-zA-Z0-9_-]+$")
+    def test_openrouter_price_negative_sentinel_is_unknown(self) -> None:
+        # OpenRouter uses negative values (e.g. the "auto" router) — not free.
+        assert _openrouter_price({"prompt": "-1", "completion": "-1"}) is None
 
-    def test_all_preset_models_produce_valid_ids(self) -> None:
-        for model in _PRESET_MODELS:
-            widget_id = _model_to_id(model)
-            assert self._VALID_ID_RE.match(widget_id), (
-                f"_model_to_id({model!r}) = {widget_id!r} contains invalid characters"
-            )
+    def test_openrouter_price_missing_is_unknown(self) -> None:
+        assert _openrouter_price(None) is None
 
-    def test_slash_replaced(self) -> None:
-        assert "/" not in _model_to_id("groq/llama-3.3-70b-versatile")
+    def test_preset_catalog_is_nonempty_fallback(self) -> None:
+        catalog = _preset_catalog()
+        assert catalog
+        assert all(isinstance(m, ModelInfo) for m in catalog)
+        # Preset entries have no pricing info.
+        assert all(m.price_per_mtok is None for m in catalog)
 
-    def test_dot_replaced(self) -> None:
-        assert "." not in _model_to_id("openrouter/google/gemini-2.5-pro")
+    def test_is_free_only_when_price_is_zero(self) -> None:
+        assert ModelInfo("x/y", "x", "x", 0.0).is_free is True
+        assert ModelInfo("x/y", "x", "x", 1.5).is_free is False
+        assert ModelInfo("x/y", "x", "x", None).is_free is False
 
-    def test_two_models_produce_distinct_ids(self) -> None:
-        ids = [_model_to_id(m) for m in _PRESET_MODELS]
-        assert len(ids) == len(set(ids)), "two preset models map to the same widget ID"
+    def test_model_label_tags(self) -> None:
+        assert "[free]" in _model_label(ModelInfo("a/b", "a", "a", 0.0))
+        assert "[?]" in _model_label(ModelInfo("a/b", "a", "a", None))
+        assert "$2.50/Mtok" in _model_label(ModelInfo("a/b", "a", "a", 2.5))

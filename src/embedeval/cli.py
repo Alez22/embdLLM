@@ -1402,12 +1402,13 @@ def tui(
     ] = Path("cases"),
 ) -> None:
     """Start the Textual TUI dashboard."""
-    import embedeval.tui as _tui
+    from embedeval.tui import EmbedEvalTUI, config as _tui_config
 
-    _tui.RESULTS_DIR = results_dir.resolve()
-    _tui.CASES_DIR = cases_dir.resolve()
+    # Override the module-level paths before the app reads them at runtime.
+    _tui_config.RESULTS_DIR = results_dir.resolve()
+    _tui_config.CASES_DIR = cases_dir.resolve()
 
-    app = _tui.EmbedEvalTUI()
+    app = EmbedEvalTUI()
     app.run()
 
 
