@@ -13,7 +13,7 @@ reordered one.
 import re
 
 from embedeval.check_utils import scoped_contains, strip_comments
-from embedeval.check_utils_nxp import has_iomuxc_before_init
+from embedeval.check_utils_nxp import has_iomuxc_before_init, has_rt1170_clock_root_config
 from embedeval.models import CheckDetail
 
 _SAI_WRITE_RE = re.compile(
@@ -42,9 +42,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     ))
 
     # Clock root configured for the SAI (implicit: no BOARD_BootClockRUN here)
-    has_clock_root = scoped_contains(
-        generated_code, "CLOCK_SetRootClock", scope="stripped"
-    )
+    has_clock_root = has_rt1170_clock_root_config(generated_code)
     details.append(CheckDetail(
         check_name="clock_root_configured",
         passed=has_clock_root,

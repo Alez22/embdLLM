@@ -47,8 +47,13 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         check_type="constraint",
     ))
 
-    # COP_Refresh inside the main loop (not before the loop)
-    loop_match = re.search(r"\bwhile\s*\(\s*1\s*\)\s*\{(.*)\}", generated_code, re.DOTALL)
+    # COP_Refresh inside the main loop (not before the loop). Accept every
+    # idiomatic infinite-loop form: while(1) / while(1U) / while(true) / for(;;).
+    loop_match = re.search(
+        r"\b(?:while\s*\(\s*(?:1[Uu]?|true)\s*\)|for\s*\(\s*;\s*;\s*\))\s*\{(.*)\}",
+        generated_code,
+        re.DOTALL,
+    )
     refresh_in_loop = bool(loop_match and "COP_Refresh" in loop_match.group(1))
     details.append(CheckDetail(
         check_name="cop_refresh_inside_main_loop",

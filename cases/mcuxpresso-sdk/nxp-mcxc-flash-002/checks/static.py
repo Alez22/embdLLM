@@ -55,15 +55,23 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         check_type="exact_match",
     ))
 
+    # Core flash write sequence: erase the sector, then program it. The prompt
+    # specifies CRC as the post-write verification strategy ("verify CRC after
+    # write"), so verification is covered by crc_function_implemented above —
+    # FLASH_VerifyProgram must NOT be required here, or models that correctly
+    # follow the CRC instruction are rejected for not also calling a hardware
+    # verify API the prompt never mentions.
     has_erase = scoped_contains(generated_code, "FLASH_EraseSector", scope="stripped")
     has_program = scoped_contains(generated_code, "FLASH_Program", scope="stripped")
-    has_verify = scoped_contains(generated_code, "FLASH_VerifyProgram", scope="stripped")
     details.append(CheckDetail(
         check_name="full_flash_sequence_present",
-        passed=has_erase and has_program and has_verify,
-        expected="FLASH_EraseSector + FLASH_Program + FLASH_VerifyProgram all present",
-        actual="complete" if (has_erase and has_program and has_verify) else
-               f"missing: {', '.join(x for x, ok in [('erase', has_erase), ('program', has_program), ('verify', has_verify)] if not ok)}",
+        passed=has_erase and has_program,
+        expected="FLASH_EraseSector + FLASH_Program both present",
+        actual="complete" if (has_erase and has_program) else
+               "missing: " + ", ".join(
+                   x for x, ok in [("erase", has_erase), ("program", has_program)]
+                   if not ok
+               ),
         check_type="exact_match",
     ))
 
