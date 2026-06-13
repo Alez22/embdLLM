@@ -623,14 +623,24 @@ def _consistency_by_model(results: list[dict]) -> dict[str, float | None]:
     return out
 
 
-def _filter_select(values: set[str], current: str, param: str) -> str:
-    """Render a submit-on-change <select> for a single filter param."""
+def _filter_select(values: set[str], current: str, param: str, auto_submit: bool = True) -> str:
+    """Render a <select> for a single filter param.
+
+    auto_submit=True submits the form on change (used by the leaderboard);
+    auto_submit=False leaves submission to an explicit Apply button.
+    """
     opts = '<option value="">All</option>'
-    for v in sorted(values):
+    # Keep the current selection visible even if it falls outside the scoped
+    # values (e.g. an inconsistent combination passed via URL).
+    visible_values = set(values)
+    if current:
+        visible_values.add(current)
+    for v in sorted(visible_values):
         sel = ' selected' if v == current else ''
         opts += f'<option value="{v}"{sel}>{v}</option>'
+    onchange = ' onchange="this.form.submit()"' if auto_submit else ''
     return (
-        f'<select name="{param}" onchange="this.form.submit()" '
+        f'<select name="{param}"{onchange} '
         f'style="background:#2d3748;color:#e2e8f0;border:1px solid #4a5568;'
         f'border-radius:4px;padding:3px 8px;font-size:0.8rem">{opts}</select>'
     )
@@ -722,13 +732,15 @@ def analysis(request: Request) -> str:
     all combinable. More analysis types will be added here over time.
 
     Optional query params:
-      ?category=kconfig   — filter by case category
       ?sdk=zephyr         — filter by SDK bucket
+      ?category=kconfig   — filter by case category
       ?difficulty=medium  — filter by difficulty
+      ?case=kconfig-001   — filter by a single case
     """
-    filter_category = request.query_params.get("category", "")
     filter_sdk = request.query_params.get("sdk", "")
+    filter_category = request.query_params.get("category", "")
     filter_diff = request.query_params.get("difficulty", "")
+    filter_case = request.query_params.get("case", "")
 
     all_results = _all_results()
     if not all_results:
@@ -737,45 +749,65 @@ def analysis(request: Request) -> str:
             "<div class='card'><p>No results found in results/. Run a benchmark first.</p></div>",
         )
 
-    # Collect available filter values across all results (for the filter UI).
-    all_categories: set[str] = set()
-    all_sdks: set[str] = set()
-    all_diffs: set[str] = set()
-    for r in all_results:
-        meta = _find_metadata(r.get("case_id", ""))
-        if meta.get("category"):
-            all_categories.add(meta["category"])
-        if meta.get("sdk"):
-            all_sdks.add(meta["sdk"])
-        if meta.get("difficulty"):
-            all_diffs.add(meta["difficulty"])
+    # Filter hierarchy: sdk > category > difficulty > case. Each dropdown is
+    # scoped only by the filters ABOVE it in this order, so choices cascade
+    # downward (e.g. picking an SDK narrows category/difficulty/case, but
+    # picking a difficulty does NOT narrow the SDK list).
+    FILTER_ORDER = ["sdk", "category", "difficulty", "case"]
+    active = {
+        "sdk": filter_sdk,
+        "category": filter_category,
+        "difficulty": filter_diff,
+        "case": filter_case,
+    }
 
-    # Apply filters. Each narrows the result set by the matching metadata field.
-    results = all_results
-    if filter_category:
-        results = [r for r in results if _find_metadata(r.get("case_id", "")).get("category") == filter_category]
-    if filter_sdk:
-        results = [r for r in results if _find_metadata(r.get("case_id", "")).get("sdk") == filter_sdk]
-    if filter_diff:
-        results = [r for r in results if _find_metadata(r.get("case_id", "")).get("difficulty") == filter_diff]
+    def _case_field(case_id: str, field: str) -> str:
+        if field == "case":
+            return case_id
+        return _find_metadata(case_id).get(field, "")
+
+    def _apply(rows: list[dict], filters: dict[str, str]) -> list[dict]:
+        """Keep results whose case matches every non-empty filter."""
+        out = rows
+        for field, value in filters.items():
+            if value:
+                out = [r for r in out if _case_field(r.get("case_id", ""), field) == value]
+        return out
+
+    def _options_for(field: str) -> set[str]:
+        """Values reachable for ``field`` given only the higher-priority filters."""
+        higher = FILTER_ORDER[: FILTER_ORDER.index(field)]
+        scoped = _apply(all_results, {f: active[f] for f in higher})
+        return {_case_field(r.get("case_id", ""), field) for r in scoped
+                if _case_field(r.get("case_id", ""), field)}
+
+    all_sdks = _options_for("sdk")
+    all_categories = _options_for("category")
+    all_diffs = _options_for("difficulty")
+    all_cases_in_scope = _options_for("case")
+
+    # Apply all active filters to get the final result set.
+    results = _apply(all_results, active)
 
     lookup = _latest_attempt_lookup(results)
     models, model_stats, _ = _model_leaderboard_stats(lookup)
     n_cases = len({cid for (cid, _) in lookup})
 
+    # Filtering happens only when the user clicks "Apply filters" (no
+    # submit-on-change), so partial selections don't trigger reloads.
     filter_form = f"""
 <form method="get" style="display:flex;align-items:center;gap:1rem;font-size:0.85rem;color:#a0aec0;flex-wrap:wrap">
-  <span>Category: {_filter_select(all_categories, filter_category, "category")}</span>
-  <span>SDK: {_filter_select(all_sdks, filter_sdk, "sdk")}</span>
-  <span>Difficulty: {_filter_select(all_diffs, filter_diff, "difficulty")}</span>
+  <span>SDK: {_filter_select(all_sdks, filter_sdk, "sdk", auto_submit=False)}</span>
+  <span>Category: {_filter_select(all_categories, filter_category, "category", auto_submit=False)}</span>
+  <span>Difficulty: {_filter_select(all_diffs, filter_diff, "difficulty", auto_submit=False)}</span>
+  <span>Case: {_filter_select(all_cases_in_scope, filter_case, "case", auto_submit=False)}</span>
+  <button type="submit" style="background:#2d3748;border:1px solid #4a5568;color:#e2e8f0;padding:4px 14px;border-radius:4px;cursor:pointer;font-size:0.85rem">Apply filters</button>
+  <a href="/analysis" style="color:#718096;font-size:0.8rem">Reset</a>
 </form>"""
 
-    active = [
-        f"category={filter_category}" if filter_category else "",
-        f"sdk={filter_sdk}" if filter_sdk else "",
-        f"difficulty={filter_diff}" if filter_diff else "",
-    ]
-    active_str = " · ".join(p for p in active if p) or "no filters (all cases)"
+    active_str = " · ".join(
+        f"{field}={value}" for field, value in active.items() if value
+    ) or "no filters (all cases)"
 
     if models:
         # Consistency needs all attempts, so compute it from the raw filtered
