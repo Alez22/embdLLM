@@ -34,7 +34,7 @@ dev = [
 ]
 
 [tool.ruff]
-line-length = 88
+line-length = 100
 target-version = "py312"
 
 [tool.ruff.lint]
@@ -42,6 +42,11 @@ select = ["E", "F", "I", "W"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["embedeval"]
+
+[tool.ruff.lint.per-file-ignores]
+# dashboard.py emits server-rendered HTML inline; wrapping these long string
+# literals hurts readability more than it helps. Keep all other lint rules.
+"src/embedeval/dashboard.py" = ["E501"]
 
 [tool.mypy]
 strict = true

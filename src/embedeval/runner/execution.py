@@ -13,6 +13,7 @@ from pathlib import Path
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 
+from embedeval import runner as _runner
 from embedeval.corpus import (
     GenerationParams,
     GradeCell,
@@ -22,7 +23,6 @@ from embedeval.corpus import (
     grade_store,
     hash_prompt,
 )
-from embedeval import runner as _runner
 from embedeval.llm_client import build_full_prompt
 from embedeval.models import (
     CaseMetadata,
@@ -32,7 +32,6 @@ from embedeval.models import (
     TokenUsage,
     Visibility,
 )
-
 from embedeval.runner.checkpoint import _append_checkpoint, _load_checkpoint
 from embedeval.runner.discovery import Filters, discover_cases, filter_cases
 from embedeval.runner.prompts import (

@@ -6,11 +6,9 @@ no database, no build step. Start with:
 Then open http://localhost:7860.
 """
 
-import json
 import difflib
-import webbrowser
+import json
 from pathlib import Path
-from threading import Timer
 from urllib.parse import quote
 
 import yaml
@@ -1012,7 +1010,7 @@ def review(request: Request) -> str:
 
     # SDK dropdown
     def _sdk_options() -> str:
-        opts = f'<option value="">All SDKs</option>'
+        opts = '<option value="">All SDKs</option>'
         for sdk in sorted(available_sdks):
             sel = ' selected' if sdk == filter_sdk else ''
             opts += f'<option value="{sdk}"{sel}>{sdk}</option>'
@@ -1223,7 +1221,6 @@ def history_detail(run_id: str) -> str:
     temperature = cases[0].get("temperature", 0.0)
     max_attempt = max(c.get("attempt", 1) for c in cases)
     gen_params = cases[0].get("generation_params", {})
-    force_str = "yes" if gen_params.get("force") else "—"
     no_think_str = "yes" if gen_params.get("no_think") else "—"
     sdks = sorted({c.get("sdk", "") for c in cases if c.get("sdk")})
     sdk_tags = " ".join(f'<span class="tag">{s}</span>' for s in sdks)

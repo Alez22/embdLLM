@@ -10,13 +10,6 @@ import time
 from pathlib import Path
 
 from embedeval import evaluator as _ev
-from embedeval.models import (
-    CaseCategory,
-    CheckDetail,
-    EvalResult,
-    LayerResult,
-    TokenUsage,
-)
 from embedeval.evaluator.build import (
     _prepare_build_dir,
     _run_compile_gate,
@@ -31,6 +24,13 @@ from embedeval.evaluator.support import (
     _is_esp_idf_case,
     _is_l1_skipped,
     _is_stm32_case,
+)
+from embedeval.models import (
+    CaseCategory,
+    CheckDetail,
+    EvalResult,
+    LayerResult,
+    TokenUsage,
 )
 
 logger = logging.getLogger(__name__)
@@ -203,7 +203,10 @@ def evaluate(
     scorable_count = _count_scorable_layers(case_dir)
     if scorable_count > 0:
         scored_layers = [ly for ly in layers if ly.layer != 4]
-        total_score = sum(ly.score for ly in scored_layers if _layer_exists_for_case(ly.layer, case_dir)) / scorable_count
+        total_score = sum(
+            ly.score for ly in scored_layers
+            if _layer_exists_for_case(ly.layer, case_dir)
+        ) / scorable_count
     else:
         executed_layers = [ly for ly in layers if ly.details and ly.layer != 4]
         total_score = (

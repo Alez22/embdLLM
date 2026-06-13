@@ -71,10 +71,6 @@ def _load_runs_summary() -> list[dict]:
         gen_params = summary.get("generation_params", {})
         no_think = gen_params.get("no_think", False)
         temperature = summary.get("temperature", 0.0)
-        max_attempt = max(
-            (d.get("attempt", 1) for d in [summary]),
-            default=summary.get("n_samples_per_case", 1),
-        )
         # n_samples_per_case is the configured attempts count.
         attempts = summary.get("n_samples_per_case", 1)
 

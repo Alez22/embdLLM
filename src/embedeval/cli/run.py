@@ -336,11 +336,11 @@ def run(
 
     # Retest-only filtering
     if retest_only:
-        from embedeval.runner import filter_cases as _filter
         from embedeval.result_tracker import (
             find_cases_needing_retest,
             load_tracker,
         )
+        from embedeval.runner import filter_cases as _filter
 
         tracker = load_tracker(output_dir)
         all_cases = _discover(cases_dir)

@@ -11,7 +11,6 @@ Re-exports the public runner API so existing imports
 # must be bound here before execution is imported.
 from embedeval.evaluator import evaluate
 from embedeval.llm_client import call_model
-
 from embedeval.runner.checkpoint import _append_checkpoint, _load_checkpoint
 from embedeval.runner.discovery import (
     Filters,
@@ -20,16 +19,16 @@ from embedeval.runner.discovery import (
     iter_case_dirs,
     load_case_metadata,
 )
-from embedeval.runner.prompts import (
-    _collect_context_files,
-    _inject_board_target,
-    _load_prompt,
-)
 from embedeval.runner.execution import (
     _build_result_from_grade,
     _make_error_result,
     _run_single_case,
     run_benchmark,
+)
+from embedeval.runner.prompts import (
+    _collect_context_files,
+    _inject_board_target,
+    _load_prompt,
 )
 
 __all__ = [

@@ -272,7 +272,10 @@ class ModelScore(BaseModel):
         default=0.0,
         ge=0.0,
         le=1.0,
-        description="Mean fraction of individual checks passed across all results, regardless of case pass/fail",
+        description=(
+            "Mean fraction of individual checks passed across all results, "
+            "regardless of case pass/fail"
+        ),
     )
     avg_duration_seconds: float = Field(
         default=0.0,

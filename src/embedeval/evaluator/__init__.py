@@ -12,6 +12,33 @@ the patches take effect at call time.
 # embedeval.evaluator.subprocess; build.py calls _ev.subprocess.run(...).
 import subprocess  # noqa: F401
 
+from embedeval.evaluator.build import (
+    DEFAULT_TIMEOUT,
+    RUNTIME_TIMEOUT,
+    _prepare_build_dir,
+    _run_compile_docker,
+    _run_compile_esp_idf,
+    _run_compile_gate,
+    _run_compile_local,
+    _run_compile_stm32,
+    _run_runtime,
+)
+from embedeval.evaluator.checks import (
+    _CheckModuleError,
+    _execute_check_module,
+    _load_check_module,
+    _load_negatives,
+    _run_behavioral,
+    _run_mutant_checks,
+    _run_static_checks,
+)
+from embedeval.evaluator.pipeline import (
+    LAYER_NAMES,
+    _count_scorable_layers,
+    _layer_exists_for_case,
+    _run_layer,
+    evaluate,
+)
 from embedeval.evaluator.support import (
     _build_env_available,
     _esp_idf_env_available,
@@ -25,33 +52,6 @@ from embedeval.evaluator.support import (
     _is_stm32_case,
     _load_case_meta,
     _stm32_env_available,
-)
-from embedeval.evaluator.checks import (
-    _CheckModuleError,
-    _execute_check_module,
-    _load_check_module,
-    _load_negatives,
-    _run_behavioral,
-    _run_mutant_checks,
-    _run_static_checks,
-)
-from embedeval.evaluator.build import (
-    DEFAULT_TIMEOUT,
-    RUNTIME_TIMEOUT,
-    _prepare_build_dir,
-    _run_compile_docker,
-    _run_compile_esp_idf,
-    _run_compile_gate,
-    _run_compile_local,
-    _run_compile_stm32,
-    _run_runtime,
-)
-from embedeval.evaluator.pipeline import (
-    LAYER_NAMES,
-    _count_scorable_layers,
-    _layer_exists_for_case,
-    _run_layer,
-    evaluate,
 )
 
 # Full public + internal surface re-exported by the facade. Listing every

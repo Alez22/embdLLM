@@ -7,7 +7,7 @@ internally. No external dependencies beyond check_utils.
 
 import re
 
-from embedeval.check_utils import has_api_call, strip_comments
+from embedeval.check_utils import strip_comments
 
 # ---------------------------------------------------------------------------
 # SDK token lists — used by case checks to avoid hardcoding strings.

@@ -5,8 +5,6 @@ by importing the command modules (whose ``@app.command()`` decorators run on
 import). The console entrypoint ``embedeval.cli:app`` resolves here.
 """
 
-from embedeval.cli.app import _parse_sdk_filter, app
-
 # Import for side effect: each module registers its commands on ``app``.
 from embedeval.cli import (  # noqa: E402,F401
     cases,
@@ -16,6 +14,7 @@ from embedeval.cli import (  # noqa: E402,F401
     run,
     validate,
 )
+from embedeval.cli.app import _parse_sdk_filter, app
 
 # Re-exported for backward compatibility with code/tests that imported
 # these from the old flat ``embedeval.cli`` module.

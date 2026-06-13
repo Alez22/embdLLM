@@ -13,7 +13,6 @@ import time
 from pathlib import Path
 
 from embedeval import evaluator as _ev
-from embedeval.models import CheckDetail, LayerResult
 from embedeval.evaluator.support import (
     _extract_build_errors,
     _get_build_board,
@@ -24,6 +23,7 @@ from embedeval.evaluator.support import (
     _is_stm32_case,
     _stm32_env_available,
 )
+from embedeval.models import CheckDetail, LayerResult
 
 logger = logging.getLogger(__name__)
 
