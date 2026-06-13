@@ -809,6 +809,153 @@ def analysis(request: Request) -> str:
     return _page("Analysis", body)
 
 
+def _attempt_section(result: dict, applicable: set[int]) -> str:
+    """Render one attempt as a card: checks + diff + side-by-side code.
+
+    Mirrors the per-attempt block used in the Run History detail view.
+    ``applicable`` is the set of layer numbers with real checks for the case,
+    used to hide env-skip sentinel layers.
+    """
+    case_id = result.get("case_id", "")
+    reference = _find_reference(case_id) or ""
+    generated = result.get("generated_code", "")
+    overall = _pass_badge(result.get("passed", False))
+    score = _bar_cell(result.get("total_score", 0))
+
+    checks_html = ""
+    for layer in result.get("layers", []):
+        layer_num = layer.get("layer")
+        layer_name = layer.get("name", "")
+        layer_passed = layer.get("passed", False)
+        layer_error = layer.get("error")
+        details = layer.get("details") or []
+
+        if layer_num not in applicable and layer_num != 4:
+            continue
+        if (layer_error or "").startswith("Skipped:") and layer_num not in applicable:
+            continue
+
+        layer_score = layer.get("score")
+        badge = _pass_badge(layer_passed)
+        score_pct = f'<span style="font-size:0.8rem;color:#718096;margin-left:0.5rem">{int(layer_score * 100)}%</span>' if layer_score is not None and details else ""
+        checks_html += f'<div style="margin-bottom:0.75rem"><h3>L{layer["layer"]} — {layer_name} {badge}{score_pct}</h3>'
+        if layer_error and not details:
+            checks_html += f'<p style="color:#718096;font-size:0.8rem;padding:0.25rem 0">{layer_error}</p>'
+        else:
+            for chk in details:
+                icon = "✓" if chk["passed"] else "✗"
+                color = "#68d391" if chk["passed"] else "#fc8181"
+                name = chk.get("check_name", "")
+                detail_html = ""
+                if not chk["passed"]:
+                    act_esc = str(chk.get("actual", "")).replace("<", "&lt;")
+                    exp_esc = str(chk.get("expected", "")).replace("<", "&lt;")
+                    detail_html = f'<div class="check-detail">expected: {exp_esc}<br>actual: <span>{act_esc}</span></div>'
+                checks_html += f"""
+<div class="check-row">
+  <span style="color:{color};font-weight:bold;min-width:1.2rem">{icon}</span>
+  <div class="check-name">{name}{detail_html}</div>
+</div>"""
+        checks_html += "</div>"
+
+    if reference and generated:
+        diff_content = _diff_html(reference, generated, fromfile="reference/main.c", tofile="generated")
+        diff_section = f'<pre style="max-height:320px;overflow-y:auto">{diff_content}</pre>'
+    else:
+        diff_section = "<p style='color:#718096;font-size:0.8rem'>No reference or no generated code.</p>"
+
+    ref_esc = reference.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    gen_esc = generated.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+    attempt = result.get("attempt", 1)
+    prose_retry_badge = (
+        '<span title="First response was prose; retried with code-only hint" '
+        'style="font-size:0.75rem;background:#744210;color:#fefcbf;padding:2px 6px;'
+        'border-radius:4px;margin-left:0.25rem">prose-retry</span>'
+        if result.get("prose_retry") else ""
+    )
+    return f"""
+<div id="att{attempt}" class="card" style="margin-bottom:1.5rem">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
+    <h2 style="margin:0">attempt {attempt}{prose_retry_badge}</h2>
+    {overall} {score}
+  </div>
+  <div class="split">
+    <div>
+      <h3>Checks</h3>
+      {checks_html}
+    </div>
+    <div>
+      <h3>Diff (reference → generated)</h3>
+      {diff_section}
+      <div class="split" style="gap:0.5rem;margin-top:0.75rem">
+        <div>
+          <h3>Reference</h3>
+          <pre class="hljs-wrap" style="max-height:320px;overflow-y:auto"><code class="language-c">{ref_esc}</code></pre>
+        </div>
+        <div>
+          <h3>Generated</h3>
+          <pre class="hljs-wrap" style="max-height:320px;overflow-y:auto"><code class="language-c">{gen_esc}</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>"""
+
+
+@app.get("/attempts/{case_id}/{model:path}", response_class=HTMLResponse)
+def case_attempts(case_id: str, model: str) -> str:
+    """All attempts for a case+model, expanded inline (checks + diff each)."""
+    results = [
+        r for r in _all_results()
+        if r.get("case_id") == case_id and r.get("model") == model
+    ]
+    if not results:
+        raise HTTPException(status_code=404, detail=f"No results for {case_id} / {model}")
+
+    results.sort(key=lambda r: r.get("attempt", 1))
+    applicable = _applicable_layers(results)
+    meta = _find_metadata(case_id)
+    model_short = model.split("/")[-1]
+
+    diff = meta.get("difficulty", "")
+    diff_badge = f'<span class="badge badge-{diff}">{diff}</span>' if diff else ""
+
+    # Per-case consistency across these attempts (n/a below 5 attempts).
+    consistency = _consistency_score([
+        _recompute_total_score(r, applicable) for r in results
+    ])
+    if consistency is None:
+        cons_html = (
+            f'<span style="color:#4a5568;font-size:0.85rem" '
+            f'title="Needs ≥5 attempts (got {len(results)})">consistency n/a</span>'
+        )
+    else:
+        cons_html = (
+            f'<span style="color:#718096;font-size:0.85rem">Consistency:</span> '
+            f'{_score_bar(consistency)} <span style="font-size:0.85rem">{int(consistency * 100)}%</span>'
+        )
+
+    sections = "".join(_attempt_section(r, applicable) for r in results)
+
+    body = f"""
+<div style="margin-bottom:1rem">
+  <a href="/case/{case_id}/{model}" style="color:#718096;font-size:0.85rem">← {case_id} / {model_short}</a>
+</div>
+<div class="card" style="margin-bottom:1rem">
+  <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+    <h1>{case_id}</h1>
+    {diff_badge}
+    <span style="color:#a0aec0">· {model_short}</span>
+    <span style="color:#718096;font-size:0.85rem">{len(results)} attempts</span>
+    {cons_html}
+  </div>
+</div>
+{sections}
+"""
+    return _page(f"{case_id} / {model_short} — attempts", body, highlight=True)
+
+
 @app.get("/case/{case_id}", response_class=HTMLResponse)
 def case_overview(case_id: str) -> str:
     """All model results for a single case."""
@@ -1127,7 +1274,7 @@ def review(request: Request) -> str:
           <td>{passed_badge}</td>
           <td>{score}</td>
           <td style="color:#718096;font-size:0.8rem">{layer_str}</td>
-          <td style="color:#718096;font-size:0.8rem;text-align:center">{n_attempts}</td>
+          <td style="font-size:0.8rem;text-align:center"><a href="/attempts/{cid}/{filter_model}">{n_attempts}</a></td>
           <td>{cons_cell}</td>
         </tr>"""
 
