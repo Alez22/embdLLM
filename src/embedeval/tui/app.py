@@ -21,7 +21,9 @@ from textual.widgets import (
     Static,
 )
 
-from embedeval.tui import config
+# Aliased to avoid shadowing by local `config` dicts (run configs) in
+# methods like _launch_run / _on_run_config.
+from embedeval.tui import config as tui_config
 from embedeval.tui.data import _discover_cases, _load_leaderboard, _score_bar
 from embedeval.tui.log_format import _CASE_UNHANDLED_RE, _format_log_line
 from embedeval.tui.run_form import RunFormScreen
@@ -94,11 +96,11 @@ class EmbedEvalTUI(App):
         yield Footer()
 
     def on_mount(self) -> None:
-        self._cases: list[dict] = _discover_cases(config.CASES_DIR)
+        self._cases: list[dict] = _discover_cases(tui_config.CASES_DIR)
         self._proc: subprocess.Popen | None = None  # type: ignore[type-arg]
         self._pending_runs: list[dict] = []  # queued configs waiting for current run to finish
         self._log_queue: Queue[str] = Queue()
-        self._log_file: Path = config.RESULTS_DIR / "tui-run.log"
+        self._log_file: Path = tui_config.RESULTS_DIR / "tui-run.log"
 
         # Progress tracking during an active run.
         self._run_total: int = 0
@@ -246,7 +248,7 @@ class EmbedEvalTUI(App):
             "uv", "run", "embedeval", "run",
             "--model", config["model"],
             "--cases", cases_path,
-            "--output-dir", str(config.RESULTS_DIR),
+            "--output-dir", str(tui_config.RESULTS_DIR),
             "--attempts", str(config["attempts"]),
         ]
 
@@ -271,7 +273,7 @@ class EmbedEvalTUI(App):
         cmd.append("--verbose")
 
         # Mirror all run output to a plain-text file so it can be copied.
-        self._log_file = config.RESULTS_DIR / "tui-run.log"
+        self._log_file = tui_config.RESULTS_DIR / "tui-run.log"
 
         # Compute expected total tasks for the progress bar.
         if selected:
@@ -317,7 +319,7 @@ class EmbedEvalTUI(App):
                     env[k.strip()] = v.strip()
 
         # Run from the project root so relative paths (results/, corpus/) resolve.
-        project_root = config.RESULTS_DIR.parent
+        project_root = tui_config.RESULTS_DIR.parent
 
         self._proc = subprocess.Popen(
             cmd,
