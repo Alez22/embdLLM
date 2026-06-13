@@ -36,10 +36,17 @@ docker-compose.override.yml
 build/
 twister-out*/
 
-# Results — track summaries, ignore per-TC detail JSONs and the run history log
+# Results — track summaries, ignore regenerable LLM caches and runtime artifacts
 results/runs/*/details/
 results/history.json
 results/report.html
+# regenerable LLM generation/grading cache
+results/corpus/
+# TUI runtime state and log
+results/test_tracker.json
+results/tui-run.log
+# TUI run checkpoints (resumable runtime state)
+results/runs/.checkpoint_*.jsonl
 
 # Environment
 .env
