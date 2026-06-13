@@ -164,6 +164,31 @@ def has_iomuxc_before_init(code: str, peripheral_init: str) -> bool:
     return mux_match.start() < init_match.start()
 
 
+def has_rt1170_clock_root_config(code: str) -> bool:
+    """Check that an RT1170 peripheral clock root is configured.
+
+    @brief The i.MX RT1170 SDK offers several valid ways to set a peripheral
+           clock root; this accepts any of them instead of forcing one literal
+           API. Requiring only ``CLOCK_SetRootClock`` produced false negatives
+           for correct solutions using the split mux/div form or a board clock
+           init wrapper.
+    @param code  Raw C source string (comments stripped internally).
+    @return True if any recognised clock-root configuration call is present.
+
+    Accepted forms:
+      - CLOCK_SetRootClock(root, &config)        (single-call form)
+      - CLOCK_SetRootClockMux / CLOCK_SetRootClockDiv  (split form)
+      - CLOCK_SetMux / CLOCK_SetDiv               (low-level form)
+      - BOARD_BootClockRUN() / BOARD_InitBootClocks()  (board wrapper)
+    """
+    stripped = strip_comments(code)
+    return bool(re.search(
+        r"\bCLOCK_Set(?:RootClock(?:Mux|Div)?|Mux|Div)\s*\("
+        r"|\bBOARD_(?:BootClockRUN|InitBootClocks)\w*\s*\(",
+        stripped,
+    ))
+
+
 # ---------------------------------------------------------------------------
 # Cortex-M7 (RT1170) D-cache coherency tokens.
 #

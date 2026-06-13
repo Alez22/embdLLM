@@ -7,7 +7,7 @@ but an embedded engineer targeting i.MX RT1170 must know.
 import re
 
 from embedeval.check_utils import scoped_contains, strip_comments
-from embedeval.check_utils_nxp import has_iomuxc_before_init
+from embedeval.check_utils_nxp import has_iomuxc_before_init, has_rt1170_clock_root_config
 from embedeval.models import CheckDetail
 
 
@@ -32,9 +32,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # Clock root configured — single-file program has no BOARD_BootClockRUN,
     # the LPSPI root must be set explicitly (implicit)
-    has_clock_root = scoped_contains(
-        generated_code, "CLOCK_SetRootClock", scope="stripped"
-    )
+    has_clock_root = has_rt1170_clock_root_config(generated_code)
     details.append(CheckDetail(
         check_name="clock_root_configured",
         passed=has_clock_root,
