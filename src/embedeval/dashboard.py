@@ -1031,12 +1031,30 @@ def review(request: Request) -> str:
     if filter_diff:
         visible = [r for r in visible if _find_metadata(r.get("case_id", "")).get("difficulty") == filter_diff]
 
-    # Keep only latest attempt per case
+    # Group all attempts per case (for attempt count + consistency), and keep
+    # the latest attempt per case for the summary row.
+    attempts_by_case: dict[str, list[dict]] = {}
+    for r in visible:
+        attempts_by_case.setdefault(r.get("case_id", ""), []).append(r)
+
     latest: dict[str, dict] = {}
     for r in visible:
         cid = r.get("case_id", "")
         if cid not in latest or r.get("attempt", 0) > latest[cid].get("attempt", 0):
             latest[cid] = r
+
+    # Per-case consistency: 1-CV over recomputed total_scores across attempts.
+    # None when fewer than 5 attempts are available (same rule as Run History).
+    applicable_by_case = {
+        cid: _applicable_layers(atts) for cid, atts in attempts_by_case.items()
+    }
+    consistency_by_case = {
+        cid: _consistency_score([
+            _recompute_total_score(c, applicable_by_case.get(cid, set()))
+            for c in atts
+        ])
+        for cid, atts in attempts_by_case.items()
+    }
 
     # Sort by difficulty order then case_id
     _diff_order = {"easy": 0, "medium": 1, "hard": 2, "unknown": 3}
@@ -1089,6 +1107,17 @@ def review(request: Request) -> str:
         layer = r.get("failed_at_layer")
         layer_str = f"L{layer}" if layer is not None else "—"
         detail_url = f"/case/{cid}/{filter_model}"
+
+        n_attempts = len(attempts_by_case.get(cid, []))
+        consistency = consistency_by_case.get(cid)
+        if consistency is None:
+            cons_cell = (
+                f'<span style="color:#4a5568;font-size:0.8rem" '
+                f'title="Needs ≥5 attempts (got {n_attempts})">n/a</span>'
+            )
+        else:
+            cons_cell = f'{_score_bar(consistency)} <span style="font-size:0.8rem">{int(consistency * 100)}%</span>'
+
         rows += f"""<tr>
           <td><a href="{detail_url}">{cid}</a></td>
           <td style="color:#718096;font-size:0.8rem">{sdk_label}</td>
@@ -1098,7 +1127,8 @@ def review(request: Request) -> str:
           <td>{passed_badge}</td>
           <td>{score}</td>
           <td style="color:#718096;font-size:0.8rem">{layer_str}</td>
-          <td style="color:#718096;font-size:0.8rem">{r.get('attempt', 1)}</td>
+          <td style="color:#718096;font-size:0.8rem;text-align:center">{n_attempts}</td>
+          <td>{cons_cell}</td>
         </tr>"""
 
     scorable = [r for r in sorted_cases if _result_status(r) != "error"]
@@ -1142,7 +1172,8 @@ def review(request: Request) -> str:
   <table>
     <thead><tr>
       <th>Case</th><th>SDK</th><th>Difficulty</th><th>Category</th>
-      <th>Title</th><th>Result</th><th>Score</th><th>Failed at</th><th>Attempt</th>
+      <th>Title</th><th>Result</th><th>Score</th><th>Failed at</th>
+      <th style="text-align:center">Attempts</th><th>Consistency</th>
     </tr></thead>
     <tbody>{rows}</tbody>
   </table>
