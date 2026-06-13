@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import time
 from pathlib import Path
 from queue import Queue
 from typing import ClassVar
@@ -807,6 +808,11 @@ class EmbedEvalTUI(App):
         self._run_fail: int = 0
         self._run_error: int = 0
         self._run_current: str = ""
+        self._run_model: str = ""
+        # Wall-clock start of the active run, and the 1s ticker that keeps
+        # the elapsed time in the progress bar moving between case events.
+        self._run_started_at: float = 0.0
+        self._run_timer = None
         # Track (case_id, attempt) already counted: the runner can emit both an
         # "unhandled" retry line and a final PASS/FAIL for the same attempt, so
         # counting every matching line double-counts and the bar overshoots 100%.
@@ -985,7 +991,14 @@ class EmbedEvalTUI(App):
         self._run_fail = 0
         self._run_error = 0
         self._run_current = ""
+        self._run_model = config["model"]
+        self._run_started_at = time.monotonic()
         self._run_seen = set()
+        # Tick once a second so elapsed time advances even while a single
+        # case is running (no case event arrives to redraw the bar).
+        if self._run_timer is not None:
+            self._run_timer.stop()
+        self._run_timer = self.set_interval(1.0, self._update_progress_bar)
 
         log = self.query_one("#run-log", Log)
         log.write_line(f"[log] {self._log_file}")
@@ -1038,6 +1051,10 @@ class EmbedEvalTUI(App):
     def _finish_run(self) -> None:
         """Called on the main thread when the subprocess exits."""
         self._load_data()
+        # Stop the elapsed-time ticker; a queued run will restart it.
+        if self._run_timer is not None:
+            self._run_timer.stop()
+            self._run_timer = None
         self._run_total = 0
         self._run_done = 0
         # Launch next queued run if any.
@@ -1116,9 +1133,21 @@ class EmbedEvalTUI(App):
         filled = round(frac * bar_width)
         bar = "█" * filled + "░" * (bar_width - filled)
         pct = int(frac * 100)
+        elapsed = self._format_elapsed(time.monotonic() - self._run_started_at)
         summary = self.query_one("#summary-bar", Static)
         summary.update(
             f"  Running  [{bar}]  {done}/{total} ({pct}%)"
-            f"  {self._run_current}"
+            f"  {self._run_model}  {self._run_current}"
+            f"  ·  {elapsed} elapsed"
             f"  ·  {self._run_pass} pass  {self._run_fail} fail  {self._run_error} error"
         )
+
+    @staticmethod
+    def _format_elapsed(seconds: float) -> str:
+        """Format an elapsed duration as M:SS (or H:MM:SS past an hour)."""
+        total = int(seconds)
+        hours, rem = divmod(total, 3600)
+        minutes, secs = divmod(rem, 60)
+        if hours:
+            return f"{hours}:{minutes:02d}:{secs:02d}"
+        return f"{minutes}:{secs:02d}"
