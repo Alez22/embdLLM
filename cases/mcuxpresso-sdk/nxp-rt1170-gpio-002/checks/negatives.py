@@ -89,7 +89,7 @@ NEGATIVES = [
         "name": "missing_sdk_headers",
         "description": "fsl_* includes removed — relies on transitive includes that may not exist",
         "mutation": lambda code: _remove_lines(code, '#include "fsl_'),
-        "must_fail": ["header_fsl_gpio_h", "header_fsl_iomuxc_h"],
+        "must_fail": ["header_fsl_gpio_h"],
     },
     {
         "name": "arduino_toggle",

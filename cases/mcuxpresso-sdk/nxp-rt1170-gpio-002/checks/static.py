@@ -15,15 +15,20 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
     stripped = strip_comments(generated_code)
 
-    for header in ("fsl_gpio.h", "fsl_iomuxc.h"):
-        present = scoped_contains(generated_code, header, scope="code_only")
-        details.append(CheckDetail(
-            check_name=f"header_{header.replace('.', '_')}",
-            passed=present,
-            expected=f"{header} included",
-            actual="present" if present else "missing",
-            check_type="exact_match",
-        ))
+    # Only the GPIO driver header is strictly required in a single-file answer.
+    # The official SDK GPIO source (driver_examples/gpio/input_interrupt/
+    # gpio_input_interrupt.c) includes fsl_gpio.h + fsl_port.h but NOT
+    # fsl_iomuxc.h — pin muxing lives in a separate pin_mux.c. Requiring
+    # fsl_iomuxc.h in the same file contradicts the SDK layout, so it is not
+    # a hard requirement here (Class B fix, docs/NXP_CASE_AUDIT.md).
+    has_gpio_header = scoped_contains(generated_code, "fsl_gpio.h", scope="code_only")
+    details.append(CheckDetail(
+        check_name="header_fsl_gpio_h",
+        passed=has_gpio_header,
+        expected="fsl_gpio.h included",
+        actual="present" if has_gpio_header else "missing",
+        check_type="exact_match",
+    ))
 
     has_isr = bool(re.search(r"\bGPIO\w+_IRQHandler\s*\(", stripped))
     details.append(CheckDetail(
