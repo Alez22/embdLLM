@@ -225,6 +225,13 @@ class EvalResult(BaseModel):
     generation_params: dict = Field(default_factory=dict)
     # True when the LLM returned prose on the first attempt and was retried with code-only hint.
     prose_retry: bool = False
+    # How this result was produced — transient run metadata, NOT part of any cache cell.
+    #   "llm"             : fresh LLM generation + fresh grading
+    #   "grade-cache"     : fresh LLM generation, grading served from cache
+    #   "gen-cache"       : generation reused from corpus, freshly re-graded
+    #   "gen+grade-cache" : both generation and grading served from cache
+    # Default keeps older EvalResult JSON files valid on load.
+    cache_source: str = "llm"
 
 
 class PerCheckStat(BaseModel):

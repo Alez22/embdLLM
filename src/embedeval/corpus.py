@@ -160,11 +160,37 @@ def hash_code(generated_code: str) -> str:
     return hashlib.sha256(generated_code.encode("utf-8")).hexdigest()[:16]
 
 
-def hash_checks(case_dir: Path) -> str:
-    """Return a 16-char content hash of all check files in case_dir/checks/.
+# Shared modules imported by per-case check files. Their content is part of
+# the grading logic, so editing them must invalidate the grade cache exactly
+# like editing a per-case checks/*.py file. hash_checks() folds them in.
+_SHARED_CHECK_MODULES = ("check_utils.py", "check_utils_nxp.py", "models.py")
 
-    Covers static.py, behavior.py, and negatives.py (if present).
-    A change to any of these produces a different hash → grading cache miss.
+
+def _hash_shared_check_modules() -> list[str]:
+    """Return name:hash8 parts for the shared check helper modules.
+
+    Located relative to the embedeval package (this file's directory), not
+    the case dir. A change to any helper (e.g. relaxing a matcher in
+    check_utils_nxp) changes the grading outcome, so it must change the hash.
+    """
+    pkg_dir = Path(__file__).parent
+    parts: list[str] = []
+    for name in _SHARED_CHECK_MODULES:
+        f = pkg_dir / name
+        if f.is_file():
+            fhash = hashlib.sha256(f.read_bytes()).hexdigest()[:8]
+            parts.append(f"shared/{name}:{fhash}")
+    return parts
+
+
+def hash_checks(case_dir: Path) -> str:
+    """Return a 16-char content hash of the full grading logic for a case.
+
+    Covers per-case static.py, behavior.py, negatives.py (if present) AND the
+    shared helper modules they import (check_utils, check_utils_nxp, models).
+    A change to any of these produces a different hash → grading cache miss,
+    so a rerun re-grades correctly after editing either a per-case check or a
+    shared helper.
     """
     checks_dir = case_dir / "checks"
     if not checks_dir.is_dir():
@@ -177,8 +203,11 @@ def hash_checks(case_dir: Path) -> str:
             fhash = hashlib.sha256(f.read_bytes()).hexdigest()[:8]
             parts.append(f"{name}:{fhash}")
 
+    # No per-case checks → nothing to grade; ignore shared modules.
     if not parts:
         return "no_checks"
+
+    parts.extend(_hash_shared_check_modules())
 
     return hashlib.sha256("\n".join(parts).encode()).hexdigest()[:16]
 
