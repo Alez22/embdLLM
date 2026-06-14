@@ -104,35 +104,80 @@ def no_nxp_hallucination(code: str) -> list[str]:
     return found
 
 
+# A function definition signature ("ret_type name(args) {") or a forward
+# declaration ("ret_type name(args);") is NOT a call site. Models that write
+# idiomatic, SDK-style code (helpers like BOARD_InitPins, a forward-declared
+# wrapper such as I2C_MasterInit) would otherwise make the init function's name
+# appear textually before the clock/pin-mux setup, even though at run time the
+# setup is called first from main(). The official SDK examples are written the
+# same way (clock gate lives in pin_mux.c::BOARD_InitPins). So ordering must be
+# judged on CALL order, not on definition/declaration position.
+#
+# We blank out signatures and forward declarations before searching, leaving
+# only call sites. Blanking (replacing with spaces) preserves byte offsets so
+# the relative ordering of the surviving call sites is unchanged.
+def _blank_function_signatures(stripped: str, name: str) -> str:
+    """Replace forward declarations and the definition signature of ``name``
+    with spaces, so a later position search only finds genuine call sites.
+
+    @param stripped  Comment-stripped C source.
+    @param name      Function name whose decl/def signature should be ignored.
+    @return The source with ``name``'s signatures blanked (offsets preserved).
+    """
+    escaped = re.escape(name)
+    # Matches a return-type token (one or more identifiers/pointers) directly
+    # in front of "name(args)" followed by "{" (definition) or ";" (forward
+    # declaration). A bare call "name(args);" has no return type in front of
+    # it, so it is not matched here.
+    signature_re = re.compile(
+        rf"\b(?:[A-Za-z_]\w*[ \t\*\n]+)+{escaped}\s*\([^;{{}}]*\)\s*[;{{]"
+    )
+
+    def _blank(match: re.Match) -> str:
+        return " " * (match.end() - match.start())
+
+    return signature_re.sub(_blank, stripped)
+
+
+def _first_call_pos(stripped: str, name: str) -> int | None:
+    """Return the offset of the first genuine call to ``name``, or None.
+
+    Forward declarations and the definition signature of ``name`` are ignored.
+    """
+    cleaned = _blank_function_signatures(stripped, name)
+    match = re.search(rf"\b{re.escape(name)}\s*\(", cleaned)
+    return match.start() if match else None
+
+
 def has_clock_gate_before(code: str, peripheral_init: str) -> bool:
     """Check that a CLOCK_EnableClock call appears before peripheral init.
 
     @brief Verifies the MCUXpresso SDK clock-gate-before-init invariant:
-           CLOCK_EnableClock() must precede the first peripheral init call.
+           CLOCK_EnableClock() must precede the first peripheral init CALL.
+           Ordering is judged on call sites, ignoring forward declarations and
+           the wrapper's own definition signature (see _blank_function_signatures).
            This is implicit domain knowledge — prompts must not mention it.
     @param code             Raw C source string.
     @param peripheral_init  Function name to check ordering against,
                             e.g. "I2C_MasterInit", "SPI_MasterInit".
-    @return True if CLOCK_EnableClock appears before peripheral_init,
-            True if peripheral_init is absent (nothing to check),
+    @return True if CLOCK_EnableClock appears before the peripheral init call,
+            True if the peripheral init is not called (nothing to check),
             False if CLOCK_EnableClock is absent or appears after.
     """
     stripped = strip_comments(code)
 
     clock_match = re.search(r"\bCLOCK_EnableClock\s*\(", stripped)
-    init_match = re.search(
-        rf"\b{re.escape(peripheral_init)}\s*\(", stripped
-    )
+    init_pos = _first_call_pos(stripped, peripheral_init)
 
-    # Nothing to check if the peripheral init is not present.
-    if init_match is None:
+    # Nothing to check if the peripheral init is not called.
+    if init_pos is None:
         return True
 
     # Clock gate must be present and positioned before the init call.
     if clock_match is None:
         return False
 
-    return clock_match.start() < init_match.start()
+    return clock_match.start() < init_pos
 
 
 def has_iomuxc_before_init(code: str, peripheral_init: str) -> bool:
@@ -140,7 +185,9 @@ def has_iomuxc_before_init(code: str, peripheral_init: str) -> bool:
 
     @brief RT1170 (i.MX RT) variant of the pin-mux-before-init invariant:
            pads are muxed via IOMUXC_SetPinMux / IOMUXC_LPSR_SetPinMux,
-           not the Kinetis PORT_SetPinMux API.
+           not the Kinetis PORT_SetPinMux API. Ordering is judged on the
+           init CALL site, ignoring forward declarations / definition
+           signatures (see _blank_function_signatures).
     @param code             Raw C source string.
     @param peripheral_init  Function name to check ordering against,
                             e.g. "GPIO_PinInit", "LPI2C_MasterInit".
@@ -151,17 +198,15 @@ def has_iomuxc_before_init(code: str, peripheral_init: str) -> bool:
     stripped = strip_comments(code)
 
     mux_match = re.search(r"\bIOMUXC\w*_SetPinMux\s*\(", stripped)
-    init_match = re.search(
-        rf"\b{re.escape(peripheral_init)}\s*\(", stripped
-    )
+    init_pos = _first_call_pos(stripped, peripheral_init)
 
-    if init_match is None:
+    if init_pos is None:
         return True
 
     if mux_match is None:
         return False
 
-    return mux_match.start() < init_match.start()
+    return mux_match.start() < init_pos
 
 
 def has_rt1170_clock_root_config(code: str) -> bool:
@@ -237,7 +282,8 @@ def has_pinmux_before_init(code: str, peripheral_init: str) -> bool:
 
     @brief Verifies the MCUXpresso SDK pin-mux-before-init invariant:
            PORT_SetPinMux() (or any PORT_SetPin* variant) must precede
-           the first peripheral init call.
+           the first peripheral init CALL. Ordering ignores forward
+           declarations / definition signatures (see _blank_function_signatures).
     @param code             Raw C source string.
     @param peripheral_init  Function name to check ordering against,
                             e.g. "I2C_MasterInit", "GPIO_PinInit".
@@ -248,14 +294,12 @@ def has_pinmux_before_init(code: str, peripheral_init: str) -> bool:
     stripped = strip_comments(code)
 
     pinmux_match = re.search(r"\bPORT_SetPin\w+\s*\(", stripped)
-    init_match = re.search(
-        rf"\b{re.escape(peripheral_init)}\s*\(", stripped
-    )
+    init_pos = _first_call_pos(stripped, peripheral_init)
 
-    if init_match is None:
+    if init_pos is None:
         return True
 
     if pinmux_match is None:
         return False
 
-    return pinmux_match.start() < init_match.start()
+    return pinmux_match.start() < init_pos
