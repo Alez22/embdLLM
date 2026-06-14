@@ -23,27 +23,35 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         check_type="constraint",
     ))
 
-    # Longest timeout configured
+    # Longest timeout configured. The fsl_cop.h API in the MCUXpresso SDK
+    # expresses the longest available timeout as the 2^18-cycle setting
+    # (kCOP_2Power10CyclesOr2Power18Cycles) together with long-timeout mode
+    # (kCOP_LongTimeoutMode). The previous check matched a non-existent
+    # kCOP_Timeout_2Power18LpoClock enum, so no model could pass (Class C fix,
+    # docs/NXP_CASE_AUDIT.md). Accept the real longest-timeout enum; the
+    # accompanying long mode is sufficient on its own as it selects the long
+    # range, but require the 2^18 cycle value to rule out shorter settings.
     has_long_timeout = bool(re.search(
-        r"kCOP_Timeout_2Power1[68]\w*", generated_code
+        r"kCOP_2Power10CyclesOr2Power18Cycles", generated_code
     ))
     details.append(CheckDetail(
         check_name="long_timeout_configured",
         passed=has_long_timeout,
-        expected="kCOP_Timeout_2Power16LpoClock or 2Power18 (longest available)",
+        expected="kCOP_2Power10CyclesOr2Power18Cycles (longest available)",
         actual="present" if has_long_timeout else "missing or short timeout",
         check_type="constraint",
     ))
 
-    # Watchdog NOT disabled (no cop_cfg.enableCop = false)
-    wdt_disabled = bool(re.search(
-        r"\.enableCop\s*=\s*false", generated_code
-    ))
+    # Watchdog NOT disabled. The cop_config_t struct has no enableCop field;
+    # the only way to disable the COP in this SDK is to call COP_Disable()
+    # (fsl_cop.h). The previous check matched a non-existent ".enableCop = false"
+    # field (Class C fix, docs/NXP_CASE_AUDIT.md).
+    wdt_disabled = bool(re.search(r"\bCOP_Disable\s*\(", generated_code))
     details.append(CheckDetail(
         check_name="watchdog_not_disabled",
         passed=not wdt_disabled,
         expected="Watchdog not disabled (prompt explicitly forbids this)",
-        actual="ok" if not wdt_disabled else "watchdog disabled — defeats purpose",
+        actual="ok" if not wdt_disabled else "COP_Disable called — defeats purpose",
         check_type="constraint",
     ))
 

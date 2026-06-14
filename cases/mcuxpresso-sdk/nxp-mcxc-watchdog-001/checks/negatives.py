@@ -41,16 +41,16 @@ NEGATIVES = [
         "name": "short_timeout",
         "description": "Short COP timeout — main loop work exceeds the window, spurious resets",
         "mutation": lambda code: code.replace(
-            "kCOP_Timeout_2Power18LpoClock", "kCOP_Timeout_2Power5LpoClock"
+            "kCOP_2Power10CyclesOr2Power18Cycles", "kCOP_2Power5CyclesOr2Power13Cycles"
         ),
         "must_fail": ["long_timeout_configured"],
     },
     {
         "name": "watchdog_disabled",
-        "description": "enableCop = false — watchdog silently disabled, defeats the purpose",
+        "description": "COP_Disable called — watchdog silently disabled, defeats the purpose",
         "mutation": lambda code: code.replace(
-            "cop_cfg.enableCop      = true;",
-            "cop_cfg.enableCop      = false;",
+            "COP_Init(SIM, &cop_cfg);",
+            "COP_Disable(SIM);",
         ),
         "must_fail": ["watchdog_not_disabled"],
     },
