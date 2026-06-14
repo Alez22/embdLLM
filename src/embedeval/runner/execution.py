@@ -105,6 +105,7 @@ def _build_result_from_grade(
     temperature: float,
     gen_params: dict,
     used_thinking: bool,
+    cache_source: str = "llm",
     prose_retry: bool = False,
     llm_duration_seconds: float = 0.0,
 ) -> EvalResult:
@@ -136,6 +137,7 @@ def _build_result_from_grade(
         prose_retry=prose_retry,
         temperature=temperature,
         generation_params=gen_params,
+        cache_source=cache_source,
     )
 
 
@@ -210,6 +212,7 @@ def _run_single_case(
                     temperature=temperature,
                     gen_params=gen_params,
                     used_thinking=False,
+                    cache_source="gen+grade-cache",
                 )
 
         result = _runner.evaluate(
@@ -226,6 +229,7 @@ def _run_single_case(
         result.reasoning_types = meta.reasoning_types
         result.temperature = temperature
         result.generation_params = gen_params
+        result.cache_source = "gen-cache"
         if corpus_dir is not None:
             grade_store(corpus_dir, cached_code, case_dir, result)
         return result
@@ -278,6 +282,7 @@ def _run_single_case(
                 used_thinking=bool(llm_response.thinking_content),
                 prose_retry=llm_response.prose_retry,
                 llm_duration_seconds=llm_response.duration_seconds,
+                cache_source="grade-cache",
             )
             # Skip feedback loop: a cached grade means we already know the
             # outcome; if the user wants to re-run feedback they must --force.
@@ -457,6 +462,7 @@ def run_benchmark(
         ).as_sorted_dict()
         cache_hits = 0
         cache_misses = 0
+        grade_hits = 0  # cells whose grading can also be served from cache
         for case_dir, meta in selected:
             if meta.id in completed:
                 continue
@@ -479,13 +485,23 @@ def run_benchmark(
                 )
                 if cell is not None:
                     cache_hits += 1
+                    # Grading is also cached only if the checks (incl. shared
+                    # helpers) are unchanged for this exact generated code.
+                    if grade_lookup(corpus_dir, cell.generated_code, case_dir):
+                        grade_hits += 1
                 else:
                     cache_misses += 1
         console = Console()
         total_cells = cache_hits + cache_misses
+        re_grade = cache_hits - grade_hits
         console.print(
-            f"[bold]Cache:[/bold] {cache_hits}/{total_cells} cells cached "
+            f"[bold]Generation cache:[/bold] {cache_hits}/{total_cells} cells "
             f"([green]{cache_hits} hits[/green], [yellow]{cache_misses} LLM calls[/yellow])"
+        )
+        console.print(
+            f"[bold]Grading cache:[/bold] of {cache_hits} cached generations, "
+            f"[green]{grade_hits} grade-hits[/green], "
+            f"[yellow]{re_grade} re-graded[/yellow]"
         )
 
     with Progress(
@@ -561,11 +577,15 @@ def run_benchmark(
                     _append_checkpoint(checkpoint_path, result)
 
                 status = "PASS" if result.passed else f"FAIL@L{result.failed_at_layer}"
+                # Append cache provenance to the same status line so the TUI
+                # (which parses this line) can show status + source together.
+                # cache_source is the single source of truth; see EvalResult.
                 logger.info(
-                    "Case %s attempt %d: %s",
+                    "Case %s attempt %d: %s [src=%s]",
                     meta.id,
                     attempt,
                     status,
+                    getattr(result, "cache_source", "llm"),
                 )
 
     if skipped:
