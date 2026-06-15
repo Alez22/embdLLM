@@ -315,7 +315,7 @@ Foundation items still open — not blocking Phase 2-6 but needed for L1 compile
   - rt1170-audio-001: `AD_17_SAI1_RX_DATA00` → `AD_20_`.
   - rt1170-lpspi-001: LPSPI1 data signals are `SOUT`/`SIN` on RT1170, not `SDO`/`SDI`.
 
-- [ ] **Add a "self-contained output" clause to every NXP prompt.md.**
+- [x] **Add a "self-contained output" clause to every NXP prompt.md.**
   Reason: the L1 gate compiles against pure MCUXpresso SDK driver headers only. Models
   often `#include "board.h" / "pin_mux.h" / "clock_config.h" / "fsl_debug_console.h"` —
   these are MCUXpresso *config-tool–generated* scaffold files, NOT part of the SDK, so the

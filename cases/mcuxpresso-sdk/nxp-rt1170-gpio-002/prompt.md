@@ -7,4 +7,6 @@ Requirements:
 4. Count the number of presses in a variable
 
 Use the MCUXpresso SDK (fsl_gpio.h).
+Self-contained: include only MCUXpresso SDK driver headers (`fsl_*.h`) and CMSIS. Do not rely on config-tool-generated board files (`board.h`, `pin_mux.h`, `clock_config.h`, `fsl_debug_console.h`); configure pins, clocks and peripherals directly in code.
+
 Output ONLY the complete C source file.

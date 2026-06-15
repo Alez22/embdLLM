@@ -10,4 +10,6 @@ DAC control interface (from the DAC datasheet — the device has no MCLK input a
 5. Power-up sequence, one byte per register write: register 0x02 = 0x01 (DAC power on), register 0x04 = 0x00 (I2S slave, 16-bit), register 0x06 = 0x3F (output volume)
 
 Use the MCUXpresso SDK (fsl_sai.h, fsl_lpi2c.h).
+Self-contained: include only MCUXpresso SDK driver headers (`fsl_*.h`) and CMSIS. Do not rely on config-tool-generated board files (`board.h`, `pin_mux.h`, `clock_config.h`, `fsl_debug_console.h`); configure pins, clocks and peripherals directly in code.
+
 Output ONLY the complete C source file.

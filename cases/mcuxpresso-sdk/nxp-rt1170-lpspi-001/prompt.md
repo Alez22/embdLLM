@@ -6,4 +6,6 @@ Requirements:
 3. Send the JEDEC ID command 0x9F and read the 3 ID bytes (manufacturer, type, capacity) into a buffer
 
 Use the MCUXpresso SDK (fsl_lpspi.h).
+Self-contained: include only MCUXpresso SDK driver headers (`fsl_*.h`) and CMSIS. Do not rely on config-tool-generated board files (`board.h`, `pin_mux.h`, `clock_config.h`, `fsl_debug_console.h`); configure pins, clocks and peripherals directly in code.
+
 Output ONLY the complete C source file.
