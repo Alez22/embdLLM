@@ -43,6 +43,19 @@ from embedeval.runner.prompts import (
 logger = logging.getLogger(__name__)
 
 
+def _status_label(result: EvalResult) -> str:
+    """Return the log status string for a result.
+
+    Emit a bare "FAIL" when the layer is unknown instead of "FAIL@LNone",
+    so the TUI log parser shows "L?" rather than a spurious layer name.
+    """
+    if result.passed:
+        return "PASS"
+    if result.failed_at_layer is None:
+        return "FAIL"
+    return f"FAIL@L{result.failed_at_layer}"
+
+
 def _make_error_result(
     meta: CaseMetadata,
     model: str,
@@ -371,7 +384,7 @@ def _run_single_case(
             feedback_round + 1,
             feedback_rounds,
             meta.id,
-            "PASS" if result.passed else f"FAIL@L{result.failed_at_layer}",
+            _status_label(result),
         )
         feedback_round += 1
         if result.passed:
@@ -576,7 +589,7 @@ def run_benchmark(
                 if checkpoint_path is not None:
                     _append_checkpoint(checkpoint_path, result)
 
-                status = "PASS" if result.passed else f"FAIL@L{result.failed_at_layer}"
+                status = _status_label(result)
                 # Append cache provenance to the same status line so the TUI
                 # (which parses this line) can show status + source together.
                 # cache_source is the single source of truth; see EvalResult.
