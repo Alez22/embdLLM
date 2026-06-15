@@ -28,8 +28,8 @@ int main(void)
     /* Pad mux: must precede peripheral init */
     IOMUXC_SetPinMux(IOMUXC_GPIO_AD_28_LPSPI1_SCK, 0U);
     IOMUXC_SetPinMux(IOMUXC_GPIO_AD_29_LPSPI1_PCS0, 0U);
-    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_30_LPSPI1_SDO, 0U);
-    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_31_LPSPI1_SDI, 0U);
+    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_30_LPSPI1_SOUT, 0U);
+    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_31_LPSPI1_SIN, 0U);
 
     /* Mode 0 = CPOL 0, CPHA 0 — the SDK default; set explicitly anyway */
     LPSPI_MasterGetDefaultConfig(&config);
