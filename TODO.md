@@ -315,6 +315,26 @@ Foundation items still open — not blocking Phase 2-6 but needed for L1 compile
   - rt1170-audio-001: `AD_17_SAI1_RX_DATA00` → `AD_20_`.
   - rt1170-lpspi-001: LPSPI1 data signals are `SOUT`/`SIN` on RT1170, not `SDO`/`SDI`.
 
+- [ ] **Add a "self-contained output" clause to every NXP prompt.md.**
+  Reason: the L1 gate compiles against pure MCUXpresso SDK driver headers only. Models
+  often `#include "board.h" / "pin_mux.h" / "clock_config.h" / "fsl_debug_console.h"` —
+  these are MCUXpresso *config-tool–generated* scaffold files, NOT part of the SDK, so the
+  gate fails them (~25 of the deepseek-v4-flash L1 failures were this, not real API bugs).
+  Decision: keep the gate strict; instead make the prompt explicit about output FORM.
+  - Apply to ALL `cases/mcuxpresso-sdk/nxp-*/prompt.md`, just before
+    `Output ONLY the complete C source file.`
+  - Suggested wording (form/environment only — NOT how to write correct code):
+    "Self-contained: include only MCUXpresso SDK driver headers (`fsl_*.h`) and CMSIS.
+    Do not rely on config-tool-generated board files (`board.h`, `pin_mux.h`,
+    `clock_config.h`, `fsl_debug_console.h`); configure pins, clocks and peripherals
+    directly in code."
+  - CRITICAL CLAUDE.md constraint: this clarifies output form/packaging, which is allowed.
+    Do NOT drift into naming correct APIs/symbols (e.g. `GPIO_PinRead` vs `GPIO_ReadPinInput`,
+    `kCLOCK_Uart2`) — those are exactly the system-reasoning the benchmark measures.
+  - After editing, prompt_hash changes → existing generations are invalidated; re-generate
+    (needs API key) to measure the effect. The genuine API-hallucination failures
+    (GPIO_ReadPinInput, i2c_status_t, kCLOCK_Gpio9, …) MUST remain failures.
+
 ---
 
 ## Phase 7 — Knowledge Currency Probing
