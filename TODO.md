@@ -325,9 +325,13 @@ Foundation items still open — not blocking Phase 2-6 but needed for L1 compile
     `Output ONLY the complete C source file.`
   - Suggested wording (form/environment only — NOT how to write correct code):
     "Self-contained: include only MCUXpresso SDK driver headers (`fsl_*.h`) and CMSIS.
+    Configure pins, clocks and peripherals with the SDK driver APIs within this file.
     Do not rely on config-tool-generated board files (`board.h`, `pin_mux.h`,
-    `clock_config.h`, `fsl_debug_console.h`); configure pins, clocks and peripherals
-    directly in code."
+    `clock_config.h`, `fsl_debug_console.h`)."
+    NOTE: first wording said "configure ... directly in code", which deepseek-v4-flash
+    read as "register-bang instead of using the SDK" (SIM->SCGC5 |= ... instead of
+    CLOCK_EnableClock). That traded L1 compile failures for L0/L3 failures on the very
+    SDK-API checks the benchmark measures. Reworded to "with the SDK driver APIs".
   - CRITICAL CLAUDE.md constraint: this clarifies output form/packaging, which is allowed.
     Do NOT drift into naming correct APIs/symbols (e.g. `GPIO_PinRead` vs `GPIO_ReadPinInput`,
     `kCLOCK_Uart2`) — those are exactly the system-reasoning the benchmark measures.

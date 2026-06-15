@@ -8,6 +8,6 @@ Requirements:
 5. If both slots are corrupt on boot, initialize with default values
 
 Use the MCUXpresso SDK (fsl_flash.h). Implement a simple CRC32 without external libraries.
-Self-contained: include only MCUXpresso SDK driver headers (`fsl_*.h`) and CMSIS. Do not rely on config-tool-generated board files (`board.h`, `pin_mux.h`, `clock_config.h`, `fsl_debug_console.h`); configure pins, clocks and peripherals directly in code.
+Self-contained: include only MCUXpresso SDK driver headers (`fsl_*.h`) and CMSIS. Configure pins, clocks and peripherals with the SDK driver APIs within this file. Do not rely on config-tool-generated board files (`board.h`, `pin_mux.h`, `clock_config.h`, `fsl_debug_console.h`).
 
 Output ONLY the complete C source file.
