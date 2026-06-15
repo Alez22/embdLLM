@@ -47,23 +47,23 @@ int main(void)
     }
 
     /* Erase sector: must be done before write — flash bits can only go 1→0 */
-    status = FLASH_EraseSector(&flash_cfg, FLASH_TARGET_ADDR, FLASH_SECTOR_SIZE,
-                               kFLASH_ApiEraseKey);
+    status = FLASH_Erase(&flash_cfg, FLASH_TARGET_ADDR, FLASH_SECTOR_SIZE,
+                         kFLASH_ApiEraseKey);
     if (status != kStatus_Success) {
         blink_forever(100000U);  /* medium blink = erase error */
     }
 
     /* Write: minimum write unit on MCXC144 is 4 bytes (longword) */
     status = FLASH_Program(&flash_cfg, FLASH_TARGET_ADDR,
-                           (uint32_t *)s_data, sizeof(s_data));
+                           (uint8_t *)s_data, sizeof(s_data));
     if (status != kStatus_Success) {
         blink_forever(200000U);  /* slow blink = write error */
     }
 
     /* Verify written data matches source */
     status = FLASH_VerifyProgram(&flash_cfg, FLASH_TARGET_ADDR, sizeof(s_data),
-                                 (const uint32_t *)s_data,
-                                 kFLASH_MarginValueNormal,
+                                 (const uint8_t *)s_data,
+                                 kFTFx_MarginValueNormal,
                                  &fail_addr, &fail_data);
     (void)fail_addr;
     (void)fail_data;

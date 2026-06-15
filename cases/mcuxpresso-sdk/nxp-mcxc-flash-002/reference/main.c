@@ -49,17 +49,17 @@ static status_t write_slot(uint32_t addr, const config_record_t *rec)
 {
     status_t s;
 
-    s = FLASH_EraseSector(&s_flash, addr, SECTOR_SIZE, kFLASH_ApiEraseKey);
+    s = FLASH_Erase(&s_flash, addr, SECTOR_SIZE, kFLASH_ApiEraseKey);
     if (s != kStatus_Success) { return s; }
 
-    s = FLASH_Program(&s_flash, addr, (uint32_t *)rec, sizeof(*rec));
+    s = FLASH_Program(&s_flash, addr, (uint8_t *)rec, sizeof(*rec));
     if (s != kStatus_Success) { return s; }
 
     /* Verify after write — validate data integrity before declaring success */
     uint32_t fail_addr, fail_data;
     s = FLASH_VerifyProgram(&s_flash, addr, sizeof(*rec),
-                            (const uint32_t *)rec,
-                            kFLASH_MarginValueNormal,
+                            (const uint8_t *)rec,
+                            kFTFx_MarginValueNormal,
                             &fail_addr, &fail_data);
     return s;
 }
