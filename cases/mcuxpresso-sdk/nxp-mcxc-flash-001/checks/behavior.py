@@ -20,14 +20,14 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details: list[CheckDetail] = []
 
     # Erase must come before program — bits can only go 1→0
-    erase_pos   = _pos(generated_code, "FLASH_EraseSector")
+    erase_pos   = _pos(generated_code, "FLASH_Erase")
     program_pos = _pos(generated_code, "FLASH_Program")
     erase_before_write = (erase_pos != -1 and program_pos != -1
                           and erase_pos < program_pos)
     details.append(CheckDetail(
         check_name="erase_before_write",
         passed=erase_before_write,
-        expected="FLASH_EraseSector called before FLASH_Program",
+        expected="FLASH_Erase called before FLASH_Program",
         actual="correct order" if erase_before_write else "wrong order or missing",
         check_type="constraint",
     ))
@@ -61,7 +61,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details.append(CheckDetail(
         check_name="flash_erase_key_used",
         passed=has_erase_key,
-        expected="kFLASH_ApiEraseKey passed to FLASH_EraseSector",
+        expected="kFLASH_ApiEraseKey passed to FLASH_Erase",
         actual="present" if has_erase_key else "missing",
         check_type="constraint",
     ))

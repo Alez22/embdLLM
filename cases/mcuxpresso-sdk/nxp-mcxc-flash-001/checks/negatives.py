@@ -11,8 +11,8 @@ import re
 
 _ERASE_BLOCK = (
     "    /* Erase sector: must be done before write — flash bits can only go 1→0 */\n"
-    "    status = FLASH_EraseSector(&flash_cfg, FLASH_TARGET_ADDR, FLASH_SECTOR_SIZE,\n"
-    "                               kFLASH_ApiEraseKey);\n"
+    "    status = FLASH_Erase(&flash_cfg, FLASH_TARGET_ADDR, FLASH_SECTOR_SIZE,\n"
+    "                         kFLASH_ApiEraseKey);\n"
     "    if (status != kStatus_Success) {\n"
     "        blink_forever(100000U);  /* medium blink = erase error */\n"
     "    }\n"
@@ -22,8 +22,8 @@ _ERASE_BLOCK = (
 _VERIFY_BLOCK = (
     "    /* Verify written data matches source */\n"
     "    status = FLASH_VerifyProgram(&flash_cfg, FLASH_TARGET_ADDR, sizeof(s_data),\n"
-    "                                 (const uint32_t *)s_data,\n"
-    "                                 kFLASH_MarginValueNormal,\n"
+    "                                 (const uint8_t *)s_data,\n"
+    "                                 kFTFx_MarginValueNormal,\n"
     "                                 &fail_addr, &fail_data);\n"
     "    (void)fail_addr;\n"
     "    (void)fail_data;\n"
@@ -119,9 +119,9 @@ NEGATIVES = [
         "description": "STM32-style HAL flash call used instead of MCUXpresso FLASH_Program",
         "mutation": lambda code: code.replace(
             "    status = FLASH_Program(&flash_cfg, FLASH_TARGET_ADDR,\n"
-            "                           (uint32_t *)s_data, sizeof(s_data));",
+            "                           (uint8_t *)s_data, sizeof(s_data));",
             "    status = HAL_FLASH_Write(FLASH_TARGET_ADDR,"
-            " (uint32_t *)s_data, sizeof(s_data));",
+            " (uint8_t *)s_data, sizeof(s_data));",
         ),
         "must_fail": ["flash_program_called", "no_cross_platform_hallucination"],
     },

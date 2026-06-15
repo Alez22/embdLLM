@@ -13,9 +13,9 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     """Validate implicit knowledge for power-loss safe flash write."""
     details: list[CheckDetail] = []
 
-    # Both slots must be written — detect either via two FLASH_EraseSector
+    # Both slots must be written — detect either via two FLASH_Erase
     # calls or two separate flash write helper calls referencing both addresses.
-    erase_calls = re.findall(r"FLASH_EraseSector\s*\(", generated_code)
+    erase_calls = re.findall(r"FLASH_Erase\s*\(", generated_code)
     program_calls = re.findall(r"FLASH_Program\s*\(", generated_code)
     # Also accept a helper function called twice with different slot addresses
     slot_a_writes = len(re.findall(r"(SLOT_A|0[xX]1[Ee]000)", generated_code))
@@ -80,7 +80,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     details.append(CheckDetail(
         check_name="flash_erase_key_used",
         passed=has_erase_key,
-        expected="kFLASH_ApiEraseKey passed to FLASH_EraseSector",
+        expected="kFLASH_ApiEraseKey passed to FLASH_Erase",
         actual="present" if has_erase_key else "missing",
         check_type="constraint",
     ))

@@ -68,7 +68,7 @@ NEGATIVES = [
     {
         "name": "isr_not_vector_named",
         "description": "Handler renamed — no longer matches the vector table entry, never called",
-        "mutation": lambda code: code.replace("UART0_IRQHandler", "uart_rx_callback"),
+        "mutation": lambda code: code.replace("UART2_FLEXIO_IRQHandler", "uart_rx_callback"),
         "must_fail": ["uart_isr_handler_defined", "rx_flag_checked_in_isr"],
     },
     {

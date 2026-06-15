@@ -35,11 +35,11 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         check_type="exact_match",
     ))
 
-    has_isr = bool(re.search(r"\bUART0_IRQHandler\s*\(", generated_code))
+    has_isr = bool(re.search(r"\bUART2_FLEXIO_IRQHandler\s*\(", generated_code))
     details.append(CheckDetail(
         check_name="uart_isr_handler_defined",
         passed=has_isr,
-        expected="UART0_IRQHandler defined",
+        expected="UART2_FLEXIO_IRQHandler defined",
         actual="present" if has_isr else "missing",
         check_type="exact_match",
     ))

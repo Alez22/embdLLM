@@ -27,12 +27,12 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         check_type="constraint",
     ))
 
-    # NVIC enabled for UART0 — implicit: prompt never mentions EnableIRQ
+    # NVIC enabled for UART2 — implicit: prompt never mentions EnableIRQ
     has_nvic = bool(re.search(r"\bEnableIRQ\s*\(", generated_code))
     details.append(CheckDetail(
         check_name="nvic_uart_interrupt_enabled",
         passed=has_nvic,
-        expected="EnableIRQ called to enable UART0 in NVIC",
+        expected="EnableIRQ called to enable UART2 in NVIC",
         actual="present" if has_nvic else "missing",
         check_type="constraint",
     ))
@@ -63,7 +63,7 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
 
     # RX status flag checked inside ISR before reading byte
     isr_match = re.search(
-        r"\bUART0_IRQHandler\s*\([^)]*\)\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}",
+        r"\bUART2_FLEXIO_IRQHandler\s*\([^)]*\)\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}",
         generated_code, re.DOTALL
     )
     if isr_match:

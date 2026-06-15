@@ -61,12 +61,12 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
     # FLASH_VerifyProgram must NOT be required here, or models that correctly
     # follow the CRC instruction are rejected for not also calling a hardware
     # verify API the prompt never mentions.
-    has_erase = scoped_contains(generated_code, "FLASH_EraseSector", scope="stripped")
+    has_erase = scoped_contains(generated_code, "FLASH_Erase", scope="stripped")
     has_program = scoped_contains(generated_code, "FLASH_Program", scope="stripped")
     details.append(CheckDetail(
         check_name="full_flash_sequence_present",
         passed=has_erase and has_program,
-        expected="FLASH_EraseSector + FLASH_Program both present",
+        expected="FLASH_Erase + FLASH_Program both present",
         actual="complete" if (has_erase and has_program) else
                "missing: " + ", ".join(
                    x for x, ok in [("erase", has_erase), ("program", has_program)]

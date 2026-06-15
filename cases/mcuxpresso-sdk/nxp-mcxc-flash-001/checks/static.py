@@ -30,11 +30,11 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         check_type="exact_match",
     ))
 
-    has_erase = scoped_contains(generated_code, "FLASH_EraseSector", scope="stripped")
+    has_erase = scoped_contains(generated_code, "FLASH_Erase", scope="stripped")
     details.append(CheckDetail(
         check_name="flash_erase_sector_called",
         passed=has_erase,
-        expected="FLASH_EraseSector called before write",
+        expected="FLASH_Erase called before write",
         actual="present" if has_erase else "missing",
         check_type="exact_match",
     ))
