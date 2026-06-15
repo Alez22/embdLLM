@@ -696,6 +696,10 @@ _NXP_MCXC = {
         "mcuxsdk-core/drivers/spi",
         "mcuxsdk-core/drivers/flash",
         "mcuxsdk-core/drivers/cop",
+        # Power/clock-mode drivers the gate previously lacked: models legitimately
+        # include fsl_sim.h / fsl_smc.h for MCXC144 (real SDK headers).
+        "mcuxsdk-core/drivers/sim",
+        "mcuxsdk-core/drivers/smc",
         "cmsis/CMSIS/Core/Include",
     ],
 }
@@ -716,6 +720,9 @@ _NXP_RT = {
         "mcuxsdk-core/drivers/sai",
         "mcuxsdk-core/drivers/rtwdog",
         "mcuxsdk-core/drivers/edma",
+        # Cortex-M7 cache driver (DCACHE clean/invalidate) — fsl_cache.h for the
+        # armv7-m7 core; models include it for DMA coherency on the RT1170.
+        "mcuxsdk-core/drivers/cache/armv7-m7",
         "cmsis/CMSIS/Core/Include",
     ],
 }
