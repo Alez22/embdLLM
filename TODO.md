@@ -303,24 +303,17 @@ Foundation items still open — not blocking Phase 2-6 but needed for L1 compile
   Installs `arm-none-eabi-gcc`, shallow-clones the 3 public MCUXpresso repos
   (`mcuxsdk-core`, `mcux-devices-mcx`, `mcux-devices-rt`) + CMSIS_5. Compile gate wired in
   `_run_compile_nxp` (`src/embedeval/evaluator/build.py`), dispatched per case-id prefix
-  (`nxp-mcxc-*` → Cortex-M0+, `nxp-rt*` → Cortex-M7). Validated: 21/28 reference cases
-  compile clean; the remaining 7 are genuine reference bugs (see below).
+  (`nxp-mcxc-*` → Cortex-M0+, `nxp-rt*` → Cortex-M7). Validated: **28/28 reference cases
+  compile clean** (initial run found 7 reference bugs, since fixed — see below).
 
-## NXP reference solutions that fail L1 compile (found by the new gate)
-
-These reference `main.c` files use API names / device symbols that do not exist in the
-MCUXpresso SDK for the target part. They are reference bugs, not gate bugs — fix in
-dedicated per-case commits, then re-run `embedeval validate`.
-
-- [ ] `nxp-mcxc-flash-001`, `nxp-mcxc-flash-002`: `FLASH_EraseSector` →
-  SDK API is `FLASH_EraseSectorNonBlocking` (in `fsl_ftfx_flash.h`).
-- [ ] `nxp-mcxc-timer-001`, `nxp-mcxc-uart-001`: `kCLOCK_Uart0` undeclared on MCXC144
-  (only `kCLOCK_Uart2` exists).
-- [ ] `nxp-mcxc-uart-002`: `UART0` undeclared on MCXC144 (use `UART2`).
-- [ ] `nxp-rt1170-audio-001`: `IOMUXC_GPIO_AD_17_SAI1_RX_DATA00` does not exist
-  (compiler suggests `IOMUXC_GPIO_AD_20_SAI1_RX_DATA00` — pick the correct pin mux).
-- [ ] `nxp-rt1170-lpspi-001`: `IOMUXC_GPIO_AD_30_LPSPI1_SDO` does not exist
-  (pick the correct LPSPI1 SDO pin mux).
+- [x] **Fix the 7 reference solutions that failed L1 compile** (API/device-symbol bugs
+  found by the gate, all now compile `-Wall` clean):
+  - flash-001/002: `FLASH_EraseSector` → `FLASH_Erase`; `FLASH_Program`/`VerifyProgram`
+    take `uint8_t*`; `kFLASH_MarginValueNormal` → `kFTFx_MarginValueNormal`.
+  - timer-001/uart-001/uart-002: MCXC144 has only UART2 → `UART0`/`kCLOCK_Uart0` → `UART2`/
+    `kCLOCK_Uart2`; uart-002 ISR is `UART2_FLEXIO_IRQHandler`/`UART2_FLEXIO_IRQn`.
+  - rt1170-audio-001: `AD_17_SAI1_RX_DATA00` → `AD_20_`.
+  - rt1170-lpspi-001: LPSPI1 data signals are `SOUT`/`SIN` on RT1170, not `SDO`/`SDI`.
 
 ---
 
