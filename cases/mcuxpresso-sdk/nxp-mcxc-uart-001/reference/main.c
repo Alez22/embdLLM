@@ -4,7 +4,7 @@
 #include "fsl_port.h"
 #include "fsl_uart.h"
 
-#define UART_BASE       UART0
+#define UART_BASE       UART2
 #define UART_CLK_FREQ   (CLOCK_GetFreq(kCLOCK_CoreSysClk))
 #define UART_BAUDRATE   115200U
 
@@ -27,11 +27,11 @@ int main(void)
 
     /* Clock gate: must be enabled before PORT and UART access */
     CLOCK_EnableClock(kCLOCK_PortA);
-    CLOCK_EnableClock(kCLOCK_Uart0);
+    CLOCK_EnableClock(kCLOCK_Uart2);
 
-    /* Pin mux: alternate function for UART0 TX/RX */
-    PORT_SetPinMux(PORTA, 1U, kPORT_MuxAlt2);   /* PTA1 = UART0_RX */
-    PORT_SetPinMux(PORTA, 2U, kPORT_MuxAlt2);   /* PTA2 = UART0_TX */
+    /* Pin mux: alternate function for UART2 TX/RX */
+    PORT_SetPinMux(PORTA, 1U, kPORT_MuxAlt2);   /* PTA1 = UART2_RX */
+    PORT_SetPinMux(PORTA, 2U, kPORT_MuxAlt2);   /* PTA2 = UART2_TX */
 
     UART_GetDefaultConfig(&config);
     config.baudRate_Bps = UART_BAUDRATE;

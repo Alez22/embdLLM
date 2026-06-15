@@ -5,7 +5,7 @@
 #include "fsl_port.h"
 #include "fsl_uart.h"
 
-#define UART_BASE       UART0
+#define UART_BASE       UART2
 #define UART_CLK_FREQ   (CLOCK_GetFreq(kCLOCK_CoreSysClk))
 #define UART_BAUDRATE   115200U
 #define RX_BUF_SIZE     64U
@@ -40,7 +40,7 @@ static inline uint8_t ring_pop(void)
     return b;
 }
 
-void UART0_IRQHandler(void)
+void UART2_FLEXIO_IRQHandler(void)
 {
     /* Check RX data register full flag */
     if (UART_GetStatusFlags(UART_BASE) & kUART_RxDataRegFullFlag) {
@@ -56,11 +56,11 @@ int main(void)
 
     /* Clock gate: must be enabled before PORT and UART access */
     CLOCK_EnableClock(kCLOCK_PortA);
-    CLOCK_EnableClock(kCLOCK_Uart0);
+    CLOCK_EnableClock(kCLOCK_Uart2);
 
-    /* Pin mux: alternate function for UART0 TX/RX */
-    PORT_SetPinMux(PORTA, 1U, kPORT_MuxAlt2);   /* PTA1 = UART0_RX */
-    PORT_SetPinMux(PORTA, 2U, kPORT_MuxAlt2);   /* PTA2 = UART0_TX */
+    /* Pin mux: alternate function for UART2 TX/RX */
+    PORT_SetPinMux(PORTA, 1U, kPORT_MuxAlt2);   /* PTA1 = UART2_RX */
+    PORT_SetPinMux(PORTA, 2U, kPORT_MuxAlt2);   /* PTA2 = UART2_TX */
 
     UART_GetDefaultConfig(&config);
     config.baudRate_Bps = UART_BAUDRATE;
@@ -70,7 +70,7 @@ int main(void)
 
     /* Enable RX interrupt in UART and NVIC */
     UART_EnableInterrupts(UART_BASE, kUART_RxDataRegFullInterruptEnable);
-    EnableIRQ(UART0_IRQn);
+    EnableIRQ(UART2_FLEXIO_IRQn);
 
     while (1) {
         while (!ring_empty()) {

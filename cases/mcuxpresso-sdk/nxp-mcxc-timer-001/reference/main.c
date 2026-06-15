@@ -9,7 +9,7 @@
 #define BUS_CLK_HZ      48000000U
 #define PIT_PERIOD_MS   100U
 
-#define UART_BASE       UART0
+#define UART_BASE       UART2
 #define UART_CLK_FREQ   (CLOCK_GetFreq(kCLOCK_CoreSysClk))
 #define UART_BAUDRATE   115200U
 
@@ -33,7 +33,7 @@ int main(void)
     /* Clock gates */
     CLOCK_EnableClock(kCLOCK_Pit0);
     CLOCK_EnableClock(kCLOCK_PortA);
-    CLOCK_EnableClock(kCLOCK_Uart0);
+    CLOCK_EnableClock(kCLOCK_Uart2);
 
     /* UART: TX only on PTA2 */
     PORT_SetPinMux(PORTA, 2U, kPORT_MuxAlt2);
