@@ -339,6 +339,21 @@ Foundation items still open — not blocking Phase 2-6 but needed for L1 compile
     (needs API key) to measure the effect. The genuine API-hallucination failures
     (GPIO_ReadPinInput, i2c_status_t, kCLOCK_Gpio9, …) MUST remain failures.
 
+- [x] **Audit outcome (deepseek-v4-flash, 1 sample/case, L1 active in `embedeval-nxp`
+  container).** Two gotchas found and fixed beyond the prompt clause:
+  1. Host runs (results 2232/2259) had L1 in soft-skip (`NXP_SDK_PATH` unset) → the
+     "25% pass" was inflated. Must run inside the `embedeval-nxp` compose service
+     (`NXP_SDK_PATH=/opt/nxp-sdk`, `EMBEDEVAL_ENABLE_BUILD=1`) for a real compile gate.
+  2. Gate `-I` list was incomplete: `fsl_sim.h`/`fsl_smc.h` (MCXC) and `fsl_cache.h`
+     (RT1170 M7) are real SDK headers but failed "No such file" — false negatives.
+     Fixed in `build.py` (added drivers/sim, drivers/smc, drivers/cache/armv7-m7);
+     24/24 references still compile clean. `fsl_power.h`/`fsl_reset.h` left out: they
+     do not exist for MCXC144/RT1176, so including them stays a genuine failure.
+  - Final run (results 2354): 0/24 pass with a real compile gate. All 16 L1 failures
+    are now genuine API hallucinations (kCLOCK_Uart0, kCLOCK_Gpio9, gpt_config_t.mode,
+    CLOCK_SetRootClockDivider, IOMUXC_PAD_DSE, …); 0 header-missing false negatives.
+    These numbers are valid for the leaderboard.
+
 ---
 
 ## Phase 7 — Knowledge Currency Probing
