@@ -243,12 +243,23 @@ class EmbedEvalTUI(App):
 
         cases_path = config["cases_dir"]
         selected = config["selected_cases"]
+        run_in_docker = bool(config.get("run_in_docker"))
+
+        # Inside the container the compose service mounts ./cases -> /app/cases
+        # and ./results -> /app/results, with WORKDIR /app. A host-absolute
+        # path would not exist in the container, so use the fixed mount paths.
+        if run_in_docker:
+            cases_arg = "cases"
+            output_arg = "results"
+        else:
+            cases_arg = cases_path
+            output_arg = str(tui_config.RESULTS_DIR)
 
         cmd = [
             "uv", "run", "embedeval", "run",
             "--model", config["model"],
-            "--cases", cases_path,
-            "--output-dir", str(tui_config.RESULTS_DIR),
+            "--cases", cases_arg,
+            "--output-dir", output_arg,
             "--attempts", str(config["attempts"]),
         ]
 
@@ -271,6 +282,26 @@ class EmbedEvalTUI(App):
         # Verbose so runner emits INFO lines ("Case X attempt N: PASS/FAIL")
         # which the TUI parses to drive the progress bar.
         cmd.append("--verbose")
+
+        # L1/L3 compile gates only work inside the embedeval-nxp container
+        # (host has no arm-none-eabi toolchain). When requested, wrap the
+        # command in `docker compose run`: the service already mounts
+        # cases/results and sets EMBEDEVAL_ENABLE_BUILD=1. API keys are
+        # forwarded by name (-e KEY) from the env we build below, so they
+        # never appear in the logged command line.
+        if run_in_docker:
+            key_flags: list[str] = []
+            for key in ("GROQ_API_KEY", "OPENROUTER_API_KEY"):
+                key_flags += ["-e", key]
+            # sudo is required to reach the Docker socket on this host
+            # (-n: never prompt — a password prompt would hang the subprocess).
+            # The image ENTRYPOINT is ["uv", "run", "embedeval"], so we drop
+            # that prefix from cmd and pass only the subcommand + args.
+            inner_args = cmd[3:]  # strip leading "uv run embedeval"
+            cmd = [
+                "sudo", "-n", "docker", "compose", "run", "--rm",
+                *key_flags, "embedeval-nxp",
+            ] + inner_args
 
         # Mirror all run output to a plain-text file so it can be copied.
         self._log_file = tui_config.RESULTS_DIR / "tui-run.log"

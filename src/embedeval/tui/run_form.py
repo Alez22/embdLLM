@@ -277,6 +277,18 @@ class RunFormScreen(ModalScreen[dict | None]):
                                 id=f"case-{case.get('id', '')}",
                             )
 
+                    # Layers to run. L0 (static) is always on. L1/L3 are
+                    # compile gates that only work inside the embedeval-nxp
+                    # container — selecting either makes the run launch in
+                    # Docker (see _launch_run in app.py).
+                    yield Label("Layers")
+                    yield Checkbox("L0 static (always on)", value=True,
+                                   disabled=True, id="check-layer-l0")
+                    yield Checkbox("L1 compile gate (runs in Docker)",
+                                   value=True, id="check-layer-l1")
+                    yield Checkbox("L3 build/run (runs in Docker)",
+                                   value=True, id="check-layer-l3")
+
             with Horizontal(id="form-buttons"):
                 yield Button("Cancel", variant="default", id="btn-cancel")
                 yield Button("Run", variant="primary", id="btn-run")
@@ -413,6 +425,12 @@ class RunFormScreen(ModalScreen[dict | None]):
             temperature = 0.0
         force = self.query_one("#check-force", Checkbox).value
         no_think = self.query_one("#check-no-think", Checkbox).value
+        # L1/L3 are compile gates: either one selected means the run needs
+        # the Docker build environment (EMBEDEVAL_ENABLE_BUILD).
+        run_in_docker = (
+            self.query_one("#check-layer-l1", Checkbox).value
+            or self.query_one("#check-layer-l3", Checkbox).value
+        )
         sdk_filter = str(self.query_one("#sel-form-sdk", Select).value)
         cat_filter = str(self.query_one("#sel-form-category", Select).value)
 
@@ -431,6 +449,7 @@ class RunFormScreen(ModalScreen[dict | None]):
                 "temperature": temperature,
                 "force": force,
                 "no_think": no_think,
+                "run_in_docker": run_in_docker,
                 "selected_cases": selected_cases,
                 "sdk_filter": sdk_filter,
                 "cat_filter": cat_filter,
