@@ -203,6 +203,16 @@ def _run_single_case(
 
     if cached_code is not None:
         # Generation cache hit — re-grade from cached code.
+        # Token usage / cost are stored in the corpus cell at generation time;
+        # propagate them on every cache hit so cached results don't report 0
+        # tokens (which corrupts efficiency/cost analyses downstream).
+        cached_token_usage = TokenUsage(
+            input_tokens=cell.input_tokens,
+            output_tokens=cell.output_tokens,
+            total_tokens=cell.input_tokens + cell.output_tokens,
+        )
+        cached_cost_usd = cell.cost_usd
+
         # Check grading cache first: if checks haven't changed either, skip evaluate().
         if corpus_dir is not None and not force:
             cached_grade = grade_lookup(corpus_dir, cached_code, case_dir)
@@ -218,10 +228,8 @@ def _run_single_case(
                     model=model,
                     attempt=attempt,
                     generated_code=cached_code,
-                    token_usage=TokenUsage(
-                        input_tokens=0, output_tokens=0, total_tokens=0
-                    ),
-                    cost_usd=0.0,
+                    token_usage=cached_token_usage,
+                    cost_usd=cached_cost_usd,
                     temperature=temperature,
                     gen_params=gen_params,
                     used_thinking=False,
@@ -233,8 +241,8 @@ def _run_single_case(
             generated_code=cached_code,
             model=model,
             attempt=attempt,
-            token_usage=TokenUsage(input_tokens=0, output_tokens=0, total_tokens=0),
-            cost_usd=0.0,
+            token_usage=cached_token_usage,
+            cost_usd=cached_cost_usd,
             category=meta.category,
         )
         result.sdk = meta.sdk
