@@ -41,9 +41,17 @@ def _load_runs() -> list[dict]:
         if details_dir.is_dir():
             for detail_file in sorted(details_dir.glob("*.json")):
                 try:
-                    cases.append(json.loads(detail_file.read_text()))
+                    case = json.loads(detail_file.read_text())
                 except Exception:
-                    pass
+                    continue
+                # The mock model is a pipeline smoke-test fixture, not a real
+                # candidate — exclude it from every dashboard view/analysis.
+                if case.get("model") == "mock":
+                    continue
+                cases.append(case)
+        # Skip runs left empty after dropping mock (pure smoke-test runs).
+        if not cases:
+            continue
         runs.append({"run_id": run_dir.name, "cases": cases})
     return runs
 
@@ -207,6 +215,7 @@ _NAV = """
   <h1>EmbedEval</h1>
   <a href="/">Leaderboard</a>
   <a href="/analysis">Analysis</a>
+  <a href="/efficiency">Model Efficiency</a>
   <a href="/report">Report</a>
   <a href="/cases">Cases</a>
   <a href="/history">Run History</a>
@@ -846,6 +855,241 @@ def analysis(request: Request) -> str:
 {content}
 """
     return _page("Analysis", body)
+
+
+def _efficiency_by_model(
+    lookup: dict[tuple[str, str], dict],
+) -> dict[str, dict]:
+    """Compute per-model (coverage, avg output tokens) from a latest-attempt lookup.
+
+    Coverage is the mean ``total_score`` over scorable cases; avg_tokens is the
+    mean ``output_tokens`` over the same cases. ERROR results (infra failures with
+    output_tokens==0) are excluded so a model is not penalised for an API outage.
+    Models left with no scorable case are dropped entirely.
+
+    @return mapping model -> {coverage, avg_tokens, n_cases, efficiency}
+            where efficiency = coverage / (avg_tokens / 1000), 0 if no tokens.
+    """
+    stats: dict[str, dict] = {}
+    for (_, model), r in lookup.items():
+        if _result_status(r) == "error":
+            continue
+        bucket = stats.setdefault(model, {"scores": [], "tokens": []})
+        bucket["scores"].append(r.get("total_score", 0.0))
+        bucket["tokens"].append(r.get("token_usage", {}).get("output_tokens", 0))
+
+    out: dict[str, dict] = {}
+    for model, b in stats.items():
+        n = len(b["scores"])
+        if n == 0:
+            continue
+        coverage = sum(b["scores"]) / n
+        avg_tokens = sum(b["tokens"]) / n
+        # Efficiency: coverage gained per 1k generated tokens. Higher is better.
+        efficiency = coverage / (avg_tokens / 1000) if avg_tokens > 0 else 0.0
+        out[model] = {
+            "coverage": coverage,
+            "avg_tokens": avg_tokens,
+            "n_cases": n,
+            "efficiency": efficiency,
+        }
+    return out
+
+
+def _efficiency_scatter_svg(model_eff: dict[str, dict]) -> str:
+    """Render a coverage-vs-output-tokens scatter as an inline SVG.
+
+    X axis = avg output tokens, Y axis = coverage (%). One labelled dot per
+    model. Top-left = efficient (high coverage, few tokens). Server-side SVG so
+    the dashboard keeps its zero-JS, no-build-step contract.
+    """
+    if not model_eff:
+        return "<p style='color:#718096;padding:1rem'>No scorable data to plot.</p>"
+
+    # Plot area geometry (viewBox units).
+    width, height = 720, 420
+    pad_l, pad_r, pad_t, pad_b = 60, 30, 20, 50
+    plot_w = width - pad_l - pad_r
+    plot_h = height - pad_t - pad_b
+
+    max_tokens = max(s["avg_tokens"] for s in model_eff.values()) or 1.0
+    # Y is coverage 0..1 mapped to 0..100%. Give a little headroom on X.
+    x_max = max_tokens * 1.1
+
+    def _x(tokens: float) -> float:
+        return pad_l + (tokens / x_max) * plot_w
+
+    def _y(coverage: float) -> float:
+        # coverage 0..1 -> bottom..top
+        return pad_t + (1.0 - coverage) * plot_h
+
+    parts: list[str] = [
+        f'<svg viewBox="0 0 {width} {height}" '
+        f'style="width:100%;max-width:760px;background:#1a1d2e;border-radius:8px;font-family:inherit">'
+    ]
+
+    # Axes.
+    parts.append(
+        f'<line x1="{pad_l}" y1="{pad_t}" x2="{pad_l}" y2="{pad_t + plot_h}" '
+        f'stroke="#4a5568" stroke-width="1"/>'
+    )
+    parts.append(
+        f'<line x1="{pad_l}" y1="{pad_t + plot_h}" x2="{pad_l + plot_w}" '
+        f'y2="{pad_t + plot_h}" stroke="#4a5568" stroke-width="1"/>'
+    )
+
+    # Y gridlines + labels at 0/25/50/75/100%.
+    for pct in (0, 25, 50, 75, 100):
+        y = _y(pct / 100)
+        parts.append(
+            f'<line x1="{pad_l}" y1="{y:.1f}" x2="{pad_l + plot_w}" y2="{y:.1f}" '
+            f'stroke="#2d3748" stroke-width="1"/>'
+        )
+        parts.append(
+            f'<text x="{pad_l - 8}" y="{y + 4:.1f}" fill="#718096" font-size="11" '
+            f'text-anchor="end">{pct}%</text>'
+        )
+
+    # X labels at 0, mid, max.
+    for frac in (0.0, 0.5, 1.0):
+        tokens = x_max * frac
+        x = _x(tokens)
+        parts.append(
+            f'<text x="{x:.1f}" y="{pad_t + plot_h + 18:.1f}" fill="#718096" '
+            f'font-size="11" text-anchor="middle">{int(tokens)}</text>'
+        )
+
+    # Axis titles.
+    parts.append(
+        f'<text x="{pad_l + plot_w / 2:.1f}" y="{height - 8}" fill="#a0aec0" '
+        f'font-size="12" text-anchor="middle">avg output tokens</text>'
+    )
+    parts.append(
+        f'<text x="14" y="{pad_t + plot_h / 2:.1f}" fill="#a0aec0" font-size="12" '
+        f'text-anchor="middle" transform="rotate(-90 14 {pad_t + plot_h / 2:.1f})">'
+        f'coverage</text>'
+    )
+
+    # Points (sorted so labels stack deterministically).
+    for model in sorted(model_eff):
+        s = model_eff[model]
+        cx, cy = _x(s["avg_tokens"]), _y(s["coverage"])
+        short = model.split("/")[-1]
+        parts.append(
+            f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="5" fill="#4299e1" '
+            f'stroke="#1a1d2e" stroke-width="1.5"><title>{short}: '
+            f'{s["coverage"] * 100:.0f}% coverage, {s["avg_tokens"]:.0f} tokens</title></circle>'
+        )
+        parts.append(
+            f'<text x="{cx + 8:.1f}" y="{cy + 4:.1f}" fill="#e2e8f0" '
+            f'font-size="11">{short}</text>'
+        )
+
+    parts.append("</svg>")
+    return "".join(parts)
+
+
+@app.get("/efficiency", response_class=HTMLResponse)
+def efficiency(request: Request) -> str:
+    """Model Efficiency page: coverage achieved per output token generated.
+
+    Same cascading metadata filters as Analysis (sdk > category > case) so the
+    efficiency view can be scoped to a specific slice of the benchmark.
+
+    Optional query params: ?sdk= &category= &case=
+    """
+    filter_sdk = request.query_params.get("sdk", "")
+    filter_category = request.query_params.get("category", "")
+    filter_case = request.query_params.get("case", "")
+
+    all_results = _all_results()
+    if not all_results:
+        return _page(
+            "Model Efficiency",
+            "<div class='card'><p>No results found in results/. Run a benchmark first.</p></div>",
+        )
+
+    # Cascading filters: sdk > category > case. Mirrors the Analysis page.
+    FILTER_ORDER = ["sdk", "category", "case"]
+    active = {"sdk": filter_sdk, "category": filter_category, "case": filter_case}
+
+    def _case_field(case_id: str, field: str) -> str:
+        if field == "case":
+            return case_id
+        return _find_metadata(case_id).get(field, "")
+
+    def _apply(rows: list[dict], filters: dict[str, str]) -> list[dict]:
+        out = rows
+        for field, value in filters.items():
+            if value:
+                out = [r for r in out if _case_field(r.get("case_id", ""), field) == value]
+        return out
+
+    def _options_for(field: str) -> set[str]:
+        higher = FILTER_ORDER[: FILTER_ORDER.index(field)]
+        scoped = _apply(all_results, {f: active[f] for f in higher})
+        return {_case_field(r.get("case_id", ""), field) for r in scoped
+                if _case_field(r.get("case_id", ""), field)}
+
+    all_sdks = _options_for("sdk")
+    all_categories = _options_for("category")
+    all_cases_in_scope = _options_for("case")
+
+    results = _apply(all_results, active)
+    lookup = _latest_attempt_lookup(results)
+    model_eff = _efficiency_by_model(lookup)
+    n_cases = len({cid for (cid, _) in lookup})
+
+    filter_form = f"""
+<form method="get" style="display:flex;align-items:center;gap:1rem;font-size:0.85rem;color:#a0aec0;flex-wrap:wrap">
+  <span>SDK: {_filter_select(all_sdks, filter_sdk, "sdk", auto_submit=False)}</span>
+  <span>Category: {_filter_select(all_categories, filter_category, "category", auto_submit=False)}</span>
+  <span>Case: {_filter_select(all_cases_in_scope, filter_case, "case", auto_submit=False)}</span>
+  <button type="submit" style="background:#2d3748;border:1px solid #4a5568;color:#e2e8f0;padding:4px 14px;border-radius:4px;cursor:pointer;font-size:0.85rem">Apply filters</button>
+  <a href="/efficiency" style="color:#718096;font-size:0.8rem">Reset</a>
+</form>"""
+
+    active_str = " · ".join(
+        f"{field}={value}" for field, value in active.items() if value
+    ) or "no filters (all cases)"
+
+    if model_eff:
+        scatter = _efficiency_scatter_svg(model_eff)
+        rows = "".join(
+            f"<tr><td class='model-id'>{m}</td>"
+            f"<td>{s['coverage'] * 100:.0f}%</td>"
+            f"<td>{s['avg_tokens']:.0f}</td>"
+            f"<td>{s['efficiency']:.1f}</td></tr>"
+            for m, s in sorted(
+                model_eff.items(), key=lambda kv: kv[1]["efficiency"], reverse=True
+            )
+        )
+        table = f"""
+<table style="margin-top:1.5rem">
+  <thead><tr>
+    <th>Model</th><th>Coverage</th><th>Avg output tokens</th>
+    <th>Efficiency (coverage / 1k tokens)</th>
+  </tr></thead>
+  <tbody>{rows}</tbody>
+</table>"""
+        content = f"<div class='card'>{scatter}</div>{table}"
+    else:
+        content = "<div class='card' style='margin-top:1rem'><p style='color:#718096;padding:1rem'>No results match the selected filters.</p></div>"
+
+    body = f"""
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.75rem">
+  <h1>Model Efficiency</h1>
+  <span style="color:#718096;font-size:0.85rem">{len(model_eff)} models · {n_cases} cases · {active_str}</span>
+</div>
+<p class="desc">
+  How much coverage each model buys per output token it generates. Points in the
+  top-left corner are efficient: high coverage with few generated tokens. Use the
+  filters to scope the metric to a specific SDK, category, or single case.
+</p>
+{filter_form}
+{content}
+"""
+    return _page("Model Efficiency", body)
 
 
 def _attempt_section(result: dict, applicable: set[int]) -> str:

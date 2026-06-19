@@ -118,6 +118,10 @@ def load_model_profiles(results_dir: Path) -> dict[str, dict[str, dict]]:
             case_id = rec.get("case_id")
             if not model or not case_id:
                 continue
+            # The mock model is a pipeline smoke-test fixture, not a real
+            # candidate — exclude it from the aggregated report.
+            if model == "mock":
+                continue
             by_case = profiles.setdefault(model, {})
             # Newest run seen first → do not overwrite with older data.
             by_case.setdefault(case_id, rec)
