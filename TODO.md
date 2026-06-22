@@ -1,6 +1,6 @@
 # TODO
 
-Tasks are ordered by **current priority** (updated 2026-05-26).
+Tasks are ordered by **current priority** (updated 2026-06-22).
 Mark done with `[x]`. Add notes inline after `—`.
 
 ## Priority order (next 2-4 weeks)
@@ -189,6 +189,12 @@ Known dashboard improvements not yet resolved, in order of usefulness:
   Show as an extra column in the dashboard leaderboard and in the markdown leaderboard.
   The `duration_seconds` field is already present in `EvalResult`.
   Fix: `llm_response.duration_seconds` now propagated to `EvalResult` in all paths of `runner.py`.
+- [x] **Model Efficiency page** — `/efficiency` route ranks models by coverage gained per
+  1k generated tokens (`efficiency = coverage / (avg_tokens / 1000)`). The mock model is
+  excluded everywhere as a smoke-test fixture (`dashboard.py`), and runs that become empty
+  after dropping mock are skipped. Token usage backfilled into older results via
+  `scripts/backfill_token_usage.py` (commit `5b7466f`). Depends on the cache-hit token/cost
+  propagation fix (`d92329c`) so cached cells no longer report 0 tokens.
 - [ ] **Check editor** — `checks/static.py` and `checks/behavior.py` are currently read-only.
   Add the ability to edit them from the dashboard (POST `/cases/<id>/checks/<file>`).
 - [ ] **Direct link** from the leaderboard to the case page (`/cases/<id>`) in addition
@@ -204,9 +210,9 @@ Known dashboard improvements not yet resolved, in order of usefulness:
   - `groq/openai/gpt-oss-20b` ✓
   - `groq/openai/gpt-oss-120b` ✓
   - `groq/meta-llama/llama-4-scout-17b-16e-instruct` ✓
-- [ ] **Verify OpenRouter provider**:
-  - `openrouter/mistralai/devstral-small`
-  - `openrouter/qwen/qwen3-coder`
+- [x] **Verify OpenRouter provider** — works end-to-end. Runs landed for
+  anthropic, deepseek, google, meta-llama, mistralai, qwen and z-ai families
+  (see `results/openrouter/` and `results/runs/*_openrouter_*`).
 - [ ] **Still to run** on all Phase 2 cases:
   - `anthropic/claude-sonnet-4-20250514` (reference ceiling)
   - `groq/qwen/qwen3-32b` (Qwen3 baseline)
@@ -221,6 +227,11 @@ Known dashboard improvements not yet resolved, in order of usefulness:
   - `groq/openai/gpt-oss-20b`: 1/12 pass, 51% avg — inconsistent on ISR cases
 - [ ] **Re-publish leaderboard** in `results/LEADERBOARD.md` after the first
   clean run.
+- Latest real-gate data point (2026-06-22, `openrouter/z-ai/glm-5.2`, 1 sample/case,
+  L1 active in container): **2/24 pass@1 (8.3%)**. 16 fails at L1, 5 at L0, 1 at L3.
+  All 16 L1 fails are genuine API hallucinations (device-specific symbols + wrong
+  `port_pin_config_t` fields), not gate false-negatives — confirms the
+  [[nxp-device-specific-symbols]] failure modes.
 
 ---
 
