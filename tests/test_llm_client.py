@@ -5,7 +5,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from embedeval.llm_client import (
-    MOCK_C_CODE,
+    MOCK_C_CODE_NXP,
+    MOCK_C_CODE_ZEPHYR,
     _extract_code,
     _looks_like_prose,
     call_model,
@@ -16,8 +17,13 @@ class TestMockMode:
     """Tests for mock mode responses."""
 
     def test_mock_returns_c_code(self) -> None:
+        # Default prompt has no Zephyr markers → NXP bare-metal body.
         response = call_model(model="mock", prompt="generate code")
-        assert MOCK_C_CODE in response.generated_code
+        assert MOCK_C_CODE_NXP in response.generated_code
+
+    def test_mock_returns_zephyr_body_for_zephyr_prompt(self) -> None:
+        response = call_model(model="mock", prompt="use zephyr/kernel.h to blink")
+        assert MOCK_C_CODE_ZEPHYR in response.generated_code
 
     def test_mock_returns_zero_cost(self) -> None:
         response = call_model(model="mock", prompt="test")
@@ -108,8 +114,8 @@ class TestContextFiles:
         )
         # Mock now echoes the prompt prefix into a /* PROMPT_PREFIX: */ block
         # so callers can verify what the model actually saw. The stock C body
-        # (MOCK_C_CODE) is still appended verbatim.
-        assert MOCK_C_CODE in response.generated_code
+        # (NXP bare-metal, no Zephyr markers in this prompt) is still appended.
+        assert MOCK_C_CODE_NXP in response.generated_code
         assert "stdio.h" in response.generated_code
 
     def test_missing_context_file_handled(self) -> None:
@@ -188,6 +194,23 @@ class TestExtractCode:
         result = _extract_code(text)
         assert "#include <header.h>" in result
         assert "int main(void)" in result
+
+    def test_unclosed_fence_drops_preamble(self) -> None:
+        """Truncated response (token limit) — no closing fence.
+
+        The opening fence exists but the model ran out of tokens before
+        emitting the closing ```. We must keep the code after the fence and
+        drop the prose preamble, not return the whole text.
+        """
+        text = (
+            "Sure, here is the implementation:\n"
+            "```c\n"
+            "#include \"fsl_clock.h\"\n"
+            "int main(void) { return 0; }\n"
+        )
+        result = _extract_code(text)
+        assert result.startswith('#include "fsl_clock.h"')
+        assert "Sure, here is" not in result
 
     def test_regression_memory_opt_012_pattern(self) -> None:
         """Exact failure pattern from memory-opt-012 Haiku run (2026-04-04)."""
