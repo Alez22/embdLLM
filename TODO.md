@@ -113,10 +113,13 @@ Issues from the 2026-05-26 review — some resolved, others tracked as debt.
   per-SDK selector (`_mock_code_for_prompt`). Default is an NXP bare-metal
   `fsl_*` body (passes `no_cross_platform_hallucination` on NXP cases); the
   Zephyr body is used only when the prompt has Zephyr markers.
-- [ ] **`Platform` enum vs `metadata.yaml` alignment**: CLAUDE.md shows
-  `platform: nxp_bare_metal` and `EvalPlatform.NXP_BARE_METAL = "nxp_bare_metal"`
-  exists. Verify whether the `platform` field in `CaseMetadata` is still active or
-  deprecated in favour of `sdk`. If deprecated, remove from metadata.
+- [x] **`Platform` enum vs `metadata.yaml` alignment**: verified — `platform` is
+  NOT deprecated. It is read by `evaluator/support.py` (`_is_nxp_case`,
+  `_is_stm32_case`, `_is_esp_idf_case`) to dispatch the L1 compile gate to the
+  right toolchain, and is distinct from `sdk`: `platform` (`EvalPlatform`, 11
+  values) is the build/run target, `sdk` (`Sdk`, 6 values) is the
+  classification/filter bucket — not 1:1 (e.g. one `sdk: zephyr` maps to
+  native_sim / qemu_arm / babblesim). Nothing to remove.
 
 ### Open — low priority (structural debt)
 
