@@ -144,6 +144,37 @@ Issues from the 2026-05-26 review — some resolved, others tracked as debt.
 
 ---
 
+## L2 (Runtime Execution) — dormant, never exercised
+
+Audit 2026-06-23: scanned every result in `results/` — **0 real L2 runtime
+executions out of 5889 L2 layers recorded** (all environment-skips), including
+the 2093 Zephyr-case results. The layer is implemented (`_run_runtime` in
+`evaluator/build.py`, dispatched at `pipeline.py` layer 2) but has never run.
+
+**Root cause — no runnable case exists:**
+- `_run_runtime` only executes when `_get_build_board(case_dir) == "native_sim"`;
+  every other board is skipped as "requires hardware".
+- All 51 Zephyr cases declare `build_board: nrf52840dk/nrf52840`. **Zero** have
+  `build_board: native_sim`. The `platform: native_sim` field in metadata is the
+  conceptual target and is NOT what L2 reads — `build_board` is, and it always
+  points at real Nordic HW.
+- Additionally many cases (e.g. `adc-001`) set `l1_skip: true` + `l2_skip: true`,
+  which short-circuit L2 to auto-pass regardless of board.
+- The Zephyr build image (`embedeval-zephyr` / `docker/Dockerfile`) is defined in
+  compose but is not built; host has no `west`.
+
+**To actually exercise L2 (not done — needs a decision):**
+1. Pick/author a simple case with `build_board: native_sim`, no `l1_skip`/`l2_skip`,
+   and an `expected_output.txt` whose keywords `native_sim` actually prints.
+2. Build the Zephyr image (`docker compose build embedeval`) — slow, clones the
+   full Zephyr v4.1.0 workspace.
+3. Run that case with `EMBEDEVAL_ENABLE_BUILD=1` inside the `embedeval` service.
+
+Until then, every leaderboard number is effectively L0 + L1 + L3 only; L2
+contributes no signal on any SDK.
+
+---
+
 ## Phase 4 — Results Dashboard
 
 Local web dashboard for exploring benchmark results: generated vs reference diff,
