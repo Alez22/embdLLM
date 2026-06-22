@@ -21,7 +21,22 @@ from embedeval.models import LLMResponse, TokenUsage
 
 logger = logging.getLogger(__name__)
 
-MOCK_C_CODE = """\
+# NXP bare-metal mock (default). Uses fsl_* SDK style so it does not trip the
+# NXP anti-hallucination check (no_cross_platform_hallucination) on NXP cases.
+MOCK_C_CODE_NXP = """\
+#include "fsl_common.h"
+#include "fsl_clock.h"
+
+int main(void) {
+    while (1) {
+        __NOP();
+    }
+}
+"""
+
+# Zephyr mock — only used when the prompt clearly targets Zephyr, so Zephyr
+# cases still see Zephyr-shaped output.
+MOCK_C_CODE_ZEPHYR = """\
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
 
@@ -32,6 +47,18 @@ void main(void) {
     }
 }
 """
+
+
+def _mock_code_for_prompt(full_prompt: str) -> str:
+    """Pick a mock C body matching the prompt's target SDK.
+
+    The mock model has no sdk argument, so we infer it from prompt markers.
+    Defaults to the NXP bare-metal body (the primary suite); falls back to
+    the Zephyr body only when the prompt references Zephyr.
+    """
+    if "zephyr/" in full_prompt or "k_sleep" in full_prompt:
+        return MOCK_C_CODE_ZEPHYR
+    return MOCK_C_CODE_NXP
 
 CLAUDE_CODE_PREFIX = "claude-code://"
 
@@ -213,8 +240,10 @@ def _call_claude_code(
     )
 
 
+# Matches both the OpenAI/Groq form ("try again in 1.5s" / "in 350ms") and the
+# OpenRouter form ("retry after 2s").
 _RETRY_AFTER_RE = re.compile(
-    r"try again in\s+([\d.]+)\s*(ms|s)", re.IGNORECASE
+    r"(?:try again in|retry after)\s+([\d.]+)\s*(ms|s)", re.IGNORECASE
 )
 
 
@@ -342,9 +371,9 @@ def _call_litellm(
                     "Waiting %.1fs before retry (source: %s)...", delay, source
                 )
                 time.sleep(delay)
-        except Exception as exc:
-            logger.error("LLM call failed (non-retryable): %s", exc)
-            raise RuntimeError(f"Non-retryable error for model {model}: {exc}") from exc
+        # Non-retryable errors (BadRequestError, AuthenticationError, ...)
+        # propagate with their original type so the caller's error result
+        # records the real exception class instead of a generic RuntimeError.
 
     msg = f"All {max_retries} retries exhausted for model {model}"
     raise RuntimeError(msg) from last_error
@@ -359,9 +388,10 @@ def _mock_response(full_prompt: str = "") -> LLMResponse:
     actually reaches the model layer (without burning real tokens).
     """
     prompt_excerpt = full_prompt.replace("*/", "*\\/")[:200] if full_prompt else ""
-    code = MOCK_C_CODE
+    mock_body = _mock_code_for_prompt(full_prompt)
+    code = mock_body
     if prompt_excerpt:
-        code = f"/* PROMPT_PREFIX:\n{prompt_excerpt}\n*/\n\n{MOCK_C_CODE}"
+        code = f"/* PROMPT_PREFIX:\n{prompt_excerpt}\n*/\n\n{mock_body}"
     return LLMResponse(
         model="mock",
         generated_code=code,
@@ -418,19 +448,30 @@ def _extract_code(text: str) -> str:
     1. If any block is explicitly tagged as a C-family language, return
        only those blocks joined.
     2. Otherwise return the FIRST code block only.
-    3. If no fenced blocks exist, return the original text.
+    3. If an opening fence exists but no matching close (response truncated
+       by the token limit), take everything from the opening fence to the
+       end as a fallback — without this the whole prose/reasoning preamble
+       leaks into main.c and the compile gate fails for the wrong reason.
+    4. If no fenced blocks exist at all, return the original text.
     """
     pattern = re.compile(r"```(\w*)\n(.*?)```", re.DOTALL)
     matches = pattern.findall(text)
-    if not matches:
-        return text.strip()
+    if matches:
+        c_blocks = [
+            content for lang, content in matches if lang.lower() in _C_FAMILY_LANGS
+        ]
+        if c_blocks:
+            return "\n".join(c_blocks).strip()
+        first_block: str = matches[0][1]
+        return first_block.strip()
 
-    c_blocks = [content for lang, content in matches if lang.lower() in _C_FAMILY_LANGS]
-    if c_blocks:
-        return "\n".join(c_blocks).strip()
+    # No complete fenced block. Handle an unclosed opening fence (truncation):
+    # keep only the content after the opening fence, dropping any preamble.
+    open_match = re.search(r"```(\w*)\n", text)
+    if open_match:
+        return text[open_match.end():].strip()
 
-    first_block: str = matches[0][1]
-    return first_block.strip()
+    return text.strip()
 
 
 def _build_context(context_files: list[str]) -> str:

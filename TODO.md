@@ -1,6 +1,6 @@
 # TODO
 
-Tasks are ordered by **current priority** (updated 2026-05-26).
+Tasks are ordered by **current priority** (updated 2026-06-22).
 Mark done with `[x]`. Add notes inline after `—`.
 
 ## Priority order (next 2-4 weeks)
@@ -100,20 +100,19 @@ Issues from the 2026-05-26 review — some resolved, others tracked as debt.
 
 ### Open — medium priority
 
-- [ ] **`_extract_code` on unclosed fences** (`src/embedeval/llm_client.py`).
-  If the model truncates mid-output (token limit), no closing fence →
-  `_extract_code` returns the entire text including reasoning. Proposed fix:
-  if an opening ` ```(c|cpp)?` is found but no complete match, take everything
-  from the opening to the end as a fallback.
-- [ ] **`_call_litellm` swallows non-retryable errors**: converts any
-  `Exception` to `RuntimeError`, losing the specific class
-  (`BadRequestError`, `AuthenticationError`). The caller `_make_error_result`
-  already uses `type(exc).__name__`, so propagating typed exceptions gives more
-  information. Keep `except (RateLimitError, ...)` as-is; remove the catch-all
-  `except Exception`.
-- [ ] **MOCK_C_CODE uses Zephyr**: `llm_client.py:24` has `#include <zephyr/kernel.h>`
-  which fails `no_cross_platform_hallucination` on NXP cases. Likely an upstream
-  leftover. Replace with a bare-metal NXP-style main.c, or make it SDK-configurable.
+- [x] **`_extract_code` on unclosed fences** (`src/embedeval/llm_client.py`).
+  Fixed: when an opening fence has no matching close (response truncated by the
+  token limit), keep only the content after the opening fence and drop the prose
+  preamble. Regression test `test_unclosed_fence_drops_preamble`.
+- [x] **`_call_litellm` swallows non-retryable errors**: removed the catch-all
+  `except Exception` that wrapped everything in `RuntimeError`. Non-retryable
+  errors now propagate with their original type, so `_make_error_result` records
+  the real class (`BadRequestError`, `AuthenticationError`, …). The retryable
+  `except (RateLimitError, ...)` branch is unchanged.
+- [x] **MOCK_C_CODE uses Zephyr**: replaced the single Zephyr body with a
+  per-SDK selector (`_mock_code_for_prompt`). Default is an NXP bare-metal
+  `fsl_*` body (passes `no_cross_platform_hallucination` on NXP cases); the
+  Zephyr body is used only when the prompt has Zephyr markers.
 - [ ] **`Platform` enum vs `metadata.yaml` alignment**: CLAUDE.md shows
   `platform: nxp_bare_metal` and `EvalPlatform.NXP_BARE_METAL = "nxp_bare_metal"`
   exists. Verify whether the `platform` field in `CaseMetadata` is still active or
@@ -125,9 +124,9 @@ Issues from the 2026-05-26 review — some resolved, others tracked as debt.
   `check_utils.py` 1430, `evaluator.py` 1180, `reporter.py` 1148,
   `safety_guide.py` 976, `dashboard.py` 943. When one becomes painful to modify,
   extract sub-modules. Not immediately critical but cost grows over time.
-- [ ] **`_RETRY_AFTER_RE` only captures "try again in"**: OpenRouter uses different
-  formats ("retry after Xs"). When Phase 6 activates OpenRouter, extend the pattern
-  or make it provider-aware.
+- [x] **`_RETRY_AFTER_RE` only captures "try again in"**: extended the regex to
+  also match the OpenRouter form "retry after Xs" (and the existing "350ms" form
+  was already covered by the `(ms|s)` group).
 - [ ] **No global retry budget**: `max_retries=6` is per-call. On a run of
   12 cases × 5 attempts × 3 feedback rounds under heavy rate limiting, the benchmark
   can silently stretch to hours. Add `--run-deadline=2h` or a global wait accumulator.
