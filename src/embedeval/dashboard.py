@@ -222,52 +222,6 @@ def _scan_stale_cells() -> list[dict]:
     return rows
 
 
-def _scan_stale_runs() -> list[dict]:
-    """Flag past runs whose results were produced with now-outdated prompt/checks.
-
-    Uses the prompt_hash / checks_hash stamped into each run detail JSON
-    (added by the runner). For each run we compare every case's stored hashes
-    to the case's current hashes:
-      - aligned: stored hash == current hash
-      - stale:   stored hash present but differs (prompt.md or checks/ changed)
-      - unknown: hash missing (run predates hash stamping) or case removed
-
-    One row per run, aggregating its cases. Read-only and diagnostic.
-    """
-    rows: list[dict] = []
-    for run in _load_runs():
-        n_prompt_stale = 0
-        n_checks_stale = 0
-        n_unknown = 0
-        n_cases = 0
-        case_ids: set[str] = set()
-        for case in run["cases"]:
-            n_cases += 1
-            case_id = case.get("case_id", "")
-            case_ids.add(case_id)
-            stored_prompt = case.get("prompt_hash")
-            stored_checks = case.get("checks_hash")
-            cur_prompt = _current_prompt_hash(case_id)
-            cur_checks = _current_checks_hash(case_id)
-            if stored_prompt is None or cur_prompt is None:
-                n_unknown += 1
-            elif stored_prompt != cur_prompt:
-                n_prompt_stale += 1
-            if stored_checks is None or cur_checks is None or cur_checks == "no_checks":
-                pass  # unknown on checks side counted via n_unknown above
-            elif stored_checks != cur_checks:
-                n_checks_stale += 1
-        rows.append({
-            "run_id": run["run_id"],
-            "n_cases": n_cases,
-            "case_ids": case_ids,
-            "n_prompt_stale": n_prompt_stale,
-            "n_checks_stale": n_checks_stale,
-            "n_unknown": n_unknown,
-        })
-    return rows
-
-
 def _all_cases() -> list[dict]:
     """Return all cases sorted by sdk then case_id, with their metadata."""
     cases = []
@@ -2221,19 +2175,57 @@ def _stale_badge(state: str, stored: str | None = None, current: str | None = No
     )
 
 
+def _aggregate_stale_by_case(rows: list[dict]) -> list[dict]:
+    """Collapse per-attempt cells into one entry per (case, model).
+
+    prompt_state is shared by all attempts of a case (same prompt). checks_state
+    can differ per attempt (depends on the generated code), so we summarise it:
+    "stale" if any attempt is checks-stale, else the common state.
+    Returns cases sorted by id, each with a sorted list of model entries.
+    """
+    by_case: dict[str, dict] = {}
+    for r in rows:
+        case = by_case.setdefault(r["case_id"], {"case_id": r["case_id"], "models": {}})
+        m = case["models"].setdefault(r["model"], {
+            "model": r["model"],
+            "prompt_state": r["prompt_state"],
+            "stored_prompt": r["stored_prompt"],
+            "current_prompt": r["current_prompt"],
+            "current_checks": r["current_checks"],
+            "n_attempts": 0,
+            "n_checks_stale": 0,
+        })
+        m["n_attempts"] += 1
+        if r["checks_state"] == "stale":
+            m["n_checks_stale"] += 1
+    result = []
+    for case_id in sorted(by_case):
+        models = by_case[case_id]["models"]
+        model_list = []
+        for model in sorted(models):
+            m = models[model]
+            m["checks_state"] = "stale" if m["n_checks_stale"] else "aligned"
+            model_list.append(m)
+        any_stale = any(
+            m["prompt_state"] == "stale" or m["checks_state"] == "stale"
+            for m in model_list
+        )
+        result.append({"case_id": case_id, "models": model_list, "any_stale": any_stale})
+    return result
+
+
 @app.get("/stale", response_class=HTMLResponse)
 def stale_cells(request: Request) -> str:
-    """Show cached generations AND past runs no longer aligned with current cases.
+    """Per-case staleness: for each case, list every model tried and whether its
+    cached generation is still aligned with the current prompt and checks.
 
-    Two sections:
-      - Runs: each past run flagged by the prompt_hash/checks_hash stamped in
-        its detail JSON vs the case's current hashes.
-      - Generations: corpus cells compared the same way.
+    A model entry is prompt-stale if prompt.md changed after the generation, and
+    checks-stale if any of its attempts was never graded with the current checks.
 
     Query params:
-      ?show=all      also list aligned generation cells
-      ?sdk=<bucket>  restrict both sections to one SDK bucket
-      ?case=<substr> restrict both sections to case_ids containing <substr>
+      ?show=all      also list fully-aligned cases
+      ?sdk=<bucket>  restrict to one SDK bucket
+      ?case=<substr> restrict to case_ids containing <substr>
     """
     show_all = request.query_params.get("show") == "all"
     sdk_filter = (request.query_params.get("sdk") or "").strip()
@@ -2243,8 +2235,7 @@ def stale_cells(request: Request) -> str:
         if case_filter and case_filter not in case_id:
             return False
         if sdk_filter:
-            sdk = str(_find_metadata(case_id).get("sdk") or "")
-            if sdk != sdk_filter:
+            if str(_find_metadata(case_id).get("sdk") or "") != sdk_filter:
                 return False
         return True
 
@@ -2275,102 +2266,64 @@ def stale_cells(request: Request) -> str:
   <a href="/stale" style="font-size:0.85rem">reset</a>
 </form>"""
 
-    # --- Runs section ---
-    run_rows = [r for r in _scan_stale_runs()
-                if any(_case_matches(cid) for cid in r["case_ids"])]
-    runs_table = ""
-    for r in run_rows:
-        flagged = r["n_prompt_stale"] > 0 or r["n_checks_stale"] > 0
-        status = (
-            '<span class="tag" style="background:#5b2c1d;color:#fbb6a4">STALE</span>'
-            if flagged else
-            '<span class="tag" style="background:#1c4532;color:#9ae6b4">current</span>'
-        )
-        runs_table += f"""<tr>
-          <td><a href="/history/{quote(r['run_id'])}">{r['run_id']}</a></td>
-          <td style="color:#718096">{r['n_cases']}</td>
-          <td>{status}</td>
-          <td style="color:#fbb6a4">{r['n_prompt_stale'] or ''}</td>
-          <td style="color:#fbb6a4">{r['n_checks_stale'] or ''}</td>
-          <td style="color:#718096">{r['n_unknown'] or ''}</td>
-        </tr>"""
-
-    # --- Generations section ---
     rows = [r for r in _scan_stale_cells() if _case_matches(r["case_id"])]
-    total = len(rows)
-    n_prompt = sum(1 for r in rows if r["prompt_state"] == "stale")
-    n_checks = sum(1 for r in rows if r["checks_state"] == "stale")
-    n_orphan = sum(1 for r in rows if r["orphan"])
+    cases = _aggregate_stale_by_case(rows)
+    visible = cases if show_all else [c for c in cases if c["any_stale"]]
 
-    def _is_stale(r: dict) -> bool:
-        return r["prompt_state"] == "stale" or r["checks_state"] == "stale" or r["orphan"]
+    n_stale_cases = sum(1 for c in cases if c["any_stale"])
 
-    visible = rows if show_all else [r for r in rows if _is_stale(r)]
-    visible.sort(key=lambda r: (not _is_stale(r), r["case_id"], r["model"], str(r["attempt"])))
+    cards = ""
+    for c in visible:
+        model_rows = ""
+        for m in c["models"]:
+            att = f" <span style='color:#718096'>×{m['n_attempts']}</span>" if m["n_attempts"] > 1 else ""
+            model_rows += f"""<tr>
+              <td class="model-id">{m['model']}{att}</td>
+              <td>{_stale_badge(m['prompt_state'], m['stored_prompt'], m['current_prompt'])}</td>
+              <td>{_stale_badge(m['checks_state'], current=m['current_checks'])}</td>
+            </tr>"""
+        flag = "" if not c["any_stale"] else (
+            ' <span class="tag" style="background:#5b2c1d;color:#fbb6a4">has stale</span>'
+        )
+        cards += f"""
+<div class="card" style="margin-bottom:1rem">
+  <h2 style="margin:0 0 0.5rem;font-size:1rem">
+    <a href="/cases/{c['case_id']}">{c['case_id']}</a>{flag}
+  </h2>
+  <table>
+    <thead><tr><th>Model</th><th>Prompt</th><th>Checks</th></tr></thead>
+    <tbody>{model_rows}</tbody>
+  </table>
+</div>"""
 
-    cell_rows = ""
-    for r in visible:
-        cell_rows += f"""<tr>
-          <td class="model-id">{r['model']}</td>
-          <td><a href="/cases/{r['case_id']}">{r['case_id']}</a></td>
-          <td style="color:#718096">{r['attempt']}</td>
-          <td>{_stale_badge(r['prompt_state'], r['stored_prompt'], r['current_prompt'])}</td>
-          <td>{_stale_badge(r['checks_state'], current=r['current_checks'])}</td>
-        </tr>"""
+    if not cards:
+        cards = ('<div class="card"><p style="color:#a0aec0">'
+                 'No cases match — try ?show=all or relax the filters.</p></div>')
 
-    # Preserve filters in the show-all toggle.
     base_qs = "".join(
         f"&{k}={quote(v)}" for k, v in (("sdk", sdk_filter), ("case", case_filter)) if v
     )
     toggle = (
         f'<a href="/stale?{base_qs.lstrip("&")}">show only stale</a>' if show_all
-        else f'<a href="/stale?show=all{base_qs}">show all cells</a>'
+        else f'<a href="/stale?show=all{base_qs}">show all cases</a>'
     )
-    n_stale_rows = sum(1 for r in rows if _is_stale(r))
-    n_stale_runs = sum(1 for r in run_rows if r["n_prompt_stale"] or r["n_checks_stale"])
 
     body = f"""
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem">
-  <h1>Stale</h1>
+  <h1>Stale by case</h1>
   <span style="color:#718096;font-size:0.85rem">{toggle}</span>
 </div>
 {filter_bar}
-<h2 style="margin:0 0 0.5rem">Runs</h2>
-<div class="card" style="margin-bottom:0.5rem">
+<div class="card" style="margin-bottom:1rem">
   <p style="color:#a0aec0;font-size:0.9rem">
-    <strong>{n_stale_runs}</strong> of <strong>{len(run_rows)}</strong> runs were
-    produced with a prompt or checks that have since changed. "unknown" =
-    run predates hash stamping, or the case was removed.
+    <strong>{n_stale_cases}</strong> of <strong>{len(cases)}</strong> cases have at
+    least one model whose cached generation is no longer aligned. A model is
+    <span style="color:#fbb6a4">prompt-stale</span> if prompt.md changed after it
+    was generated, and <span style="color:#fbb6a4">checks-stale</span> if it was
+    never graded with the checks currently in the repo.
   </p>
 </div>
-<div class="card" style="padding:0;overflow:auto;margin-bottom:1.5rem">
-  <table>
-    <thead><tr>
-      <th>Run</th><th>Cases</th><th>Status</th>
-      <th>Prompt-stale</th><th>Checks-stale</th><th>Unknown</th>
-    </tr></thead>
-    <tbody>{runs_table}</tbody>
-  </table>
-</div>
-<h2 style="margin:0 0 0.5rem">Generations</h2>
-<div class="card" style="margin-bottom:0.5rem">
-  <p style="color:#a0aec0;font-size:0.9rem">
-    <strong>{n_stale_rows}</strong> stale of <strong>{total}</strong> cached generations —
-    <span style="color:#fbb6a4">{n_prompt} prompt-stale</span>,
-    <span style="color:#fbb6a4">{n_checks} checks-stale</span>,
-    <span style="color:#a0aec0">{n_orphan} orphaned (case removed)</span>.
-    A cell is prompt-stale if prompt.md changed after it was generated, and
-    checks-stale if it was never graded with the checks currently in the repo.
-  </p>
-</div>
-<div class="card" style="padding:0;overflow:auto">
-  <table>
-    <thead><tr>
-      <th>Model</th><th>Case</th><th>Attempt</th><th>Prompt</th><th>Checks</th>
-    </tr></thead>
-    <tbody>{cell_rows}</tbody>
-  </table>
-</div>
+{cards}
 """
     return _page("Stale", body)
 

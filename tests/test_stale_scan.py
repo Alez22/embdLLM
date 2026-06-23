@@ -5,7 +5,6 @@ cells and past runs whose prompt.md or checks/ changed after they were
 produced, by reconstructing the same full-prompt hash the runner uses.
 """
 
-import json
 from pathlib import Path
 
 import pytest
@@ -116,50 +115,37 @@ def test_scan_flags_orphan_case(tmp_path, monkeypatch):
     assert rows[0]["prompt_state"] == "orphan"
 
 
-def _write_run_detail(runs_dir: Path, run_id: str, case_id: str,
-                      prompt_hash, checks_hash) -> None:
-    """Write a minimal run detail JSON for a non-mock model."""
-    details = runs_dir / run_id / "details"
-    details.mkdir(parents=True)
-    detail = {
-        "case_id": case_id,
-        "model": "test-model",
-        "attempt": 1,
-        "generated_code": "x",
-        "layers": [],
-        "passed": True,
-        "duration_seconds": 0.0,
-        "token_usage": {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0},
-        "cost_usd": 0.0,
-        "prompt_hash": prompt_hash,
-        "checks_hash": checks_hash,
-    }
-    (details / f"{case_id}_attempt1.json").write_text(json.dumps(detail), encoding="utf-8")
-
-
-def test_scan_runs_flags_prompt_and_checks(tmp_path, monkeypatch):
+def test_aggregate_by_case_groups_models(tmp_path, monkeypatch):
     cases = tmp_path / "cases" / "bucket"
     case_dir = cases / "c1"
     _write_case(case_dir, "Original prompt.", "CHECK = 1\n")
-
     monkeypatch.setattr(dash, "RESULTS_DIR", tmp_path / "results")
     monkeypatch.setattr(dash, "CASES_DIR", tmp_path / "cases")
 
-    runs_dir = tmp_path / "results" / "runs"
-    cur_prompt = dash._current_prompt_hash("c1")
-    cur_checks = dash._current_checks_hash("c1")
+    cur_prompt = _current_prompt_hash(case_dir)
 
-    # A run produced with the current hashes -> not stale.
-    _write_run_detail(runs_dir, "run_aligned", "c1", cur_prompt, cur_checks)
-    # A run produced with a different prompt + checks hash -> stale on both.
-    _write_run_detail(runs_dir, "run_stale", "c1", "oldprompt", "oldchecks")
-    # A pre-stamping run with no hashes -> unknown.
-    _write_run_detail(runs_dir, "run_unknown", "c1", None, None)
-
-    rows = {r["run_id"]: r for r in dash._scan_stale_runs()}
-
-    assert rows["run_aligned"]["n_prompt_stale"] == 0
-    assert rows["run_aligned"]["n_checks_stale"] == 0
-    assert rows["run_stale"]["n_prompt_stale"] == 1
-    assert rows["run_stale"]["n_checks_stale"] == 1
-    assert rows["run_unknown"]["n_unknown"] == 1
+    rows = [
+        # model A: prompt aligned, one attempt checks-stale
+        {"case_id": "c1", "model": "A", "attempt": 1, "orphan": False,
+         "prompt_state": "aligned", "stored_prompt": cur_prompt,
+         "current_prompt": cur_prompt, "checks_state": "stale", "current_checks": "x"},
+        {"case_id": "c1", "model": "A", "attempt": 2, "orphan": False,
+         "prompt_state": "aligned", "stored_prompt": cur_prompt,
+         "current_prompt": cur_prompt, "checks_state": "aligned", "current_checks": "x"},
+        # model B: prompt stale
+        {"case_id": "c1", "model": "B", "attempt": 1, "orphan": False,
+         "prompt_state": "stale", "stored_prompt": "old",
+         "current_prompt": cur_prompt, "checks_state": "aligned", "current_checks": "x"},
+    ]
+    out = dash._aggregate_stale_by_case(rows)
+    assert len(out) == 1
+    case = out[0]
+    assert case["case_id"] == "c1"
+    assert case["any_stale"] is True
+    models = {m["model"]: m for m in case["models"]}
+    # A: two attempts, one checks-stale -> aggregated checks-stale
+    assert models["A"]["n_attempts"] == 2
+    assert models["A"]["checks_state"] == "stale"
+    assert models["A"]["prompt_state"] == "aligned"
+    # B: prompt-stale
+    assert models["B"]["prompt_state"] == "stale"
