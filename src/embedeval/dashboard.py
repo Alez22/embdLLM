@@ -117,6 +117,42 @@ def _find_case_dir(case_id: str) -> Path | None:
     return None
 
 
+@lru_cache(maxsize=None)
+def _current_prompt_hash(case_id: str) -> str | None:
+    """Hash of the full prompt for a case, as the runner would compute it now.
+
+    Reconstructs the SAME string the runner hashes: prompt.md with the board
+    target injected, then build_full_prompt assembly, using the default run
+    config (no team context_pack, no /no_think suffix) — the standard path for
+    NXP runs. Cells/runs produced with --context or no_think will not match and
+    surface as prompt-stale; that is a known limitation, documented on the page.
+    Cached: hashes do not change while the dashboard runs.
+    """
+    from embedeval.corpus import hash_prompt
+    from embedeval.llm_client import build_full_prompt
+    from embedeval.runner.prompts import _collect_context_files, _load_prompt
+
+    case_dir = _find_case_dir(case_id)
+    if case_dir is None:
+        return None
+    prompt = _load_prompt(case_dir)
+    # Replicate runner's _inject_board_target without building a full
+    # CaseMetadata: it only reads build_board (default native_sim).
+    board = _find_metadata(case_id).get("build_board") or "native_sim"
+    prompt = prompt.rstrip() + "\n\nTarget board: " + board + "\n"
+    context_files = _collect_context_files(case_dir)
+    return hash_prompt(build_full_prompt(prompt, context_files, None))
+
+
+@lru_cache(maxsize=None)
+def _current_checks_hash(case_id: str) -> str | None:
+    """Hash of the current checks/ for a case, or None if the case is gone."""
+    from embedeval.corpus import hash_checks
+
+    case_dir = _find_case_dir(case_id)
+    return hash_checks(case_dir) if case_dir is not None else None
+
+
 def _scan_stale_cells() -> list[dict]:
     """Scan corpus generation cells and flag those misaligned with current cases.
 
@@ -133,47 +169,12 @@ def _scan_stale_cells() -> list[dict]:
     Read-only and diagnostic; never mutates the corpus. O(cells) hashing +
     one stat() per cell — fine for an on-demand page, not the benchmark path.
     """
-    from embedeval.corpus import hash_checks, hash_code, hash_prompt
-    from embedeval.llm_client import build_full_prompt
-    from embedeval.runner.prompts import _collect_context_files, _load_prompt
+    from embedeval.corpus import hash_code
 
     corpus_dir = RESULTS_DIR / "corpus"
     gen_root = corpus_dir / "generations"
     if not gen_root.is_dir():
         return []
-
-    # Memoize per-case current hashes; recomputed once per request.
-    prompt_hash_by_case: dict[str, str | None] = {}
-    checks_hash_by_case: dict[str, str | None] = {}
-
-    def _current_prompt_hash(case_id: str) -> str | None:
-        # Reconstruct the SAME string the runner hashes: prompt.md with the
-        # board target injected, then the full-prompt assembly. We use the
-        # default run config (no team context_pack, no /no_think suffix) — the
-        # standard path for NXP runs. Cells produced with --context or
-        # no_think will not match here and surface as prompt-stale; that is a
-        # known limitation, documented on the page.
-        if case_id not in prompt_hash_by_case:
-            case_dir = _find_case_dir(case_id)
-            if case_dir is None:
-                prompt_hash_by_case[case_id] = None
-            else:
-                prompt = _load_prompt(case_dir)
-                # Replicate runner's _inject_board_target without constructing a
-                # full CaseMetadata: it only reads build_board (default native_sim).
-                meta = _find_metadata(case_id)
-                board = meta.get("build_board") or "native_sim"
-                prompt = prompt.rstrip() + "\n\nTarget board: " + board + "\n"
-                context_files = _collect_context_files(case_dir)
-                full = build_full_prompt(prompt, context_files, None)
-                prompt_hash_by_case[case_id] = hash_prompt(full)
-        return prompt_hash_by_case[case_id]
-
-    def _current_checks_hash(case_id: str) -> str | None:
-        if case_id not in checks_hash_by_case:
-            case_dir = _find_case_dir(case_id)
-            checks_hash_by_case[case_id] = hash_checks(case_dir) if case_dir is not None else None
-        return checks_hash_by_case[case_id]
 
     rows: list[dict] = []
     for model_dir in sorted(gen_root.iterdir()):
@@ -218,6 +219,52 @@ def _scan_stale_cells() -> list[dict]:
                     "checks_state": checks_state,
                     "current_checks": cur_checks,
                 })
+    return rows
+
+
+def _scan_stale_runs() -> list[dict]:
+    """Flag past runs whose results were produced with now-outdated prompt/checks.
+
+    Uses the prompt_hash / checks_hash stamped into each run detail JSON
+    (added by the runner). For each run we compare every case's stored hashes
+    to the case's current hashes:
+      - aligned: stored hash == current hash
+      - stale:   stored hash present but differs (prompt.md or checks/ changed)
+      - unknown: hash missing (run predates hash stamping) or case removed
+
+    One row per run, aggregating its cases. Read-only and diagnostic.
+    """
+    rows: list[dict] = []
+    for run in _load_runs():
+        n_prompt_stale = 0
+        n_checks_stale = 0
+        n_unknown = 0
+        n_cases = 0
+        case_ids: set[str] = set()
+        for case in run["cases"]:
+            n_cases += 1
+            case_id = case.get("case_id", "")
+            case_ids.add(case_id)
+            stored_prompt = case.get("prompt_hash")
+            stored_checks = case.get("checks_hash")
+            cur_prompt = _current_prompt_hash(case_id)
+            cur_checks = _current_checks_hash(case_id)
+            if stored_prompt is None or cur_prompt is None:
+                n_unknown += 1
+            elif stored_prompt != cur_prompt:
+                n_prompt_stale += 1
+            if stored_checks is None or cur_checks is None or cur_checks == "no_checks":
+                pass  # unknown on checks side counted via n_unknown above
+            elif stored_checks != cur_checks:
+                n_checks_stale += 1
+        rows.append({
+            "run_id": run["run_id"],
+            "n_cases": n_cases,
+            "case_ids": case_ids,
+            "n_prompt_stale": n_prompt_stale,
+            "n_checks_stale": n_checks_stale,
+            "n_unknown": n_unknown,
+        })
     return rows
 
 
@@ -2176,15 +2223,80 @@ def _stale_badge(state: str, stored: str | None = None, current: str | None = No
 
 @app.get("/stale", response_class=HTMLResponse)
 def stale_cells(request: Request) -> str:
-    """Show cached generations no longer aligned with current prompts/checks.
+    """Show cached generations AND past runs no longer aligned with current cases.
 
-    A generation is "stale" when the case's prompt.md or checks/ changed after
-    the generation was produced, so any run built on it no longer reflects the
-    case as it exists now. Append ?show=all to also list aligned cells.
+    Two sections:
+      - Runs: each past run flagged by the prompt_hash/checks_hash stamped in
+        its detail JSON vs the case's current hashes.
+      - Generations: corpus cells compared the same way.
+
+    Query params:
+      ?show=all      also list aligned generation cells
+      ?sdk=<bucket>  restrict both sections to one SDK bucket
+      ?case=<substr> restrict both sections to case_ids containing <substr>
     """
     show_all = request.query_params.get("show") == "all"
-    rows = _scan_stale_cells()
+    sdk_filter = (request.query_params.get("sdk") or "").strip()
+    case_filter = (request.query_params.get("case") or "").strip()
 
+    def _case_matches(case_id: str) -> bool:
+        if case_filter and case_filter not in case_id:
+            return False
+        if sdk_filter:
+            sdk = str(_find_metadata(case_id).get("sdk") or "")
+            if sdk != sdk_filter:
+                return False
+        return True
+
+    # Build the SDK dropdown from current cases.
+    sdks = sorted({str(m.get("sdk")) for m in _all_cases() if m.get("sdk")})
+    sdk_opts = '<option value="">all SDKs</option>'
+    for s in sdks:
+        sel = " selected" if s == sdk_filter else ""
+        sdk_opts += f'<option value="{s}"{sel}>{s}</option>'
+    filter_bar = f"""
+<form method="get" action="/stale" class="card"
+      style="display:flex;gap:1rem;align-items:center;margin-bottom:1rem">
+  <label style="color:#a0aec0;font-size:0.85rem">SDK
+    <select name="sdk" onchange="this.form.submit()"
+            style="background:#0d1117;color:#e2e8f0;border:1px solid #2d3748;
+                   border-radius:4px;padding:3px 6px;margin-left:4px">{sdk_opts}</select>
+  </label>
+  <label style="color:#a0aec0;font-size:0.85rem">Case contains
+    <input name="case" value="{case_filter}" placeholder="e.g. gpio"
+           style="background:#0d1117;color:#e2e8f0;border:1px solid #2d3748;
+                  border-radius:4px;padding:3px 6px;margin-left:4px">
+  </label>
+  <input type="hidden" name="show" value="{'all' if show_all else ''}">
+  <button type="submit"
+          style="background:#2d3748;border:1px solid #4a5568;color:#e2e8f0;
+                 padding:3px 14px;border-radius:4px;cursor:pointer;font-size:0.85rem">
+    Apply</button>
+  <a href="/stale" style="font-size:0.85rem">reset</a>
+</form>"""
+
+    # --- Runs section ---
+    run_rows = [r for r in _scan_stale_runs()
+                if any(_case_matches(cid) for cid in r["case_ids"])]
+    runs_table = ""
+    for r in run_rows:
+        flagged = r["n_prompt_stale"] > 0 or r["n_checks_stale"] > 0
+        status = (
+            '<span class="tag" style="background:#5b2c1d;color:#fbb6a4">STALE</span>'
+            if flagged else
+            '<span class="tag" style="background:#1c4532;color:#9ae6b4">current</span>'
+        )
+        runs_table += f"""<tr>
+          <td><a href="/history/{quote(r['run_id'])}">{r['run_id']}</a></td>
+          <td style="color:#718096">{r['n_cases']}</td>
+          <td>{status}</td>
+          <td style="color:#fbb6a4">{r['n_prompt_stale'] or ''}</td>
+          <td style="color:#fbb6a4">{r['n_checks_stale'] or ''}</td>
+          <td style="color:#718096">{r['n_unknown'] or ''}</td>
+        </tr>"""
+
+    # --- Generations section ---
+    rows = [r for r in _scan_stale_cells() if _case_matches(r["case_id"])]
     total = len(rows)
     n_prompt = sum(1 for r in rows if r["prompt_state"] == "stale")
     n_checks = sum(1 for r in rows if r["checks_state"] == "stale")
@@ -2194,15 +2306,11 @@ def stale_cells(request: Request) -> str:
         return r["prompt_state"] == "stale" or r["checks_state"] == "stale" or r["orphan"]
 
     visible = rows if show_all else [r for r in rows if _is_stale(r)]
-    # Stale first, then grouped by case then model for a stable reading order.
     visible.sort(key=lambda r: (not _is_stale(r), r["case_id"], r["model"], str(r["attempt"])))
 
-    if not rows:
-        return _page("Stale", "<div class='card'><p>No corpus generations found.</p></div>")
-
-    table_rows = ""
+    cell_rows = ""
     for r in visible:
-        table_rows += f"""<tr>
+        cell_rows += f"""<tr>
           <td class="model-id">{r['model']}</td>
           <td><a href="/cases/{r['case_id']}">{r['case_id']}</a></td>
           <td style="color:#718096">{r['attempt']}</td>
@@ -2210,17 +2318,42 @@ def stale_cells(request: Request) -> str:
           <td>{_stale_badge(r['checks_state'], current=r['current_checks'])}</td>
         </tr>"""
 
+    # Preserve filters in the show-all toggle.
+    base_qs = "".join(
+        f"&{k}={quote(v)}" for k, v in (("sdk", sdk_filter), ("case", case_filter)) if v
+    )
     toggle = (
-        '<a href="/stale">show only stale</a>' if show_all
-        else '<a href="/stale?show=all">show all cells</a>'
+        f'<a href="/stale?{base_qs.lstrip("&")}">show only stale</a>' if show_all
+        else f'<a href="/stale?show=all{base_qs}">show all cells</a>'
     )
     n_stale_rows = sum(1 for r in rows if _is_stale(r))
+    n_stale_runs = sum(1 for r in run_rows if r["n_prompt_stale"] or r["n_checks_stale"])
+
     body = f"""
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem">
-  <h1>Stale generations</h1>
+  <h1>Stale</h1>
   <span style="color:#718096;font-size:0.85rem">{toggle}</span>
 </div>
-<div class="card" style="margin-bottom:1rem">
+{filter_bar}
+<h2 style="margin:0 0 0.5rem">Runs</h2>
+<div class="card" style="margin-bottom:0.5rem">
+  <p style="color:#a0aec0;font-size:0.9rem">
+    <strong>{n_stale_runs}</strong> of <strong>{len(run_rows)}</strong> runs were
+    produced with a prompt or checks that have since changed. "unknown" =
+    run predates hash stamping, or the case was removed.
+  </p>
+</div>
+<div class="card" style="padding:0;overflow:auto;margin-bottom:1.5rem">
+  <table>
+    <thead><tr>
+      <th>Run</th><th>Cases</th><th>Status</th>
+      <th>Prompt-stale</th><th>Checks-stale</th><th>Unknown</th>
+    </tr></thead>
+    <tbody>{runs_table}</tbody>
+  </table>
+</div>
+<h2 style="margin:0 0 0.5rem">Generations</h2>
+<div class="card" style="margin-bottom:0.5rem">
   <p style="color:#a0aec0;font-size:0.9rem">
     <strong>{n_stale_rows}</strong> stale of <strong>{total}</strong> cached generations —
     <span style="color:#fbb6a4">{n_prompt} prompt-stale</span>,
@@ -2235,7 +2368,7 @@ def stale_cells(request: Request) -> str:
     <thead><tr>
       <th>Model</th><th>Case</th><th>Attempt</th><th>Prompt</th><th>Checks</th>
     </tr></thead>
-    <tbody>{table_rows}</tbody>
+    <tbody>{cell_rows}</tbody>
   </table>
 </div>
 """
