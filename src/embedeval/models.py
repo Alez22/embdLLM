@@ -232,6 +232,13 @@ class EvalResult(BaseModel):
     #   "gen+grade-cache" : both generation and grading served from cache
     # Default keeps older EvalResult JSON files valid on load.
     cache_source: str = "llm"
+    # Hashes of the prompt and checks this result was produced with, so a run's
+    # results can later be detected as stale when prompt.md or checks/ change.
+    # Call-site metadata (like temperature/cache_source) — NOT part of any cache
+    # cell. None on older JSON files and on error results where the case could
+    # not be loaded.
+    prompt_hash: str | None = None
+    checks_hash: str | None = None
 
 
 class PerCheckStat(BaseModel):

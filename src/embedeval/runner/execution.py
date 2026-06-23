@@ -21,6 +21,7 @@ from embedeval.corpus import (
     corpus_store,
     grade_lookup,
     grade_store,
+    hash_checks,
     hash_prompt,
 )
 from embedeval.llm_client import build_full_prompt
@@ -553,6 +554,7 @@ def run_benchmark(
             if no_think:
                 full_prompt_for_hash = full_prompt_for_hash + "\n/no_think"
             prompt_hash = hash_prompt(full_prompt_for_hash)
+            checks_hash = hash_checks(case_dir)
 
             for attempt in range(1, attempts + 1):
                 progress.update(
@@ -588,6 +590,12 @@ def run_benchmark(
                         type(exc).__name__,
                     )
                     result = _make_error_result(meta, model, attempt, exc)
+
+                # Stamp the prompt/checks hashes the result was produced with so
+                # the run JSON is self-describing for staleness detection. Set on
+                # both the success and error paths (hashes are known here).
+                result.prompt_hash = prompt_hash
+                result.checks_hash = checks_hash
 
                 results.append(result)
                 progress.advance(task)
