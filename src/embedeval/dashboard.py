@@ -333,6 +333,37 @@ def _pass_badge(passed: bool) -> str:
     return f'<span class="badge {cls}">{label}</span>'
 
 
+def _build_log_html(layer_num: int, layer_name: str, layer_error: str | None) -> str:
+    """Render a layer's compile/runtime log as a collapsible, full-width block.
+
+    L1/L2 store the raw tool output (e.g. arm-none-eabi-gcc stderr) in
+    `layer.error`, but those layers also carry a CheckDetail ("exit code N"),
+    so the plain-error rendering path (which only fires when there are no
+    details) never shows them. This helper surfaces that log regardless of
+    whether details are present.
+
+    Compiler output is column-aligned (the `^~~~~` caret must sit under the
+    offending token), so we use `white-space:pre` + horizontal scroll rather
+    than wrapping. Meant to be placed in a full-width container, not inside the
+    narrow Checks column.
+
+    Returns "" for empty errors and for "Skipped:" sentinels (not real logs).
+    """
+    if not layer_error or layer_error.startswith("Skipped:"):
+        return ""
+    log_esc = (
+        layer_error.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    )
+    return (
+        '<details style="margin-top:0.5rem">'
+        '<summary style="cursor:pointer;color:#fc8181;font-size:0.9rem">'
+        f"L{layer_num} — {layer_name}: build log (compiler output)</summary>"
+        '<pre style="max-height:360px;overflow:auto;background:#1a1a1a;'
+        'padding:0.75rem;font-size:0.8rem;white-space:pre;line-height:1.4">'
+        f"{log_esc}</pre></details>"
+    )
+
+
 def _score_bar(score: float) -> str:
     """Render a coloured progress bar. Does NOT include the percentage text."""
     pct = int(score * 100)
@@ -1329,12 +1360,14 @@ def case_detail(case_id: str, model: str) -> str:
 
     # --- checks table ---
     checks_html = ""
+    build_logs_html = ""  # full-width compiler/runtime logs, rendered below the split
     for layer in result.get("layers", []):
         layer_name = layer.get("name", "")
         layer_passed = layer.get("passed", False)
         layer_error = layer.get("error")
         details = layer.get("details", [])
         layer_score = layer.get("score")
+        build_logs_html += _build_log_html(layer.get("layer"), layer_name, layer_error)
 
         badge = _pass_badge(layer_passed)
         score_pct = f'<span style="font-size:0.8rem;color:#718096;margin-left:0.5rem">{int(layer_score * 100)}%</span>' if layer_score is not None and details else ""
@@ -1360,6 +1393,13 @@ def case_detail(case_id: str, model: str) -> str:
   <div class="check-name">{name}{detail_html}</div>
 </div>"""
         checks_html += "</div>"
+
+    # Build logs go full-width below the split (compiler output is column-aligned).
+    build_log_section = (
+        f'<div class="card" style="margin-top:1rem"><h2>Build logs</h2>{build_logs_html}</div>'
+        if build_logs_html
+        else ""
+    )
 
     # --- diff ---
     if reference:
@@ -1422,6 +1462,7 @@ def case_detail(case_id: str, model: str) -> str:
   </div>
 
 </div>
+{build_log_section}
 """
     return _page(f"{case_id} / {model_short}", body, highlight=True)
 
@@ -1833,6 +1874,7 @@ def history_detail(run_id: str) -> str:
         # Checks
         applicable = applicable_by_case.get(case_id, set())
         checks_html = ""
+        build_logs_html = ""  # full-width compiler/runtime logs, rendered below the split
         for layer in result.get("layers", []):
             layer_num = layer.get("layer")
             layer_name = layer.get("name", "")
@@ -1846,6 +1888,8 @@ def history_detail(run_id: str) -> str:
             # Also skip L4 skipped-due-to-earlier-failure silently.
             if (layer_error or "").startswith("Skipped:") and layer_num not in applicable:
                 continue
+
+            build_logs_html += _build_log_html(layer_num, layer_name, layer_error)
 
             layer_score = layer.get("score")
             badge = _pass_badge(layer_passed)
@@ -1871,6 +1915,13 @@ def history_detail(run_id: str) -> str:
   <div class="check-name">{name}{detail_html}</div>
 </div>"""
             checks_html += "</div>"
+
+        # Build logs go full-width below the split (compiler output is column-aligned).
+        build_log_section = (
+            f'<div class="card" style="margin-top:1rem"><h3>Build logs</h3>{build_logs_html}</div>'
+            if build_logs_html
+            else ""
+        )
 
         # Diff + side-by-side
         if reference and generated:
@@ -1915,6 +1966,7 @@ def history_detail(run_id: str) -> str:
       </div>
     </div>
   </div>
+  {build_log_section}
 </div>"""
 
     body = f"""
