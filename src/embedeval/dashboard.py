@@ -117,6 +117,110 @@ def _find_case_dir(case_id: str) -> Path | None:
     return None
 
 
+def _scan_stale_cells() -> list[dict]:
+    """Scan corpus generation cells and flag those misaligned with current cases.
+
+    For every cached generation cell we compare against the case as it exists
+    NOW:
+      - prompt_stale: the cell's stored prompt_hash differs from the hash of
+        the current prompt.md (the prompt was edited after the generation).
+      - checks_stale: re-grading the cell's code with the current checks would
+        be a grade-cache miss — i.e. no grade entry exists for
+        (hash_code(cell.code), hash_checks(case_dir)). Means the code was never
+        graded with the checks currently in the repo.
+      - orphan: the cell's case_id no longer exists under cases/.
+
+    Read-only and diagnostic; never mutates the corpus. O(cells) hashing +
+    one stat() per cell — fine for an on-demand page, not the benchmark path.
+    """
+    from embedeval.corpus import hash_checks, hash_code, hash_prompt
+    from embedeval.llm_client import build_full_prompt
+    from embedeval.runner.prompts import _collect_context_files, _load_prompt
+
+    corpus_dir = RESULTS_DIR / "corpus"
+    gen_root = corpus_dir / "generations"
+    if not gen_root.is_dir():
+        return []
+
+    # Memoize per-case current hashes; recomputed once per request.
+    prompt_hash_by_case: dict[str, str | None] = {}
+    checks_hash_by_case: dict[str, str | None] = {}
+
+    def _current_prompt_hash(case_id: str) -> str | None:
+        # Reconstruct the SAME string the runner hashes: prompt.md with the
+        # board target injected, then the full-prompt assembly. We use the
+        # default run config (no team context_pack, no /no_think suffix) — the
+        # standard path for NXP runs. Cells produced with --context or
+        # no_think will not match here and surface as prompt-stale; that is a
+        # known limitation, documented on the page.
+        if case_id not in prompt_hash_by_case:
+            case_dir = _find_case_dir(case_id)
+            if case_dir is None:
+                prompt_hash_by_case[case_id] = None
+            else:
+                prompt = _load_prompt(case_dir)
+                # Replicate runner's _inject_board_target without constructing a
+                # full CaseMetadata: it only reads build_board (default native_sim).
+                meta = _find_metadata(case_id)
+                board = meta.get("build_board") or "native_sim"
+                prompt = prompt.rstrip() + "\n\nTarget board: " + board + "\n"
+                context_files = _collect_context_files(case_dir)
+                full = build_full_prompt(prompt, context_files, None)
+                prompt_hash_by_case[case_id] = hash_prompt(full)
+        return prompt_hash_by_case[case_id]
+
+    def _current_checks_hash(case_id: str) -> str | None:
+        if case_id not in checks_hash_by_case:
+            case_dir = _find_case_dir(case_id)
+            checks_hash_by_case[case_id] = hash_checks(case_dir) if case_dir is not None else None
+        return checks_hash_by_case[case_id]
+
+    rows: list[dict] = []
+    for model_dir in sorted(gen_root.iterdir()):
+        if not model_dir.is_dir():
+            continue
+        model = model_dir.name
+        for case_dir in sorted(model_dir.iterdir()):
+            if not case_dir.is_dir():
+                continue
+            case_id = case_dir.name
+            orphan = _find_case_dir(case_id) is None
+            cur_prompt = _current_prompt_hash(case_id)
+            cur_checks = _current_checks_hash(case_id)
+            for cell_file in sorted(case_dir.glob("*.json")):
+                try:
+                    cell = json.loads(cell_file.read_text(encoding="utf-8"))
+                except Exception:
+                    continue
+                stored_prompt = cell.get("prompt_hash")
+                # prompt alignment
+                if orphan or cur_prompt is None:
+                    prompt_state = "orphan" if orphan else "no_prompt"
+                elif stored_prompt == cur_prompt:
+                    prompt_state = "aligned"
+                else:
+                    prompt_state = "stale"
+                # checks alignment: does a grade entry exist for current checks?
+                if orphan or cur_checks is None or cur_checks == "no_checks":
+                    checks_state = "orphan" if orphan else "no_checks"
+                else:
+                    code = cell.get("generated_code") or ""
+                    grade_file = corpus_dir / "grades" / hash_code(code) / f"{cur_checks}.json"
+                    checks_state = "aligned" if grade_file.is_file() else "stale"
+                rows.append({
+                    "model": model,
+                    "case_id": case_id,
+                    "attempt": cell.get("attempt"),
+                    "orphan": orphan,
+                    "prompt_state": prompt_state,
+                    "stored_prompt": stored_prompt,
+                    "current_prompt": cur_prompt,
+                    "checks_state": checks_state,
+                    "current_checks": cur_checks,
+                })
+    return rows
+
+
 def _all_cases() -> list[dict]:
     """Return all cases sorted by sdk then case_id, with their metadata."""
     cases = []
@@ -226,6 +330,7 @@ _NAV = """
   <a href="/efficiency">Model Efficiency</a>
   <a href="/report">Report</a>
   <a href="/cases">Cases</a>
+  <a href="/stale">Stale</a>
   <a href="/history">Run History</a>
   <a href="/docs/layers">Docs</a>
   <a href="/docs/models">Models</a>
@@ -2050,6 +2155,91 @@ def cases_list() -> str:
 </div>
 """
     return _page("Cases", body)
+
+
+def _stale_badge(state: str, stored: str | None = None, current: str | None = None) -> str:
+    """Render an alignment badge for the stale page."""
+    if state == "aligned":
+        return '<span class="tag" style="background:#1c4532;color:#9ae6b4">aligned</span>'
+    if state == "orphan":
+        return '<span class="tag" style="background:#2d3748;color:#a0aec0">case removed</span>'
+    if state in ("no_prompt", "no_checks"):
+        label = "no prompt" if state == "no_prompt" else "no checks"
+        return f'<span class="tag" style="background:#2d3748;color:#718096">{label}</span>'
+    # stale
+    tip = f"stored={stored or '—'} current={current or '—'}"
+    return (
+        f'<span class="tag" style="background:#5b2c1d;color:#fbb6a4" title="{tip}">'
+        f'STALE</span>'
+    )
+
+
+@app.get("/stale", response_class=HTMLResponse)
+def stale_cells(request: Request) -> str:
+    """Show cached generations no longer aligned with current prompts/checks.
+
+    A generation is "stale" when the case's prompt.md or checks/ changed after
+    the generation was produced, so any run built on it no longer reflects the
+    case as it exists now. Append ?show=all to also list aligned cells.
+    """
+    show_all = request.query_params.get("show") == "all"
+    rows = _scan_stale_cells()
+
+    total = len(rows)
+    n_prompt = sum(1 for r in rows if r["prompt_state"] == "stale")
+    n_checks = sum(1 for r in rows if r["checks_state"] == "stale")
+    n_orphan = sum(1 for r in rows if r["orphan"])
+
+    def _is_stale(r: dict) -> bool:
+        return r["prompt_state"] == "stale" or r["checks_state"] == "stale" or r["orphan"]
+
+    visible = rows if show_all else [r for r in rows if _is_stale(r)]
+    # Stale first, then grouped by case then model for a stable reading order.
+    visible.sort(key=lambda r: (not _is_stale(r), r["case_id"], r["model"], str(r["attempt"])))
+
+    if not rows:
+        return _page("Stale", "<div class='card'><p>No corpus generations found.</p></div>")
+
+    table_rows = ""
+    for r in visible:
+        table_rows += f"""<tr>
+          <td class="model-id">{r['model']}</td>
+          <td><a href="/cases/{r['case_id']}">{r['case_id']}</a></td>
+          <td style="color:#718096">{r['attempt']}</td>
+          <td>{_stale_badge(r['prompt_state'], r['stored_prompt'], r['current_prompt'])}</td>
+          <td>{_stale_badge(r['checks_state'], current=r['current_checks'])}</td>
+        </tr>"""
+
+    toggle = (
+        '<a href="/stale">show only stale</a>' if show_all
+        else '<a href="/stale?show=all">show all cells</a>'
+    )
+    n_stale_rows = sum(1 for r in rows if _is_stale(r))
+    body = f"""
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem">
+  <h1>Stale generations</h1>
+  <span style="color:#718096;font-size:0.85rem">{toggle}</span>
+</div>
+<div class="card" style="margin-bottom:1rem">
+  <p style="color:#a0aec0;font-size:0.9rem">
+    <strong>{n_stale_rows}</strong> stale of <strong>{total}</strong> cached generations —
+    <span style="color:#fbb6a4">{n_prompt} prompt-stale</span>,
+    <span style="color:#fbb6a4">{n_checks} checks-stale</span>,
+    <span style="color:#a0aec0">{n_orphan} orphaned (case removed)</span>.
+    A cell is prompt-stale if prompt.md changed after it was generated, and
+    checks-stale if it was never graded with the checks currently in the repo.
+  </p>
+</div>
+<div class="card" style="padding:0;overflow:auto">
+  <table>
+    <thead><tr>
+      <th>Model</th><th>Case</th><th>Attempt</th><th>Prompt</th><th>Checks</th>
+    </tr></thead>
+    <tbody>{table_rows}</tbody>
+  </table>
+</div>
+"""
+    return _page("Stale", body)
 
 
 def _editor_panel(
