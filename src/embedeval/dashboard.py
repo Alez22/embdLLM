@@ -181,6 +181,10 @@ def _scan_stale_cells() -> list[dict]:
         if not model_dir.is_dir():
             continue
         model = model_dir.name
+        # The mock model is a smoke-test fixture, not a candidate — exclude it
+        # everywhere in the dashboard (matches _load_runs).
+        if model == "mock":
+            continue
         for case_dir in sorted(model_dir.iterdir()):
             if not case_dir.is_dir():
                 continue
