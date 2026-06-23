@@ -28,8 +28,10 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         check_type="constraint",
     ))
 
-    # NVIC enabled — implicit: prompt never mentions EnableIRQ
-    has_nvic = bool(re.search(r"\bEnableIRQ\s*\(", generated_code))
+    # NVIC enabled — implicit: prompt never mentions EnableIRQ.
+    # Accept both the SDK alias EnableIRQ() and the raw CMSIS NVIC_EnableIRQ();
+    # they are equivalent (EnableIRQ is a thin wrapper over NVIC_EnableIRQ).
+    has_nvic = bool(re.search(r"(?:NVIC_)?EnableIRQ\s*\(", generated_code))
     details.append(CheckDetail(
         check_name="nvic_interrupt_enabled",
         passed=has_nvic,
@@ -38,18 +40,11 @@ def run_checks(generated_code: str) -> list[CheckDetail]:
         check_type="constraint",
     ))
 
-    # volatile on ISR-shared variable — implicit: prompt never mentions this
-    # Match only variable declarations (not __asm volatile or comments)
-    has_volatile = bool(re.search(
-        r"\bvolatile\b\s+(?:uint|int|bool|char|float|double|struct)\w*", generated_code
-    ))
-    details.append(CheckDetail(
-        check_name="isr_shared_variable_volatile",
-        passed=has_volatile,
-        expected="volatile qualifier on ISR-shared variable declaration",
-        actual="present" if has_volatile else "missing",
-        check_type="constraint",
-    ))
+    # NOTE: no isr_shared_variable_volatile check here.
+    # The prompt asks only to toggle the LED in the ISR with an empty main loop,
+    # so a correct minimal solution has NO state shared between ISR and main and
+    # therefore nothing that must be volatile. Requiring volatile would penalise
+    # valid code; the check belongs only on cases that imply shared ISR state.
 
     # Falling-edge interrupt configured (not just any interrupt)
     has_falling = scoped_contains(
