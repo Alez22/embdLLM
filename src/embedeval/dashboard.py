@@ -187,7 +187,8 @@ tr:hover td { background: #252840; }
 pre { background: #0d1117; border: 1px solid #2d3748; border-radius: 6px;
       padding: 1rem; overflow-x: auto; font-size: 0.8rem;
       line-height: 1.5; white-space: pre; }
-pre.hljs-wrap { background: transparent; border: none; padding: 0; }
+pre.hljs-wrap { background: transparent; border: none; padding: 0;
+                overflow-x: auto; }
 pre.hljs-wrap code.hljs { border-radius: 6px; font-size: 0.8rem;
                            line-height: 1.5; display: block; }
 .diff-add { background: #1a3a2a; color: #68d391; display: block; }
@@ -195,6 +196,13 @@ pre.hljs-wrap code.hljs { border-radius: 6px; font-size: 0.8rem;
 .diff-ctx { display: block; color: #718096; }
 .diff-hdr { display: block; color: #63b3ed; background: #1a2744; }
 .split { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+/* Checks column is short text; give it a fixed narrow width and let the
+   code/diff column take the rest instead of an even 50/50 split. */
+.split-checks { display: grid; grid-template-columns: 320px 1fr; gap: 1.5rem; }
+/* Grid items default to min-width:auto, so wide code forces the column past
+   1fr and overflows the page. min-width:0 lets the column shrink and the
+   inner <pre> scroll horizontally instead. */
+.split > *, .split-checks > * { min-width: 0; }
 .check-row { display: flex; align-items: flex-start; gap: 0.75rem;
              padding: 0.5rem 0; border-bottom: 1px solid #2d3748; }
 .check-row:last-child { border-bottom: none; }
@@ -1163,7 +1171,7 @@ def _attempt_section(result: dict, applicable: set[int]) -> str:
     <h2 style="margin:0">attempt {attempt}{prose_retry_badge}</h2>
     {overall} {score}
   </div>
-  <div class="split">
+  <div class="split-checks">
     <div>
       <h3>Checks</h3>
       {checks_html}
@@ -1384,7 +1392,7 @@ def case_detail(case_id: str, model: str) -> str:
   </div>
 </div>
 
-<div class="split">
+<div class="split-checks">
 
   <div>
     <div class="card">
@@ -1887,7 +1895,7 @@ def history_detail(run_id: str) -> str:
     <h2 style="margin:0"><a href="/case/{case_id}">{case_id}</a> <span style="color:#718096;font-size:0.9rem;font-weight:normal">attempt {attempt}</span>{prose_retry_badge}</h2>
     {overall} {score}
   </div>
-  <div class="split">
+  <div class="split-checks">
     <div>
       <h3>Checks</h3>
       {checks_html}
