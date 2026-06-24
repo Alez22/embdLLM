@@ -2863,33 +2863,31 @@ def _latest_agent_run_per_key(runs: list[dict]) -> list[dict]:
     return kept
 
 
-def _run_check_coverage(run: dict) -> float | None:
-    """@brief Average final-turn check coverage across a run's cases.
+def _checks_passed_per_turn(run: dict) -> list[int]:
+    """@brief Total checks passed at each turn index, summed over all cases.
 
-    Coverage of a case = passed / executed checks on its final turn, where
-    "executed" excludes checks gated out beyond the failed layer (those never
-    ran). This is the exact-from-data denominator; it does NOT penalise early
-    gating (a case stopping at L0 with 7/7 reads 100%). Returns None if no
-    checks were executed at all.
+    Index i is the count of green checks across every case's turn i+1. This
+    absolute count is the honest "improvement across turns" signal: when a
+    case unlocks a gated layer, many new checks become evaluable and pass, so
+    the count jumps (e.g. 29 -> 30 -> 45). A ratio would hide this because the
+    denominator grows with the numerator, and there is no fixed per-case
+    denominator available from the data (L2/L3/L4 checks are generated at
+    runtime, not declared in the case).
+
+    Cases that stopped earlier (fewer turns) simply contribute nothing to the
+    later turn indices.
     """
-    ratios: list[float] = []
+    max_turns = max(
+        (len(c.get("history", [])) for c in run.get("cases", [])), default=0
+    )
+    totals = [0] * max_turns
     for case in run.get("cases", []):
-        history = case.get("history", [])
-        if not history:
-            continue
-        last = history[-1]
-        passed = sum(
-            1 for ly in last.get("layers", []) for x in ly.get("details", [])
-            if x["passed"]
-        )
-        executed = sum(
-            1 for ly in last.get("layers", []) for x in ly.get("details", [])
-        )
-        if executed:
-            ratios.append(passed / executed)
-    if not ratios:
-        return None
-    return sum(ratios) / len(ratios)
+        for i, turn in enumerate(case.get("history", [])):
+            totals[i] += sum(
+                1 for ly in turn.get("layers", []) for x in ly.get("details", [])
+                if x["passed"]
+            )
+    return totals
 
 
 def _turn_check_states(turn: dict) -> dict[str, str]:
@@ -3057,47 +3055,54 @@ def agent_models() -> str:
         return f'{"+" if d >= 0 else ""}{d:.0%}' if d else "0%"
 
     rows = []
-    prev_group = None  # (model, pack): deltas only within the same condition
+    prev_group = None  # (model, pack): delta only within the same condition
     prev_pass = None
-    prev_cov = None
     for r in runs:
         s = r.get("summary", {})
         model = r.get("model", "")
         pack = r.get("context_pack")
         pack_str = pack if pack else "—"
         pass_rate = s.get("pass_rate", 0)
-        cov = _run_check_coverage(r)
-        cov_str = "—" if cov is None else f"{cov:.0%}"
         rec = s.get("recovery_rate")
         rec_str = "—" if rec is None else f"{rec:.0%}"
         same = (model, pack) == prev_group
         pass_delta = _delta(pass_rate, prev_pass) if same else "—"
-        cov_delta = (
-            _delta(cov, prev_cov) if same and cov is not None else "—"
-        )
+        # Absolute checks-passed per turn: shows partial progress the binary
+        # pass rate hides. Net gain annotated when it moved across turns.
+        per_turn = _checks_passed_per_turn(r)
+        if per_turn:
+            seq = " → ".join(str(n) for n in per_turn)
+            net = per_turn[-1] - per_turn[0]
+            checks_str = (
+                f'{seq} <span class="desc">'
+                f'({"+" if net >= 0 else ""}{net})</span>'
+                if len(per_turn) > 1 else seq
+            )
+        else:
+            checks_str = "—"
         rows.append(
             f'<tr><td>{model}</td>'
             f'<td style="text-align:center">{pack_str}</td>'
             f'<td style="text-align:center">t{r.get("max_turns")}</td>'
             f'<td style="text-align:center">{pass_rate:.0%}</td>'
             f'<td style="text-align:center">{pass_delta}</td>'
-            f'<td style="text-align:center">{cov_str}</td>'
-            f'<td style="text-align:center">{cov_delta}</td>'
+            f'<td style="text-align:center">{checks_str}</td>'
             f'<td style="text-align:center">{rec_str}</td>'
             f'<td style="text-align:right">{s.get("total_tokens", 0):,}</td>'
             f'<td><a href="/agent/{quote(r["run_id"])}">heatmap</a></td></tr>'
         )
-        prev_group, prev_pass, prev_cov = (model, pack), pass_rate, cov
+        prev_group, prev_pass = (model, pack), pass_rate
 
     body = (
         "<h2>Agent — Per Model</h2>"
         '<p class="desc">One row per (model, pack, turns). Container runs '
-        "only; latest run kept per key. Δ columns compare to the lower turn "
-        "budget of the same model AND pack. Coverage = passed / executed "
-        "checks on each case's final turn (averaged); it does not penalise "
-        "early gating, so a case stopping at L0 can read high.</p>"
+        "only; latest run kept per key. Δ pass compares to the lower turn "
+        "budget of the same model AND pack. 'Checks passed' is the absolute "
+        "count of green checks summed over all cases at each turn (t1 → t2 → "
+        "t3); it rises when a case unlocks a gated layer — the partial "
+        "progress the binary pass rate hides.</p>"
         "<table><thead><tr><th>model</th><th>pack</th><th>turns</th>"
-        "<th>pass</th><th>Δ pass</th><th>coverage</th><th>Δ cov</th>"
+        "<th>pass</th><th>Δ pass</th><th>checks passed (per turn)</th>"
         "<th>recovery</th><th>tokens</th><th></th></tr></thead>"
         f"<tbody>{''.join(rows)}</tbody></table>"
     )
