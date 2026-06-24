@@ -2857,6 +2857,35 @@ def _latest_agent_run_per_key(runs: list[dict]) -> list[dict]:
     return kept
 
 
+def _run_check_coverage(run: dict) -> float | None:
+    """@brief Average final-turn check coverage across a run's cases.
+
+    Coverage of a case = passed / executed checks on its final turn, where
+    "executed" excludes checks gated out beyond the failed layer (those never
+    ran). This is the exact-from-data denominator; it does NOT penalise early
+    gating (a case stopping at L0 with 7/7 reads 100%). Returns None if no
+    checks were executed at all.
+    """
+    ratios: list[float] = []
+    for case in run.get("cases", []):
+        history = case.get("history", [])
+        if not history:
+            continue
+        last = history[-1]
+        passed = sum(
+            1 for ly in last.get("layers", []) for x in ly.get("details", [])
+            if x["passed"]
+        )
+        executed = sum(
+            1 for ly in last.get("layers", []) for x in ly.get("details", [])
+        )
+        if executed:
+            ratios.append(passed / executed)
+    if not ratios:
+        return None
+    return sum(ratios) / len(ratios)
+
+
 def _turn_check_states(turn: dict) -> dict[str, str]:
     """@brief Map check_name -> "pass" | "fail" | "skip" for one turn.
 
@@ -3006,39 +3035,52 @@ def agent_models() -> str:
     # Sort by model then turns so each model's budgets are adjacent.
     runs.sort(key=lambda r: (r.get("model", ""), r.get("max_turns", 0)))
 
+    def _delta(cur: float, prev: float | None) -> str:
+        if prev is None:
+            return "—"
+        d = cur - prev
+        return f'{"+" if d >= 0 else ""}{d:.0%}' if d else "0%"
+
     rows = []
     prev_model = None
     prev_pass = None
+    prev_cov = None
     for r in runs:
         s = r.get("summary", {})
         model = r.get("model", "")
         pass_rate = s.get("pass_rate", 0)
+        cov = _run_check_coverage(r)
+        cov_str = "—" if cov is None else f"{cov:.0%}"
         rec = s.get("recovery_rate")
         rec_str = "—" if rec is None else f"{rec:.0%}"
-        # Delta vs the same model's previous (lower) turn budget.
-        if model == prev_model and prev_pass is not None:
-            d = pass_rate - prev_pass
-            delta = f'{"+" if d >= 0 else ""}{d:.0%}' if d else "0%"
-        else:
-            delta = "—"
+        same = model == prev_model
+        pass_delta = _delta(pass_rate, prev_pass) if same else "—"
+        cov_delta = (
+            _delta(cov, prev_cov) if same and cov is not None else "—"
+        )
         rows.append(
             f'<tr><td>{model}</td>'
             f'<td style="text-align:center">t{r.get("max_turns")}</td>'
             f'<td style="text-align:center">{pass_rate:.0%}</td>'
-            f'<td style="text-align:center">{delta}</td>'
+            f'<td style="text-align:center">{pass_delta}</td>'
+            f'<td style="text-align:center">{cov_str}</td>'
+            f'<td style="text-align:center">{cov_delta}</td>'
             f'<td style="text-align:center">{rec_str}</td>'
             f'<td style="text-align:right">{s.get("total_tokens", 0):,}</td>'
             f'<td><a href="/agent/{quote(r["run_id"])}">heatmap</a></td></tr>'
         )
-        prev_model, prev_pass = model, pass_rate
+        prev_model, prev_pass, prev_cov = model, pass_rate, cov
 
     body = (
         "<h2>Agent — Per Model</h2>"
         '<p class="desc">One row per (model, turns). Container runs only; '
-        "latest run kept per key. Δ is pass-rate vs the same model's lower "
-        "turn budget.</p>"
+        "latest run kept per key. Δ columns compare to the same model's lower "
+        "turn budget. Coverage = passed / executed checks on each case's final "
+        "turn (averaged); it does not penalise early gating, so a case "
+        "stopping at L0 can read high.</p>"
         "<table><thead><tr><th>model</th><th>turns</th><th>pass</th>"
-        "<th>Δ pass</th><th>recovery</th><th>tokens</th><th></th></tr></thead>"
+        "<th>Δ pass</th><th>coverage</th><th>Δ cov</th>"
+        "<th>recovery</th><th>tokens</th><th></th></tr></thead>"
         f"<tbody>{''.join(rows)}</tbody></table>"
     )
     return _page("Agent — Per Model", body)
