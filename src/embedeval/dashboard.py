@@ -336,6 +336,7 @@ _NAV = """
   <a href="/report">Report</a>
   <a href="/cases">Cases</a>
   <a href="/stale">Stale</a>
+  <a href="/agent">Agent</a>
   <a href="/history">Run History</a>
   <a href="/docs/layers">Docs</a>
   <a href="/docs/models">Models</a>
@@ -2771,3 +2772,190 @@ Specs sourced from official model cards and provider documentation (verified 202
 """
     return _page("Docs — Models", body)
     return _page("Docs — Evaluation Layers", body)
+
+
+# ---------------------------------------------------------------------------
+# Agent runs: multi-turn check-coverage views
+# ---------------------------------------------------------------------------
+
+# Layer ids in evaluation order, with display names for the heatmap groups.
+_AGENT_LAYER_NAMES = {
+    0: "L0 static",
+    1: "L1 compile",
+    2: "L2 runtime",
+    3: "L3 heuristic",
+    4: "L4 test-quality",
+}
+
+
+def _load_agent_runs() -> list[dict]:
+    """@brief Load every agent_run.json under results/runs/, newest-first.
+
+    Separate from _load_runs (which reads <run>/details/*.json for single-shot
+    runs). Agent runs use their own agent_run.json format and are otherwise
+    invisible to the dashboard. The mock model is excluded as elsewhere.
+    """
+    from embedeval.agent_report import AGENT_RUN_FILENAME
+
+    runs_root = RESULTS_DIR / "runs"
+    if not runs_root.is_dir():
+        return []
+    runs = []
+    for run_dir in sorted(runs_root.iterdir(), reverse=True):
+        archive = run_dir / AGENT_RUN_FILENAME
+        if not archive.is_file():
+            continue
+        try:
+            data = json.loads(archive.read_text())
+        except Exception:
+            continue
+        if data.get("model") == "mock":
+            continue
+        data["run_id"] = run_dir.name
+        runs.append(data)
+    return runs
+
+
+def _turn_check_states(turn: dict) -> dict[str, str]:
+    """@brief Map check_name -> "pass" | "fail" | "skip" for one turn.
+
+    A check is "skip" (not evaluated) when its layer sits beyond the turn's
+    failed_at_layer: the pipeline stops at the first failing layer, so later
+    layers never ran. When the turn passed (failed_at_layer is None) every
+    layer ran, so there are no skips among present details.
+    """
+    failed_at = turn.get("failed_at_layer")
+    states: dict[str, str] = {}
+    for layer in turn.get("layers", []):
+        layer_num = layer.get("layer", 0)
+        gated = failed_at is not None and layer_num > failed_at
+        for det in layer.get("details", []):
+            name = det["check_name"]
+            if gated:
+                states[name] = "skip"
+            else:
+                states[name] = "pass" if det["passed"] else "fail"
+    return states
+
+
+def _agent_check_catalog(history: list[dict]) -> list[tuple[int, str]]:
+    """@brief Ordered (layer, check_name) list across all turns of a case.
+
+    Union of every check seen in any turn, kept in (layer, first-seen) order
+    so the heatmap rows are stable and grouped by layer.
+    """
+    seen: dict[str, int] = {}
+    order: list[tuple[int, str]] = []
+    for turn in history:
+        for layer in turn.get("layers", []):
+            layer_num = layer.get("layer", 0)
+            for det in layer.get("details", []):
+                name = det["check_name"]
+                if name not in seen:
+                    seen[name] = layer_num
+                    order.append((layer_num, name))
+    order.sort(key=lambda x: x[0])
+    return order
+
+
+def _agent_cell(state: str) -> str:
+    """Render one heatmap cell from a pass/fail/skip state."""
+    if state == "pass":
+        return '<td class="cell-pass">PASS</td>'
+    if state == "fail":
+        return '<td class="cell-fail">FAIL</td>'
+    if state == "skip":
+        return '<td class="cell-none">–</td>'
+    return '<td class="cell-none"></td>'  # check absent in this turn
+
+
+def _case_heatmap_html(case: dict) -> str:
+    """@brief Build the check x turn heatmap table for one case."""
+    history = case.get("history", [])
+    catalog = _agent_check_catalog(history)
+    per_turn = [_turn_check_states(t) for t in history]
+
+    header_cells = "".join(
+        f'<th>t{t.get("attempt", i + 1)}</th>' for i, t in enumerate(history)
+    )
+
+    rows = []
+    current_layer = None
+    for layer_num, name in catalog:
+        if layer_num != current_layer:
+            current_layer = layer_num
+            label = _AGENT_LAYER_NAMES.get(layer_num, f"L{layer_num}")
+            rows.append(
+                f'<tr><td colspan="{len(history) + 1}" '
+                f'style="background:#2d3748;font-weight:600">{label}</td></tr>'
+            )
+        cells = "".join(_agent_cell(states.get(name, "")) for states in per_turn)
+        rows.append(f"<tr><td>{name}</td>{cells}</tr>")
+
+    pat = case.get("passed_at_turn")
+    summary = (
+        f'turns used: {case.get("turns_used")} · '
+        f'{"passed at turn " + str(pat) if pat else "never passed"}'
+    )
+    badge = _pass_badge(bool(case.get("passed")))
+    return (
+        f'<h3>{case.get("case_id")} {badge}</h3>'
+        f'<p class="desc">{summary}</p>'
+        f'<table><thead><tr><th>check</th>{header_cells}</tr></thead>'
+        f"<tbody>{''.join(rows)}</tbody></table>"
+    )
+
+
+@app.get("/agent", response_class=HTMLResponse)
+def agent_index() -> str:
+    """Index of agent (multi-turn) runs."""
+    runs = _load_agent_runs()
+    if not runs:
+        body = (
+            "<h2>Agent Runs</h2><p>No agent runs found. Run "
+            "<code>embedeval agent &lt;model&gt; --max-turns N</code> first.</p>"
+        )
+        return _page("Agent Runs", body)
+
+    rows = []
+    for r in runs:
+        s = r.get("summary", {})
+        rec = s.get("recovery_rate")
+        rec_str = "—" if rec is None else f"{rec:.0%}"
+        rows.append(
+            f'<tr><td><a href="/agent/{quote(r["run_id"])}">{r["run_id"]}</a></td>'
+            f'<td>{r.get("model")}</td>'
+            f'<td style="text-align:center">{r.get("max_turns")}</td>'
+            f'<td style="text-align:center">{s.get("pass_rate", 0):.0%}</td>'
+            f'<td style="text-align:center">{rec_str}</td>'
+            f'<td style="text-align:right">{s.get("total_tokens", 0):,}</td></tr>'
+        )
+    body = (
+        "<h2>Agent Runs</h2>"
+        "<table><thead><tr><th>run</th><th>model</th><th>turns</th>"
+        "<th>pass</th><th>recovery</th><th>tokens</th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody></table>"
+    )
+    return _page("Agent Runs", body)
+
+
+@app.get("/agent/{run_id:path}", response_class=HTMLResponse)
+def agent_detail(run_id: str) -> str:
+    """Per-case check x turn heatmaps for one agent run."""
+    run = next((r for r in _load_agent_runs() if r["run_id"] == run_id), None)
+    if run is None:
+        raise HTTPException(status_code=404, detail="Agent run not found")
+
+    s = run.get("summary", {})
+    rec = s.get("recovery_rate")
+    rec_str = "—" if rec is None else f"{rec:.0%}"
+    header = (
+        f'<h2>{run["model"]} · t{run.get("max_turns")}</h2>'
+        f'<p class="desc">{run_id}<br>'
+        f'pass {s.get("pass_rate", 0):.0%} · recovery {rec_str} · '
+        f'{s.get("total_tokens", 0):,} tokens · '
+        f'resumed_from: {run.get("resumed_from") or "—"}</p>'
+        '<p class="desc">PASS / FAIL / – (layer not reached this turn)</p>'
+    )
+    heatmaps = "".join(_case_heatmap_html(c) for c in run.get("cases", []))
+    return _page(f"Agent — {run_id}", header + heatmaps)
