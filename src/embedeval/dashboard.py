@@ -2816,6 +2816,47 @@ def _load_agent_runs() -> list[dict]:
     return runs
 
 
+def _agent_run_used_build(run: dict) -> bool:
+    """@brief True if the run used the real L1 compile gate (container), not
+    the host soft-skip.
+
+    With EMBEDEVAL_ENABLE_BUILD the L1 layer runs arm-none-eabi-gcc and its
+    check is named ``nxp_gcc``. On the host without the toolchain the gate
+    soft-skips and the L1 check is ``nxp_available`` instead — those runs
+    can report a spurious L1/L2 pass and must be excluded from per-model
+    aggregation. We treat a run as host-mode if any L1 detail is named
+    ``nxp_available``.
+    """
+    for case in run.get("cases", []):
+        for turn in case.get("history", []):
+            for layer in turn.get("layers", []):
+                if layer.get("layer") != 1:
+                    continue
+                for det in layer.get("details", []):
+                    if det["check_name"] == "nxp_available":
+                        return False
+    return True
+
+
+def _latest_agent_run_per_key(runs: list[dict]) -> list[dict]:
+    """@brief Keep the most recent container run per (model, max_turns).
+
+    Runs are loaded newest-first, so the first one seen for each key wins.
+    Host-mode runs are dropped entirely.
+    """
+    seen: set[tuple[str, int]] = set()
+    kept: list[dict] = []
+    for run in runs:
+        if not _agent_run_used_build(run):
+            continue
+        key = (run.get("model", ""), run.get("max_turns", 0))
+        if key in seen:
+            continue
+        seen.add(key)
+        kept.append(run)
+    return kept
+
+
 def _turn_check_states(turn: dict) -> dict[str, str]:
     """@brief Map check_name -> "pass" | "fail" | "skip" for one turn.
 
@@ -2922,8 +2963,15 @@ def agent_index() -> str:
         s = r.get("summary", {})
         rec = s.get("recovery_rate")
         rec_str = "—" if rec is None else f"{rec:.0%}"
+        # Flag host-mode runs: they soft-skip the compile gate and can show a
+        # spurious pass, so they are excluded from the per-model view.
+        host_tag = (
+            "" if _agent_run_used_build(r)
+            else ' <span class="badge badge-skip">host (no build)</span>'
+        )
         rows.append(
-            f'<tr><td><a href="/agent/{quote(r["run_id"])}">{r["run_id"]}</a></td>'
+            f'<tr><td><a href="/agent/{quote(r["run_id"])}">{r["run_id"]}</a>'
+            f'{host_tag}</td>'
             f'<td>{r.get("model")}</td>'
             f'<td style="text-align:center">{r.get("max_turns")}</td>'
             f'<td style="text-align:center">{s.get("pass_rate", 0):.0%}</td>'
@@ -2932,11 +2980,68 @@ def agent_index() -> str:
         )
     body = (
         "<h2>Agent Runs</h2>"
+        '<p><a href="/agent/models">→ Per-model view</a> '
+        "(container runs only, latest per model+turns)</p>"
         "<table><thead><tr><th>run</th><th>model</th><th>turns</th>"
         "<th>pass</th><th>recovery</th><th>tokens</th></tr></thead>"
         f"<tbody>{''.join(rows)}</tbody></table>"
     )
     return _page("Agent Runs", body)
+
+
+@app.get("/agent/models", response_class=HTMLResponse)
+def agent_models() -> str:
+    """Per-model agent view: one row per (model, max_turns), container runs
+    only, latest run per key. Adjacent turn budgets of the same model show a
+    pass-rate delta so the gain from extra turns is visible."""
+    runs = _latest_agent_run_per_key(_load_agent_runs())
+    if not runs:
+        body = (
+            "<h2>Agent — Per Model</h2><p>No container agent runs found. "
+            "Run the agent inside the embedeval-nxp container so the L1/L3 "
+            "compile gates are active.</p>"
+        )
+        return _page("Agent — Per Model", body)
+
+    # Sort by model then turns so each model's budgets are adjacent.
+    runs.sort(key=lambda r: (r.get("model", ""), r.get("max_turns", 0)))
+
+    rows = []
+    prev_model = None
+    prev_pass = None
+    for r in runs:
+        s = r.get("summary", {})
+        model = r.get("model", "")
+        pass_rate = s.get("pass_rate", 0)
+        rec = s.get("recovery_rate")
+        rec_str = "—" if rec is None else f"{rec:.0%}"
+        # Delta vs the same model's previous (lower) turn budget.
+        if model == prev_model and prev_pass is not None:
+            d = pass_rate - prev_pass
+            delta = f'{"+" if d >= 0 else ""}{d:.0%}' if d else "0%"
+        else:
+            delta = "—"
+        rows.append(
+            f'<tr><td>{model}</td>'
+            f'<td style="text-align:center">t{r.get("max_turns")}</td>'
+            f'<td style="text-align:center">{pass_rate:.0%}</td>'
+            f'<td style="text-align:center">{delta}</td>'
+            f'<td style="text-align:center">{rec_str}</td>'
+            f'<td style="text-align:right">{s.get("total_tokens", 0):,}</td>'
+            f'<td><a href="/agent/{quote(r["run_id"])}">heatmap</a></td></tr>'
+        )
+        prev_model, prev_pass = model, pass_rate
+
+    body = (
+        "<h2>Agent — Per Model</h2>"
+        '<p class="desc">One row per (model, turns). Container runs only; '
+        "latest run kept per key. Δ is pass-rate vs the same model's lower "
+        "turn budget.</p>"
+        "<table><thead><tr><th>model</th><th>turns</th><th>pass</th>"
+        "<th>Δ pass</th><th>recovery</th><th>tokens</th><th></th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody></table>"
+    )
+    return _page("Agent — Per Model", body)
 
 
 @app.get("/agent/{run_id:path}", response_class=HTMLResponse)
