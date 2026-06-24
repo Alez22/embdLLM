@@ -27,6 +27,14 @@ MAX_PACK_CHARS = 32_000
 
 EXPERT_KEYWORD = "expert"
 
+# Bundled packs addressable by keyword instead of a file path. The file lives
+# next to this module under context_packs/. Add an entry to ship a new
+# keyword-addressable pack.
+_BUNDLED_PACKS = {
+    "expert": "expert.md",
+    "nxp": "nxp.md",
+}
+
 
 class ContextPackTooLargeError(ValueError):
     """Raised when a context pack exceeds MAX_PACK_CHARS."""
@@ -41,28 +49,31 @@ def resolve_context_pack(identifier: str) -> Path:
     """Resolve a CLI --context-pack value to an actual file path.
 
     Args:
-        identifier: Either a path to a context file, or the literal string
-            "expert" to use the bundled expert pack.
+        identifier: Either a path to a context file, or a bundled-pack
+            keyword ("expert", "nxp").
 
     Returns:
         Path to a readable .md/.txt file.
 
     Raises:
-        FileNotFoundError: identifier neither matches "expert" nor exists.
+        FileNotFoundError: identifier is neither a known keyword nor an
+            existing file.
     """
-    if identifier == EXPERT_KEYWORD:
-        path = bundled_expert_pack_path()
+    if identifier in _BUNDLED_PACKS:
+        path = Path(__file__).parent / "context_packs" / _BUNDLED_PACKS[identifier]
         if not path.is_file():
             raise FileNotFoundError(
-                f"Bundled expert pack missing at {path}. "
-                f"Reinstall embedeval or run scripts/build_expert_pack.py."
+                f"Bundled pack '{identifier}' missing at {path}. "
+                f"Reinstall embedeval."
             )
         return path
 
     path = Path(identifier).expanduser()
     if not path.is_file():
+        keywords = "', '".join(_BUNDLED_PACKS)
         raise FileNotFoundError(
-            f"Context pack file not found: {path} (use 'expert' for the bundled pack)"
+            f"Context pack file not found: {path} "
+            f"(or use a bundled keyword: '{keywords}')"
         )
     return path
 

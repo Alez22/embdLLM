@@ -50,7 +50,7 @@ def agent(
             "--context-pack",
             help=(
                 "Run-wide context prepended to every turn. Path to a file, "
-                "or 'expert' for the bundled pack. "
+                "or a bundled keyword ('expert', 'nxp'). "
                 "See docs/CONTEXT-QUALITY-MODE.md."
             ),
         ),
