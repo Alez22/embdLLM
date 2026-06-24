@@ -2874,19 +2874,28 @@ def _checks_passed_per_turn(run: dict) -> list[int]:
     denominator available from the data (L2/L3/L4 checks are generated at
     runtime, not declared in the case).
 
-    Cases that stopped earlier (fewer turns) simply contribute nothing to the
-    later turn indices.
+    A case that stopped earlier (it passed, or was copied from a --resume so
+    it has fewer turns) carries its final count forward into the later turn
+    indices. Without this carry-forward a resumed case that passed at t3 would
+    silently drop out of the t4/t5 sums, faking a regression.
     """
     max_turns = max(
         (len(c.get("history", [])) for c in run.get("cases", [])), default=0
     )
     totals = [0] * max_turns
     for case in run.get("cases", []):
-        for i, turn in enumerate(case.get("history", [])):
-            totals[i] += sum(
-                1 for ly in turn.get("layers", []) for x in ly.get("details", [])
-                if x["passed"]
-            )
+        history = case.get("history", [])
+        if not history:
+            continue
+        last_count = 0
+        for i in range(max_turns):
+            if i < len(history):
+                last_count = sum(
+                    1 for ly in history[i].get("layers", [])
+                    for x in ly.get("details", []) if x["passed"]
+                )
+            # else: carry the case's final count forward to this turn index.
+            totals[i] += last_count
     return totals
 
 
