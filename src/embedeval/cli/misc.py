@@ -92,6 +92,8 @@ def agent(
     # Agent mode does not write to a tracker, so no hash-mismatch
     # enforcement is needed; just resolve and load the pack content.
     context_pack_text: str | None = None
+    context_pack_name: str | None = None
+    context_pack_hash: str | None = None
     if context_pack is not None:
         from embedeval.context_pack import resolve_context_pack
 
@@ -107,6 +109,14 @@ def agent(
                 err=True,
             )
             raise typer.Exit(code=1)
+        # Record pack identity (name + short content hash) so the dashboard
+        # can separate with-pack from without-pack runs.
+        import hashlib
+
+        context_pack_name = pack_path.name
+        context_pack_hash = hashlib.sha256(
+            context_pack_text.encode("utf-8")
+        ).hexdigest()[:12]
         typer.echo(f"Context pack: {pack_path.name} ({len(context_pack_text)} chars)")
 
     cases = discover_cases(cases_dir)
@@ -193,6 +203,8 @@ def agent(
         temperature=temperature,
         results=results,
         resumed_from=resumed_from,
+        context_pack_name=context_pack_name,
+        context_pack_hash=context_pack_hash,
     )
 
     typer.echo(f"\nAgent results: {passed}/{total} passed ({pass_rate:.1%})")

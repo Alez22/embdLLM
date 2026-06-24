@@ -123,12 +123,19 @@ def write_agent_run(
     temperature: float,
     results: list[AgentResult],
     resumed_from: str | None = None,
+    context_pack_name: str | None = None,
+    context_pack_hash: str | None = None,
 ) -> Path:
     """@brief Write agent_run.json into the run directory.
 
     @param run_dir Target run directory (already created).
     @param resumed_from Path of the run this one continued, or None for a
         fresh run. Marks runs that share their initial turns.
+    @param context_pack_name Identity of the run-wide context pack (file name
+        or keyword), or None if no pack was used. Lets the dashboard treat
+        with-pack vs without-pack as distinct experimental conditions.
+    @param context_pack_hash Short hash of the pack text, distinguishing two
+        different versions of the same file. None when no pack was used.
     @return Path to the written agent_run.json.
     """
     payload = {
@@ -137,6 +144,8 @@ def write_agent_run(
         "temperature": temperature,
         "timestamp": datetime.now().isoformat(timespec="seconds"),
         "resumed_from": resumed_from,
+        "context_pack": context_pack_name,
+        "context_pack_hash": context_pack_hash,
         "cases": [_serialize_case(r) for r in results],
         "summary": _build_summary(results),
     }
