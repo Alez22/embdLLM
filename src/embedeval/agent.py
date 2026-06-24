@@ -61,15 +61,24 @@ def evaluate_agent(
     context: list[str] = list(initial_context or [])
     case_id = case_dir.name
     history: list[EvalResult] = list(prior_history or [])
+    # The most recent generated source, fed back so the model patches its own
+    # code instead of regenerating from scratch each turn. Seeded from the
+    # last prior-history turn when resuming.
+    last_code: str | None = (
+        history[-1].generated_code if history else None
+    )
 
     for turn in range(start_turn, max_turns + 1):
-        # Build prompt with accumulated error context from prior turns
-        if context:
+        # Build prompt: show the model its last attempt (so errors that
+        # reference line numbers are actionable) plus the accumulated error
+        # history, then ask for a fix.
+        if context and last_code is not None:
             full_prompt = (
                 f"{prompt}\n\n"
+                f"Your previous attempt:\n```c\n{last_code}\n```\n\n"
                 f"Previous attempts and errors:\n"
                 + "\n".join(context)
-                + "\n\nPlease fix all issues and output ONLY"
+                + "\n\nFix the code above and output ONLY"
                 " the complete C source file."
             )
         else:
@@ -83,6 +92,7 @@ def evaluate_agent(
             timeout=timeout,
         )
         generated_code = llm_response.generated_code
+        last_code = generated_code
 
         # Evaluate
         result = evaluate(

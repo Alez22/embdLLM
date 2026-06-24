@@ -162,3 +162,40 @@ def test_agent_run_archive_round_trip(tmp_path: Path) -> None:
     )["summary"]
     assert summary["recovery_rate"] == 0.5
     assert summary["passed_at_turn_hist"] == {"1": 1, "2": 1}
+
+
+def test_turn2_prompt_includes_previous_code(tmp_path: Path) -> None:
+    """Regression: the model must see its own previous code in the next
+    turn's prompt, so line-referencing compile errors are actionable and it
+    patches instead of regenerating from scratch."""
+    case_dir = tmp_path / "fake-case-001"
+    case_dir.mkdir()
+
+    def _resp(code: str) -> LLMResponse:
+        return LLMResponse(
+            model="mock",
+            generated_code=code,
+            token_usage=TokenUsage(input_tokens=1, output_tokens=1, total_tokens=2),
+            cost_usd=0.0,
+            duration_seconds=0.0,
+        )
+
+    turn1_code = "int main(void){ BROKEN_MARKER_123; }"
+    with patch("embedeval.agent.call_model") as mock_call:
+        mock_call.side_effect = [_resp(turn1_code), _resp("int main(void){}")]
+        with patch("embedeval.agent.evaluate") as mock_eval:
+            mock_eval.side_effect = [
+                _eval_result("fake-case-001", 1, passed=False),
+                _eval_result("fake-case-001", 2, passed=True),
+            ]
+            evaluate_agent(
+                case_dir=case_dir,
+                model="mock",
+                prompt="task body",
+                max_turns=2,
+            )
+
+    # Second call is turn 2: its prompt must embed turn 1's code.
+    turn2_prompt = mock_call.call_args_list[1].kwargs["prompt"]
+    assert turn1_code in turn2_prompt
+    assert "Your previous attempt" in turn2_prompt
