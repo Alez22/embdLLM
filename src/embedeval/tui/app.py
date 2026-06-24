@@ -255,29 +255,47 @@ class EmbedEvalTUI(App):
             cases_arg = cases_path
             output_arg = str(tui_config.RESULTS_DIR)
 
-        cmd = [
-            "uv", "run", "embedeval", "run",
-            "--model", config["model"],
-            "--cases", cases_arg,
-            "--output-dir", output_arg,
-            "--attempts", str(config["attempts"]),
-        ]
-
-        if selected:
-            cmd += ["--case-ids", ",".join(selected)]
-        else:
-            # No explicit case selection: apply SDK/category filters if set.
+        mode = config.get("mode", "run")
+        if mode == "agent":
+            # Agent mode: model is a positional arg, turns replace attempts,
+            # and only SDK/category filters apply (no --case-ids support).
+            cmd = [
+                "uv", "run", "embedeval", "agent",
+                config["model"],
+                "--cases", cases_arg,
+                "--output-dir", output_arg,
+                "--max-turns", str(config["max_turns"]),
+            ]
             if config.get("sdk_filter", "all") != "all":
                 cmd += ["--sdk", config["sdk_filter"]]
             if config.get("cat_filter", "all") != "all":
                 cmd += ["--category", config["cat_filter"]]
+            if config.get("resume_from"):
+                cmd += ["--resume", config["resume_from"]]
+        else:
+            cmd = [
+                "uv", "run", "embedeval", "run",
+                "--model", config["model"],
+                "--cases", cases_arg,
+                "--output-dir", output_arg,
+                "--attempts", str(config["attempts"]),
+            ]
+
+            if selected:
+                cmd += ["--case-ids", ",".join(selected)]
+            else:
+                # No explicit case selection: apply SDK/category filters if set.
+                if config.get("sdk_filter", "all") != "all":
+                    cmd += ["--sdk", config["sdk_filter"]]
+                if config.get("cat_filter", "all") != "all":
+                    cmd += ["--category", config["cat_filter"]]
 
         temperature = config.get("temperature", 0.0)
         if temperature != 0.0:
             cmd += ["--temperature", str(temperature)]
-        if config["force"]:
+        if mode == "run" and config["force"]:
             cmd.append("--force")
-        if config["no_think"]:
+        if mode == "run" and config["no_think"]:
             cmd.append("--no-think")
         # Verbose so runner emits INFO lines ("Case X attempt N: PASS/FAIL")
         # which the TUI parses to drive the progress bar.
@@ -317,7 +335,10 @@ class EmbedEvalTUI(App):
                 if (sdk_f == "all" or c.get("sdk") == sdk_f)
                 and (cat_f == "all" or c.get("category") == cat_f)
             )
-        self._run_total = n_cases * config["attempts"]
+        # Agent mode runs up to max_turns LLM calls per case; run mode does
+        # `attempts` samples per case. Both are upper bounds for the bar.
+        per_case = config["max_turns"] if mode == "agent" else config["attempts"]
+        self._run_total = n_cases * per_case
         self._run_done = 0
         self._run_pass = 0
         self._run_fail = 0
