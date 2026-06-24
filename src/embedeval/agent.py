@@ -29,6 +29,9 @@ def evaluate_agent(
     max_turns: int = 5,
     timeout: float = 300.0,
     context_pack: str | None = None,
+    start_turn: int = 1,
+    initial_context: list[str] | None = None,
+    prior_history: list[EvalResult] | None = None,
 ) -> AgentResult:
     """Evaluate a case using multi-turn agent with error feedback.
 
@@ -45,15 +48,21 @@ def evaluate_agent(
         context_pack: Optional run-wide context (e.g. team CLAUDE.md or
             expert pack content) prepended to every LLM call across all
             turns. See docs/CONTEXT-QUALITY-MODE.md.
+        start_turn: First turn number to execute. Used by --resume to
+            continue a previous agent run from turn N+1 instead of 1.
+        initial_context: Accumulated error context from prior turns, used
+            together with start_turn when resuming.
+        prior_history: EvalResults from prior turns to prepend to the
+            returned history when resuming.
 
     Returns:
         AgentResult with pass/fail status, turns used, and per-turn history.
     """
-    context: list[str] = []
+    context: list[str] = list(initial_context or [])
     case_id = case_dir.name
-    history: list[EvalResult] = []
+    history: list[EvalResult] = list(prior_history or [])
 
-    for turn in range(1, max_turns + 1):
+    for turn in range(start_turn, max_turns + 1):
         # Build prompt with accumulated error context from prior turns
         if context:
             full_prompt = (
