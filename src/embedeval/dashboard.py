@@ -2839,17 +2839,23 @@ def _agent_run_used_build(run: dict) -> bool:
 
 
 def _latest_agent_run_per_key(runs: list[dict]) -> list[dict]:
-    """@brief Keep the most recent container run per (model, max_turns).
+    """@brief Keep the most recent container run per (model, turns, pack).
 
-    Runs are loaded newest-first, so the first one seen for each key wins.
+    The context pack is part of the key: a with-pack run and a without-pack
+    run are distinct experimental conditions and must not overwrite each
+    other. Runs are loaded newest-first, so the first one seen per key wins.
     Host-mode runs are dropped entirely.
     """
-    seen: set[tuple[str, int]] = set()
+    seen: set[tuple[str, int, str | None]] = set()
     kept: list[dict] = []
     for run in runs:
         if not _agent_run_used_build(run):
             continue
-        key = (run.get("model", ""), run.get("max_turns", 0))
+        key = (
+            run.get("model", ""),
+            run.get("max_turns", 0),
+            run.get("context_pack"),
+        )
         if key in seen:
             continue
         seen.add(key)
@@ -2998,10 +3004,12 @@ def agent_index() -> str:
             "" if _agent_run_used_build(r)
             else ' <span class="badge badge-skip">host (no build)</span>'
         )
+        pack = r.get("context_pack")
         rows.append(
             f'<tr><td><a href="/agent/{quote(r["run_id"])}">{r["run_id"]}</a>'
             f'{host_tag}</td>'
             f'<td>{r.get("model")}</td>'
+            f'<td style="text-align:center">{pack if pack else "—"}</td>'
             f'<td style="text-align:center">{r.get("max_turns")}</td>'
             f'<td style="text-align:center">{s.get("pass_rate", 0):.0%}</td>'
             f'<td style="text-align:center">{rec_str}</td>'
@@ -3010,8 +3018,8 @@ def agent_index() -> str:
     body = (
         "<h2>Agent Runs</h2>"
         '<p><a href="/agent/models">→ Per-model view</a> '
-        "(container runs only, latest per model+turns)</p>"
-        "<table><thead><tr><th>run</th><th>model</th><th>turns</th>"
+        "(container runs only, latest per model+pack+turns)</p>"
+        "<table><thead><tr><th>run</th><th>model</th><th>pack</th><th>turns</th>"
         "<th>pass</th><th>recovery</th><th>tokens</th></tr></thead>"
         f"<tbody>{''.join(rows)}</tbody></table>"
     )
@@ -3032,8 +3040,15 @@ def agent_models() -> str:
         )
         return _page("Agent — Per Model", body)
 
-    # Sort by model then turns so each model's budgets are adjacent.
-    runs.sort(key=lambda r: (r.get("model", ""), r.get("max_turns", 0)))
+    # Sort by model, then pack, then turns so each (model, pack) group's turn
+    # budgets are adjacent — deltas compare like-for-like conditions.
+    runs.sort(
+        key=lambda r: (
+            r.get("model", ""),
+            r.get("context_pack") or "",
+            r.get("max_turns", 0),
+        )
+    )
 
     def _delta(cur: float, prev: float | None) -> str:
         if prev is None:
@@ -3042,24 +3057,27 @@ def agent_models() -> str:
         return f'{"+" if d >= 0 else ""}{d:.0%}' if d else "0%"
 
     rows = []
-    prev_model = None
+    prev_group = None  # (model, pack): deltas only within the same condition
     prev_pass = None
     prev_cov = None
     for r in runs:
         s = r.get("summary", {})
         model = r.get("model", "")
+        pack = r.get("context_pack")
+        pack_str = pack if pack else "—"
         pass_rate = s.get("pass_rate", 0)
         cov = _run_check_coverage(r)
         cov_str = "—" if cov is None else f"{cov:.0%}"
         rec = s.get("recovery_rate")
         rec_str = "—" if rec is None else f"{rec:.0%}"
-        same = model == prev_model
+        same = (model, pack) == prev_group
         pass_delta = _delta(pass_rate, prev_pass) if same else "—"
         cov_delta = (
             _delta(cov, prev_cov) if same and cov is not None else "—"
         )
         rows.append(
             f'<tr><td>{model}</td>'
+            f'<td style="text-align:center">{pack_str}</td>'
             f'<td style="text-align:center">t{r.get("max_turns")}</td>'
             f'<td style="text-align:center">{pass_rate:.0%}</td>'
             f'<td style="text-align:center">{pass_delta}</td>'
@@ -3069,17 +3087,17 @@ def agent_models() -> str:
             f'<td style="text-align:right">{s.get("total_tokens", 0):,}</td>'
             f'<td><a href="/agent/{quote(r["run_id"])}">heatmap</a></td></tr>'
         )
-        prev_model, prev_pass, prev_cov = model, pass_rate, cov
+        prev_group, prev_pass, prev_cov = (model, pack), pass_rate, cov
 
     body = (
         "<h2>Agent — Per Model</h2>"
-        '<p class="desc">One row per (model, turns). Container runs only; '
-        "latest run kept per key. Δ columns compare to the same model's lower "
-        "turn budget. Coverage = passed / executed checks on each case's final "
-        "turn (averaged); it does not penalise early gating, so a case "
-        "stopping at L0 can read high.</p>"
-        "<table><thead><tr><th>model</th><th>turns</th><th>pass</th>"
-        "<th>Δ pass</th><th>coverage</th><th>Δ cov</th>"
+        '<p class="desc">One row per (model, pack, turns). Container runs '
+        "only; latest run kept per key. Δ columns compare to the lower turn "
+        "budget of the same model AND pack. Coverage = passed / executed "
+        "checks on each case's final turn (averaged); it does not penalise "
+        "early gating, so a case stopping at L0 can read high.</p>"
+        "<table><thead><tr><th>model</th><th>pack</th><th>turns</th>"
+        "<th>pass</th><th>Δ pass</th><th>coverage</th><th>Δ cov</th>"
         "<th>recovery</th><th>tokens</th><th></th></tr></thead>"
         f"<tbody>{''.join(rows)}</tbody></table>"
     )
