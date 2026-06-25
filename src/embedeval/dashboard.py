@@ -273,6 +273,10 @@ h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: #a0aec0
 .container { padding: 1.5rem; max-width: 1600px; margin: 0 auto; }
 .card { background: #1a1d2e; border: 1px solid #2d3748;
         border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem; }
+/* Agent per-case blocks: extra gap + a left accent so one case clearly
+   ends before the next begins in the dense heatmap list. */
+.case-block { margin-bottom: 1.75rem; border-left: 3px solid #4a5568; }
+.case-block h3 { margin-bottom: 0.25rem; }
 .badge { display: inline-block; padding: 2px 8px; border-radius: 4px;
          font-size: 0.75rem; font-weight: 600; }
 .badge-pass { background: #22543d; color: #68d391; }
@@ -2787,6 +2791,9 @@ _AGENT_LAYER_NAMES = {
     4: "L4 test-quality",
 }
 
+# L4 is a benchmark-quality audit, not a model score; hidden from the agent view.
+_AGENT_L4_LAYER = 4
+
 
 def _load_agent_runs() -> list[dict]:
     """@brief Load every agent_run.json under results/runs/, newest-first.
@@ -2926,12 +2933,19 @@ def _agent_check_catalog(history: list[dict]) -> list[tuple[int, str]]:
 
     Union of every check seen in any turn, kept in (layer, first-seen) order
     so the heatmap rows are stable and grouped by layer.
+
+    Layer 4 (test_quality_proof) is excluded: it is a benchmark-quality audit
+    of the checks themselves, not a measure of the model's output, and never
+    affects the case pass/fail. Showing it in the per-model agent view is
+    misleading, so it is hidden here.
     """
     seen: dict[str, int] = {}
     order: list[tuple[int, str]] = []
     for turn in history:
         for layer in turn.get("layers", []):
             layer_num = layer.get("layer", 0)
+            if layer_num == _AGENT_L4_LAYER:
+                continue
             for det in layer.get("details", []):
                 name = det["check_name"]
                 if name not in seen:
@@ -2950,6 +2964,57 @@ def _agent_cell(state: str) -> str:
     if state == "skip":
         return '<td class="cell-none">–</td>'
     return '<td class="cell-none"></td>'  # check absent in this turn
+
+
+def _case_checks_passed_per_turn(case: dict) -> list[int]:
+    """@brief Count of green checks at each turn of one case (L4 excluded).
+
+    Mirrors the run-level _checks_passed_per_turn metric but per case: the
+    absolute number of passing checks each turn. A rising count is the honest
+    partial-progress signal across turns (unlocking a gated layer adds newly
+    evaluable checks). L4 (test_quality_proof) is excluded to match the agent
+    view, which hides it as a benchmark audit rather than a model score.
+    """
+    counts: list[int] = []
+    for turn in case.get("history", []):
+        counts.append(sum(
+            1
+            for ly in turn.get("layers", [])
+            if ly.get("layer", 0) != _AGENT_L4_LAYER
+            for x in ly.get("details", [])
+            if x["passed"]
+        ))
+    return counts
+
+
+def _case_progress_sparkline(case: dict) -> str:
+    """@brief Inline bar chart of checks-passed per turn for one case.
+
+    Bars are scaled to the case's own max so short cases stay readable; the
+    numeric counts are shown beneath so the absolute progression is explicit.
+    """
+    counts = _case_checks_passed_per_turn(case)
+    if not counts:
+        return ""
+    peak = max(counts) or 1
+    bars = []
+    for i, n in enumerate(counts):
+        h = max(2, round(n / peak * 28))  # px, min 2 so a 0 is still visible
+        bars.append(
+            f'<div title="t{i + 1}: {n} checks passed" '
+            f'style="display:flex;flex-direction:column;align-items:center;'
+            f'justify-content:flex-end">'
+            f'<div style="width:18px;height:{h}px;background:#4299e1;'
+            f'border-radius:2px 2px 0 0"></div>'
+            f'<span style="font-size:0.7rem;color:#a0aec0">{n}</span></div>'
+        )
+    return (
+        '<div style="display:flex;gap:6px;align-items:flex-end;height:46px;'
+        'margin:0.25rem 0 0.75rem" '
+        'title="checks passed per turn (L4 excluded)">'
+        + "".join(bars)
+        + "</div>"
+    )
 
 
 def _case_heatmap_html(case: dict) -> str:
@@ -2981,11 +3046,18 @@ def _case_heatmap_html(case: dict) -> str:
         f'{"passed at turn " + str(pat) if pat else "never passed"}'
     )
     badge = _pass_badge(bool(case.get("passed")))
+    sparkline = _case_progress_sparkline(case)
+    # Wrap each case in a .card so adjacent cases are visually separated:
+    # without it the previous case's last layer row runs straight into the
+    # next case's heading.
     return (
+        '<div class="card case-block">'
         f'<h3>{case.get("case_id")} {badge}</h3>'
         f'<p class="desc">{summary}</p>'
+        f"{sparkline}"
         f'<table><thead><tr><th>check</th>{header_cells}</tr></thead>'
         f"<tbody>{''.join(rows)}</tbody></table>"
+        "</div>"
     )
 
 
