@@ -36,16 +36,6 @@ NEGATIVES = [
         "must_fail": ["nvic_interrupt_enabled"],
     },
     {
-        "name": "nonvolatile_counter",
-        "description": "volatile dropped from ISR-shared counter — compiler may cache it in a register",
-        # NOTE: must_fail references 'isr_shared_variable_volatile', which this
-        # case intentionally does NOT define (see behavior.py). This mutation is
-        # therefore dangling and always reports as missed — flagged for review.
-        # Mutation kept regex-based for consistency (strips all volatile).
-        "mutation": lambda code: re.sub(r"\bvolatile\s+", "", code),
-        "must_fail": ["isr_shared_variable_volatile"],
-    },
-    {
         "name": "rising_edge",
         "description": "Rising edge instead of falling — fires on release, not press",
         "mutation": lambda code: code.replace(
