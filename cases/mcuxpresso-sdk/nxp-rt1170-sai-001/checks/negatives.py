@@ -7,6 +7,8 @@ Each mutation seeds a realistic RT1170 audio bug into the reference
 and asserts the corresponding L0/L3 check detects it.
 """
 
+import re
+
 # Codec power-up call in main, including its error check.
 _CODEC_CALL_BLOCK = (
     "    /* Codec must be configured before streaming starts: it has to lock to\n"
@@ -108,9 +110,13 @@ NEGATIVES = [
     {
         "name": "preshifted_codec_address",
         "description": "Codec address pre-shifted (0x18 << 1) — SDK shifts internally, codec never ACKs",
-        "mutation": lambda code: code.replace(
-            "#define CODEC_ADDR        0x18U",
-            "#define CODEC_ADDR        (0x18U << 1)",
+        # Wrap the codec address literal in the pre-shift expression the check
+        # flags (0x18 << 1), wherever it appears — in a #define under any macro
+        # name, or inline. re.sub does not re-scan its replacement, so the new
+        # 0x18 is not matched again. The literal whole-line replace assumed the
+        # exact name CODEC_ADDR and spacing.
+        "mutation": lambda code: re.sub(
+            r"\b0x18[Uu]?\b", "(0x18U << 1)", code
         ),
         "must_fail": ["codec_address_not_preshifted"],
     },
@@ -134,11 +140,15 @@ NEGATIVES = [
     {
         "name": "esp_i2s_api",
         "description": "ESP-IDF i2s_write used instead of MCUXpresso SAI API",
-        "mutation": lambda code: code.replace(
-            "        SAI_WriteBlocking(SAI_BASE, 0U, BIT_WIDTH,\n"
-            "                          (uint8_t *)s_audio_buf, sizeof(s_audio_buf));",
-            "        esp_i2s_write(I2S_NUM_0, s_audio_buf, sizeof(s_audio_buf),"
+        # Replace any SAI write call (WriteBlocking or register-level
+        # WriteData) with the ESP-IDF i2s_write: removes the NXP SAI write
+        # (fails sai_write_api_used) and injects esp_ (fails hallucination).
+        "mutation": lambda code: re.sub(
+            r"\bSAI_Write\w*\s*\([^;]*\);",
+            "esp_i2s_write(I2S_NUM_0, s_audio_buf, sizeof(s_audio_buf),"
             " &written, portMAX_DELAY);",
+            code,
+            count=1,
         ),
         "must_fail": ["sai_write_api_used", "no_cross_platform_hallucination"],
     },

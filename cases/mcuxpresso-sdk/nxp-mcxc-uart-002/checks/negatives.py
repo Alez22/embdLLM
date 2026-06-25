@@ -7,6 +7,8 @@ Each mutation seeds a realistic MCXC144 bare-metal bug into the reference
 and asserts the corresponding L0/L3 check detects it.
 """
 
+import re
+
 _ISR_FLAG_CHECK_BLOCK = (
     "    if (UART_GetStatusFlags(UART_BASE) & kUART_RxDataRegFullFlag) {\n"
     "        ring_push(UART_ReadByte(UART_BASE));\n"
@@ -41,19 +43,20 @@ NEGATIVES = [
     {
         "name": "buffer_not_volatile",
         "description": "volatile dropped from ring buffer array shared between ISR and main",
-        "mutation": lambda code: code.replace(
-            "static volatile uint8_t  s_rx_buf[RX_BUF_SIZE];",
-            "static uint8_t s_rx_buf[RX_BUF_SIZE];",
-        ),
+        # Strip every 'volatile' qualifier regardless of type/name/spacing. The
+        # literal replace assumed the exact declaration (type + buffer name +
+        # double space) and missed nearly every model. ring_buffer_volatile
+        # matches a volatile uint8_t array.
+        "mutation": lambda code: re.sub(r"\bvolatile\s+", "", code),
         "must_fail": ["ring_buffer_volatile"],
     },
     {
         "name": "tail_not_volatile",
         "description": "volatile dropped from tail index — main may spin on a stale copy",
-        "mutation": lambda code: code.replace(
-            "static volatile uint32_t s_rx_tail = 0U;",
-            "static uint32_t s_rx_tail = 0U;",
-        ),
+        # Strip every 'volatile' qualifier so fewer than 2 volatile indices
+        # remain. The literal replace assumed the exact name s_rx_tail and
+        # missed models using head/tail/write_idx/etc. spellings.
+        "mutation": lambda code: re.sub(r"\bvolatile\s+", "", code),
         "must_fail": ["ring_buffer_indices_volatile"],
     },
     {
@@ -80,9 +83,13 @@ NEGATIVES = [
     {
         "name": "zephyr_msgq",
         "description": "Zephyr k_msgq API used instead of bare-metal ring buffer drain",
-        "mutation": lambda code: code.replace(
-            "UART_WriteBlocking(UART_BASE, line_buf, line_len);",
+        # Inject the Zephyr k_msgq API by replacing any UART write call,
+        # regardless of base/args.
+        "mutation": lambda code: re.sub(
+            r"\bUART_Write\w*\s*\([^;]*\);",
             "k_msgq_put(&uart_msgq, line_buf, K_NO_WAIT);",
+            code,
+            count=1,
         ),
         "must_fail": ["no_cross_platform_hallucination"],
     },

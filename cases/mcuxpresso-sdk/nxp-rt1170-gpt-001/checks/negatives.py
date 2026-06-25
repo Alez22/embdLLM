@@ -7,6 +7,8 @@ Each mutation seeds a realistic RT1170 bare-metal bug into the reference
 and asserts the corresponding L0/L3 check detects it.
 """
 
+import re
+
 
 def _remove_lines(code: str, pattern: str) -> str:
     """Remove all lines containing *pattern*."""
@@ -57,9 +59,10 @@ NEGATIVES = [
     {
         "name": "counter_not_volatile",
         "description": "volatile dropped from tick counter — main may read a stale cached copy",
-        "mutation": lambda code: code.replace(
-            "static volatile uint32_t", "static uint32_t"
-        ),
+        # Strip every 'volatile' qualifier regardless of type. The literal
+        # "static volatile uint32_t" missed models that used a different type;
+        # volatile_tick_counter matches any 'volatile <type>'.
+        "mutation": lambda code: re.sub(r"\bvolatile\s+", "", code),
         "must_fail": ["volatile_tick_counter"],
     },
     {
@@ -79,8 +82,14 @@ NEGATIVES = [
     {
         "name": "freertos_delay",
         "description": "FreeRTOS vTaskDelay used in a bare-metal main loop",
-        "mutation": lambda code: code.replace(
-            '__asm volatile("wfi");', "vTaskDelay(1);"
+        # Inject FreeRTOS vTaskDelay in place of whichever wait-for-interrupt
+        # idle the model used: __WFI() or an inline-asm wfi. Most models write
+        # __WFI(), which the single literal replace missed.
+        "mutation": lambda code: re.sub(
+            r'\b__WFI\s*\(\s*\)\s*;|__asm\b[^;]*\bwfi\b[^;]*;',
+            "vTaskDelay(1);",
+            code,
+            count=1,
         ),
         "must_fail": ["no_cross_platform_hallucination"],
     },

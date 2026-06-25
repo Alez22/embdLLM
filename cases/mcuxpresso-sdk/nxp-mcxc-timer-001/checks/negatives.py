@@ -7,6 +7,8 @@ Each mutation seeds a realistic MCXC144 bare-metal bug into the reference
 and asserts the corresponding L0/L3 check detects it.
 """
 
+import re
+
 _PERIOD_BLOCK = (
     "    PIT_SetTimerPeriod(PIT, PIT_CH,\n"
     "        USEC_TO_COUNT(PIT_PERIOD_MS * 1000U, BUS_CLK_HZ));\n"
@@ -40,10 +42,11 @@ NEGATIVES = [
     {
         "name": "nonvolatile_counter",
         "description": "volatile dropped from ISR-shared tick counter — main may spin on a stale copy",
-        "mutation": lambda code: code.replace(
-            "static volatile uint32_t g_tick_count",
-            "static uint32_t g_tick_count",
-        ),
+        # Strip every 'volatile' qualifier regardless of type/name. The literal
+        # replace assumed the exact type+name (uint32_t g_tick_count) and missed
+        # models that used a different type or counter name. isr_counter_volatile
+        # matches any 'volatile <type>', so all must go.
+        "mutation": lambda code: re.sub(r"\bvolatile\s+", "", code),
         "must_fail": ["isr_counter_volatile"],
     },
     {
@@ -79,9 +82,12 @@ NEGATIVES = [
     {
         "name": "stm32_timer_init",
         "description": "STM32 HAL_TIM_Base_Init used instead of MCUXpresso PIT API",
-        "mutation": lambda code: code.replace(
-            "PIT_Init(PIT, &pit_cfg);",
+        # Replace any PIT_Init(...) with the STM32 HAL timer init, regardless
+        # of base/args.
+        "mutation": lambda code: re.sub(
+            r"\bPIT_Init\s*\([^;]*\);",
             "HAL_TIM_Base_Init(&htim2);",
+            code,
         ),
         "must_fail": ["pit_init_called", "no_cross_platform_hallucination"],
     },

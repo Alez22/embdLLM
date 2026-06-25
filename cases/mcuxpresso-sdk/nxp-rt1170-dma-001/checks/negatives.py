@@ -9,6 +9,8 @@ the important ones: they are exactly the bugs that work on an M0+/M4
 without cache and corrupt data on the M7.
 """
 
+import re
+
 
 def _remove_lines(code: str, pattern: str) -> str:
     """Remove all lines containing *pattern*."""
@@ -91,9 +93,12 @@ NEGATIVES = [
     {
         "name": "stm32_hal_dma",
         "description": "STM32 HAL_DMA_Start used instead of MCUXpresso eDMA API",
-        "mutation": lambda code: code.replace(
-            "EDMA_StartTransfer(&s_dma_handle);",
+        # Replace any EDMA_StartTransfer(...) with the STM32 HAL DMA start,
+        # regardless of base/args.
+        "mutation": lambda code: re.sub(
+            r"\bEDMA_StartTransfer\s*\([^;]*\);",
             "HAL_DMA_Start(&hdma, (uint32_t)s_src, (uint32_t)s_dst, BUF_SIZE);",
+            code,
         ),
         "must_fail": ["edma_transfer_started", "no_cross_platform_hallucination"],
     },

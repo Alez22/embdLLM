@@ -7,6 +7,8 @@ Each mutation seeds a realistic MCXC144 bare-metal bug into the reference
 and asserts the corresponding L0/L3 check detects it.
 """
 
+import re
+
 # Exact ISR flag-clear block in the reference (comment + call + blank line).
 _ISR_CLEAR_BLOCK = (
     "    /* Clear interrupt flag before any other action to avoid re-entry */\n"
@@ -36,10 +38,11 @@ NEGATIVES = [
     {
         "name": "nonvolatile_counter",
         "description": "volatile dropped from ISR-shared counter — compiler may cache it in a register",
-        "mutation": lambda code: code.replace(
-            "static volatile uint32_t g_btn_press_count",
-            "static uint32_t g_btn_press_count",
-        ),
+        # NOTE: must_fail references 'isr_shared_variable_volatile', which this
+        # case intentionally does NOT define (see behavior.py). This mutation is
+        # therefore dangling and always reports as missed — flagged for review.
+        # Mutation kept regex-based for consistency (strips all volatile).
+        "mutation": lambda code: re.sub(r"\bvolatile\s+", "", code),
         "must_fail": ["isr_shared_variable_volatile"],
     },
     {
@@ -91,9 +94,15 @@ NEGATIVES = [
     {
         "name": "arduino_toggle",
         "description": "Arduino digitalWrite used instead of MCUXpresso GPIO API",
-        "mutation": lambda code: code.replace(
-            "GPIO_PortToggle(LED_GPIO, 1U << LED_PIN);",
+        # Inject an Arduino digitalWrite by replacing whichever GPIO output
+        # toggle/write call the model used (PortToggle / TogglePinsOutput /
+        # PinWrite / ...Output spellings). The literal replace only matched one
+        # exact toggle statement and missed every other form.
+        "mutation": lambda code: re.sub(
+            r"\bGPIO_(?:PortToggle\w*|TogglePinsOutput|PinWrite)\s*\([^;]*\);",
             "digitalWrite(24, HIGH);",
+            code,
+            count=1,
         ),
         "must_fail": ["no_cross_platform_hallucination"],
     },

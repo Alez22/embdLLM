@@ -7,6 +7,8 @@ Each mutation seeds a realistic RT1170 audio bug into the reference
 and asserts the corresponding L0/L3 check detects it.
 """
 
+import re
+
 
 def _remove_lines(code: str, pattern: str) -> str:
     """Remove all lines containing *pattern*."""
@@ -104,10 +106,13 @@ NEGATIVES = [
     {
         "name": "stm32_hal_i2s",
         "description": "STM32 HAL I2S call used instead of MCUXpresso SAI API",
-        "mutation": lambda code: code.replace(
-            "    SAI_WriteData(SAI_BASE, 0U, sample);   /* left  */\n"
-            "    SAI_WriteData(SAI_BASE, 0U, sample);   /* right */\n",
-            "    HAL_I2S_Transmit_IT(&hi2s1, (uint16_t *)&sample, 2U);\n",
+        # Inject the STM32 HAL I2S API by replacing any SAI write call
+        # (WriteData or WriteBlocking), regardless of base/args.
+        "mutation": lambda code: re.sub(
+            r"\bSAI_Write\w*\s*\([^;]*\);",
+            "HAL_I2S_Transmit_IT(&hi2s1, (uint16_t *)&sample, 2U);",
+            code,
+            count=1,
         ),
         "must_fail": ["no_cross_platform_hallucination"],
     },

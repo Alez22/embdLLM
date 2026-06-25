@@ -7,6 +7,8 @@ Each mutation seeds a realistic RT1170 bare-metal bug into the reference
 and asserts the corresponding L0/L3 check detects it.
 """
 
+import re
+
 
 def _remove_lines(code: str, pattern: str) -> str:
     """Remove all lines containing *pattern*."""
@@ -39,10 +41,16 @@ NEGATIVES = [
     {
         "name": "watchdog_disabled",
         "description": "enableRtwdog forced false — watchdog never armed, prompt forbids this",
-        "mutation": lambda code: code.replace(
-            "    config.timeoutValue = (uint16_t)(WDT_TIMEOUT_TICKS - 1U);",
-            "    config.enableRtwdog = false;\n"
-            "    config.timeoutValue = (uint16_t)(WDT_TIMEOUT_TICKS - 1U);",
+        # Force the config's enableRtwdog field false right after
+        # RTWDOG_GetDefaultConfig(&<cfg>), capturing whatever name the model
+        # gave the config struct (config / rtwdogConfig / wdogConfig / cfg /...).
+        # watchdog_not_disabled flags 'enableRtwdog = false'. The literal replace
+        # assumed a 'config.timeoutValue = ...' line spelled exactly.
+        "mutation": lambda code: re.sub(
+            r"(RTWDOG\d*_GetDefaultConfig\s*\(\s*&\s*(\w+)\s*\)\s*;)",
+            r"\1\n    \2.enableRtwdog = false;",
+            code,
+            count=1,
         ),
         "must_fail": ["watchdog_not_disabled"],
     },
@@ -55,8 +63,10 @@ NEGATIVES = [
     {
         "name": "kinetis_wdog_api",
         "description": "Kinetis WDOG API used — wrong NXP family, RT1170 has RTWDOG",
-        "mutation": lambda code: code.replace(
-            "RTWDOG_Refresh(WDT_BASE);", "WDOG_Refresh(WDOG);"
+        # Demote any RTWDOG_Refresh(...) to the Kinetis WDOG_Refresh spelling,
+        # regardless of base/args.
+        "mutation": lambda code: re.sub(
+            r"\bRTWDOG_Refresh\s*\([^;]*\);", "WDOG_Refresh(WDOG);", code
         ),
         "must_fail": ["no_legacy_kinetis_wdog_api"],
     },
@@ -69,8 +79,10 @@ NEGATIVES = [
     {
         "name": "stm32_iwdg",
         "description": "STM32 HAL IWDG call used instead of MCUXpresso RTWDOG API",
-        "mutation": lambda code: code.replace(
-            "RTWDOG_Refresh(WDT_BASE);", "HAL_IWDG_Refresh(&hiwdg);"
+        # Replace any RTWDOG_Refresh(...) with the STM32 HAL refresh, regardless
+        # of base/args.
+        "mutation": lambda code: re.sub(
+            r"\bRTWDOG_Refresh\s*\([^;]*\);", "HAL_IWDG_Refresh(&hiwdg);", code
         ),
         "must_fail": ["no_cross_platform_hallucination"],
     },

@@ -7,6 +7,8 @@ Each mutation seeds a realistic MCXC144 bare-metal bug into the reference
 and asserts the corresponding L0/L3 check detects it.
 """
 
+import re
+
 _STATUS_CHECK_BLOCK = (
     "    if (status != kStatus_Success) {\n"
     "        while (1);\n"
@@ -54,10 +56,10 @@ NEGATIVES = [
     {
         "name": "preshifted_address",
         "description": "8-bit pre-shifted address 0xD0 — SDK shifts internally, device never ACKs",
-        "mutation": lambda code: code.replace(
-            "#define SENSOR_ADDR     0x68U",
-            "#define SENSOR_ADDR     0xD0U",
-        ),
+        # Pre-shift the 7-bit address literal (0x68 -> 0xD0) wherever it appears
+        # — in a #define under any macro name, or inline. The device regs here
+        # are 0x1A/0x06, never 0x68, so replacing every 0x68 token is safe.
+        "mutation": lambda code: re.sub(r"\b0x68[Uu]?\b", "0xD0U", code),
         "must_fail": ["i2c_address_not_preshifted"],
     },
     {
@@ -87,8 +89,14 @@ NEGATIVES = [
     {
         "name": "zephyr_i2c_api",
         "description": "Zephyr i2c_write_read used instead of MCUXpresso transfer API",
-        "mutation": lambda code: code.replace(
-            "I2C_MasterTransferBlocking", "i2c_write_read"
+        # Rename any I2C_Master*Blocking transfer call to the Zephyr API name.
+        # Keeping it a name-level rename preserves the two_separate_transfers
+        # effect; the regex covers transfer-call spellings beyond the single
+        # literal the original matched.
+        "mutation": lambda code: re.sub(
+            r"\bI2C_Master(?:Transfer|Write|Read)Blocking\b",
+            "i2c_write_read",
+            code,
         ),
         "must_fail": ["no_cross_platform_hallucination", "two_separate_transfers"],
     },

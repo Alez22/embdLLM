@@ -7,6 +7,8 @@ Each mutation seeds a realistic ISR-concurrency bug into the reference
 and asserts the corresponding L0/L3 check detects it.
 """
 
+import re
+
 
 def _remove_lines(code: str, pattern: str) -> str:
     """Remove all lines containing *pattern*."""
@@ -34,9 +36,10 @@ NEGATIVES = [
     {
         "name": "counter_not_volatile",
         "description": "volatile dropped from uptime counter — main may read a stale cached copy",
-        "mutation": lambda code: code.replace(
-            "static volatile uint64_t", "static uint64_t"
-        ),
+        # Strip every 'volatile' qualifier regardless of type. The literal
+        # "static volatile uint64_t" missed models that used a different type;
+        # volatile_uptime_counter matches any 'volatile <type>'.
+        "mutation": lambda code: re.sub(r"\bvolatile\s+", "", code),
         "must_fail": ["volatile_uptime_counter"],
     },
     {
@@ -74,9 +77,15 @@ NEGATIVES = [
     {
         "name": "zephyr_uptime",
         "description": "Zephyr k_uptime_get used instead of a bare-metal counter",
-        "mutation": lambda code: code.replace(
-            "uint64_t now = g_uptime_ms;",
-            "uint64_t now = k_uptime_get();",
+        # Inject the Zephyr k_uptime_get() call in place of reading whichever
+        # uptime source the model used: a counter variable (now = g_uptime_ms;)
+        # or an accessor call (now = uptime_ms();). The RHS must contain an
+        # uptime token, so the counter *declaration* (= 0;) is never matched.
+        "mutation": lambda code: re.sub(
+            r"=\s*\w*uptime\w*\s*(?:\([^;]*\))?\s*;",
+            "= k_uptime_get();",
+            code,
+            count=1,
         ),
         "must_fail": ["no_cross_platform_hallucination"],
     },

@@ -7,6 +7,8 @@ Each mutation seeds a realistic RT1170 bare-metal bug into the reference
 and asserts the corresponding L0/L3 check detects it.
 """
 
+import re
+
 _STATUS_CHECK_BLOCK = (
     "    if (status != kStatus_Success) {\n"
     "        /* Communication error — halt */\n"
@@ -36,10 +38,10 @@ NEGATIVES = [
     {
         "name": "preshifted_address",
         "description": "8-bit pre-shifted address 0xD0 — SDK shifts internally, device never ACKs",
-        "mutation": lambda code: code.replace(
-            "#define SENSOR_ADDR       0x68U",
-            "#define SENSOR_ADDR       0xD0U",
-        ),
+        # Pre-shift the 7-bit address literal (0x68 -> 0xD0) wherever it appears
+        # — in a #define under any macro name, or inline. The device regs here
+        # are 0x75/..., never 0x68, so replacing every 0x68 token is safe.
+        "mutation": lambda code: re.sub(r"\b0x68[Uu]?\b", "0xD0U", code),
         "must_fail": ["i2c_address_not_preshifted"],
     },
     {
@@ -84,10 +86,13 @@ NEGATIVES = [
     {
         "name": "stm32_mem_read",
         "description": "STM32 HAL_I2C_Mem_Read used instead of MCUXpresso transfer API",
-        "mutation": lambda code: code.replace(
-            "status = LPI2C_MasterTransferBlocking(LPI2C_BASE, &transfer);",
-            "status = HAL_I2C_Mem_Read(&hi2c1, SENSOR_ADDR, WHO_AM_I_REG,"
-            " 1, &s_who_am_i, 1, 100);",
+        # Replace any LPI2C_MasterTransferBlocking(...) with the STM32 HAL call,
+        # regardless of base/args.
+        "mutation": lambda code: re.sub(
+            r"\bLPI2C_MasterTransferBlocking\s*\([^;]*\)",
+            "HAL_I2C_Mem_Read(&hi2c1, SENSOR_ADDR, WHO_AM_I_REG,"
+            " 1, &s_who_am_i, 1, 100)",
+            code,
         ),
         "must_fail": ["lpi2c_blocking_transfer_used", "no_cross_platform_hallucination"],
     },

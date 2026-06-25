@@ -117,11 +117,15 @@ NEGATIVES = [
     {
         "name": "stm32_flash_write",
         "description": "STM32-style HAL flash call used instead of MCUXpresso FLASH_Program",
-        "mutation": lambda code: code.replace(
-            "    status = FLASH_Program(&flash_cfg, FLASH_TARGET_ADDR,\n"
-            "                           (uint8_t *)s_data, sizeof(s_data));",
-            "    status = HAL_FLASH_Write(FLASH_TARGET_ADDR,"
-            " (uint8_t *)s_data, sizeof(s_data));",
+        # Replace any FLASH_Program(...) call with the STM32 HAL_FLASH_Write
+        # call, regardless of arguments/spacing: removes FLASH_Program (fails
+        # flash_program_called) and injects HAL_ (fails the hallucination
+        # check). The literal whole-statement replace missed every model that
+        # spelled the args differently.
+        "mutation": lambda code: re.sub(
+            r"\bFLASH_Program\s*\([^;]*\)",
+            "HAL_FLASH_Write(FLASH_TARGET_ADDR, (uint8_t *)s_data, sizeof(s_data))",
+            code,
         ),
         "must_fail": ["flash_program_called", "no_cross_platform_hallucination"],
     },

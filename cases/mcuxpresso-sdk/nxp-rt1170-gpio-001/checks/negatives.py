@@ -7,6 +7,8 @@ Each mutation seeds a realistic RT1170 bare-metal bug into the reference
 and asserts the corresponding L0/L3 check detects it.
 """
 
+import re
+
 
 def _remove_lines(code: str, pattern: str) -> str:
     """Remove all lines containing *pattern*."""
@@ -49,9 +51,14 @@ NEGATIVES = [
     {
         "name": "kinetis_port_mux",
         "description": "Kinetis PORT_SetPinMux used — wrong NXP family, does not exist on RT1170",
-        "mutation": lambda code: code.replace(
-            "IOMUXC_SetPinMux(IOMUXC_GPIO_AD_04_GPIO9_IO03, 0U);",
+        # Replace any IOMUXC_SetPinMux(...) with the Kinetis PORT_SetPinMux the
+        # check flags. RT1170 IOMUXC_SetPinMux takes model-variable tuple-macro
+        # args, so the literal single-statement replace matched almost no model.
+        "mutation": lambda code: re.sub(
+            r"\bIOMUXC_SetPinMux\s*\([^;]*\);",
             "PORT_SetPinMux(PORTE, 3U, kPORT_MuxAsGpio);",
+            code,
+            count=1,
         ),
         "must_fail": ["no_kinetis_port_api"],
     },
@@ -70,9 +77,14 @@ NEGATIVES = [
     {
         "name": "arduino_toggle",
         "description": "Arduino digitalWrite used instead of MCUXpresso GPIO API",
-        "mutation": lambda code: code.replace(
-            "GPIO_PortToggle(LED_GPIO, 1U << LED_PIN);",
+        # Replace ALL toggle/write spellings gpio_toggle_called accepts
+        # (GPIO_PortToggle / GPIO_PinWrite / GPIO_TogglePinsOutput) with the
+        # Arduino call, regardless of arguments. Must cover every accepted form
+        # or the check still sees a remaining accepted call and passes.
+        "mutation": lambda code: re.sub(
+            r"\bGPIO_(?:PortToggle|PinWrite|TogglePinsOutput)\s*\([^;]*\);",
             "digitalWrite(LED_PIN, !digitalRead(LED_PIN));",
+            code,
         ),
         "must_fail": ["gpio_toggle_called", "no_cross_platform_hallucination"],
     },

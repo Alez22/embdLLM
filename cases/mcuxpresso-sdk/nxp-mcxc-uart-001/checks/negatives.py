@@ -7,6 +7,8 @@ Each mutation seeds a realistic MCXC144 bare-metal bug into the reference
 and asserts the corresponding L0/L3 check detects it.
 """
 
+import re
+
 
 def _remove_lines(code: str, pattern: str) -> str:
     """Remove all lines containing *pattern*."""
@@ -47,9 +49,12 @@ NEGATIVES = [
     {
         "name": "stm32_uart_transmit",
         "description": "STM32 HAL_UART_Transmit used instead of MCUXpresso write API",
-        "mutation": lambda code: code.replace(
-            "UART_WriteBlocking(UART_BASE, s_msg, strlen((const char *)s_msg));",
+        # Replace any UART_WriteBlocking(...) with the STM32 HAL transmit,
+        # regardless of base/args.
+        "mutation": lambda code: re.sub(
+            r"\bUART_WriteBlocking\s*\([^;]*\);",
             "HAL_UART_Transmit(&huart0, s_msg, sizeof(s_msg) - 1U, 100);",
+            code,
         ),
         "must_fail": ["uart_write_blocking_used", "no_cross_platform_hallucination"],
     },

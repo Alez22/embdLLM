@@ -7,6 +7,8 @@ Each mutation seeds a realistic MCXC144 bare-metal bug into the reference
 and asserts the corresponding L0/L3 check detects it.
 """
 
+import re
+
 _MAIN_LOOP = (
     "    while (1) {\n"
     "        do_work();\n"
@@ -48,9 +50,11 @@ NEGATIVES = [
     {
         "name": "watchdog_disabled",
         "description": "COP_Disable called — watchdog silently disabled, defeats the purpose",
-        "mutation": lambda code: code.replace(
-            "COP_Init(SIM, &cop_cfg);",
-            "COP_Disable(SIM);",
+        # Replace any COP_Init(...) with COP_Disable(SIM); watchdog_not_disabled
+        # flags COP_Disable. The literal replace assumed the exact args
+        # (SIM, &cop_cfg) and missed models passing a differently-named config.
+        "mutation": lambda code: re.sub(
+            r"\bCOP_Init\s*\([^;]*\);", "COP_Disable(SIM);", code
         ),
         "must_fail": ["watchdog_not_disabled"],
     },
@@ -75,9 +79,12 @@ NEGATIVES = [
     {
         "name": "stm32_iwdg",
         "description": "STM32 HAL_IWDG_Init used instead of MCUXpresso COP API",
-        "mutation": lambda code: code.replace(
-            "COP_Init(SIM, &cop_cfg);",
+        # Replace any COP_Init(...) with the STM32 HAL IWDG init, regardless of
+        # base/args.
+        "mutation": lambda code: re.sub(
+            r"\bCOP_Init\s*\([^;]*\);",
             "HAL_IWDG_Init(&hiwdg);",
+            code,
         ),
         "must_fail": ["cop_init_called", "no_cross_platform_hallucination"],
     },

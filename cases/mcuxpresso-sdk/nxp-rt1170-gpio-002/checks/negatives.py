@@ -7,6 +7,8 @@ Each mutation seeds a realistic RT1170 bare-metal bug into the reference
 and asserts the corresponding L0/L3 check detects it.
 """
 
+import re
+
 
 def _remove_lines(code: str, pattern: str) -> str:
     """Remove all lines containing *pattern*."""
@@ -37,9 +39,10 @@ NEGATIVES = [
     {
         "name": "counter_not_volatile",
         "description": "volatile dropped from press counter — main may read a stale cached copy",
-        "mutation": lambda code: code.replace(
-            "static volatile uint32_t", "static uint32_t"
-        ),
+        # Strip every 'volatile' qualifier regardless of type. The literal
+        # "static volatile uint32_t" missed models that used a different type;
+        # volatile_press_counter matches any 'volatile <type>'.
+        "mutation": lambda code: re.sub(r"\bvolatile\s+", "", code),
         "must_fail": ["volatile_press_counter"],
     },
     {
@@ -79,9 +82,14 @@ NEGATIVES = [
     {
         "name": "kinetis_port_mux",
         "description": "Kinetis PORT_SetPinMux used — wrong NXP family, does not exist on RT1170",
-        "mutation": lambda code: code.replace(
-            "IOMUXC_SetPinMux(IOMUXC_WAKEUP_DIG_GPIO13_IO00, 0U);",
+        # Replace any IOMUXC_SetPinMux(...) with the Kinetis PORT_SetPinMux the
+        # check flags. RT1170 IOMUXC_SetPinMux takes model-variable tuple-macro
+        # args, so the literal single-statement replace matched almost no model.
+        "mutation": lambda code: re.sub(
+            r"\bIOMUXC_SetPinMux\s*\([^;]*\);",
             "PORT_SetPinMux(PORTA, 0U, kPORT_MuxAsGpio);",
+            code,
+            count=1,
         ),
         "must_fail": ["no_kinetis_port_api"],
     },
@@ -94,9 +102,14 @@ NEGATIVES = [
     {
         "name": "arduino_toggle",
         "description": "Arduino digitalWrite used instead of MCUXpresso GPIO API",
-        "mutation": lambda code: code.replace(
-            "GPIO_PortToggle(LED_GPIO, 1U << LED_PIN);",
+        # Inject an Arduino digitalWrite by replacing whichever GPIO output
+        # toggle/write call the model used (PortToggle / TogglePinsOutput /
+        # PinToggle / TogglePin / PinWrite spellings).
+        "mutation": lambda code: re.sub(
+            r"\bGPIO_(?:PortToggle\w*|TogglePinsOutput|PinToggle|TogglePin|PinWrite)\s*\([^;]*\);",
             "digitalWrite(LED_PIN, !digitalRead(LED_PIN));",
+            code,
+            count=1,
         ),
         "must_fail": ["no_cross_platform_hallucination"],
     },

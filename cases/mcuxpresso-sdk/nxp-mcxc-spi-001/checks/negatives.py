@@ -7,6 +7,8 @@ Each mutation seeds a realistic MCXC144 bare-metal bug into the reference
 and asserts the corresponding L0/L3 check detects it.
 """
 
+import re
+
 
 def _remove_lines(code: str, pattern: str) -> str:
     """Remove all lines containing *pattern*."""
@@ -67,9 +69,12 @@ NEGATIVES = [
     {
         "name": "stm32_spi_transfer",
         "description": "STM32 HAL_SPI_TransmitReceive used instead of MCUXpresso transfer API",
-        "mutation": lambda code: code.replace(
-            "SPI_MasterTransferBlocking(SPI_BASE, &transfer);",
+        # Replace any SPI_MasterTransferBlocking(...) with the STM32 HAL call,
+        # regardless of base/args.
+        "mutation": lambda code: re.sub(
+            r"\bSPI_MasterTransferBlocking\s*\([^;]*\);",
             "HAL_SPI_TransmitReceive(&hspi1, s_tx_buf, s_rx_buf, 2, 100);",
+            code,
         ),
         "must_fail": ["spi_blocking_transfer_used", "no_cross_platform_hallucination"],
     },

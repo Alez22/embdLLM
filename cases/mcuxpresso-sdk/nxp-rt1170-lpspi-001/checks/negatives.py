@@ -7,6 +7,8 @@ Each mutation seeds a realistic RT1170 bare-metal bug into the reference
 and asserts the corresponding L0/L3 check detects it.
 """
 
+import re
+
 
 def _remove_lines(code: str, pattern: str) -> str:
     """Remove all lines containing *pattern*."""
@@ -64,15 +66,20 @@ NEGATIVES = [
     {
         "name": "wrong_command",
         "description": "Read command 0x03 sent instead of JEDEC ID 0x9F",
-        "mutation": lambda code: code.replace("0x9FU", "0x03U"),
+        # Replace the JEDEC ID opcode regardless of case/suffix; jedec_command_used
+        # matches 0x9F with optional U. The literal "0x9FU" missed 0x9F / 0x9f.
+        "mutation": lambda code: re.sub(r"0[xX]9[Ff][Uu]?\b", "0x03U", code),
         "must_fail": ["jedec_command_used"],
     },
     {
         "name": "kinetis_dspi_api",
         "description": "Kinetis DSPI API used — wrong NXP family, RT1170 has LPSPI only",
-        "mutation": lambda code: code.replace(
-            "LPSPI_MasterTransferBlocking(FLASH_SPI, &xfer)",
-            "DSPI_MasterTransferBlocking(FLASH_SPI, &xfer)",
+        # Demote any LPSPI_MasterTransferBlocking(...) to the Kinetis DSPI_*
+        # spelling the check flags, regardless of base/args.
+        "mutation": lambda code: re.sub(
+            r"\bLPSPI_MasterTransferBlocking\s*\(",
+            "DSPI_MasterTransferBlocking(",
+            code,
         ),
         "must_fail": ["no_legacy_kinetis_spi_api"],
     },
@@ -85,9 +92,12 @@ NEGATIVES = [
     {
         "name": "stm32_hal_spi",
         "description": "STM32 HAL SPI call used instead of MCUXpresso LPSPI API",
-        "mutation": lambda code: code.replace(
-            "LPSPI_MasterTransferBlocking(FLASH_SPI, &xfer)",
+        # Replace any LPSPI_MasterTransferBlocking(...) with the STM32 HAL call,
+        # regardless of base/args.
+        "mutation": lambda code: re.sub(
+            r"\bLPSPI_MasterTransferBlocking\s*\([^;]*\)",
             "HAL_SPI_TransmitReceive(&hspi1, tx_buf, rx_buf, 4U, 100U)",
+            code,
         ),
         "must_fail": ["no_cross_platform_hallucination"],
     },

@@ -14,6 +14,8 @@ satisfy the check regardless of the main-loop ordering. See review notes:
 the check itself should be tightened.
 """
 
+import re
+
 _CONSUME_BLOCK = (
     "        if (g_sample_ready) {\n"
     "            /* Clear flag before reading value to avoid missing the next sample */\n"
@@ -61,20 +63,27 @@ NEGATIVES = [
     {
         "name": "value_not_volatile",
         "description": "volatile dropped from shared value — main may read a stale register copy",
-        "mutation": lambda code: code.replace(
-            "static volatile uint32_t g_sample_value",
-            "static uint32_t g_sample_value",
+        # Drop volatile from a SINGLE shared declaration, leaving the other
+        # volatile — distinct from no_volatile_at_all which strips both.
+        # both_shared_vars_volatile requires >=2 volatile-typed decls; removing
+        # one leaves <2. Match volatile only when immediately followed by a type
+        # keyword (a declaration), so the word "volatile" in a comment is not
+        # what gets stripped.
+        "mutation": lambda code: re.sub(
+            r"\bvolatile\s+(?=(?:unsigned\s+)?(?:uint|int|bool|char|float|double|struct)\w*)",
+            "", code, count=1,
         ),
         "must_fail": ["both_shared_vars_volatile"],
     },
     {
         "name": "no_volatile_at_all",
         "description": "volatile dropped from both shared variables — main loop may never see updates",
-        "mutation": lambda code: (
-            code
-            .replace("static volatile bool", "static bool")
-            .replace("static volatile uint32_t", "static uint32_t")
-        ),
+        # Strip every 'volatile' qualifier regardless of the underlying type.
+        # Literal replaces (e.g. "static volatile bool") missed models that
+        # declared the flag with another type such as uint8_t, leaving a
+        # residual 'volatile' that satisfied the generic volatile_shared_data
+        # check and masked the mutation. The regex preserves 'static'.
+        "mutation": lambda code: re.sub(r"\bvolatile\s+", "", code),
         "must_fail": ["both_shared_vars_volatile", "volatile_shared_data"],
     },
     {
@@ -99,8 +108,11 @@ NEGATIVES = [
     {
         "name": "hardcoded_input_value",
         "description": "GPIO_PinRead replaced with a constant — input never actually sampled",
-        "mutation": lambda code: code.replace(
-            "GPIO_PinRead(INPUT_GPIO, INPUT_PIN)", "1U"
+        # Replace any GPIO_PinRead(...) with a constant; gpio_pin_read_in_code
+        # flags the absence of GPIO_PinRead. The literal replace assumed the
+        # exact args (INPUT_GPIO, INPUT_PIN).
+        "mutation": lambda code: re.sub(
+            r"\bGPIO_PinRead\s*\([^;)]*\)", "1U", code
         ),
         "must_fail": ["gpio_pin_read_in_code"],
     },
@@ -119,9 +131,15 @@ NEGATIVES = [
     {
         "name": "arduino_toggle",
         "description": "Arduino digitalWrite used instead of MCUXpresso GPIO API",
-        "mutation": lambda code: code.replace(
-            "GPIO_PortToggle(LED_GPIO, 1U << LED_PIN);",
+        # Inject an Arduino digitalWrite by replacing whichever GPIO output
+        # toggle/write call the model used. If the solution drives no GPIO
+        # output (this case centres on input sampling), there is nothing to
+        # replace and the mutation legitimately no-ops.
+        "mutation": lambda code: re.sub(
+            r"\bGPIO_(?:PortToggle\w*|TogglePinsOutput|PinToggle|TogglePin|PinWrite)\s*\([^;]*\);",
             "digitalWrite(24, HIGH);",
+            code,
+            count=1,
         ),
         "must_fail": ["no_cross_platform_hallucination"],
     },
