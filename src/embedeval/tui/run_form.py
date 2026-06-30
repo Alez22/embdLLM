@@ -16,6 +16,7 @@ from textual.widgets import (
 
 from embedeval.model_catalog import ModelInfo, fetch_models
 from embedeval.tui import config
+from embedeval.tui.data import _load_subsets
 
 _CUSTOM_MODEL = "__custom__"
 
@@ -145,6 +146,14 @@ class RunFormScreen(ModalScreen[dict | None]):
         # user has selected so selection survives list rebuilds on filtering.
         self._catalog: list[ModelInfo] = []
         self._selected_models: set[str] = set()
+        # Named case subsets from cases/subsets.yaml (name -> case IDs).
+        self._subsets = _load_subsets(config.CASES_DIR)
+
+    def _subset_options(self) -> list[tuple[str, str]]:
+        """Build the subset Select options: '(none)' plus each named subset."""
+        return [("(no subset)", "none")] + [
+            (name, name) for name in sorted(self._subsets)
+        ]
 
     def _sdk_options(self) -> list[tuple[str, str]]:
         sdks = sorted({c.get("sdk", "") for c in self._cases if c.get("sdk")})
@@ -292,6 +301,16 @@ class RunFormScreen(ModalScreen[dict | None]):
                             allow_blank=False,
                         )
 
+                    # Named subsets: selecting one ticks its case checkboxes.
+                    if self._subsets:
+                        yield Label("Subset (ticks the listed cases)")
+                        yield Select(
+                            self._subset_options(),
+                            value="none",
+                            id="sel-subset",
+                            allow_blank=False,
+                        )
+
                     with Horizontal(id="cases-header"):
                         yield Label("Cases (empty = all matching filters)")
                         yield Button("All", variant="default", id="btn-select-all")
@@ -331,6 +350,27 @@ class RunFormScreen(ModalScreen[dict | None]):
     @on(Select.Changed, "#sel-form-category")
     def on_form_filter_changed(self, event: Select.Changed) -> None:
         self._update_case_visibility()
+
+    @on(Select.Changed, "#sel-subset")
+    def on_subset_changed(self, event: Select.Changed) -> None:
+        """Tick exactly the cases of the chosen subset (clear others first).
+
+        '(no subset)' leaves the current selection untouched so the user can
+        switch back without losing manual ticks.
+        """
+        name = str(event.value)
+        if name == "none":
+            return
+        # Reset SDK/category filters so all ticked subset cases stay visible
+        # (a subset can span SDKs; a stale filter would hide ticked cases).
+        self.query_one("#sel-form-sdk", Select).value = "all"
+        self.query_one("#sel-form-category", Select).value = "all"
+        self._update_case_visibility()
+        wanted = set(self._subsets.get(name, []))
+        for case in self._cases:
+            cid = case.get("id", "")
+            cb = self.query_one(f"#case-{cid}", Checkbox)
+            cb.value = cid in wanted
 
     @on(Button.Pressed, "#btn-select-all")
     def on_select_all(self) -> None:

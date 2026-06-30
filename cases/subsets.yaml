@@ -1,0 +1,34 @@
+# Named case subsets — curated lists of case IDs for quick selection.
+#
+# A subset is just a list of case IDs that already live under cases/. It does
+# NOT duplicate the cases (no symlinks): the TUI uses these lists to tick the
+# matching case checkboxes in the New Run form. To add a subset, add a key
+# here with the case IDs you want; the cases must exist under cases/.
+#
+# nxp10: the 10-case NXP subset used for the agent-mode model ranking
+#        (5-model t5 ranking). Covers MCXC and RT1170 peripherals.
+nxp10:
+  - nxp-mcxc-flash-001
+  - nxp-mcxc-gpio-001
+  - nxp-mcxc-i2c-001
+  - nxp-mcxc-isr-001
+  - nxp-mcxc-spi-001
+  - nxp-mcxc-uart-001
+  - nxp-rt1170-dma-001
+  - nxp-rt1170-gpio-001
+  - nxp-rt1170-lpi2c-001
+  - nxp-rt1170-lpuart-001
+
+# zephyr10: a 10-case Zephyr subset, one case per key domain, mirroring the
+#           breadth of nxp10.
+zephyr10:
+  - adc-001
+  - boot-001
+  - device-tree-001
+  - dma-001
+  - gpio-basic-001
+  - isr-concurrency-001
+  - kconfig-001
+  - memory-opt-001
+  - spi-i2c-001
+  - storage-006

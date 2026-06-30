@@ -22,6 +22,29 @@ def _discover_cases(cases_dir: Path) -> list[dict]:
     return cases
 
 
+def _load_subsets(cases_dir: Path) -> dict[str, list[str]]:
+    """Return named case subsets from cases/subsets.yaml.
+
+    Maps subset name -> list of case IDs. Returns {} if the file is missing
+    or malformed; the TUI simply shows no subset options in that case.
+    """
+    subsets_file = cases_dir / "subsets.yaml"
+    if not subsets_file.is_file():
+        return {}
+    try:
+        data = yaml.safe_load(subsets_file.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    if not isinstance(data, dict):
+        return {}
+    # Keep only well-formed entries: a name mapping to a list of string IDs.
+    return {
+        name: [str(cid) for cid in ids]
+        for name, ids in data.items()
+        if isinstance(ids, list)
+    }
+
+
 def _load_runs_summary() -> list[dict]:
     """Return one dict per run dir, built from summary.json + detail stats."""
     runs: list[dict] = []
