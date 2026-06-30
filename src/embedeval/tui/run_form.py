@@ -254,6 +254,15 @@ class RunFormScreen(ModalScreen[dict | None]):
                                 id="lbl-resume")
                     yield Input(placeholder="results/runs/..._tN",
                                 id="input-resume")
+                    yield Label("Context pack (agent mode)", id="lbl-context-pack")
+                    yield Select(
+                        [("none", "none"),
+                         ("nxp (bundled NXP headers)", "nxp"),
+                         ("expert", "expert")],
+                        value="none",
+                        id="sel-context-pack",
+                        allow_blank=False,
+                    )
 
                     yield Label("Attempts  (min 5 for consistency metric)")
                     yield Input("5", id="input-attempts")
@@ -348,7 +357,8 @@ class RunFormScreen(ModalScreen[dict | None]):
         """Show agent-only fields only in agent mode, attempts only in run."""
         is_agent = str(self.query_one("#sel-mode", Select).value) == "agent"
         for wid in ("#lbl-max-turns", "#input-max-turns",
-                    "#lbl-resume", "#input-resume"):
+                    "#lbl-resume", "#input-resume",
+                    "#lbl-context-pack", "#sel-context-pack"):
             self.query_one(wid).display = is_agent
         # Attempts is meaningless in agent mode (turns replace it).
         self.query_one("#input-attempts").display = not is_agent
@@ -469,6 +479,7 @@ class RunFormScreen(ModalScreen[dict | None]):
         except ValueError:
             max_turns = 3
         resume_from = self.query_one("#input-resume", Input).value.strip()
+        context_pack = str(self.query_one("#sel-context-pack", Select).value)
         sdk_filter = str(self.query_one("#sel-form-sdk", Select).value)
         cat_filter = str(self.query_one("#sel-form-category", Select).value)
 
@@ -485,6 +496,7 @@ class RunFormScreen(ModalScreen[dict | None]):
                 "mode": mode,
                 "max_turns": max_turns,
                 "resume_from": resume_from,
+                "context_pack": context_pack,
                 "cases_dir": cases_dir,
                 "attempts": attempts,
                 "temperature": temperature,

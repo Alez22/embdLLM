@@ -81,6 +81,7 @@ class EmbedEvalTUI(App):
         Binding("r", "refresh", "Refresh"),
         Binding("n", "new_run", "New Run"),
         Binding("s", "stop_run", "Stop Run"),
+        Binding("d", "open_dashboard", "Dashboard"),
         Binding("q", "quit", "Quit"),
     ]
 
@@ -102,6 +103,7 @@ class EmbedEvalTUI(App):
     def on_mount(self) -> None:
         self._cases: list[dict] = _discover_cases(tui_config.CASES_DIR)
         self._proc: subprocess.Popen | None = None  # type: ignore[type-arg]
+        self._dash_proc: subprocess.Popen | None = None  # type: ignore[type-arg]
         self._pending_runs: list[dict] = []  # queued configs waiting for current run to finish
         self._log_queue: Queue[str] = Queue()
         self._log_file: Path = tui_config.RESULTS_DIR / "tui-run.log"
@@ -186,6 +188,26 @@ class EmbedEvalTUI(App):
         self._load_data()
         log = self.query_one("#run-log", Log)
         log.write_line("[refresh] Results reloaded from disk.")
+
+    def action_open_dashboard(self) -> None:
+        """Launch the results dashboard web app (detached) and open the browser.
+
+        The dashboard is a uvicorn server, so it must not run in the
+        foreground or it would block the TUI. We spawn it detached and let it
+        open the browser itself. A second press reuses the running server.
+        """
+        log = self.query_one("#run-log", Log)
+        if self._dash_proc is not None and self._dash_proc.poll() is None:
+            log.write_line("[dashboard] Already running at http://localhost:7860")
+            return
+        self._dash_proc = subprocess.Popen(
+            ["uv", "run", "embedeval", "dashboard",
+             "--results", str(tui_config.RESULTS_DIR),
+             "--cases", str(tui_config.CASES_DIR)],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        log.write_line("[dashboard] Starting at http://localhost:7860 …")
 
     def action_new_run(self) -> None:
         self.push_screen(RunFormScreen(self._cases), self._on_run_config)
@@ -276,6 +298,8 @@ class EmbedEvalTUI(App):
                 cmd += ["--category", config["cat_filter"]]
             if config.get("resume_from"):
                 cmd += ["--resume", config["resume_from"]]
+            if config.get("context_pack", "none") != "none":
+                cmd += ["--context-pack", config["context_pack"]]
         else:
             cmd = [
                 "uv", "run", "embedeval", "run",
