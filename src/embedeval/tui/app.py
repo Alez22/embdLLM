@@ -25,7 +25,11 @@ from textual.widgets import (
 # methods like _launch_run / _on_run_config.
 from embedeval.tui import config as tui_config
 from embedeval.tui.data import _discover_cases, _load_leaderboard, _score_bar
-from embedeval.tui.log_format import _CASE_UNHANDLED_RE, _format_log_line
+from embedeval.tui.log_format import (
+    _AGENT_RESULT_RE,
+    _CASE_UNHANDLED_RE,
+    _format_log_line,
+)
 from embedeval.tui.run_form import RunFormScreen
 
 
@@ -335,9 +339,9 @@ class EmbedEvalTUI(App):
                 if (sdk_f == "all" or c.get("sdk") == sdk_f)
                 and (cat_f == "all" or c.get("category") == cat_f)
             )
-        # Agent mode runs up to max_turns LLM calls per case; run mode does
-        # `attempts` samples per case. Both are upper bounds for the bar.
-        per_case = config["max_turns"] if mode == "agent" else config["attempts"]
+        # Agent mode emits exactly one completion event per case (regardless
+        # of how many turns it took); run mode does `attempts` samples per case.
+        per_case = 1 if mode == "agent" else config["attempts"]
         self._run_total = n_cases * per_case
         self._run_done = 0
         self._run_pass = 0
@@ -456,6 +460,23 @@ class EmbedEvalTUI(App):
             self._run_seen.add((case_id, attempt))
             self._run_done += 1
             self._run_error += 1
+            self._update_progress_bar()
+            return
+
+        # Agent mode: one completion event per case (passed/failed on turn N/M).
+        # Dedup on case_id alone since the agent emits exactly one such line.
+        a = _AGENT_RESULT_RE.search(line)
+        if a:
+            case_id, status = a.group(1), a.group(2)
+            self._run_current = case_id
+            if (case_id, "agent") in self._run_seen:
+                return
+            self._run_seen.add((case_id, "agent"))
+            self._run_done += 1
+            if status == "passed":
+                self._run_pass += 1
+            else:
+                self._run_fail += 1
             self._update_progress_bar()
             return
 

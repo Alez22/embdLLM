@@ -7,6 +7,11 @@ _CASE_RESULT_RE = _re.compile(
     r"Case (\S+) attempt (\d+): (PASS|FAIL@L(\S+)|FAIL)(?: \[src=(\S+)\])?"
 )
 _CASE_UNHANDLED_RE = _re.compile(r"Case (\S+) attempt (\d+): unhandled (\S+)")
+# Agent mode emits one completion line per case (see agent.py): the case
+# either passed or failed after running up to max_turns turns.
+_AGENT_RESULT_RE = _re.compile(
+    r"Case (\S+) (passed|failed) on turn (\d+)/(\d+)"
+)
 
 # Human-readable provenance shown next to each result, derived from the
 # EvalResult.cache_source tag the runner appends as "[src=...]".
@@ -32,6 +37,14 @@ def _format_log_line(line: str) -> str | None:
     u = _CASE_UNHANDLED_RE.search(line)
     if u:
         return f"[ERROR] {u.group(1)} #{u.group(2)}  ({u.group(3)})"
+
+    # Agent mode: one completion line per case (passed/failed on turn N/M).
+    a = _AGENT_RESULT_RE.search(line)
+    if a:
+        case_id, status, turn, max_turns = a.groups()
+        if status == "passed":
+            return f"[ PASS ] {case_id}  (turn {turn}/{max_turns})"
+        return f"[ FAIL ] {case_id}  (turn {turn}/{max_turns})"
 
     # Per-attempt result: reformat into a compact, aligned line.
     m = _CASE_RESULT_RE.search(line)
