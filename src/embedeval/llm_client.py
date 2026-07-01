@@ -17,6 +17,7 @@ from litellm.exceptions import (
     Timeout as LitellmTimeout,
 )
 
+from embedeval.model_catalog import estimate_cost_usd
 from embedeval.models import LLMResponse, TokenUsage
 
 logger = logging.getLogger(__name__)
@@ -329,6 +330,10 @@ def _call_litellm(
                 cost = litellm.completion_cost(completion_response=response)
             except Exception:
                 cost = 0.0
+            # litellm's price map does not know "openrouter/<vendor>/<model>"
+            # slugs and silently yields 0 — fall back to catalog pricing.
+            if not cost:
+                cost = estimate_cost_usd(model, input_tokens, output_tokens)
 
             return LLMResponse(
                 model=model,

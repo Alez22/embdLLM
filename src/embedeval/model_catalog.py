@@ -62,12 +62,18 @@ class ModelInfo:
         ``anthropic``, ``qwen``); used for the dynamic provider filter.
     :param price_per_mtok: Combined prompt+completion price per million
         tokens in USD, or ``None`` when unknown (Groq).
+    :param price_in_per_mtok: Prompt price per million tokens (USD), or
+        ``None`` when unknown. Used for real cost tracking of runs.
+    :param price_out_per_mtok: Completion price per million tokens (USD),
+        or ``None`` when unknown.
     """
 
     slug: str
     provider: str
     sub_provider: str
     price_per_mtok: float | None
+    price_in_per_mtok: float | None = None
+    price_out_per_mtok: float | None = None
 
     @property
     def is_free(self) -> bool:
@@ -128,12 +134,15 @@ def _fetch_openrouter() -> list[ModelInfo]:
             continue
         # OpenRouter ids look like "anthropic/claude-opus-4".
         sub_provider = model_id.split("/")[0]
+        price_in, price_out = _openrouter_price_split(entry.get("pricing"))
         catalog.append(
             ModelInfo(
                 slug=f"openrouter/{model_id}",
                 provider="openrouter",
                 sub_provider=sub_provider,
                 price_per_mtok=_openrouter_price(entry.get("pricing")),
+                price_in_per_mtok=price_in,
+                price_out_per_mtok=price_out,
             )
         )
     return catalog
@@ -157,6 +166,44 @@ def _openrouter_price(pricing: dict | None) -> float | None:
     if prompt < 0 or completion < 0:
         return None
     return (prompt + completion) * 1_000_000
+
+
+def _openrouter_price_split(pricing: dict | None) -> tuple[float | None, float | None]:
+    """Return (prompt, completion) prices in USD per million tokens.
+
+    Same parsing rules as :func:`_openrouter_price`; negative sentinels
+    mean variable pricing and are treated as unknown.
+    """
+    if not pricing:
+        return None, None
+    try:
+        prompt = float(pricing.get("prompt", 0) or 0)
+        completion = float(pricing.get("completion", 0) or 0)
+    except (TypeError, ValueError):
+        return None, None
+    if prompt < 0 or completion < 0:
+        return None, None
+    return prompt * 1_000_000, completion * 1_000_000
+
+
+def estimate_cost_usd(model_slug: str, input_tokens: int, output_tokens: int) -> float:
+    """Estimate the USD cost of one call from catalog pricing.
+
+    Fallback for providers litellm cannot price (e.g. ``openrouter/...``
+    slugs). Returns 0.0 when the model or its pricing is unknown, so the
+    caller can keep litellm's value when this fails.
+
+    .. warning:: May perform blocking network I/O on a cold catalog cache.
+    """
+    for info in fetch_models():
+        if info.slug == model_slug:
+            if info.price_in_per_mtok is None or info.price_out_per_mtok is None:
+                return 0.0
+            return (
+                input_tokens * info.price_in_per_mtok
+                + output_tokens * info.price_out_per_mtok
+            ) / 1_000_000
+    return 0.0
 
 
 def _fetch_groq() -> list[ModelInfo]:
