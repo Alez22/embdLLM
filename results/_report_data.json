@@ -1,0 +1,336 @@
+{
+ "nxp": [
+  {
+   "model": "openrouter/deepseek/deepseek-v4-flash",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 1,
+   "tested": 24,
+   "rate": 0.041666666666666664
+  },
+  {
+   "model": "openrouter/z-ai/glm-5.2",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 1,
+   "tested": 24,
+   "rate": 0.041666666666666664
+  },
+  {
+   "model": "openrouter/google/gemma-4-31b-it",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 0,
+   "tested": 24,
+   "rate": 0.0
+  },
+  {
+   "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 0,
+   "tested": 24,
+   "rate": 0.0
+  },
+  {
+   "model": "openrouter/openai/gpt-oss-120b",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 0,
+   "tested": 24,
+   "rate": 0.0
+  }
+ ],
+ "zephyr": [
+  {
+   "model": "openrouter/qwen/qwen3-235b-a22b",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 13,
+   "tested": 16,
+   "rate": 0.8125
+  },
+  {
+   "model": "groq/openai/gpt-oss-120b",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 13,
+   "tested": 18,
+   "rate": 0.7222222222222222
+  },
+  {
+   "model": "openrouter/deepseek/deepseek-v4-flash",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 111,
+   "tested": 158,
+   "rate": 0.7025316455696202
+  },
+  {
+   "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 16,
+   "tested": 25,
+   "rate": 0.64
+  },
+  {
+   "model": "groq/openai/gpt-oss-20b",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 11,
+   "tested": 18,
+   "rate": 0.6111111111111112
+  },
+  {
+   "model": "groq/llama-3.3-70b-versatile",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 9,
+   "tested": 18,
+   "rate": 0.5
+  },
+  {
+   "model": "openrouter/z-ai/glm-4.7-flash",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 4,
+   "tested": 8,
+   "rate": 0.5
+  },
+  {
+   "model": "openrouter/google/gemma-4-31b-it",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 17,
+   "tested": 34,
+   "rate": 0.5
+  },
+  {
+   "model": "openrouter/openai/gpt-oss-120b",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 5,
+   "tested": 10,
+   "rate": 0.5
+  },
+  {
+   "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 8,
+   "tested": 18,
+   "rate": 0.4444444444444444
+  },
+  {
+   "model": "groq/qwen/qwen3-32b",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 8,
+   "tested": 18,
+   "rate": 0.4444444444444444
+  },
+  {
+   "model": "openrouter/z-ai/glm-5.2",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 3,
+   "tested": 10,
+   "rate": 0.3
+  },
+  {
+   "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 0,
+   "tested": 8,
+   "rate": 0.0
+  },
+  {
+   "model": "openrouter/qwen/qwen3-30b-a3b",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 0,
+   "tested": 8,
+   "rate": 0.0
+  },
+  {
+   "model": "openrouter/meta-llama/llama-4-maverick",
+   "temp": 0.5,
+   "att": 5,
+   "passed": 0,
+   "tested": 2,
+   "rate": 0.0
+  }
+ ],
+ "gap": {
+  "nxp": [
+   0.7364583333333333,
+   0.5165525793650794,
+   5
+  ],
+  "zephyr": [
+   0.9032575757575758,
+   0.7751224296536796,
+   14
+  ]
+ },
+ "consistency": {
+  "zephyr": [
+   {
+    "model": "openrouter/qwen/qwen3-30b-a3b",
+    "n": 8,
+    "p1": 0.0,
+    "p3": 0.0,
+    "p5": 0.0,
+    "cov": 0.0
+   },
+   {
+    "model": "openrouter/meta-llama/llama-4-maverick",
+    "n": 2,
+    "p1": 0.0,
+    "p3": 0.0,
+    "p5": 0.0,
+    "cov": 0.0
+   },
+   {
+    "model": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+    "n": 8,
+    "p1": 0.04999999999999999,
+    "p3": 0.15,
+    "p5": 0.25,
+    "cov": 0.21395833333333333
+   },
+   {
+    "model": "groq/llama-3.3-70b-versatile",
+    "n": 18,
+    "p1": 0.4555555555555555,
+    "p3": 0.5,
+    "p5": 0.5,
+    "cov": 0.8341363636363637
+   },
+   {
+    "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+    "n": 18,
+    "p1": 0.47777777777777775,
+    "p3": 0.5,
+    "p5": 0.5,
+    "cov": 0.8557954545454546
+   },
+   {
+    "model": "groq/qwen/qwen3-32b",
+    "n": 18,
+    "p1": 0.43333333333333335,
+    "p3": 0.5,
+    "p5": 0.5,
+    "cov": 0.5095227272727273
+   },
+   {
+    "model": "openrouter/google/gemma-4-31b-it",
+    "n": 27,
+    "p1": 0.5037037037037037,
+    "p3": 0.5407407407407407,
+    "p5": 0.5555555555555556,
+    "cov": 0.4794503129890454
+   },
+   {
+    "model": "groq/openai/gpt-oss-20b",
+    "n": 18,
+    "p1": 0.5666666666666667,
+    "p3": 0.6555555555555556,
+    "p5": 0.6666666666666666,
+    "cov": 0.7832954545454546
+   },
+   {
+    "model": "openrouter/openai/gpt-oss-120b",
+    "n": 10,
+    "p1": 0.4,
+    "p3": 0.6,
+    "p5": 0.7,
+    "cov": 0.6362754329004329
+   },
+   {
+    "model": "openrouter/z-ai/glm-4.7-flash",
+    "n": 8,
+    "p1": 0.6,
+    "p3": 0.75,
+    "p5": 0.75,
+    "cov": 0.7669494047619048
+   },
+   {
+    "model": "groq/openai/gpt-oss-120b",
+    "n": 18,
+    "p1": 0.8,
+    "p3": 0.8333333333333334,
+    "p5": 0.8333333333333334,
+    "cov": 0.9032575757575758
+   },
+   {
+    "model": "openrouter/deepseek/deepseek-v4-flash",
+    "n": 158,
+    "p1": 0.6949367088607594,
+    "p3": 0.8303797468354429,
+    "p5": 0.8734177215189873,
+    "cov": 0.9027701632052898
+   },
+   {
+    "model": "openrouter/qwen/qwen3-235b-a22b",
+    "n": 8,
+    "p1": 0.7,
+    "p3": 0.8625,
+    "p5": 0.875,
+    "cov": 0.8083184523809523
+   },
+   {
+    "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+    "n": 16,
+    "p1": 0.825,
+    "p3": 0.875,
+    "p5": 0.875,
+    "cov": 0.8674355158730158
+   }
+  ],
+  "nxp": [
+   {
+    "model": "openrouter/google/gemma-4-31b-it",
+    "n": 24,
+    "p1": 0.0,
+    "p3": 0.0,
+    "p5": 0.0,
+    "cov": 0.3952876984126984
+   },
+   {
+    "model": "openrouter/openai/gpt-oss-120b",
+    "n": 24,
+    "p1": 0.008333333333333331,
+    "p3": 0.024999999999999998,
+    "p5": 0.041666666666666664,
+    "cov": 0.4710262345679012
+   },
+   {
+    "model": "openrouter/z-ai/glm-5.2",
+    "n": 24,
+    "p1": 0.06666666666666667,
+    "p3": 0.10833333333333334,
+    "p5": 0.125,
+    "cov": 0.5165525793650794
+   },
+   {
+    "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+    "n": 24,
+    "p1": 0.11666666666666665,
+    "p3": 0.24583333333333335,
+    "p5": 0.3333333333333333,
+    "cov": 0.6166021825396826
+   },
+   {
+    "model": "openrouter/deepseek/deepseek-v4-flash",
+    "n": 24,
+    "p1": 0.3,
+    "p3": 0.5499999999999999,
+    "p5": 0.625,
+    "cov": 0.7364583333333333
+   }
+  ]
+ }
+}
