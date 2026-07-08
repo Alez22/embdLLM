@@ -1,0 +1,249 @@
+{
+  "version": "0.1.0",
+  "date": "2026-06-23",
+  "models": [
+    {
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "pass_at_1": 1.0,
+      "pass_at_1_quality": 1.0,
+      "pass_at_1_comparable": null,
+      "pass_at_3": 1.0,
+      "pass_at_5": 1.0,
+      "avg_score": 1.0,
+      "check_coverage": 1.0,
+      "avg_duration_seconds": 0.005770997999889005,
+      "total_cases": 2,
+      "passed_cases": 2,
+      "passed_cases_quality": 2,
+      "comparable_cases": null,
+      "layer_pass_rates": {
+        "compile_gate": 1.0,
+        "runtime_execution": 1.0,
+        "static_analysis": 1.0,
+        "static_heuristic": 1.0,
+        "test_quality_proof": 1.0
+      },
+      "pass_at_1_ci": [
+        0.34237195288961925,
+        1.0
+      ],
+      "n_samples": 1,
+      "per_check_stats": [
+        {
+          "check_name": "build_env",
+          "category": "gpio-basic",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "clock_gate_before_gpio_init",
+          "category": "gpio-basic",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "falling_edge_interrupt_configured",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "flag_cleared_inside_isr",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "gpio_mux_enum_used",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "gpio_pin_init_called",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "gpio_toggle_called",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_clock_h",
+          "category": "gpio-basic",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_gpio_h",
+          "category": "gpio-basic",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_port_h",
+          "category": "gpio-basic",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "interrupt_flag_cleared",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "isr_handler_defined",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_cross_platform_hallucination",
+          "category": "gpio-basic",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "nvic_interrupt_enabled",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "nxp_available",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "nxp_gcc",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "output_direction_configured",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pin_interrupt_configured",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pinmux_as_gpio_before_init",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "category": "gpio-basic",
+      "pass_at_1": 1.0,
+      "total_cases": 2,
+      "passed_cases": 2
+    }
+  ],
+  "tier_scores": [
+    {
+      "tier": "core",
+      "pass_at_1": 1.0,
+      "total_cases": 2,
+      "passed_cases": 2
+    }
+  ],
+  "reasoning_scores": [
+    {
+      "reasoning_type": "api_recall",
+      "pass_at_1": 1.0,
+      "total_cases": 2,
+      "passed_cases": 2
+    },
+    {
+      "reasoning_type": "rule_application",
+      "pass_at_1": 1.0,
+      "total_cases": 2,
+      "passed_cases": 2
+    },
+    {
+      "reasoning_type": "system_reasoning",
+      "pass_at_1": 1.0,
+      "total_cases": 2,
+      "passed_cases": 2
+    }
+  ],
+  "sdk_scores": [
+    {
+      "sdk": "mcuxpresso-sdk",
+      "pass_at_1": 1.0,
+      "total_cases": 2,
+      "passed_cases": 2
+    }
+  ],
+  "overall": {
+    "total_cases": 2,
+    "total_models": 1,
+    "best_model": "openrouter/anthropic/claude-opus-4.8",
+    "best_pass_at_1": 1.0,
+    "common_cases": null,
+    "case_set_warning": null
+  },
+  "scenario": "generation",
+  "temperature": 0.5,
+  "n_samples_per_case": 1,
+  "n_runs": 1,
+  "run_timestamp": "2026-06-23",
+  "run_time": "1839",
+  "model": "openrouter/anthropic/claude-opus-4.8",
+  "total_results": 2,
+  "passed": 2,
+  "failed": 0
+}

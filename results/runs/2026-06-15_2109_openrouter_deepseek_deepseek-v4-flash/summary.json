@@ -1,0 +1,246 @@
+{
+  "version": "0.1.0",
+  "date": "2026-06-15",
+  "models": [
+    {
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "pass_at_1": 0.0,
+      "pass_at_1_quality": 0.0,
+      "pass_at_1_comparable": null,
+      "pass_at_3": 0.0,
+      "pass_at_5": 0.0,
+      "avg_score": 0.0,
+      "check_coverage": 0.0,
+      "avg_duration_seconds": 0.0,
+      "total_cases": 24,
+      "passed_cases": 0,
+      "passed_cases_quality": 0,
+      "comparable_cases": null,
+      "layer_pass_rates": {
+        "static_analysis": 0.0
+      },
+      "pass_at_1_ci": [
+        0.0,
+        0.13798057582897535
+      ],
+      "n_samples": 5,
+      "per_check_stats": [
+        {
+          "check_name": "llm_call",
+          "category": "audio",
+          "total_runs": 15,
+          "fail_count": 15,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-rt1170-audio-001",
+            "nxp-rt1170-sai-001",
+            "nxp-rt1170-sai-002"
+          ]
+        },
+        {
+          "check_name": "llm_call",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 5,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-rt1170-dma-001"
+          ]
+        },
+        {
+          "check_name": "llm_call",
+          "category": "gpio-basic",
+          "total_runs": 20,
+          "fail_count": 20,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-gpio-001",
+            "nxp-mcxc-gpio-002",
+            "nxp-rt1170-gpio-001",
+            "nxp-rt1170-gpio-002"
+          ]
+        },
+        {
+          "check_name": "llm_call",
+          "category": "isr-concurrency",
+          "total_runs": 10,
+          "fail_count": 10,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-isr-001",
+            "nxp-rt1170-isr-001"
+          ]
+        },
+        {
+          "check_name": "llm_call",
+          "category": "spi-i2c",
+          "total_runs": 25,
+          "fail_count": 25,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-i2c-001",
+            "nxp-mcxc-i2c-002",
+            "nxp-mcxc-spi-001",
+            "nxp-rt1170-lpi2c-001",
+            "nxp-rt1170-lpspi-001"
+          ]
+        },
+        {
+          "check_name": "llm_call",
+          "category": "storage",
+          "total_runs": 10,
+          "fail_count": 10,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-flash-001",
+            "nxp-mcxc-flash-002"
+          ]
+        },
+        {
+          "check_name": "llm_call",
+          "category": "timer",
+          "total_runs": 10,
+          "fail_count": 10,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-timer-001",
+            "nxp-rt1170-gpt-001"
+          ]
+        },
+        {
+          "check_name": "llm_call",
+          "category": "uart",
+          "total_runs": 15,
+          "fail_count": 15,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-uart-001",
+            "nxp-mcxc-uart-002",
+            "nxp-rt1170-lpuart-001"
+          ]
+        },
+        {
+          "check_name": "llm_call",
+          "category": "watchdog",
+          "total_runs": 10,
+          "fail_count": 10,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-watchdog-001",
+            "nxp-rt1170-rtwdog-001"
+          ]
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "category": "audio",
+      "pass_at_1": 0.0,
+      "total_cases": 3,
+      "passed_cases": 0
+    },
+    {
+      "category": "dma",
+      "pass_at_1": 0.0,
+      "total_cases": 1,
+      "passed_cases": 0
+    },
+    {
+      "category": "gpio-basic",
+      "pass_at_1": 0.0,
+      "total_cases": 4,
+      "passed_cases": 0
+    },
+    {
+      "category": "isr-concurrency",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    },
+    {
+      "category": "spi-i2c",
+      "pass_at_1": 0.0,
+      "total_cases": 5,
+      "passed_cases": 0
+    },
+    {
+      "category": "storage",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    },
+    {
+      "category": "timer",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    },
+    {
+      "category": "uart",
+      "pass_at_1": 0.0,
+      "total_cases": 3,
+      "passed_cases": 0
+    },
+    {
+      "category": "watchdog",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    }
+  ],
+  "tier_scores": [
+    {
+      "tier": "core",
+      "pass_at_1": 0.0,
+      "total_cases": 24,
+      "passed_cases": 0
+    }
+  ],
+  "reasoning_scores": [
+    {
+      "reasoning_type": "api_recall",
+      "pass_at_1": 0.0,
+      "total_cases": 24,
+      "passed_cases": 0
+    },
+    {
+      "reasoning_type": "rule_application",
+      "pass_at_1": 0.0,
+      "total_cases": 24,
+      "passed_cases": 0
+    },
+    {
+      "reasoning_type": "system_reasoning",
+      "pass_at_1": 0.0,
+      "total_cases": 24,
+      "passed_cases": 0
+    }
+  ],
+  "sdk_scores": [
+    {
+      "sdk": "mcuxpresso-sdk",
+      "pass_at_1": 0.0,
+      "total_cases": 24,
+      "passed_cases": 0
+    }
+  ],
+  "overall": {
+    "total_cases": 24,
+    "total_models": 1,
+    "best_model": "openrouter/deepseek/deepseek-v4-flash",
+    "best_pass_at_1": 0.0,
+    "common_cases": null,
+    "case_set_warning": null
+  },
+  "scenario": "generation",
+  "temperature": 0.0,
+  "n_samples_per_case": 5,
+  "n_runs": 1,
+  "run_timestamp": "2026-06-15",
+  "run_time": "2109",
+  "model": "openrouter/deepseek/deepseek-v4-flash",
+  "total_results": 120,
+  "passed": 0,
+  "failed": 120
+}

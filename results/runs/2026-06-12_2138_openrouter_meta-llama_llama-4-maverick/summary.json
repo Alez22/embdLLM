@@ -1,0 +1,104 @@
+{
+  "version": "0.1.0",
+  "date": "2026-06-12",
+  "models": [
+    {
+      "model": "openrouter/meta-llama/llama-4-maverick",
+      "pass_at_1": 0.0,
+      "pass_at_1_quality": 0.0,
+      "pass_at_1_comparable": null,
+      "pass_at_3": 0.0,
+      "pass_at_5": 0.0,
+      "avg_score": 0.0,
+      "check_coverage": 0.0,
+      "avg_duration_seconds": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0,
+      "passed_cases_quality": 0,
+      "comparable_cases": null,
+      "layer_pass_rates": {
+        "static_analysis": 0.0
+      },
+      "pass_at_1_ci": [
+        0.0,
+        0.6576280471103807
+      ],
+      "n_samples": 5,
+      "per_check_stats": [
+        {
+          "check_name": "llm_call",
+          "category": "adc",
+          "total_runs": 10,
+          "fail_count": 10,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "adc-001",
+            "adc-002"
+          ]
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "category": "adc",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    }
+  ],
+  "tier_scores": [
+    {
+      "tier": "core",
+      "pass_at_1": 0.0,
+      "total_cases": 1,
+      "passed_cases": 0
+    },
+    {
+      "tier": "challenge",
+      "pass_at_1": 0.0,
+      "total_cases": 1,
+      "passed_cases": 0
+    }
+  ],
+  "reasoning_scores": [
+    {
+      "reasoning_type": "api_recall",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    },
+    {
+      "reasoning_type": "rule_application",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    }
+  ],
+  "sdk_scores": [
+    {
+      "sdk": "zephyr",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    }
+  ],
+  "overall": {
+    "total_cases": 2,
+    "total_models": 1,
+    "best_model": "openrouter/meta-llama/llama-4-maverick",
+    "best_pass_at_1": 0.0,
+    "common_cases": null,
+    "case_set_warning": null
+  },
+  "scenario": "generation",
+  "temperature": 0.5,
+  "n_samples_per_case": 5,
+  "n_runs": 1,
+  "run_timestamp": "2026-06-12",
+  "run_time": "2138",
+  "model": "openrouter/meta-llama/llama-4-maverick",
+  "total_results": 10,
+  "passed": 0,
+  "failed": 10
+}

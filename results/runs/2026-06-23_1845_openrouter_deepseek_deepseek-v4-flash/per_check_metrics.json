@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "run_id": null,
+  "generated": "2026-06-23T18:45:05Z",
+  "rows": [
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "gpio_pin_init_called",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "gpio_toggle_called",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_clock_h",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "interrupt_flag_cleared",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_gpio_h",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_port_h",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_clock_h",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_gpio_h",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_port_h",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "isr_handler_defined",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "pin_interrupt_configured",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    }
+  ]
+}

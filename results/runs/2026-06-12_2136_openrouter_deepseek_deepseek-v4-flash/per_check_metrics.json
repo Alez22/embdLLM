@@ -1,0 +1,583 @@
+{
+  "schema_version": 1,
+  "run_id": null,
+  "generated": "2026-06-12T21:36:44Z",
+  "rows": [
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 3,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "sample_buffer_nonzero",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 4,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 3,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-002",
+      "category": "dma",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-003",
+      "category": "dma",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-004",
+      "category": "dma",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-005",
+      "category": "dma",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-006",
+      "category": "dma",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-007",
+      "category": "dma",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-008",
+      "category": "dma",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-009",
+      "category": "dma",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-011",
+      "category": "dma",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-012",
+      "category": "dma",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "timer-001",
+      "category": "timer",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "timer-002",
+      "category": "timer",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "timer-003",
+      "category": "timer",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "timer-004",
+      "category": "timer",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "timer-005",
+      "category": "timer",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "timer-006",
+      "category": "timer",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "timer-007",
+      "category": "timer",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "timer-008",
+      "category": "timer",
+      "check_name": "llm_call",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "adc_header_included",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "adc_sequence_defined",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "buffer_linked_to_sequence",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "build_env",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "channel_setup_before_read",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "device_ready_check",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "kernel_header_included",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "millivolt_conversion_called",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "no_cross_platform_apis",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "no_raw_register_access",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "periodic_sampling_loop",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "read_return_value_checked",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "sample_buffer_declared",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "uses_adc_dt_spec",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "adc_channel_setup_called",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "adc_header_included",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "adc_read_called",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "build_env",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 8,
+      "passed": 8,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "device_ready_check",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "kernel_header_included",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "no_arduino_analogread",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "no_cross_platform_apis",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "no_stm32_hal_adc",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "oversampling_before_read",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "oversampling_configured",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "periodic_read_with_sleep",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "setup_before_read",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "valid_adc_resolution",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "block_size_set",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "build_env",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "completion_synchronization",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "config_before_start",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "device_ready_check",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "dma_block_config_struct",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "dma_config_called",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "dma_config_struct",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "dma_error_handling",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "dma_header_included",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "dma_start_called",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "memory_to_memory_direction",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "no_cross_platform_apis",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "separate_src_dst_buffers",
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    }
+  ]
+}

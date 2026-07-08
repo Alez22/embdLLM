@@ -1,0 +1,880 @@
+{
+  "schema_version": 1,
+  "run_id": null,
+  "generated": "2026-06-13T12:22:02Z",
+  "rows": [
+    {
+      "case_id": "dma-002",
+      "category": "dma",
+      "check_name": "peripheral_to_memory_direction",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-003",
+      "category": "dma",
+      "check_name": "cyclic_flag_set",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-003",
+      "category": "dma",
+      "check_name": "dma_reload_called",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-004",
+      "category": "dma",
+      "check_name": "head_block_set",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-004",
+      "category": "dma",
+      "check_name": "multiple_block_descriptors",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-005",
+      "category": "dma",
+      "check_name": "cache_header_included",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-007",
+      "category": "dma",
+      "check_name": "channel_priority_field_used",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-009",
+      "category": "dma",
+      "check_name": "dma_start_called_twice",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 3,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-011",
+      "category": "dma",
+      "check_name": "three_block_configs",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-012",
+      "category": "dma",
+      "check_name": "wait_for_completion",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 3,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "dma-003",
+      "category": "dma",
+      "check_name": "dma_config_and_start",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 1,
+      "pass_rate": 0.2
+    },
+    {
+      "case_id": "dma-003",
+      "category": "dma",
+      "check_name": "dma_stop_called",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 1,
+      "pass_rate": 0.2
+    },
+    {
+      "case_id": "dma-004",
+      "category": "dma",
+      "check_name": "next_block_pointer_used",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 1,
+      "pass_rate": 0.2
+    },
+    {
+      "case_id": "dma-011",
+      "category": "dma",
+      "check_name": "blocks_linked",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 1,
+      "pass_rate": 0.2
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "dma_block_config_struct",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 2,
+      "pass_rate": 0.4
+    },
+    {
+      "case_id": "dma-002",
+      "category": "dma",
+      "check_name": "dma_config_called",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 2,
+      "pass_rate": 0.4
+    },
+    {
+      "case_id": "dma-004",
+      "category": "dma",
+      "check_name": "block_count_set",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 2,
+      "pass_rate": 0.4
+    },
+    {
+      "case_id": "dma-005",
+      "category": "dma",
+      "check_name": "cache_invalidate_present",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 2,
+      "pass_rate": 0.4
+    },
+    {
+      "case_id": "dma-011",
+      "category": "dma",
+      "check_name": "head_block_set",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 2,
+      "pass_rate": 0.4
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "memory_to_memory_direction",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 2,
+      "passed": 1,
+      "pass_rate": 0.5
+    },
+    {
+      "case_id": "dma-002",
+      "category": "dma",
+      "check_name": "dma_config_struct",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 3,
+      "pass_rate": 0.6
+    },
+    {
+      "case_id": "dma-003",
+      "category": "dma",
+      "check_name": "dma_header_included",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 3,
+      "pass_rate": 0.6
+    },
+    {
+      "case_id": "dma-009",
+      "category": "dma",
+      "check_name": "kernel_header_included",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 3,
+      "pass_rate": 0.6
+    },
+    {
+      "case_id": "dma-011",
+      "category": "dma",
+      "check_name": "block_count_three",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 3,
+      "pass_rate": 0.6
+    },
+    {
+      "case_id": "dma-012",
+      "category": "dma",
+      "check_name": "cache_flush_before_dma",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 3,
+      "pass_rate": 0.6
+    },
+    {
+      "case_id": "dma-009",
+      "category": "dma",
+      "check_name": "timeout_mechanism_present",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 3,
+      "passed": 2,
+      "pass_rate": 0.6666666666666666
+    },
+    {
+      "case_id": "dma-008",
+      "category": "dma",
+      "check_name": "callback_sets_flag_on_error_status",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 3,
+      "pass_rate": 0.75
+    },
+    {
+      "case_id": "dma-008",
+      "category": "dma",
+      "check_name": "error_flag_causes_return",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 3,
+      "pass_rate": 0.75
+    },
+    {
+      "case_id": "dma-008",
+      "category": "dma",
+      "check_name": "error_flag_is_volatile",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 3,
+      "pass_rate": 0.75
+    },
+    {
+      "case_id": "dma-008",
+      "category": "dma",
+      "check_name": "error_flag_read_after_sync",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 3,
+      "pass_rate": 0.75
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "dma_header_included",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "dma-004",
+      "category": "dma",
+      "check_name": "dma_header_included",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "dma-006",
+      "category": "dma",
+      "check_name": "dma_header_included",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "dma-008",
+      "category": "dma",
+      "check_name": "volatile_error_flag",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "dma-009",
+      "category": "dma",
+      "check_name": "dma_header_included",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "dma-012",
+      "category": "dma",
+      "check_name": "dma_header_included",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "block_size_set",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "build_env",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "completion_synchronization",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "config_before_start",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "device_ready_check",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "dma_config_called",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "dma_config_struct",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "dma_error_handling",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "dma_start_called",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "no_cross_platform_apis",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-001",
+      "category": "dma",
+      "check_name": "separate_src_dst_buffers",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-002",
+      "category": "dma",
+      "check_name": "dma_header_included",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-002",
+      "category": "dma",
+      "check_name": "dma_start_called",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-005",
+      "category": "dma",
+      "check_name": "cache_flush_present",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-005",
+      "category": "dma",
+      "check_name": "dma_header_included",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-005",
+      "category": "dma",
+      "check_name": "dst_buffer_aligned",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-006",
+      "category": "dma",
+      "check_name": "aligned_attribute_present",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 9,
+      "passed": 9,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-006",
+      "category": "dma",
+      "check_name": "alignment_at_least_cache_line",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-006",
+      "category": "dma",
+      "check_name": "alignment_value_sufficient",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-006",
+      "category": "dma",
+      "check_name": "both_buffers_aligned",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-006",
+      "category": "dma",
+      "check_name": "both_src_dst_buffers_present",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-006",
+      "category": "dma",
+      "check_name": "buffer_verified_after_dma",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-006",
+      "category": "dma",
+      "check_name": "build_env",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 8,
+      "passed": 8,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-006",
+      "category": "dma",
+      "check_name": "config_before_start",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-006",
+      "category": "dma",
+      "check_name": "dma_config_and_start_present",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-006",
+      "category": "dma",
+      "check_name": "no_cross_platform_apis",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-006",
+      "category": "dma",
+      "check_name": "no_memalign",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-006",
+      "category": "dma",
+      "check_name": "no_posix_memalign",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-006",
+      "category": "dma",
+      "check_name": "semaphore_synchronization",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-007",
+      "category": "dma",
+      "check_name": "device_dt_get_present",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-007",
+      "category": "dma",
+      "check_name": "dma_header_included",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-007",
+      "category": "dma",
+      "check_name": "two_dma_config_calls",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-007",
+      "category": "dma",
+      "check_name": "two_dma_start_calls",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-008",
+      "category": "dma",
+      "check_name": "build_env",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 8,
+      "passed": 8,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-008",
+      "category": "dma",
+      "check_name": "callback_checks_status_parameter",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-008",
+      "category": "dma",
+      "check_name": "dma_callback_defined",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-008",
+      "category": "dma",
+      "check_name": "dma_config_and_start_present",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-008",
+      "category": "dma",
+      "check_name": "dma_header_included",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-008",
+      "category": "dma",
+      "check_name": "dma_stop_called",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-008",
+      "category": "dma",
+      "check_name": "dma_stop_in_error_path",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-008",
+      "category": "dma",
+      "check_name": "dma_stop_on_error",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-008",
+      "category": "dma",
+      "check_name": "error_flag_checked_after_wait",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-008",
+      "category": "dma",
+      "check_name": "no_cross_platform_apis",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-009",
+      "category": "dma",
+      "check_name": "build_env",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 6,
+      "passed": 6,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-009",
+      "category": "dma",
+      "check_name": "dma_config_after_stop",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-009",
+      "category": "dma",
+      "check_name": "dma_stop_called",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-009",
+      "category": "dma",
+      "check_name": "error_status_checked",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-009",
+      "category": "dma",
+      "check_name": "no_arduino_contamination",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-009",
+      "category": "dma",
+      "check_name": "no_cross_platform_apis",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-009",
+      "category": "dma",
+      "check_name": "no_freertos_contamination",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-009",
+      "category": "dma",
+      "check_name": "statistics_tracking",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-009",
+      "category": "dma",
+      "check_name": "timeout_abort_variable_present",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-009",
+      "category": "dma",
+      "check_name": "transfer_size_256",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-011",
+      "category": "dma",
+      "check_name": "dma_header_included",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-011",
+      "category": "dma",
+      "check_name": "single_dma_start",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-012",
+      "category": "dma",
+      "check_name": "buffer_alignment",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-012",
+      "category": "dma",
+      "check_name": "build_env",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 6,
+      "passed": 6,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-012",
+      "category": "dma",
+      "check_name": "device_ready_check",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 3,
+      "passed": 3,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-012",
+      "category": "dma",
+      "check_name": "direction_memory_to_memory",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-012",
+      "category": "dma",
+      "check_name": "dma_start_called",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "dma-012",
+      "category": "dma",
+      "check_name": "dma_structs_used",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    }
+  ]
+}

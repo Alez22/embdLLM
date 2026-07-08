@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "run_id": null,
+  "generated": "2026-06-23T17:53:45Z",
+  "rows": [
+    {
+      "case_id": "nxp-mcxc-flash-001",
+      "category": "storage",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-002",
+      "category": "storage",
+      "check_name": "two_flash_slots_defined",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-001",
+      "category": "storage",
+      "check_name": "flash_erase_sector_called",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-001",
+      "category": "storage",
+      "check_name": "flash_init_called",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-001",
+      "category": "storage",
+      "check_name": "flash_program_called",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-001",
+      "category": "storage",
+      "check_name": "flash_verify_program_called",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-001",
+      "category": "storage",
+      "check_name": "header_fsl_flash_h",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-001",
+      "category": "storage",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-002",
+      "category": "storage",
+      "check_name": "crc_function_implemented",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-002",
+      "category": "storage",
+      "check_name": "full_flash_sequence_present",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-002",
+      "category": "storage",
+      "check_name": "header_fsl_flash_h",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-002",
+      "category": "storage",
+      "check_name": "magic_constant_defined",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-002",
+      "category": "storage",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    }
+  ]
+}

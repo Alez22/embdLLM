@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "run_id": null,
+  "generated": "2026-06-17T17:20:41Z",
+  "rows": [
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "gpio_pin_init_called",
+      "model": "mock",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "gpio_toggle_called",
+      "model": "mock",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_clock_h",
+      "model": "mock",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_gpio_h",
+      "model": "mock",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_port_h",
+      "model": "mock",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "mock",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    }
+  ]
+}

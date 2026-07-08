@@ -1,0 +1,961 @@
+{
+  "schema_version": 1,
+  "run_id": null,
+  "generated": "2026-06-13T10:35:11Z",
+  "rows": [
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "net_sockets_sockopt_tls_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "spi_dma_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 2,
+      "pass_rate": 0.4
+    },
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "tls_credentials_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 2,
+      "pass_rate": 0.4
+    },
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "mbedtls_builtin_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 3,
+      "pass_rate": 0.6
+    },
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "net_sockets_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "all_required_configs_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "build_env",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 4,
+      "passed": 4,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "dependency_chain_complete",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "dependency_chain_consistent",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "dma_dependency_chain",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "dma_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "no_conflicting_configs",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "no_conflicting_options",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_config_options",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "no_newlib_minimal_libc_conflict",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 2,
+      "passed": 2,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-001",
+      "category": "kconfig",
+      "check_name": "spi_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "all_required_configs_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "bt_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "bt_hci_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "bt_mesh_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "bt_mesh_relay_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "bt_requires_hci",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "build_env",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "friend_low_power_mutual_exclusion",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "mesh_requires_bt",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "no_friend_low_power_conflict",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_config_options",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "no_newlib_minimal_libc_conflict",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-002",
+      "category": "kconfig",
+      "check_name": "relay_requires_mesh",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-003",
+      "category": "kconfig",
+      "check_name": "all_required_configs_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-003",
+      "category": "kconfig",
+      "check_name": "build_env",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-003",
+      "category": "kconfig",
+      "check_name": "cdc_acm_requires_usb_device_stack",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-003",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-003",
+      "category": "kconfig",
+      "check_name": "no_fake_usb_serial_option",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-003",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_config_options",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-003",
+      "category": "kconfig",
+      "check_name": "no_newlib_minimal_libc_conflict",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-003",
+      "category": "kconfig",
+      "check_name": "uart_line_ctrl_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-003",
+      "category": "kconfig",
+      "check_name": "uart_line_ctrl_requires_cdc_acm",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-003",
+      "category": "kconfig",
+      "check_name": "usb_cdc_acm_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-003",
+      "category": "kconfig",
+      "check_name": "usb_device_stack_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "all_required_configs_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "build_env",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_backend_requires_log",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_backend_uart_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_buffer_size_positive",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_buffer_size_power_of_2",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_buffer_size_set",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_mode_deferred_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "log_mode_mutual_exclusion",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_config_options",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "no_log_mode_immediate_conflict",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-004",
+      "category": "kconfig",
+      "check_name": "no_newlib_minimal_libc_conflict",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "mbedtls_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "networking_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-005",
+      "category": "kconfig",
+      "check_name": "no_conflicting_tls_backend",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "all_required_security_configs_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "assert_not_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "build_env",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "debug_not_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "defense_in_depth_stack_protection",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "hw_stack_protection_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "no_assert_in_production",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "no_debug_in_production",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "no_debug_optimizations_in_production",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_config_options",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_secure_mode",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "no_newlib_minimal_libc_conflict",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "secure_boot_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "secure_boot_requires_fw_info",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-006",
+      "category": "kconfig",
+      "check_name": "stack_canaries_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "all_required_configs_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "bt_coex_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "bt_coex_requires_bt_and_wifi",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "bt_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "build_env",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "networking_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_config_options",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_wifi_ble_coex",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "no_newlib_minimal_libc_conflict",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "wifi_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "wifi_mgmt_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "wifi_mgmt_requires_wifi",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-007",
+      "category": "kconfig",
+      "check_name": "wifi_requires_networking",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "all_required_configs_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "arm_mpu_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "build_env",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "heap_mem_pool_adequate",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "kconfig_format",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "max_domain_partitions_positive",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "memory_sizing_configured",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "mpu_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "mpu_has_platform_implementation",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "mpu_platform_mutual_exclusion",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "no_conflicting_duplicate_config_keys",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "no_hallucinated_config_options",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "no_mpu_platform_conflict",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "no_newlib_minimal_libc_conflict",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "userspace_enabled",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "kconfig-008",
+      "category": "kconfig",
+      "check_name": "userspace_requires_mpu",
+      "model": "openrouter/google/gemma-4-31b-it",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    }
+  ]
+}

@@ -1,0 +1,173 @@
+{
+  "version": "0.1.0",
+  "date": "2026-06-23",
+  "models": [
+    {
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "pass_at_1": 0.0,
+      "pass_at_1_quality": 0.0,
+      "pass_at_1_comparable": null,
+      "pass_at_3": 0.0,
+      "pass_at_5": 0.0,
+      "avg_score": 0.0,
+      "check_coverage": 0.3392857142857143,
+      "avg_duration_seconds": 112.00412832400002,
+      "total_cases": 2,
+      "passed_cases": 0,
+      "passed_cases_quality": 0,
+      "comparable_cases": null,
+      "layer_pass_rates": {
+        "static_analysis": 0.0
+      },
+      "pass_at_1_ci": [
+        0.0,
+        0.6576280471103807
+      ],
+      "n_samples": 1,
+      "per_check_stats": [
+        {
+          "check_name": "gpio_pin_init_called",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-gpio-001"
+          ]
+        },
+        {
+          "check_name": "gpio_toggle_called",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-gpio-001"
+          ]
+        },
+        {
+          "check_name": "header_fsl_clock_h",
+          "category": "gpio-basic",
+          "total_runs": 2,
+          "fail_count": 1,
+          "pass_rate": 0.5,
+          "failing_tc_ids": [
+            "nxp-mcxc-gpio-001"
+          ]
+        },
+        {
+          "check_name": "header_fsl_gpio_h",
+          "category": "gpio-basic",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_port_h",
+          "category": "gpio-basic",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "interrupt_flag_cleared",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-gpio-002"
+          ]
+        },
+        {
+          "check_name": "isr_handler_defined",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_cross_platform_hallucination",
+          "category": "gpio-basic",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pin_interrupt_configured",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "category": "gpio-basic",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    }
+  ],
+  "tier_scores": [
+    {
+      "tier": "core",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    }
+  ],
+  "reasoning_scores": [
+    {
+      "reasoning_type": "api_recall",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    },
+    {
+      "reasoning_type": "rule_application",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    },
+    {
+      "reasoning_type": "system_reasoning",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    }
+  ],
+  "sdk_scores": [
+    {
+      "sdk": "mcuxpresso-sdk",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    }
+  ],
+  "overall": {
+    "total_cases": 2,
+    "total_models": 1,
+    "best_model": "openrouter/deepseek/deepseek-v4-flash",
+    "best_pass_at_1": 0.0,
+    "common_cases": null,
+    "case_set_warning": null
+  },
+  "scenario": "generation",
+  "temperature": 0.5,
+  "n_samples_per_case": 1,
+  "n_runs": 1,
+  "run_timestamp": "2026-06-23",
+  "run_time": "1845",
+  "model": "openrouter/deepseek/deepseek-v4-flash",
+  "total_results": 2,
+  "passed": 0,
+  "failed": 2
+}

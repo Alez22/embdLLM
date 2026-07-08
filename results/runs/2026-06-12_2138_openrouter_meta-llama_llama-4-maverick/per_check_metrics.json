@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "run_id": null,
+  "generated": "2026-06-12T21:38:50Z",
+  "rows": [
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "llm_call",
+      "model": "openrouter/meta-llama/llama-4-maverick",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "llm_call",
+      "model": "openrouter/meta-llama/llama-4-maverick",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    }
+  ]
+}

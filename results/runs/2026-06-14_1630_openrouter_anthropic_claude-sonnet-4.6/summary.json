@@ -1,0 +1,1628 @@
+{
+  "version": "0.1.0",
+  "date": "2026-06-14",
+  "models": [
+    {
+      "model": "openrouter/anthropic/claude-sonnet-4.6",
+      "pass_at_1": 0.2916666666666667,
+      "pass_at_1_quality": 0.2916666666666667,
+      "pass_at_1_comparable": null,
+      "pass_at_3": 0.2916666666666667,
+      "pass_at_5": 0.2916666666666667,
+      "avg_score": 0.2916666666666667,
+      "check_coverage": 0.7483878968253969,
+      "avg_duration_seconds": 0.010823280874622773,
+      "total_cases": 24,
+      "passed_cases": 7,
+      "passed_cases_quality": 7,
+      "comparable_cases": null,
+      "layer_pass_rates": {
+        "compile_gate": 1.0,
+        "runtime_execution": 1.0,
+        "static_analysis": 0.7083333333333334,
+        "static_heuristic": 0.4117647058823529,
+        "test_quality_proof": 0.8571428571428571
+      },
+      "pass_at_1_ci": [
+        0.14914460334164278,
+        0.49168063658709704
+      ],
+      "n_samples": 1,
+      "per_check_stats": [
+        {
+          "check_name": "baud_rate_configured",
+          "category": "uart",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-rt1170-lpuart-001"
+          ]
+        },
+        {
+          "check_name": "bit_clock_rate_set",
+          "category": "audio",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-rt1170-sai-002"
+          ]
+        },
+        {
+          "check_name": "both_shared_vars_volatile",
+          "category": "isr-concurrency",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "both_slots_written",
+          "category": "storage",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "both_transfer_returns_checked",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-i2c-002"
+          ]
+        },
+        {
+          "check_name": "both_write_and_read_transfers",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "build_env",
+          "category": "audio",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "build_env",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "build_env",
+          "category": "gpio-basic",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "build_env",
+          "category": "isr-concurrency",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "build_env",
+          "category": "spi-i2c",
+          "total_runs": 10,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "build_env",
+          "category": "storage",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "build_env",
+          "category": "timer",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "build_env",
+          "category": "uart",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "build_env",
+          "category": "watchdog",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "clock_gate_before_gpio_init",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "clock_gate_before_gpio_init",
+          "category": "isr-concurrency",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "clock_gate_before_i2c_init",
+          "category": "spi-i2c",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "clock_gate_before_pit_init",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-timer-001"
+          ]
+        },
+        {
+          "check_name": "clock_gate_before_spi_init",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "clock_gate_before_uart_init",
+          "category": "uart",
+          "total_runs": 2,
+          "fail_count": 1,
+          "pass_rate": 0.5,
+          "failing_tc_ids": [
+            "nxp-mcxc-uart-002"
+          ]
+        },
+        {
+          "check_name": "clock_root_configured",
+          "category": "audio",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "clock_root_configured",
+          "category": "spi-i2c",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "clock_root_configured",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "compare_value_set",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "cop_init_called",
+          "category": "watchdog",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "cop_refresh_called",
+          "category": "watchdog",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "cop_refresh_inside_main_loop",
+          "category": "watchdog",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "corruption_recovery_handled",
+          "category": "storage",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "crc_excludes_crc_field",
+          "category": "storage",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-flash-002"
+          ]
+        },
+        {
+          "check_name": "crc_function_implemented",
+          "category": "storage",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "cs_asserted_before_transfer",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-spi-001"
+          ]
+        },
+        {
+          "check_name": "cs_deasserted_after_transfer",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "cs_idle_high_initial_state",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dcache_clean_before_start",
+          "category": "dma",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-rt1170-dma-001"
+          ]
+        },
+        {
+          "check_name": "dcache_coherency_handled",
+          "category": "dma",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-rt1170-dma-001"
+          ]
+        },
+        {
+          "check_name": "dcache_invalidate_after_transfer",
+          "category": "dma",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-rt1170-dma-001"
+          ]
+        },
+        {
+          "check_name": "default_transfer_flag_set",
+          "category": "spi-i2c",
+          "total_runs": 2,
+          "fail_count": 1,
+          "pass_rate": 0.5,
+          "failing_tc_ids": [
+            "nxp-mcxc-i2c-001"
+          ]
+        },
+        {
+          "check_name": "dma_buffers_cache_aligned",
+          "category": "dma",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "done_flag_volatile",
+          "category": "dma",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "echo_read_write_api",
+          "category": "uart",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "edma_init_called",
+          "category": "dma",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "edma_transfer_prepared",
+          "category": "dma",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "edma_transfer_started",
+          "category": "dma",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "falling_edge_configured",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-rt1170-gpio-002"
+          ]
+        },
+        {
+          "check_name": "fifo_interrupt_enabled",
+          "category": "audio",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "fifo_underrun_handled",
+          "category": "audio",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "flash_erase_key_used",
+          "category": "storage",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-flash-002"
+          ]
+        },
+        {
+          "check_name": "flash_erase_sector_called",
+          "category": "storage",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-flash-001"
+          ]
+        },
+        {
+          "check_name": "flash_init_called",
+          "category": "storage",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "flash_program_called",
+          "category": "storage",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "flash_verify_program_called",
+          "category": "storage",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "full_flash_sequence_present",
+          "category": "storage",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "gpio_mux_enum_used",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "gpio_pin_init_called",
+          "category": "gpio-basic",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "gpio_pin_read_in_code",
+          "category": "isr-concurrency",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "gpio_toggle_called",
+          "category": "gpio-basic",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_clock_h",
+          "category": "gpio-basic",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_clock_h",
+          "category": "isr-concurrency",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_clock_h",
+          "category": "spi-i2c",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_clock_h",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_clock_h",
+          "category": "uart",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_cop_h",
+          "category": "watchdog",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_edma_h",
+          "category": "dma",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_flash_h",
+          "category": "storage",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_gpio_h",
+          "category": "gpio-basic",
+          "total_runs": 4,
+          "fail_count": 1,
+          "pass_rate": 0.75,
+          "failing_tc_ids": [
+            "nxp-rt1170-gpio-002"
+          ]
+        },
+        {
+          "check_name": "header_fsl_gpio_h",
+          "category": "isr-concurrency",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_gpio_h",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_gpt_h",
+          "category": "isr-concurrency",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_gpt_h",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_i2c_h",
+          "category": "spi-i2c",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_iomuxc_h",
+          "category": "audio",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_iomuxc_h",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_iomuxc_h",
+          "category": "spi-i2c",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_iomuxc_h",
+          "category": "uart",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_lpi2c_h",
+          "category": "audio",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_lpi2c_h",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_lpspi_h",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_lpuart_h",
+          "category": "uart",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_pit_h",
+          "category": "isr-concurrency",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_pit_h",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_port_h",
+          "category": "gpio-basic",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_port_h",
+          "category": "spi-i2c",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_port_h",
+          "category": "uart",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_rtwdog_h",
+          "category": "watchdog",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_sai_h",
+          "category": "audio",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_spi_h",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "header_fsl_uart_h",
+          "category": "uart",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "i2c_address_not_preshifted",
+          "category": "spi-i2c",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "i2c_blocking_transfer_used",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "i2c_master_init_called",
+          "category": "spi-i2c",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "interrupt_flag_cleared",
+          "category": "gpio-basic",
+          "total_runs": 2,
+          "fail_count": 2,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-gpio-002",
+            "nxp-rt1170-gpio-002"
+          ]
+        },
+        {
+          "check_name": "interrupt_flag_cleared",
+          "category": "isr-concurrency",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "interrupt_flag_cleared",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "iomuxc_before_gpio_init",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-rt1170-gpio-001"
+          ]
+        },
+        {
+          "check_name": "iomuxc_before_lpi2c_init",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "iomuxc_before_lpspi_init",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "iomuxc_before_sai_init",
+          "category": "audio",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "isr_counter_volatile",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "isr_handler_defined",
+          "category": "audio",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "isr_handler_defined",
+          "category": "gpio-basic",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "isr_handler_defined",
+          "category": "isr-concurrency",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-rt1170-isr-001"
+          ]
+        },
+        {
+          "check_name": "isr_handler_defined",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "jedec_command_used",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "long_timeout_configured",
+          "category": "watchdog",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "lpi2c_blocking_transfer_used",
+          "category": "audio",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "lpi2c_blocking_transfer_used",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "lpi2c_master_init_called",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "lpo_clock_source_used",
+          "category": "watchdog",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "lpspi_transfer_used",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "magic_constant_defined",
+          "category": "storage",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_blocking_write",
+          "category": "audio",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_cross_platform_hallucination",
+          "category": "audio",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_cross_platform_hallucination",
+          "category": "dma",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_cross_platform_hallucination",
+          "category": "gpio-basic",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_cross_platform_hallucination",
+          "category": "isr-concurrency",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_cross_platform_hallucination",
+          "category": "spi-i2c",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_cross_platform_hallucination",
+          "category": "storage",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_cross_platform_hallucination",
+          "category": "timer",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_cross_platform_hallucination",
+          "category": "uart",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_cross_platform_hallucination",
+          "category": "watchdog",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_kinetis_port_api",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_legacy_kinetis_i2c_api",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_legacy_kinetis_spi_api",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_legacy_kinetis_wdog_api",
+          "category": "watchdog",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "nvic_irq_enabled",
+          "category": "audio",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "nvic_irq_enabled",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "nvic_pit_enabled",
+          "category": "isr-concurrency",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "nvic_pit_interrupt_enabled",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "nvic_uart_interrupt_enabled",
+          "category": "uart",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "output_direction_configured",
+          "category": "gpio-basic",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pad_config_set",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-rt1170-gpio-001"
+          ]
+        },
+        {
+          "check_name": "pcs_continuous_set",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "peripheral_interrupt_enabled",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pin_interrupt_configured",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-gpio-002"
+          ]
+        },
+        {
+          "check_name": "pinmux_as_gpio_before_init",
+          "category": "gpio-basic",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pinmux_before_i2c_init",
+          "category": "spi-i2c",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pinmux_before_spi_init",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pinmux_before_uart_init",
+          "category": "uart",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pit_flag_cleared_in_isr",
+          "category": "isr-concurrency",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pit_flag_cleared_in_isr",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pit_init_called",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pit_interrupts_enabled",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pit_isr_defined",
+          "category": "isr-concurrency",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pit_isr_defined",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pit_period_set",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "pit_timer_started",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "read_and_write_api_used",
+          "category": "audio",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-rt1170-audio-001"
+          ]
+        },
+        {
+          "check_name": "ready_flag_cleared_before_consuming",
+          "category": "isr-concurrency",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "refresh_inside_main_loop",
+          "category": "watchdog",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-rt1170-rtwdog-001"
+          ]
+        },
+        {
+          "check_name": "ring_buffer_array_declared",
+          "category": "uart",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "ring_buffer_indices_volatile",
+          "category": "uart",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "ring_buffer_volatile",
+          "category": "uart",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "rtwdog_init_called",
+          "category": "watchdog",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "rtwdog_refresh_used",
+          "category": "watchdog",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "rx_flag_checked_in_isr",
+          "category": "uart",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-mcxc-uart-002"
+          ]
+        },
+        {
+          "check_name": "sai_init_called",
+          "category": "audio",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-rt1170-sai-001"
+          ]
+        },
+        {
+          "check_name": "sai_tx_configured",
+          "category": "audio",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "sai_write_api_used",
+          "category": "audio",
+          "total_runs": 1,
+          "fail_count": 1,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "nxp-rt1170-sai-001"
+          ]
+        },
+        {
+          "check_name": "spi_blocking_transfer_used",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "spi_master_init_called",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "timeout_configured",
+          "category": "watchdog",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "timer_started",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "transfer_return_value_checked",
+          "category": "spi-i2c",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "transfer_status_checked",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "two_flash_slots_defined",
+          "category": "storage",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "two_separate_transfers",
+          "category": "spi-i2c",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "tx_enabled",
+          "category": "audio",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "uart_init_called",
+          "category": "uart",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "uart_isr_handler_defined",
+          "category": "uart",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "uart_rx_interrupt_enabled",
+          "category": "uart",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "uart_tx_enabled_in_config",
+          "category": "uart",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "uart_write_blocking_used",
+          "category": "uart",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "uptime_accessor_defined",
+          "category": "isr-concurrency",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "verify_after_each_write",
+          "category": "storage",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "volatile_sample_index",
+          "category": "audio",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "volatile_shared_data",
+          "category": "isr-concurrency",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "volatile_tick_counter",
+          "category": "timer",
+          "total_runs": 1,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "watchdog_not_disabled",
+          "category": "watchdog",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "category": "audio",
+      "pass_at_1": 0.0,
+      "total_cases": 3,
+      "passed_cases": 0
+    },
+    {
+      "category": "dma",
+      "pass_at_1": 0.0,
+      "total_cases": 1,
+      "passed_cases": 0
+    },
+    {
+      "category": "gpio-basic",
+      "pass_at_1": 0.25,
+      "total_cases": 4,
+      "passed_cases": 1
+    },
+    {
+      "category": "isr-concurrency",
+      "pass_at_1": 0.5,
+      "total_cases": 2,
+      "passed_cases": 1
+    },
+    {
+      "category": "spi-i2c",
+      "pass_at_1": 0.4,
+      "total_cases": 5,
+      "passed_cases": 2
+    },
+    {
+      "category": "storage",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    },
+    {
+      "category": "timer",
+      "pass_at_1": 0.5,
+      "total_cases": 2,
+      "passed_cases": 1
+    },
+    {
+      "category": "uart",
+      "pass_at_1": 0.3333333333333333,
+      "total_cases": 3,
+      "passed_cases": 1
+    },
+    {
+      "category": "watchdog",
+      "pass_at_1": 0.5,
+      "total_cases": 2,
+      "passed_cases": 1
+    }
+  ],
+  "tier_scores": [
+    {
+      "tier": "core",
+      "pass_at_1": 0.2916666666666667,
+      "total_cases": 24,
+      "passed_cases": 7
+    }
+  ],
+  "reasoning_scores": [
+    {
+      "reasoning_type": "api_recall",
+      "pass_at_1": 0.2916666666666667,
+      "total_cases": 24,
+      "passed_cases": 7
+    },
+    {
+      "reasoning_type": "rule_application",
+      "pass_at_1": 0.2916666666666667,
+      "total_cases": 24,
+      "passed_cases": 7
+    },
+    {
+      "reasoning_type": "system_reasoning",
+      "pass_at_1": 0.2916666666666667,
+      "total_cases": 24,
+      "passed_cases": 7
+    }
+  ],
+  "sdk_scores": [
+    {
+      "sdk": "mcuxpresso-sdk",
+      "pass_at_1": 0.2916666666666667,
+      "total_cases": 24,
+      "passed_cases": 7
+    }
+  ],
+  "overall": {
+    "total_cases": 24,
+    "total_models": 1,
+    "best_model": "openrouter/anthropic/claude-sonnet-4.6",
+    "best_pass_at_1": 0.2916666666666667,
+    "common_cases": null,
+    "case_set_warning": null
+  },
+  "scenario": "generation",
+  "temperature": 0.5,
+  "n_samples_per_case": 1,
+  "n_runs": 1,
+  "run_timestamp": "2026-06-14",
+  "run_time": "1630",
+  "model": "openrouter/anthropic/claude-sonnet-4.6",
+  "total_results": 24,
+  "passed": 7,
+  "failed": 17
+}

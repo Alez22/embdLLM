@@ -1,0 +1,753 @@
+{
+  "version": "0.1.0",
+  "date": "2026-06-13",
+  "models": [
+    {
+      "model": "openrouter/google/gemma-4-31b-it",
+      "pass_at_1": 0.5037037037037037,
+      "pass_at_1_quality": 0.5555555555555556,
+      "pass_at_1_comparable": null,
+      "pass_at_3": 0.5407407407407407,
+      "pass_at_5": 0.5555555555555556,
+      "avg_score": 0.5037037037037037,
+      "check_coverage": 0.4794503129890454,
+      "avg_duration_seconds": 33.22964804366207,
+      "total_cases": 27,
+      "passed_cases": 15,
+      "passed_cases_quality": 15,
+      "comparable_cases": null,
+      "layer_pass_rates": {
+        "compile_gate": 1.0,
+        "runtime_execution": 1.0,
+        "static_analysis": 0.4225352112676056,
+        "static_heuristic": 0.6666666666666666,
+        "test_quality_proof": 0.85
+      },
+      "pass_at_1_ci": [
+        0.32678200024726295,
+        0.6797027476257396
+      ],
+      "n_samples": 5,
+      "per_check_stats": [
+        {
+          "check_name": "aligned_attribute_present",
+          "category": "dma",
+          "total_runs": 9,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "alignment_at_least_cache_line",
+          "category": "dma",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "alignment_value_sufficient",
+          "category": "dma",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "block_count_set",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 3,
+          "pass_rate": 0.4,
+          "failing_tc_ids": [
+            "dma-004"
+          ]
+        },
+        {
+          "check_name": "block_count_three",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 2,
+          "pass_rate": 0.6,
+          "failing_tc_ids": [
+            "dma-011"
+          ]
+        },
+        {
+          "check_name": "block_size_set",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "blocks_linked",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 4,
+          "pass_rate": 0.2,
+          "failing_tc_ids": [
+            "dma-011"
+          ]
+        },
+        {
+          "check_name": "both_buffers_aligned",
+          "category": "dma",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "both_src_dst_buffers_present",
+          "category": "dma",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "buffer_alignment",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "buffer_verified_after_dma",
+          "category": "dma",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "build_env",
+          "category": "dma",
+          "total_runs": 32,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "cache_flush_before_dma",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 2,
+          "pass_rate": 0.6,
+          "failing_tc_ids": [
+            "dma-012"
+          ]
+        },
+        {
+          "check_name": "cache_flush_present",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "cache_header_included",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 5,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "dma-005"
+          ]
+        },
+        {
+          "check_name": "cache_invalidate_present",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 3,
+          "pass_rate": 0.4,
+          "failing_tc_ids": [
+            "dma-005"
+          ]
+        },
+        {
+          "check_name": "callback_checks_status_parameter",
+          "category": "dma",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "callback_sets_flag_on_error_status",
+          "category": "dma",
+          "total_runs": 4,
+          "fail_count": 1,
+          "pass_rate": 0.75,
+          "failing_tc_ids": [
+            "dma-008"
+          ]
+        },
+        {
+          "check_name": "channel_priority_field_used",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 5,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "dma-007"
+          ]
+        },
+        {
+          "check_name": "completion_synchronization",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "config_before_start",
+          "category": "dma",
+          "total_runs": 6,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "cyclic_flag_set",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 5,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "dma-003"
+          ]
+        },
+        {
+          "check_name": "device_dt_get_present",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "device_ready_check",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "direction_memory_to_memory",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_block_config_struct",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 3,
+          "pass_rate": 0.4,
+          "failing_tc_ids": [
+            "dma-001"
+          ]
+        },
+        {
+          "check_name": "dma_callback_defined",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_config_after_stop",
+          "category": "dma",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_config_and_start",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 4,
+          "pass_rate": 0.2,
+          "failing_tc_ids": [
+            "dma-003"
+          ]
+        },
+        {
+          "check_name": "dma_config_and_start_present",
+          "category": "dma",
+          "total_runs": 10,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_config_called",
+          "category": "dma",
+          "total_runs": 10,
+          "fail_count": 3,
+          "pass_rate": 0.7,
+          "failing_tc_ids": [
+            "dma-002"
+          ]
+        },
+        {
+          "check_name": "dma_config_struct",
+          "category": "dma",
+          "total_runs": 10,
+          "fail_count": 2,
+          "pass_rate": 0.8,
+          "failing_tc_ids": [
+            "dma-002"
+          ]
+        },
+        {
+          "check_name": "dma_error_handling",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_header_included",
+          "category": "dma",
+          "total_runs": 55,
+          "fail_count": 7,
+          "pass_rate": 0.8727272727272727,
+          "failing_tc_ids": [
+            "dma-001",
+            "dma-003",
+            "dma-004",
+            "dma-006",
+            "dma-009",
+            "dma-012"
+          ]
+        },
+        {
+          "check_name": "dma_reload_called",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 5,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "dma-003"
+          ]
+        },
+        {
+          "check_name": "dma_start_called",
+          "category": "dma",
+          "total_runs": 15,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_start_called_twice",
+          "category": "dma",
+          "total_runs": 3,
+          "fail_count": 3,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "dma-009"
+          ]
+        },
+        {
+          "check_name": "dma_stop_called",
+          "category": "dma",
+          "total_runs": 13,
+          "fail_count": 4,
+          "pass_rate": 0.6923076923076923,
+          "failing_tc_ids": [
+            "dma-003"
+          ]
+        },
+        {
+          "check_name": "dma_stop_in_error_path",
+          "category": "dma",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_stop_on_error",
+          "category": "dma",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_structs_used",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dst_buffer_aligned",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "error_flag_causes_return",
+          "category": "dma",
+          "total_runs": 4,
+          "fail_count": 1,
+          "pass_rate": 0.75,
+          "failing_tc_ids": [
+            "dma-008"
+          ]
+        },
+        {
+          "check_name": "error_flag_checked_after_wait",
+          "category": "dma",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "error_flag_is_volatile",
+          "category": "dma",
+          "total_runs": 4,
+          "fail_count": 1,
+          "pass_rate": 0.75,
+          "failing_tc_ids": [
+            "dma-008"
+          ]
+        },
+        {
+          "check_name": "error_flag_read_after_sync",
+          "category": "dma",
+          "total_runs": 4,
+          "fail_count": 1,
+          "pass_rate": 0.75,
+          "failing_tc_ids": [
+            "dma-008"
+          ]
+        },
+        {
+          "check_name": "error_status_checked",
+          "category": "dma",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "head_block_set",
+          "category": "dma",
+          "total_runs": 10,
+          "fail_count": 8,
+          "pass_rate": 0.2,
+          "failing_tc_ids": [
+            "dma-004",
+            "dma-011"
+          ]
+        },
+        {
+          "check_name": "kernel_header_included",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 2,
+          "pass_rate": 0.6,
+          "failing_tc_ids": [
+            "dma-009"
+          ]
+        },
+        {
+          "check_name": "memory_to_memory_direction",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 1,
+          "pass_rate": 0.5,
+          "failing_tc_ids": [
+            "dma-001"
+          ]
+        },
+        {
+          "check_name": "multiple_block_descriptors",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 5,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "dma-004"
+          ]
+        },
+        {
+          "check_name": "next_block_pointer_used",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 4,
+          "pass_rate": 0.2,
+          "failing_tc_ids": [
+            "dma-004"
+          ]
+        },
+        {
+          "check_name": "no_arduino_contamination",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_cross_platform_apis",
+          "category": "dma",
+          "total_runs": 13,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_freertos_contamination",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_memalign",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_posix_memalign",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "peripheral_to_memory_direction",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 5,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "dma-002"
+          ]
+        },
+        {
+          "check_name": "semaphore_synchronization",
+          "category": "dma",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "separate_src_dst_buffers",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "single_dma_start",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "statistics_tracking",
+          "category": "dma",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "three_block_configs",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 5,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "dma-011"
+          ]
+        },
+        {
+          "check_name": "timeout_abort_variable_present",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "timeout_mechanism_present",
+          "category": "dma",
+          "total_runs": 3,
+          "fail_count": 1,
+          "pass_rate": 0.6666666666666666,
+          "failing_tc_ids": [
+            "dma-009"
+          ]
+        },
+        {
+          "check_name": "transfer_size_256",
+          "category": "dma",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "two_dma_config_calls",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "two_dma_start_calls",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "volatile_error_flag",
+          "category": "dma",
+          "total_runs": 5,
+          "fail_count": 1,
+          "pass_rate": 0.8,
+          "failing_tc_ids": [
+            "dma-008"
+          ]
+        },
+        {
+          "check_name": "wait_for_completion",
+          "category": "dma",
+          "total_runs": 3,
+          "fail_count": 3,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "dma-012"
+          ]
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "category": "device-tree",
+      "pass_at_1": 0.75,
+      "total_cases": 8,
+      "passed_cases": 6
+    },
+    {
+      "category": "dma",
+      "pass_at_1": 0.2727272727272727,
+      "total_cases": 11,
+      "passed_cases": 3
+    },
+    {
+      "category": "kconfig",
+      "pass_at_1": 0.75,
+      "total_cases": 8,
+      "passed_cases": 6
+    }
+  ],
+  "tier_scores": [
+    {
+      "tier": "sanity",
+      "pass_at_1": 0.5,
+      "total_cases": 2,
+      "passed_cases": 1
+    },
+    {
+      "tier": "core",
+      "pass_at_1": 0.6363636363636364,
+      "total_cases": 11,
+      "passed_cases": 7
+    },
+    {
+      "tier": "challenge",
+      "pass_at_1": 0.5,
+      "total_cases": 14,
+      "passed_cases": 7
+    }
+  ],
+  "reasoning_scores": [
+    {
+      "reasoning_type": "api_recall",
+      "pass_at_1": 0.6521739130434783,
+      "total_cases": 23,
+      "passed_cases": 15
+    },
+    {
+      "reasoning_type": "rule_application",
+      "pass_at_1": 0.7222222222222222,
+      "total_cases": 18,
+      "passed_cases": 13
+    },
+    {
+      "reasoning_type": "cross_domain",
+      "pass_at_1": 0.16666666666666666,
+      "total_cases": 6,
+      "passed_cases": 1
+    },
+    {
+      "reasoning_type": "system_reasoning",
+      "pass_at_1": 0.3333333333333333,
+      "total_cases": 6,
+      "passed_cases": 2
+    }
+  ],
+  "sdk_scores": [
+    {
+      "sdk": "zephyr",
+      "pass_at_1": 0.5555555555555556,
+      "total_cases": 27,
+      "passed_cases": 15
+    }
+  ],
+  "overall": {
+    "total_cases": 27,
+    "total_models": 1,
+    "best_model": "openrouter/google/gemma-4-31b-it",
+    "best_pass_at_1": 0.5037037037037037,
+    "common_cases": null,
+    "case_set_warning": null
+  },
+  "scenario": "generation",
+  "temperature": 0.5,
+  "n_samples_per_case": 5,
+  "n_runs": 1,
+  "run_timestamp": "2026-06-13",
+  "run_time": "1222",
+  "model": "openrouter/google/gemma-4-31b-it",
+  "total_results": 55,
+  "passed": 8,
+  "failed": 47
+}

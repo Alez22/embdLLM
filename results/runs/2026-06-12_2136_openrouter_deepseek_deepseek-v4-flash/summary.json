@@ -1,0 +1,475 @@
+{
+  "version": "0.1.0",
+  "date": "2026-06-12",
+  "models": [
+    {
+      "model": "openrouter/deepseek/deepseek-v4-flash",
+      "pass_at_1": 0.0380952380952381,
+      "pass_at_1_quality": 0.09523809523809523,
+      "pass_at_1_comparable": null,
+      "pass_at_3": 0.08571428571428572,
+      "pass_at_5": 0.09523809523809523,
+      "avg_score": 0.0380952380952381,
+      "check_coverage": 0.07346938775510205,
+      "avg_duration_seconds": 1.3924335482571872,
+      "total_cases": 21,
+      "passed_cases": 2,
+      "passed_cases_quality": 2,
+      "comparable_cases": null,
+      "layer_pass_rates": {
+        "compile_gate": 1.0,
+        "runtime_execution": 1.0,
+        "static_analysis": 0.0761904761904762,
+        "static_heuristic": 0.5,
+        "test_quality_proof": 1.0
+      },
+      "pass_at_1_ci": [
+        0.0057516128912460385,
+        0.21330030002901673
+      ],
+      "n_samples": 5,
+      "per_check_stats": [
+        {
+          "check_name": "adc_channel_setup_called",
+          "category": "adc",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "adc_header_included",
+          "category": "adc",
+          "total_runs": 6,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "adc_read_called",
+          "category": "adc",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "adc_sequence_defined",
+          "category": "adc",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "block_size_set",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "buffer_linked_to_sequence",
+          "category": "adc",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "build_env",
+          "category": "adc",
+          "total_runs": 12,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "build_env",
+          "category": "dma",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "channel_setup_before_read",
+          "category": "adc",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "completion_synchronization",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "config_before_start",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "device_ready_check",
+          "category": "adc",
+          "total_runs": 6,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "device_ready_check",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_block_config_struct",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_config_called",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_config_struct",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_error_handling",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_header_included",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_start_called",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "kernel_header_included",
+          "category": "adc",
+          "total_runs": 6,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "llm_call",
+          "category": "adc",
+          "total_runs": 4,
+          "fail_count": 4,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "adc-001",
+            "adc-002"
+          ]
+        },
+        {
+          "check_name": "llm_call",
+          "category": "dma",
+          "total_runs": 53,
+          "fail_count": 53,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "dma-001",
+            "dma-002",
+            "dma-003",
+            "dma-004",
+            "dma-005",
+            "dma-006",
+            "dma-007",
+            "dma-008",
+            "dma-009",
+            "dma-011",
+            "dma-012"
+          ]
+        },
+        {
+          "check_name": "llm_call",
+          "category": "timer",
+          "total_runs": 40,
+          "fail_count": 40,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "timer-001",
+            "timer-002",
+            "timer-003",
+            "timer-004",
+            "timer-005",
+            "timer-006",
+            "timer-007",
+            "timer-008"
+          ]
+        },
+        {
+          "check_name": "memory_to_memory_direction",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "millivolt_conversion_called",
+          "category": "adc",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_arduino_analogread",
+          "category": "adc",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_cross_platform_apis",
+          "category": "adc",
+          "total_runs": 6,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_cross_platform_apis",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_raw_register_access",
+          "category": "adc",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_stm32_hal_adc",
+          "category": "adc",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "oversampling_before_read",
+          "category": "adc",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "oversampling_configured",
+          "category": "adc",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "periodic_read_with_sleep",
+          "category": "adc",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "periodic_sampling_loop",
+          "category": "adc",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "read_return_value_checked",
+          "category": "adc",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "sample_buffer_declared",
+          "category": "adc",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "sample_buffer_nonzero",
+          "category": "adc",
+          "total_runs": 4,
+          "fail_count": 4,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "adc-002"
+          ]
+        },
+        {
+          "check_name": "separate_src_dst_buffers",
+          "category": "dma",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "setup_before_read",
+          "category": "adc",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "uses_adc_dt_spec",
+          "category": "adc",
+          "total_runs": 2,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "valid_adc_resolution",
+          "category": "adc",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "category": "adc",
+      "pass_at_1": 0.5,
+      "total_cases": 2,
+      "passed_cases": 1
+    },
+    {
+      "category": "dma",
+      "pass_at_1": 0.09090909090909091,
+      "total_cases": 11,
+      "passed_cases": 1
+    },
+    {
+      "category": "timer",
+      "pass_at_1": 0.0,
+      "total_cases": 8,
+      "passed_cases": 0
+    }
+  ],
+  "tier_scores": [
+    {
+      "tier": "core",
+      "pass_at_1": 0.2222222222222222,
+      "total_cases": 9,
+      "passed_cases": 2
+    },
+    {
+      "tier": "challenge",
+      "pass_at_1": 0.0,
+      "total_cases": 12,
+      "passed_cases": 0
+    }
+  ],
+  "reasoning_scores": [
+    {
+      "reasoning_type": "api_recall",
+      "pass_at_1": 0.125,
+      "total_cases": 16,
+      "passed_cases": 2
+    },
+    {
+      "reasoning_type": "rule_application",
+      "pass_at_1": 0.2857142857142857,
+      "total_cases": 7,
+      "passed_cases": 2
+    },
+    {
+      "reasoning_type": "cross_domain",
+      "pass_at_1": 0.0,
+      "total_cases": 10,
+      "passed_cases": 0
+    },
+    {
+      "reasoning_type": "system_reasoning",
+      "pass_at_1": 0.125,
+      "total_cases": 8,
+      "passed_cases": 1
+    }
+  ],
+  "sdk_scores": [
+    {
+      "sdk": "zephyr",
+      "pass_at_1": 0.09523809523809523,
+      "total_cases": 21,
+      "passed_cases": 2
+    }
+  ],
+  "overall": {
+    "total_cases": 21,
+    "total_models": 1,
+    "best_model": "openrouter/deepseek/deepseek-v4-flash",
+    "best_pass_at_1": 0.0380952380952381,
+    "common_cases": null,
+    "case_set_warning": null
+  },
+  "scenario": "generation",
+  "temperature": 0.5,
+  "n_samples_per_case": 5,
+  "n_runs": 1,
+  "run_timestamp": "2026-06-12",
+  "run_time": "2136",
+  "model": "openrouter/deepseek/deepseek-v4-flash",
+  "total_results": 105,
+  "passed": 4,
+  "failed": 101
+}

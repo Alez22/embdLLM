@@ -1,0 +1,357 @@
+{
+  "version": "0.1.0",
+  "date": "2026-06-13",
+  "models": [
+    {
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "pass_at_1": 0.1769230769230769,
+      "pass_at_1_quality": 0.19230769230769232,
+      "pass_at_1_comparable": null,
+      "pass_at_3": 0.19230769230769232,
+      "pass_at_5": 0.19230769230769232,
+      "avg_score": 0.1769230769230769,
+      "check_coverage": 0.37815126050420167,
+      "avg_duration_seconds": 6.313589789294222,
+      "total_cases": 26,
+      "passed_cases": 5,
+      "passed_cases_quality": 5,
+      "comparable_cases": null,
+      "layer_pass_rates": {
+        "compile_gate": 1.0,
+        "runtime_execution": 1.0,
+        "static_analysis": 0.6470588235294118,
+        "static_heuristic": 0.5,
+        "test_quality_proof": 1.0
+      },
+      "pass_at_1_ci": [
+        0.07541917645971621,
+        0.3616083287678855
+      ],
+      "n_samples": 5,
+      "per_check_stats": [
+        {
+          "check_name": "adc_channel_setup_called",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "adc_header_included",
+          "category": "adc",
+          "total_runs": 10,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "adc_read_called",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "adc_sequence_defined",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "buffer_linked_to_sequence",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "build_env",
+          "category": "adc",
+          "total_runs": 20,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "channel_setup_before_read",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "device_ready_check",
+          "category": "adc",
+          "total_runs": 10,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "kernel_header_included",
+          "category": "adc",
+          "total_runs": 10,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "millivolt_conversion_called",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_arduino_analogread",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_cross_platform_apis",
+          "category": "adc",
+          "total_runs": 10,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_raw_register_access",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_stm32_hal_adc",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "oversampling_before_read",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "oversampling_configured",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "periodic_read_with_sleep",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "periodic_sampling_loop",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "read_return_value_checked",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "sample_buffer_declared",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "sample_buffer_nonzero",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 2,
+          "pass_rate": 0.6,
+          "failing_tc_ids": [
+            "adc-002"
+          ]
+        },
+        {
+          "check_name": "setup_before_read",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "uses_adc_dt_spec",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "valid_adc_resolution",
+          "category": "adc",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "category": "adc",
+      "pass_at_1": 1.0,
+      "total_cases": 2,
+      "passed_cases": 2
+    },
+    {
+      "category": "audio",
+      "pass_at_1": 0.0,
+      "total_cases": 3,
+      "passed_cases": 0
+    },
+    {
+      "category": "dma",
+      "pass_at_1": 0.0,
+      "total_cases": 1,
+      "passed_cases": 0
+    },
+    {
+      "category": "gpio-basic",
+      "pass_at_1": 0.25,
+      "total_cases": 4,
+      "passed_cases": 1
+    },
+    {
+      "category": "isr-concurrency",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    },
+    {
+      "category": "spi-i2c",
+      "pass_at_1": 0.2,
+      "total_cases": 5,
+      "passed_cases": 1
+    },
+    {
+      "category": "storage",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    },
+    {
+      "category": "timer",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    },
+    {
+      "category": "uart",
+      "pass_at_1": 0.3333333333333333,
+      "total_cases": 3,
+      "passed_cases": 1
+    },
+    {
+      "category": "watchdog",
+      "pass_at_1": 0.0,
+      "total_cases": 2,
+      "passed_cases": 0
+    }
+  ],
+  "tier_scores": [
+    {
+      "tier": "core",
+      "pass_at_1": 0.16,
+      "total_cases": 25,
+      "passed_cases": 4
+    },
+    {
+      "tier": "challenge",
+      "pass_at_1": 1.0,
+      "total_cases": 1,
+      "passed_cases": 1
+    }
+  ],
+  "reasoning_scores": [
+    {
+      "reasoning_type": "api_recall",
+      "pass_at_1": 0.19230769230769232,
+      "total_cases": 26,
+      "passed_cases": 5
+    },
+    {
+      "reasoning_type": "rule_application",
+      "pass_at_1": 0.19230769230769232,
+      "total_cases": 26,
+      "passed_cases": 5
+    },
+    {
+      "reasoning_type": "system_reasoning",
+      "pass_at_1": 0.125,
+      "total_cases": 24,
+      "passed_cases": 3
+    }
+  ],
+  "sdk_scores": [
+    {
+      "sdk": "zephyr",
+      "pass_at_1": 1.0,
+      "total_cases": 2,
+      "passed_cases": 2
+    },
+    {
+      "sdk": "mcuxpresso-sdk",
+      "pass_at_1": 0.125,
+      "total_cases": 24,
+      "passed_cases": 3
+    }
+  ],
+  "overall": {
+    "total_cases": 26,
+    "total_models": 1,
+    "best_model": "openrouter/qwen/qwen3-235b-a22b-2507",
+    "best_pass_at_1": 0.1769230769230769,
+    "common_cases": null,
+    "case_set_warning": null
+  },
+  "scenario": "generation",
+  "temperature": 0.5,
+  "n_samples_per_case": 5,
+  "n_runs": 1,
+  "run_timestamp": "2026-06-13",
+  "run_time": "2050",
+  "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+  "total_results": 10,
+  "passed": 8,
+  "failed": 2
+}

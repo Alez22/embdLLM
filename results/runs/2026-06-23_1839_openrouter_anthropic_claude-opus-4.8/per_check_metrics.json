@@ -1,0 +1,232 @@
+{
+  "schema_version": 1,
+  "run_id": null,
+  "generated": "2026-06-23T18:39:10Z",
+  "rows": [
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "build_env",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "clock_gate_before_gpio_init",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "gpio_mux_enum_used",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "gpio_pin_init_called",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "gpio_toggle_called",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_clock_h",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_gpio_h",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_port_h",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "output_direction_configured",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "pinmux_as_gpio_before_init",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "build_env",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "clock_gate_before_gpio_init",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "falling_edge_interrupt_configured",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "flag_cleared_inside_isr",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_clock_h",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_gpio_h",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_port_h",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "interrupt_flag_cleared",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "isr_handler_defined",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "nvic_interrupt_enabled",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "nxp_available",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "pin_interrupt_configured",
+      "model": "openrouter/anthropic/claude-opus-4.8",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    }
+  ]
+}

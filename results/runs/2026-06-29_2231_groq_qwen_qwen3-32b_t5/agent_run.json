@@ -1,0 +1,4439 @@
+{
+  "model": "groq/qwen/qwen3-32b",
+  "max_turns": 5,
+  "temperature": 0.0,
+  "timestamp": "2026-06-29T22:31:03",
+  "resumed_from": null,
+  "context_pack": "nxp.md",
+  "context_pack_hash": "756cb58f1914",
+  "cases": [
+    {
+      "case_id": "nxp-mcxc-flash-001",
+      "passed": false,
+      "turns_used": 5,
+      "passed_at_turn": null,
+      "total_cost_usd": 0.0,
+      "total_tokens": 15493,
+      "history": [
+        {
+          "case_id": "nxp-mcxc-flash-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 1,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00013731000035477336,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0002020880001509795,
+          "token_usage": {
+            "input_tokens": 959,
+            "output_tokens": 2048,
+            "total_tokens": 3007
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-flash-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 2,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00016984600006253459,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00022514800002682023,
+          "token_usage": {
+            "input_tokens": 1021,
+            "output_tokens": 2048,
+            "total_tokens": 3069
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-flash-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 3,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.0001719920001050923,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0002309159999640542,
+          "token_usage": {
+            "input_tokens": 1056,
+            "output_tokens": 2048,
+            "total_tokens": 3104
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-flash-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 4,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00012145399978180649,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00016943799982982455,
+          "token_usage": {
+            "input_tokens": 1091,
+            "output_tokens": 2048,
+            "total_tokens": 3139
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-flash-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 5,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00012263400003575953,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00017302299966104329,
+          "token_usage": {
+            "input_tokens": 1126,
+            "output_tokens": 2048,
+            "total_tokens": 3174
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        }
+      ]
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "passed": false,
+      "turns_used": 5,
+      "passed_at_turn": null,
+      "total_cost_usd": 0.0,
+      "total_tokens": 14824,
+      "history": [
+        {
+          "case_id": "nxp-mcxc-gpio-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 1,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00018232200000056764,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0002461600006427034,
+          "token_usage": {
+            "input_tokens": 812,
+            "output_tokens": 2048,
+            "total_tokens": 2860
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-gpio-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 2,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00013883100018574623,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00019434099976933794,
+          "token_usage": {
+            "input_tokens": 874,
+            "output_tokens": 2048,
+            "total_tokens": 2922
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-gpio-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 3,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00012891300048067933,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00017604900040169014,
+          "token_usage": {
+            "input_tokens": 909,
+            "output_tokens": 2048,
+            "total_tokens": 2957
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-gpio-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 4,
+          "generated_code": "#include \"fsl_common.h\"\n#include \"fsl_clock.h\"\n#include \"fsl_port.h\"\n#include \"fsl_gpio.h\"\n\nstatic void delay(void) {\n    for (volatile uint32_t i = 0; i < 100000; ++i) {\n        __NOP();\n    }\n}\n\nint main(void) {\n    // Enable clock for PORT E and GPIO E\n    CLOCK_EnableClock(k",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "header_fsl_gpio_h",
+                  "passed": true,
+                  "expected": "fsl_gpio.h included",
+                  "actual": "present",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "header_fsl_port_h",
+                  "passed": true,
+                  "expected": "fsl_port.h included",
+                  "actual": "present",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "header_fsl_clock_h",
+                  "passed": true,
+                  "expected": "fsl_clock.h included",
+                  "actual": "present",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "gpio_pin_init_called",
+                  "passed": false,
+                  "expected": "GPIO_PinInit called",
+                  "actual": "missing",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "gpio_toggle_called",
+                  "passed": false,
+                  "expected": "GPIO toggle or write API called",
+                  "actual": "missing",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "no_cross_platform_hallucination",
+                  "passed": true,
+                  "expected": "Only NXP MCUXpresso SDK APIs used",
+                  "actual": "clean",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.0035760049995587906,
+              "score": 0.6666666666666666
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.3333333333333333,
+          "duration_seconds": 0.0037404739996418357,
+          "token_usage": {
+            "input_tokens": 912,
+            "output_tokens": 2048,
+            "total_tokens": 2960
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-gpio-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 5,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00013341700014279922,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0001963499998964835,
+          "token_usage": {
+            "input_tokens": 1077,
+            "output_tokens": 2048,
+            "total_tokens": 3125
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        }
+      ]
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-001",
+      "passed": false,
+      "turns_used": 5,
+      "passed_at_turn": null,
+      "total_cost_usd": 0.0,
+      "total_tokens": 13677,
+      "history": [
+        {
+          "case_id": "nxp-mcxc-i2c-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 1,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00015631699989171466,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00021659000049112365,
+          "token_usage": {
+            "input_tokens": 850,
+            "output_tokens": 2048,
+            "total_tokens": 2898
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-i2c-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 2,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00013630400007969,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00019820700072159525,
+          "token_usage": {
+            "input_tokens": 912,
+            "output_tokens": 2048,
+            "total_tokens": 2960
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-i2c-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 3,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00015722199987067143,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00021951399958197726,
+          "token_usage": {
+            "input_tokens": 947,
+            "output_tokens": 2048,
+            "total_tokens": 2995
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-i2c-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 4,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00013706099980481667,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00017991599997913,
+          "token_usage": {
+            "input_tokens": 982,
+            "output_tokens": 2048,
+            "total_tokens": 3030
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-i2c-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 5,
+          "generated_code": "#include \"fsl_clock.h\"\n#include \"fsl_port.h\"\n#include \"fsl_i2c.h\"\n#include \"core_cm0plus.h\" // CMSIS core header\n\n// I2C peripheral and sensor definitions\n#define I2C_INSTANCE I2C0\n#define I2C_SENSOR_ADDRESS 0x68\n#define WHO_AM_I_REGISTER 0x75\n\n// Configure pin multiplexing for I2C\nvoid configure_i2c_pins(void) {\n    // Enable clock to PORT C\n    CLOCK_EnableClock(kCLOCK_PortC);\n\n    // Configure PTC8 as I2C0_SCL\n    PORT_SetPinMux(PORTC, 8, kPORT_MuxAlt4 |\n                   kPORT_OpenDrainEnable |\n                   kPORT_PullUp);\n\n    // Configure PTC9 as I2C0_SDA\n    PORT_SetPinMux(PORTC, 9, kPORT_MuxAlt4 |\n                   kPORT_OpenDrainEnable |\n                   kPORT_PullUp);\n}\n\nint main(void) {\n    // Initialize clock\n    CLOCK_SetSimConfig(kCLOCK_I2C0_FastMode);\n\n    // Initialize I2C\n    i2c_master_config_t i2cConfig = {\n        .baudRate_Bps = 100000,  // 100 kHz\n        .isPecEnabled = false,\n    };\n    I2C_MasterInit(I2C_INSTANCE, &i2cConfig, CLOCK_GetFreq(kCLOCK_I2C0_Clock));\n\n    // Configure I2C pins\n    configure_i2c_pins();\n\n    // Variable to store the result\n    uint8_t whoAmI;\n\n    // I2C master transfer\n    i2c_master_transfer_t transfer = {\n        .slaveAddress = I2C_SENSOR_ADDRESS,\n        .flags = kI2C_TransferDefaultFlag,\n        .subaddress = WHO_AM_I_REGISTER,\n        .subaddressSize = 1,\n        .data = &whoAmI,\n        .dataSize = 1\n    };\n\n    // Execute the I2C read operation\n    status_t status = I2C_MasterTransferBlocking(I2C_INSTANCE, &transfer);\n\n    if (status != kStatus_Success) {\n        // Handle error (add your error handling here)\n        __BKPT(0); // Breakpoint for debugging\n    }\n\n    // Optional: Add application code here to process whoAmI\n\n    // Infinite loop\n    while (1) {\n        // Main loop code\n    }\n\n    return 0;\n}",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": true,
+              "details": [
+                {
+                  "check_name": "header_fsl_i2c_h",
+                  "passed": true,
+                  "expected": "fsl_i2c.h included",
+                  "actual": "present",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "header_fsl_port_h",
+                  "passed": true,
+                  "expected": "fsl_port.h included",
+                  "actual": "present",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "header_fsl_clock_h",
+                  "passed": true,
+                  "expected": "fsl_clock.h included",
+                  "actual": "present",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "i2c_master_init_called",
+                  "passed": true,
+                  "expected": "I2C_MasterInit called",
+                  "actual": "present",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "i2c_blocking_transfer_used",
+                  "passed": true,
+                  "expected": "I2C_MasterTransferBlocking called",
+                  "actual": "present",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "no_cross_platform_hallucination",
+                  "passed": true,
+                  "expected": "Only NXP MCUXpresso SDK APIs used",
+                  "actual": "clean",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.0015782259997649817,
+              "score": 1.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "nxp_gcc",
+                  "passed": false,
+                  "expected": "exit code 0",
+                  "actual": "exit code 1",
+                  "check_type": "compile",
+                  "weight": 1.0
+                }
+              ],
+              "error": "/tmp/tmpak8sb8ab/main.c: In function 'configure_i2c_pins':\n/tmp/tmpak8sb8ab/main.c:18:20: error: 'kPORT_OpenDrainEnable' undeclared (first use in this function)\n   18 |                    kPORT_OpenDrainEnable |\n      |                    ^~~~~~~~~~~~~~~~~~~~~\n/tmp/tmpak8sb8ab/main.c:18:20: note: each undeclared identifier is reported only once for each function it appears in\n/tmp/tmpak8sb8ab/main.c: In function 'main':\n/tmp/tmpak8sb8ab/main.c:29:24: error: 'kCLOCK_I2C0_FastMode' undeclared (first use in this function)\n   29 |     CLOCK_SetSimConfig(kCLOCK_I2C0_FastMode);\n      |                        ^~~~~~~~~~~~~~~~~~~~\n/tmp/tmpak8sb8ab/main.c:34:10: error: 'i2c_master_config_t' {aka 'struct _i2c_master_config'} has no member named 'isPecEnabled'\n   34 |         .isPecEnabled = false,\n      |          ^~~~~~~~~~~~\n/tmp/tmpak8sb8ab/main.c:36:60: error: 'kCLOCK_I2C0_Clock' undeclared (first use in this function)\n   36 |     I2C_MasterInit(I2C_INSTANCE, &i2cConfig, CLOCK_GetFreq(kCLOCK_I2C0_Clock));\n      |                                                            ^~~~~~~~~~~~~~~~~\n",
+              "duration_seconds": 0.051154976000361785,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 1 failed",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 1 failed",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 1 failed",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 1,
+          "passed": false,
+          "total_score": 0.5,
+          "duration_seconds": 0.0528724420000799,
+          "token_usage": {
+            "input_tokens": 985,
+            "output_tokens": 809,
+            "total_tokens": 1794
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        }
+      ]
+    },
+    {
+      "case_id": "nxp-mcxc-isr-001",
+      "passed": false,
+      "turns_used": 5,
+      "passed_at_turn": null,
+      "total_cost_usd": 0.0,
+      "total_tokens": 15123,
+      "history": [
+        {
+          "case_id": "nxp-mcxc-isr-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 1,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00016226499974436592,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00022989700028119842,
+          "token_usage": {
+            "input_tokens": 885,
+            "output_tokens": 2048,
+            "total_tokens": 2933
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-isr-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 2,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.0005653729995174217,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0006250379992707167,
+          "token_usage": {
+            "input_tokens": 947,
+            "output_tokens": 2048,
+            "total_tokens": 2995
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-isr-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 3,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.000722273000064888,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0007764219999444322,
+          "token_usage": {
+            "input_tokens": 982,
+            "output_tokens": 2048,
+            "total_tokens": 3030
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-isr-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 4,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.0001998899997488479,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.000289902000076836,
+          "token_usage": {
+            "input_tokens": 1017,
+            "output_tokens": 2048,
+            "total_tokens": 3065
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-isr-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 5,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00022467399958259193,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0002914790002250811,
+          "token_usage": {
+            "input_tokens": 1052,
+            "output_tokens": 2048,
+            "total_tokens": 3100
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        }
+      ]
+    },
+    {
+      "case_id": "nxp-mcxc-spi-001",
+      "passed": false,
+      "turns_used": 5,
+      "passed_at_turn": null,
+      "total_cost_usd": 0.0,
+      "total_tokens": 15123,
+      "history": [
+        {
+          "case_id": "nxp-mcxc-spi-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 1,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00015465199976461008,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00020602600034180796,
+          "token_usage": {
+            "input_tokens": 885,
+            "output_tokens": 2048,
+            "total_tokens": 2933
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-spi-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 2,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.0002472239993949188,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0003839410001091892,
+          "token_usage": {
+            "input_tokens": 947,
+            "output_tokens": 2048,
+            "total_tokens": 2995
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-spi-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 3,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00018939900019177003,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00029532300050050253,
+          "token_usage": {
+            "input_tokens": 982,
+            "output_tokens": 2048,
+            "total_tokens": 3030
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-spi-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 4,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.0001316050002060365,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00020500600021478022,
+          "token_usage": {
+            "input_tokens": 1017,
+            "output_tokens": 2048,
+            "total_tokens": 3065
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-spi-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 5,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.0001844789994720486,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00025947499943868024,
+          "token_usage": {
+            "input_tokens": 1052,
+            "output_tokens": 2048,
+            "total_tokens": 3100
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        }
+      ]
+    },
+    {
+      "case_id": "nxp-mcxc-uart-001",
+      "passed": false,
+      "turns_used": 5,
+      "passed_at_turn": null,
+      "total_cost_usd": 0.0,
+      "total_tokens": 14903,
+      "history": [
+        {
+          "case_id": "nxp-mcxc-uart-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 1,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.0001978149994101841,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00027539399980014423,
+          "token_usage": {
+            "input_tokens": 841,
+            "output_tokens": 2048,
+            "total_tokens": 2889
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-uart-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 2,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00020184400000289315,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00027492400022310903,
+          "token_usage": {
+            "input_tokens": 903,
+            "output_tokens": 2048,
+            "total_tokens": 2951
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-uart-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 3,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00014172800001688302,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00018863200057239737,
+          "token_usage": {
+            "input_tokens": 938,
+            "output_tokens": 2048,
+            "total_tokens": 2986
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-uart-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 4,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.000189828000657144,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00025466500119364355,
+          "token_usage": {
+            "input_tokens": 973,
+            "output_tokens": 2048,
+            "total_tokens": 3021
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-mcxc-uart-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 5,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00016646200128889177,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0002243470007670112,
+          "token_usage": {
+            "input_tokens": 1008,
+            "output_tokens": 2048,
+            "total_tokens": 3056
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        }
+      ]
+    },
+    {
+      "case_id": "nxp-rt1170-dma-001",
+      "passed": false,
+      "turns_used": 5,
+      "passed_at_turn": null,
+      "total_cost_usd": 0.0,
+      "total_tokens": 13951,
+      "history": [
+        {
+          "case_id": "nxp-rt1170-dma-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 1,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00015394600086438004,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00020250200032023713,
+          "token_usage": {
+            "input_tokens": 852,
+            "output_tokens": 2048,
+            "total_tokens": 2900
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-rt1170-dma-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 2,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.0001456949994462775,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0002042360010818811,
+          "token_usage": {
+            "input_tokens": 914,
+            "output_tokens": 2048,
+            "total_tokens": 2962
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-rt1170-dma-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 3,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00017155199930130038,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0002362649993301602,
+          "token_usage": {
+            "input_tokens": 949,
+            "output_tokens": 2048,
+            "total_tokens": 2997
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-rt1170-dma-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 4,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00020373200095491484,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0002915090008173138,
+          "token_usage": {
+            "input_tokens": 984,
+            "output_tokens": 2048,
+            "total_tokens": 3032
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-rt1170-dma-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 5,
+          "generated_code": "#include \"fsl_common.h\"\n#include \"fsl_clock.h\"\n#include \"fsl_iomuxc.h\"\n#include \"fsl_edma.h\"\n\n// Define buffer sizes\n#define BUFFER_SIZE_BYTES 512\n\n// Define buffers in RAM (aligned for DMA)\nALIGN(16) uint8_t sourceBuffer[BUFFER_SIZE_BYTES];\nALIGN(16) uint8_t destBuffer[BUFFER_SIZE_BYTES];\n\n// eDMA peripheral instance\nedma_handle_t g_edmaHandle;\nvolatile bool transferComplete = false;\n\n// eDMA channel callback function\nstatic void EDMA_Callback(edma_handle_t *handle, void *userData, bool transferDone, uint32_t tcds)\n{\n    if (transferDone)\n    {\n        transferComplete = true;\n    }\n}\n\nint main(void)\n{\n    // Initialize system clock\n    CLOCK_EnableClock(kCLOCK_BusCfgClock);\n    CLOCK_EnableClock(kCLOCK_CoreSysPll);\n    CLOCK_SetMux(kCLOCK_CoreSysPllSel, 0); // Select oscillator as reference\n    CLOCK_SetMux(kCLOCK_PrePeriphPllDiv, 1); // Divide by 2\n    CLOCK_InitSysPfd(kCLOCK_Pfd0, 27); // Set PFD0 for LCDIF\n    CLOCK_InitSysPfd(kCLOCK_Pfd1, 22); // Set PFD1 for USB\n    CLOCK_EnableClock(kCLOCK_AccelerometerClock);\n    CLOCK_EnableClock(kCLOCK_DMA);\n\n    // Initialize eDMA\n    edma_config_t edmaConfig;\n    EDMA_GetDefaultConfig(&edmaConfig);\n    EDMA_Init(DMA0, &edmaConfig);\n    \n    // Create eDMA handle\n    EDMA_CreateHandle(&g_edmaHandle, DMA0, 0);\n    \n    // Set up DMA channel callback\n    EDMA_SetCallback(&g_edmaHandle, EDMA_Callback, NULL);\n\n    // Prepare source buffer with (index & 0xFF)\n    for (size_t i = 0; i < BUFFER_SIZE_BYTES; i++)\n    {\n        sourceBuffer[i] = (uint8_t)(i & 0xFF);\n    }\n\n    // Configure TCD for memory-to-memory transfer\n    edma_transfer_config_t tcdConfig;\n    EDMA_PrepareTransfer(&tcdConfig, sourceBuffer, sizeof(uint8_t), destBuffer, sizeof(uint8_t), \n                         sizeof(uint8_t), BUFFER_SIZE_BYTES, kEDMA_MemoryToMemory);\n    \n    // Submit transfer\n    EDMA_SubmitTransfer(&g_edmaHandle, &tcdConfig, kEDMA_EnableInterrupt);\n\n    // Start the transfer\n    EDMA_StartTransfer(&g_edmaHandle);\n\n    // Wait for transfer to complete\n    while (!transferComplete)\n    {\n        __WFE(); // Wait for event\n    }\n\n    // Verify the transfer\n    bool success = true;\n    for (size_t i = 0; i < BUFFER_SIZE_BYTES; i++)\n    {\n        if (sourceBuffer[i] != destBuffer[i])\n        {\n            success = false;\n            break;\n        }\n    }\n\n    // If there is any mismatch, halt in infinite loop\n    if (!success)\n    {\n        // Indicate error with LED (optional) if available\n        while (1)\n        {\n            // Optionally add LED blinking here to indicate error\n            __NOP();\n        }\n    }\n\n    // If everything is fine, enter low power mode or do something else\n    while (1)\n    {\n        __WFI(); // Wait for interrupt\n    }\n}",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": true,
+              "details": [
+                {
+                  "check_name": "header_fsl_edma_h",
+                  "passed": true,
+                  "expected": "fsl_edma.h included",
+                  "actual": "present",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "edma_init_called",
+                  "passed": true,
+                  "expected": "EDMA_Init called",
+                  "actual": "present",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "edma_transfer_prepared",
+                  "passed": true,
+                  "expected": "EDMA_PrepareTransfer called",
+                  "actual": "present",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "edma_transfer_started",
+                  "passed": true,
+                  "expected": "EDMA_StartTransfer called",
+                  "actual": "present",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "no_cross_platform_hallucination",
+                  "passed": true,
+                  "expected": "Only NXP MCUXpresso SDK APIs used",
+                  "actual": "clean",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.0030108290011412464,
+              "score": 1.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "nxp_gcc",
+                  "passed": false,
+                  "expected": "exit code 0",
+                  "actual": "exit code 1",
+                  "check_type": "compile",
+                  "weight": 1.0
+                }
+              ],
+              "error": "/tmp/tmp3u9t1hbm/main.c:10:7: error: expected declaration specifiers or '...' before numeric constant\n   10 | ALIGN(16) uint8_t sourceBuffer[BUFFER_SIZE_BYTES];\n      |       ^~\n/tmp/tmp3u9t1hbm/main.c:11:7: error: expected declaration specifiers or '...' before numeric constant\n   11 | ALIGN(16) uint8_t destBuffer[BUFFER_SIZE_BYTES];\n      |       ^~\n/tmp/tmp3u9t1hbm/main.c: In function 'main':\n/tmp/tmp3u9t1hbm/main.c:29:23: error: 'kCLOCK_BusCfgClock' undeclared (first use in this function)\n   29 |     CLOCK_EnableClock(kCLOCK_BusCfgClock);\n      |                       ^~~~~~~~~~~~~~~~~~\n/tmp/tmp3u9t1hbm/main.c:29:23: note: each undeclared identifier is reported only once for each function it appears in\n/tmp/tmp3u9t1hbm/main.c:30:23: error: 'kCLOCK_CoreSysPll' undeclared (first use in this function); did you mean 'kCLOCK_CoreSysClk'?\n   30 |     CLOCK_EnableClock(kCLOCK_CoreSysPll);\n      |                       ^~~~~~~~~~~~~~~~~\n      |                       kCLOCK_CoreSysClk\n/tmp/tmp3u9t1hbm/main.c:31:5: error: implicit declaration of function 'CLOCK_SetMux' [-Wimplicit-function-declaration]\n   31 |     CLOCK_SetMux(kCLOCK_CoreSysPllSel, 0); // Select oscillator as reference\n      |     ^~~~~~~~~~~~\n/tmp/tmp3u9t1hbm/main.c:31:18: error: 'kCLOCK_CoreSysPllSel' undeclared (first use in this function); did you mean 'kCLOCK_CoreSysClk'?\n   31 |     CLOCK_SetMux(kCLOCK_CoreSysPllSel, 0); // Select oscillator as reference\n      |                  ^~~~~~~~~~~~~~~~~~~~\n      |                  kCLOCK_CoreSysClk\n/tmp/tmp3u9t1hbm/main.c:32:18: error: 'kCLOCK_PrePeriphPllDiv' undeclared (first use in this function)\n   32 |     CLOCK_SetMux(kCLOCK_PrePeriphPllDiv, 1); // Divide by 2\n      |                  ^~~~~~~~~~~~~~~~~~~~~~\n/tmp/tmp3u9t1hbm/main.c:33:5: error: implicit declaration of function 'CLOCK_InitSysPfd'; did you mean 'CLOCK_InitPfd'? [-Wimplicit-function-declaration]\n   33 |     CLOCK_InitSysPfd(kCLOCK_Pfd0, 27); // Set PFD0 for LCDIF\n      |     ^~~~~~~~~~~~~~~~\n      |     CLOCK_InitPfd\n/tmp/tmp3u9t1hbm/main.c:35:23: error: 'kCLOCK_AccelerometerClock' undeclared (first use in this function)\n   35 |     CLOCK_EnableClock(kCLOCK_AccelerometerClock);\n      |                       ^~~~~~~~~~~~~~~~~~~~~~~~~\n/tmp/tmp3u9t1hbm/main.c:36:23: error: 'kCLOCK_DMA' undeclared (first use in this function); did you mean 'kCLOCK_Dac'?\n   36 |     CLOCK_EnableClock(kCLOCK_DMA);\n      |                       ^~~~~~~~~~\n      |                       kCLOCK_Dac\n/tmp/tmp3u9t1hbm/main.c:52:9: error: 'sourceBuffer' undeclared (first use in this function)\n   52 |         sourceBuffer[i] = (uint8_t)(i & 0xFF);\n      |         ^~~~~~~~~~~~\n/tmp/tmp3u9t1hbm/main.c:57:69: error: 'destBuffer' undeclared (first use in this function)\n   57 |     EDMA_PrepareTransfer(&tcdConfig, sourceBuffer, sizeof(uint8_t), destBuffer, sizeof(uint8_t),\n      |                                                                     ^~~~~~~~~~\n/tmp/tmp3u9t1hbm/main.c:61:52: error: 'kEDMA_EnableInterrupt' undeclared (first use in this function); did you mean 'EDMA_TcdEnableInterrupts'?\n   61 |     EDMA_SubmitTransfer(&g_edmaHandle, &tcdConfig, kEDMA_EnableInterrupt);\n      |                                                    ^~~~~~~~~~~~~~~~~~~~~\n      |                                                    EDMA_TcdEnableInterrupts\n/tmp/tmp3u9t1hbm/main.c:61:5: error: too many arguments to function 'EDMA_SubmitTransfer'\n   61 |     EDMA_SubmitTransfer(&g_edmaHandle, &tcdConfig, kEDMA_EnableInterrupt);\n      |     ^~~~~~~~~~~~~~~~~~~\nIn file included from /tmp/tmp3u9t1hbm/main.c:4:\n/opt/nxp-sdk/mcuxsdk-core/drivers/edma/fsl_edma.h:920:10: note: declared here\n  920 | status_t EDMA_SubmitTransfer(edma_handle_t *handle, const edma_transfer_config_t *config);\n      |          ^~~~~~~~~~~~~~~~~~~\n",
+              "duration_seconds": 0.5495567710004252,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 1 failed",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 1 failed",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 1 failed",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 1,
+          "passed": false,
+          "total_score": 0.5,
+          "duration_seconds": 0.5528426000000763,
+          "token_usage": {
+            "input_tokens": 987,
+            "output_tokens": 1073,
+            "total_tokens": 2060
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        }
+      ]
+    },
+    {
+      "case_id": "nxp-rt1170-gpio-001",
+      "passed": false,
+      "turns_used": 5,
+      "passed_at_turn": null,
+      "total_cost_usd": 0.0,
+      "total_tokens": 14778,
+      "history": [
+        {
+          "case_id": "nxp-rt1170-gpio-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 1,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00012262900054338388,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0001661969999986468,
+          "token_usage": {
+            "input_tokens": 816,
+            "output_tokens": 2048,
+            "total_tokens": 2864
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-rt1170-gpio-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 2,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00014409700088435784,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0001983519996429095,
+          "token_usage": {
+            "input_tokens": 878,
+            "output_tokens": 2048,
+            "total_tokens": 2926
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-rt1170-gpio-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 3,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00012966000031156,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0001833340011216933,
+          "token_usage": {
+            "input_tokens": 913,
+            "output_tokens": 2048,
+            "total_tokens": 2961
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-rt1170-gpio-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 4,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00019584199981181882,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0002861359989765333,
+          "token_usage": {
+            "input_tokens": 948,
+            "output_tokens": 2048,
+            "total_tokens": 2996
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-rt1170-gpio-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 5,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.0001654130010138033,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00023830400095903315,
+          "token_usage": {
+            "input_tokens": 983,
+            "output_tokens": 2048,
+            "total_tokens": 3031
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        }
+      ]
+    },
+    {
+      "case_id": "nxp-rt1170-lpi2c-001",
+      "passed": false,
+      "turns_used": 5,
+      "passed_at_turn": null,
+      "total_cost_usd": 0.0,
+      "total_tokens": 14963,
+      "history": [
+        {
+          "case_id": "nxp-rt1170-lpi2c-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 1,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00013844299974152818,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00020633799977076706,
+          "token_usage": {
+            "input_tokens": 853,
+            "output_tokens": 2048,
+            "total_tokens": 2901
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-rt1170-lpi2c-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 2,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00014629399993282277,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0002068289995804662,
+          "token_usage": {
+            "input_tokens": 915,
+            "output_tokens": 2048,
+            "total_tokens": 2963
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-rt1170-lpi2c-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 3,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00019721900025615469,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00026551100017968565,
+          "token_usage": {
+            "input_tokens": 950,
+            "output_tokens": 2048,
+            "total_tokens": 2998
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-rt1170-lpi2c-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 4,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00011555399942153599,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00015776099826325662,
+          "token_usage": {
+            "input_tokens": 985,
+            "output_tokens": 2048,
+            "total_tokens": 3033
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-rt1170-lpi2c-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 5,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00013853299969923683,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00018557400107965805,
+          "token_usage": {
+            "input_tokens": 1020,
+            "output_tokens": 2048,
+            "total_tokens": 3068
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        }
+      ]
+    },
+    {
+      "case_id": "nxp-rt1170-lpuart-001",
+      "passed": false,
+      "turns_used": 5,
+      "passed_at_turn": null,
+      "total_cost_usd": 0.0,
+      "total_tokens": 14334,
+      "history": [
+        {
+          "case_id": "nxp-rt1170-lpuart-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 1,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00020180600040475838,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00029423699925246183,
+          "token_usage": {
+            "input_tokens": 844,
+            "output_tokens": 2048,
+            "total_tokens": 2892
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-rt1170-lpuart-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 2,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.0001742410004226258,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00023726499966869596,
+          "token_usage": {
+            "input_tokens": 906,
+            "output_tokens": 2048,
+            "total_tokens": 2954
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-rt1170-lpuart-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 3,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.0001820109991967911,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.0002539180004532682,
+          "token_usage": {
+            "input_tokens": 941,
+            "output_tokens": 2048,
+            "total_tokens": 2989
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-rt1170-lpuart-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 4,
+          "generated_code": "",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "code_extracted",
+                  "passed": false,
+                  "expected": "LLM output contains a C source file",
+                  "actual": "empty \u2014 model returned prose or no code",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.00018414599981042556,
+              "score": 0.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 0 failed (no code extracted)",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 0,
+          "passed": false,
+          "total_score": 0.0,
+          "duration_seconds": 0.00027838499954668805,
+          "token_usage": {
+            "input_tokens": 976,
+            "output_tokens": 2048,
+            "total_tokens": 3024
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        },
+        {
+          "case_id": "nxp-rt1170-lpuart-001",
+          "category": null,
+          "sdk": null,
+          "model": "groq/qwen/qwen3-32b",
+          "attempt": 5,
+          "generated_code": "#include \"fsl_common.h\"\n#include \"fsl_clock.h\"\n#include \"fsl_iomuxc.h\"\n#include \"fsl_lpuart.h\"\n\n#define LPUART_INSTANCE LPUART1\n\nvoid BOARD_InitLPUARTClock(void)\n{\n    CLOCK_EnableClock(kCLOCK_Lpuart1);\n    \n    clock_root_config_t clockRootCfg = {\n        .clockRoot = kCLOCK_Root_Lpuart1,\n        .preDivider = 0,\n        .divider = 3\n    };\n    CLOCK_SetRootClock(&clockRootCfg);\n}\n\nvoid BOARD_InitLPUARTPins(void)\n{\n    // Configure RX pin (GPIO_AD_24)\n    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_24_LPUART1_RX, 0);\n    IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_24_LPUART1_RX,\n        (kIOMUXC_MuxModeAlt3 | kIOMUXC_PullUp | kIOMUXC_PadSpeed100FS));\n    \n    // Configure TX pin (GPIO_AD_25)\n    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_25_LPUART1_TX, 0);\n    IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_25_LPUART1_TX,\n        (kIOMUXC_MuxModeAlt3 | kIOMUXC_PullUp | kIOMUXC_PadSpeed100FS));\n}\n\nint main(void)\n{\n    lpuart_handle_t lpuartHandle;\n    lpuart_config_t lpuartConfig;\n    \n    // Initialize clock\n    BOARD_InitLPUARTClock();\n    \n    // Initialize pins\n    BOARD_InitLPUARTPins();\n    \n    // Get default configuration\n    LPUART_GetDefaultConfig(&lpuartConfig);\n    lpuartConfig.baudRate_Bps = 115200;\n    lpuartConfig.parityMode = kLPUART_ParityDisabled;\n    lpuartConfig.stopBitCount = kLPUART_OneStopBit;\n    lpuartConfig.dataBitsCount = kLPUART_EightDataBits;\n    \n    // Initialize LPUART\n    LPUART_Init(LPUART_INSTANCE, &lpuartConfig, CLOCK_GetFreq(kCLOCK_IrCs));\n    \n    uint8_t rxByte;\n    \n    while (1)\n    {\n        // Read one byte\n        while (LPUART_ReadBlocking(LPUART_INSTANCE, &rxByte, 1) != kStatus_Success);\n        \n        // Write byte back immediately\n        while (LPUART_WriteBlocking(LPUART_INSTANCE, &rxByte, 1) != kStatus_Success);\n    }\n}",
+          "layers": [
+            {
+              "layer": 0,
+              "name": "static_analysis",
+              "passed": true,
+              "details": [
+                {
+                  "check_name": "header_fsl_lpuart_h",
+                  "passed": true,
+                  "expected": "fsl_lpuart.h included",
+                  "actual": "present",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "header_fsl_iomuxc_h",
+                  "passed": true,
+                  "expected": "fsl_iomuxc.h included",
+                  "actual": "present",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "baud_rate_configured",
+                  "passed": true,
+                  "expected": "115200 baud rate configured",
+                  "actual": "present",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "echo_read_write_api",
+                  "passed": true,
+                  "expected": "LPUART_Read* and LPUART_Write* used for the echo loop",
+                  "actual": "present",
+                  "check_type": "exact_match",
+                  "weight": 1.0
+                },
+                {
+                  "check_name": "no_cross_platform_hallucination",
+                  "passed": true,
+                  "expected": "Only NXP MCUXpresso SDK APIs used",
+                  "actual": "clean",
+                  "check_type": "constraint",
+                  "weight": 1.0
+                }
+              ],
+              "error": null,
+              "duration_seconds": 0.0021012519991927547,
+              "score": 1.0
+            },
+            {
+              "layer": 1,
+              "name": "compile_gate",
+              "passed": false,
+              "details": [
+                {
+                  "check_name": "nxp_gcc",
+                  "passed": false,
+                  "expected": "exit code 0",
+                  "actual": "exit code 1",
+                  "check_type": "compile",
+                  "weight": 1.0
+                }
+              ],
+              "error": "/tmp/tmpycy3oz_5/main.c: In function 'BOARD_InitLPUARTClock':\n/tmp/tmpycy3oz_5/main.c:13:10: error: 'clock_root_config_t' {aka 'struct _clock_root_config_t'} has no member named 'clockRoot'\n   13 |         .clockRoot = kCLOCK_Root_Lpuart1,\n      |          ^~~~~~~~~\n/tmp/tmpycy3oz_5/main.c:14:10: error: 'clock_root_config_t' {aka 'struct _clock_root_config_t'} has no member named 'preDivider'\n   14 |         .preDivider = 0,\n      |          ^~~~~~~~~~\n/tmp/tmpycy3oz_5/main.c:15:10: error: 'clock_root_config_t' {aka 'struct _clock_root_config_t'} has no member named 'divider'\n   15 |         .divider = 3\n      |          ^~~~~~~\n/tmp/tmpycy3oz_5/main.c:17:24: error: incompatible type for argument 1 of 'CLOCK_SetRootClock'\n   17 |     CLOCK_SetRootClock(&clockRootCfg);\n      |                        ^~~~~~~~~~~~~\n      |                        |\n      |                        clock_root_config_t * {aka struct _clock_root_config_t *}\nIn file included from /opt/nxp-sdk/mcuxsdk-core/drivers/common/fsl_common_arm.h:675,\n                 from /opt/nxp-sdk/mcuxsdk-core/drivers/common/fsl_common.h:490,\n                 from /tmp/tmpycy3oz_5/main.c:1:\n/opt/nxp-sdk/rt/RT1170/MIMXRT1176/drivers/fsl_clock.h:2103:52: note: expected 'clock_root_t' {aka 'enum _clock_root'} but argument is of type 'clock_root_config_t *' {aka 'struct _clock_root_config_t *'}\n 2103 | static inline void CLOCK_SetRootClock(clock_root_t root, const clock_root_config_t *config)\n      |                                       ~~~~~~~~~~~~~^~~~\n/tmp/tmpycy3oz_5/main.c:17:5: error: too few arguments to function 'CLOCK_SetRootClock'\n   17 |     CLOCK_SetRootClock(&clockRootCfg);\n      |     ^~~~~~~~~~~~~~~~~~\n/opt/nxp-sdk/rt/RT1170/MIMXRT1176/drivers/fsl_clock.h:2103:20: note: declared here\n 2103 | static inline void CLOCK_SetRootClock(clock_root_t root, const clock_root_config_t *config)\n      |                    ^~~~~~~~~~~~~~~~~~\n/tmp/tmpycy3oz_5/main.c: In function 'BOARD_InitLPUARTPins':\n/tmp/tmpycy3oz_5/main.c:23:22: error: 'IOMUXC_GPIO_AD_24_LPUART1_RX' undeclared (first use in this function); did you mean 'IOMUXC_GPIO_AD_24_LPUART1_TXD'?\n   23 |     IOMUXC_SetPinMux(IOMUXC_GPIO_AD_24_LPUART1_RX, 0);\n      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~\n      |                      IOMUXC_GPIO_AD_24_LPUART1_TXD\n/tmp/tmpycy3oz_5/main.c:23:22: note: each undeclared identifier is reported only once for each function it appears in\n/tmp/tmpycy3oz_5/main.c:23:5: error: too few arguments to function 'IOMUXC_SetPinMux'\n   23 |     IOMUXC_SetPinMux(IOMUXC_GPIO_AD_24_LPUART1_RX, 0);\n      |     ^~~~~~~~~~~~~~~~\nIn file included from /tmp/tmpycy3oz_5/main.c:3:\n/opt/nxp-sdk/rt/RT1170/MIMXRT1176/drivers/fsl_iomuxc.h:1633:20: note: declared here\n 1633 | static inline void IOMUXC_SetPinMux(uint32_t muxRegister,\n      |                    ^~~~~~~~~~~~~~~~\n/tmp/tmpycy3oz_5/main.c:25:10: error: 'kIOMUXC_MuxModeAlt3' undeclared (first use in this function)\n   25 |         (kIOMUXC_MuxModeAlt3 | kIOMUXC_PullUp | kIOMUXC_PadSpeed100FS));\n      |          ^~~~~~~~~~~~~~~~~~~\n/tmp/tmpycy3oz_5/main.c:25:32: error: 'kIOMUXC_PullUp' undeclared (first use in this function)\n   25 |         (kIOMUXC_MuxModeAlt3 | kIOMUXC_PullUp | kIOMUXC_PadSpeed100FS));\n      |                                ^~~~~~~~~~~~~~\n/tmp/tmpycy3oz_5/main.c:25:49: error: 'kIOMUXC_PadSpeed100FS' undeclared (first use in this function)\n   25 |         (kIOMUXC_MuxModeAlt3 | kIOMUXC_PullUp | kIOMUXC_PadSpeed100FS));\n      |                                                 ^~~~~~~~~~~~~~~~~~~~~\n/tmp/tmpycy3oz_5/main.c:24:5: error: too few arguments to function 'IOMUXC_SetPinConfig'\n   24 |     IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_24_LPUART1_RX,\n      |     ^~~~~~~~~~~~~~~~~~~\n/opt/nxp-sdk/rt/RT1170/MIMXRT1176/drivers/fsl_iomuxc.h:1665:20: note: declared here\n 1665 | static inline void IOMUXC_SetPinConfig(uint32_t muxRegister,\n      |                    ^~~~~~~~~~~~~~~~~~~\n/tmp/tmpycy3oz_5/main.c:28:22: error: 'IOMUXC_GPIO_AD_25_LPUART1_TX' undeclared (first use in this function); did you mean 'IOMUXC_GPIO_AD_24_LPUART1_TXD'?\n   28 |     IOMUXC_SetPinMux(IOMUXC_GPIO_AD_25_LPUART1_TX, 0);\n      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~\n      |                      IOMUXC_GPIO_AD_24_LPUART1_TXD\n/tmp/tmpycy3oz_5/main.c:28:5: error: too few arguments to function 'IOMUXC_SetPinMux'\n   28 |     IOMUXC_SetPinMux(IOMUXC_GPIO_AD_25_LPUART1_TX, 0);\n      |     ^~~~~~~~~~~~~~~~\n/opt/nxp-sdk/rt/RT1170/MIMXRT1176/drivers/fsl_iomuxc.h:1633:20: note: declared here\n 1633 | static inline void IOMUXC_SetPinMux(uint32_t muxRegister,\n      |                    ^~~~~~~~~~~~~~~~\n/tmp/tmpycy3oz_5/main.c:29:5: error: too few arguments to function 'IOMUXC_SetPinConfig'\n   29 |     IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_25_LPUART1_TX,\n      |     ^~~~~~~~~~~~~~~~~~~\n/opt/nxp-sdk/rt/RT1170/MIMXRT1176/drivers/fsl_iomuxc.h:1665:20: note: declared here\n 1665 | static inline void IOMUXC_SetPinConfig(uint32_t muxRegister,\n      |                    ^~~~~~~~~~~~~~~~~~~\n/tmp/tmpycy3oz_5/main.c: In function 'main':\n/tmp/tmpycy3oz_5/main.c:52:63: error: 'kCLOCK_IrCs' undeclared (first use in this function); did you mean 'kCLOCK_Src'?\n   52 |     LPUART_Init(LPUART_INSTANCE, &lpuartConfig, CLOCK_GetFreq(kCLOCK_IrCs));\n      |                                                               ^~~~~~~~~~~\n      |                                                               kCLOCK_Src\n/tmp/tmpycy3oz_5/main.c:35:21: warning: unused variable 'lpuartHandle' [-Wunused-variable]\n   35 |     lpuart_handle_t lpuartHandle;\n      |                     ^~~~~~~~~~~~\n",
+              "duration_seconds": 0.4437160319994291,
+              "score": 0.0
+            },
+            {
+              "layer": 2,
+              "name": "runtime_execution",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 1 failed",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 3,
+              "name": "static_heuristic",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 1 failed",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            },
+            {
+              "layer": 4,
+              "name": "test_quality_proof",
+              "passed": false,
+              "details": [],
+              "error": "Skipped: layer 1 failed",
+              "duration_seconds": 0.0,
+              "score": 0.0
+            }
+          ],
+          "failed_at_layer": 1,
+          "passed": false,
+          "total_score": 0.5,
+          "duration_seconds": 0.44598433600003773,
+          "token_usage": {
+            "input_tokens": 979,
+            "output_tokens": 1496,
+            "total_tokens": 2475
+          },
+          "cost_usd": 0.0,
+          "tier": null,
+          "reasoning_types": [],
+          "used_thinking": false,
+          "temperature": 0.0,
+          "generation_params": {},
+          "prose_retry": false,
+          "cache_source": "llm",
+          "prompt_hash": null,
+          "checks_hash": null
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "pass_rate": 0.0,
+    "recovery_rate": 0.0,
+    "passed_at_turn_hist": {},
+    "total_cost_usd": 0.0,
+    "total_tokens": 147169
+  }
+}

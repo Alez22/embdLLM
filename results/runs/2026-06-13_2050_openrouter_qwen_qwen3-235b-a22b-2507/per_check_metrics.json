@@ -1,0 +1,268 @@
+{
+  "schema_version": 1,
+  "run_id": null,
+  "generated": "2026-06-13T20:50:42Z",
+  "rows": [
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "sample_buffer_nonzero",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 3,
+      "pass_rate": 0.6
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "adc_header_included",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "adc_sequence_defined",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "buffer_linked_to_sequence",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "build_env",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "channel_setup_before_read",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "device_ready_check",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "kernel_header_included",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "millivolt_conversion_called",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "no_cross_platform_apis",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "no_raw_register_access",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "periodic_sampling_loop",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "read_return_value_checked",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "sample_buffer_declared",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-001",
+      "category": "adc",
+      "check_name": "uses_adc_dt_spec",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "adc_channel_setup_called",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "adc_header_included",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "adc_read_called",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "build_env",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "device_ready_check",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "kernel_header_included",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "no_arduino_analogread",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "no_cross_platform_apis",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "no_stm32_hal_adc",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "oversampling_before_read",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "oversampling_configured",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "periodic_read_with_sleep",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "setup_before_read",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "adc-002",
+      "category": "adc",
+      "check_name": "valid_adc_resolution",
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    }
+  ]
+}

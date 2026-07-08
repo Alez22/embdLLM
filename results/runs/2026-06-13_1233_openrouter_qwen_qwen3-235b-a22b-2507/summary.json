@@ -1,0 +1,714 @@
+{
+  "version": "0.1.0",
+  "date": "2026-06-13",
+  "models": [
+    {
+      "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "pass_at_1": 0.825,
+      "pass_at_1_quality": 0.875,
+      "pass_at_1_comparable": null,
+      "pass_at_3": 0.875,
+      "pass_at_5": 0.875,
+      "avg_score": 0.825,
+      "check_coverage": 0.8674355158730158,
+      "avg_duration_seconds": 2.5196083136667085,
+      "total_cases": 16,
+      "passed_cases": 14,
+      "passed_cases_quality": 14,
+      "comparable_cases": null,
+      "layer_pass_rates": {
+        "compile_gate": 1.0,
+        "runtime_execution": 1.0,
+        "static_analysis": 0.8125,
+        "static_heuristic": 0.9743589743589743,
+        "test_quality_proof": 1.0
+      },
+      "pass_at_1_ci": [
+        0.5834351832215439,
+        0.9407160949011881
+      ],
+      "n_samples": 5,
+      "per_check_stats": [
+        {
+          "check_name": "all_required_configs_enabled",
+          "category": "kconfig",
+          "total_runs": 26,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "all_required_security_configs_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "arm_mpu_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "assert_not_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "bt_coex_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "bt_coex_requires_bt_and_wifi",
+          "category": "kconfig",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "bt_enabled",
+          "category": "kconfig",
+          "total_runs": 10,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "bt_hci_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "bt_mesh_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "bt_mesh_relay_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "bt_requires_hci",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "build_env",
+          "category": "kconfig",
+          "total_runs": 62,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "cdc_acm_requires_usb_device_stack",
+          "category": "kconfig",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "debug_not_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "defense_in_depth_stack_protection",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dependency_chain_complete",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dependency_chain_consistent",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_dependency_chain",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "dma_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "friend_low_power_mutual_exclusion",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "heap_mem_pool_adequate",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "hw_stack_protection_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "kconfig_format",
+          "category": "kconfig",
+          "total_runs": 40,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "log_backend_requires_log",
+          "category": "kconfig",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "log_backend_uart_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "log_buffer_size_positive",
+          "category": "kconfig",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "log_buffer_size_power_of_2",
+          "category": "kconfig",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "log_buffer_size_set",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 2,
+          "pass_rate": 0.6,
+          "failing_tc_ids": [
+            "kconfig-004"
+          ]
+        },
+        {
+          "check_name": "log_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "log_mode_deferred_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "log_mode_mutual_exclusion",
+          "category": "kconfig",
+          "total_runs": 3,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "max_domain_partitions_positive",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "mbedtls_builtin_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 5,
+          "pass_rate": 0.0,
+          "failing_tc_ids": [
+            "kconfig-005"
+          ]
+        },
+        {
+          "check_name": "mbedtls_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "memory_sizing_configured",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "mesh_requires_bt",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "mpu_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "mpu_has_platform_implementation",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "mpu_platform_mutual_exclusion",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "net_sockets_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "net_sockets_sockopt_tls_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 1,
+          "pass_rate": 0.8,
+          "failing_tc_ids": [
+            "kconfig-005"
+          ]
+        },
+        {
+          "check_name": "networking_enabled",
+          "category": "kconfig",
+          "total_runs": 10,
+          "fail_count": 2,
+          "pass_rate": 0.8,
+          "failing_tc_ids": [
+            "kconfig-005",
+            "kconfig-007"
+          ]
+        },
+        {
+          "check_name": "no_assert_in_production",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_conflicting_configs",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_conflicting_duplicate_config_keys",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_conflicting_options",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_conflicting_tls_backend",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_debug_in_production",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_debug_optimizations_in_production",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_fake_usb_serial_option",
+          "category": "kconfig",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_friend_low_power_conflict",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_hallucinated_config_options",
+          "category": "kconfig",
+          "total_runs": 31,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_hallucinated_secure_mode",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_hallucinated_wifi_ble_coex",
+          "category": "kconfig",
+          "total_runs": 9,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_log_mode_immediate_conflict",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_mpu_platform_conflict",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "no_newlib_minimal_libc_conflict",
+          "category": "kconfig",
+          "total_runs": 31,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "relay_requires_mesh",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "secure_boot_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "secure_boot_requires_fw_info",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "spi_dma_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "spi_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "stack_canaries_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "tls_credentials_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 1,
+          "pass_rate": 0.8,
+          "failing_tc_ids": [
+            "kconfig-005"
+          ]
+        },
+        {
+          "check_name": "uart_line_ctrl_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "uart_line_ctrl_requires_cdc_acm",
+          "category": "kconfig",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "usb_cdc_acm_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 1,
+          "pass_rate": 0.8,
+          "failing_tc_ids": [
+            "kconfig-003"
+          ]
+        },
+        {
+          "check_name": "usb_device_stack_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "userspace_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "userspace_requires_mpu",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "wifi_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "wifi_mgmt_enabled",
+          "category": "kconfig",
+          "total_runs": 5,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "wifi_mgmt_requires_wifi",
+          "category": "kconfig",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        },
+        {
+          "check_name": "wifi_requires_networking",
+          "category": "kconfig",
+          "total_runs": 4,
+          "fail_count": 0,
+          "pass_rate": 1.0,
+          "failing_tc_ids": []
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "category": "device-tree",
+      "pass_at_1": 0.875,
+      "total_cases": 8,
+      "passed_cases": 7
+    },
+    {
+      "category": "kconfig",
+      "pass_at_1": 0.875,
+      "total_cases": 8,
+      "passed_cases": 7
+    }
+  ],
+  "tier_scores": [
+    {
+      "tier": "sanity",
+      "pass_at_1": 1.0,
+      "total_cases": 2,
+      "passed_cases": 2
+    },
+    {
+      "tier": "core",
+      "pass_at_1": 1.0,
+      "total_cases": 8,
+      "passed_cases": 8
+    },
+    {
+      "tier": "challenge",
+      "pass_at_1": 0.6666666666666666,
+      "total_cases": 6,
+      "passed_cases": 4
+    }
+  ],
+  "reasoning_scores": [
+    {
+      "reasoning_type": "api_recall",
+      "pass_at_1": 0.875,
+      "total_cases": 16,
+      "passed_cases": 14
+    },
+    {
+      "reasoning_type": "rule_application",
+      "pass_at_1": 0.875,
+      "total_cases": 16,
+      "passed_cases": 14
+    }
+  ],
+  "sdk_scores": [
+    {
+      "sdk": "zephyr",
+      "pass_at_1": 0.875,
+      "total_cases": 16,
+      "passed_cases": 14
+    }
+  ],
+  "overall": {
+    "total_cases": 16,
+    "total_models": 1,
+    "best_model": "openrouter/qwen/qwen3-235b-a22b-2507",
+    "best_pass_at_1": 0.825,
+    "common_cases": null,
+    "case_set_warning": null
+  },
+  "scenario": "generation",
+  "temperature": 0.5,
+  "n_samples_per_case": 5,
+  "n_runs": 1,
+  "run_timestamp": "2026-06-13",
+  "run_time": "1233",
+  "model": "openrouter/qwen/qwen3-235b-a22b-2507",
+  "total_results": 40,
+  "passed": 31,
+  "failed": 9
+}

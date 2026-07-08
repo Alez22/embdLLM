@@ -1,0 +1,1456 @@
+{
+  "schema_version": 1,
+  "run_id": null,
+  "generated": "2026-07-01T22:39:27Z",
+  "rows": [
+    {
+      "case_id": "nxp-mcxc-flash-001",
+      "category": "storage",
+      "check_name": "flash_verify_program_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-002",
+      "category": "storage",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 2,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "interrupt_flag_cleared",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "pin_interrupt_configured",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-001",
+      "category": "spi-i2c",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-isr-001",
+      "category": "isr-concurrency",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 2,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-spi-001",
+      "category": "spi-i2c",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-timer-001",
+      "category": "timer",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 3,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-uart-001",
+      "category": "uart",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-uart-002",
+      "category": "uart",
+      "check_name": "uart_isr_handler_defined",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-mcxc-watchdog-001",
+      "category": "watchdog",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-rt1170-audio-001",
+      "category": "audio",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-rt1170-dma-001",
+      "category": "dma",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 4,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-rt1170-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 4,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-rt1170-gpt-001",
+      "category": "timer",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-rt1170-isr-001",
+      "category": "isr-concurrency",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpi2c-001",
+      "category": "spi-i2c",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpspi-001",
+      "category": "spi-i2c",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpuart-001",
+      "category": "uart",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-rt1170-rtwdog-001",
+      "category": "watchdog",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-rt1170-sai-001",
+      "category": "audio",
+      "check_name": "sai_init_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-rt1170-sai-002",
+      "category": "audio",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 4,
+      "passed": 0,
+      "pass_rate": 0.0
+    },
+    {
+      "case_id": "nxp-rt1170-audio-001",
+      "category": "audio",
+      "check_name": "read_and_write_api_used",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 1,
+      "pass_rate": 0.2
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-002",
+      "category": "spi-i2c",
+      "check_name": "nxp_gcc",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 3,
+      "passed": 1,
+      "pass_rate": 0.3333333333333333
+    },
+    {
+      "case_id": "nxp-mcxc-flash-002",
+      "category": "storage",
+      "check_name": "two_flash_slots_defined",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 2,
+      "pass_rate": 0.4
+    },
+    {
+      "case_id": "nxp-mcxc-isr-001",
+      "category": "isr-concurrency",
+      "check_name": "pit_isr_defined",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 2,
+      "pass_rate": 0.4
+    },
+    {
+      "case_id": "nxp-rt1170-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "falling_edge_configured",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 2,
+      "pass_rate": 0.4
+    },
+    {
+      "case_id": "nxp-rt1170-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "isr_handler_defined",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 2,
+      "pass_rate": 0.4
+    },
+    {
+      "case_id": "nxp-rt1170-sai-001",
+      "category": "audio",
+      "check_name": "sai_write_api_used",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 2,
+      "pass_rate": 0.4
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-002",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_port_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 3,
+      "pass_rate": 0.6
+    },
+    {
+      "case_id": "nxp-mcxc-timer-001",
+      "category": "timer",
+      "check_name": "pit_isr_defined",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 3,
+      "pass_rate": 0.6
+    },
+    {
+      "case_id": "nxp-rt1170-dma-001",
+      "category": "dma",
+      "check_name": "edma_transfer_prepared",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "nxp-rt1170-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "gpio_toggle_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "nxp-rt1170-sai-001",
+      "category": "audio",
+      "check_name": "header_fsl_iomuxc_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "nxp-rt1170-sai-002",
+      "category": "audio",
+      "check_name": "no_blocking_write",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    {
+      "case_id": "nxp-mcxc-flash-001",
+      "category": "storage",
+      "check_name": "flash_erase_sector_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-001",
+      "category": "storage",
+      "check_name": "flash_init_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-001",
+      "category": "storage",
+      "check_name": "flash_program_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-001",
+      "category": "storage",
+      "check_name": "header_fsl_flash_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-001",
+      "category": "storage",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-002",
+      "category": "storage",
+      "check_name": "crc_function_implemented",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-002",
+      "category": "storage",
+      "check_name": "full_flash_sequence_present",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-002",
+      "category": "storage",
+      "check_name": "header_fsl_flash_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-002",
+      "category": "storage",
+      "check_name": "magic_constant_defined",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-flash-002",
+      "category": "storage",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "gpio_pin_init_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "gpio_toggle_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_clock_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_gpio_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_port_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_clock_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_gpio_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_port_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "isr_handler_defined",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-001",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_clock_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-001",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_i2c_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-001",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_port_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-001",
+      "category": "spi-i2c",
+      "check_name": "i2c_blocking_transfer_used",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-001",
+      "category": "spi-i2c",
+      "check_name": "i2c_master_init_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-001",
+      "category": "spi-i2c",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-002",
+      "category": "spi-i2c",
+      "check_name": "both_transfer_returns_checked",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-002",
+      "category": "spi-i2c",
+      "check_name": "both_write_and_read_transfers",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-002",
+      "category": "spi-i2c",
+      "check_name": "build_env",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-002",
+      "category": "spi-i2c",
+      "check_name": "clock_gate_before_i2c_init",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-002",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_clock_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-002",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_i2c_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-002",
+      "category": "spi-i2c",
+      "check_name": "i2c_address_not_preshifted",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-002",
+      "category": "spi-i2c",
+      "check_name": "i2c_master_init_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-002",
+      "category": "spi-i2c",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-002",
+      "category": "spi-i2c",
+      "check_name": "pinmux_before_i2c_init",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 1,
+      "passed": 1,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-i2c-002",
+      "category": "spi-i2c",
+      "check_name": "two_separate_transfers",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-isr-001",
+      "category": "isr-concurrency",
+      "check_name": "gpio_pin_read_in_code",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-isr-001",
+      "category": "isr-concurrency",
+      "check_name": "header_fsl_clock_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-isr-001",
+      "category": "isr-concurrency",
+      "check_name": "header_fsl_gpio_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-isr-001",
+      "category": "isr-concurrency",
+      "check_name": "header_fsl_pit_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-isr-001",
+      "category": "isr-concurrency",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-isr-001",
+      "category": "isr-concurrency",
+      "check_name": "volatile_shared_data",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-spi-001",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_clock_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-spi-001",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_gpio_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-spi-001",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_port_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-spi-001",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_spi_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-spi-001",
+      "category": "spi-i2c",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-spi-001",
+      "category": "spi-i2c",
+      "check_name": "spi_blocking_transfer_used",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-spi-001",
+      "category": "spi-i2c",
+      "check_name": "spi_master_init_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-timer-001",
+      "category": "timer",
+      "check_name": "header_fsl_clock_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-timer-001",
+      "category": "timer",
+      "check_name": "header_fsl_pit_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-timer-001",
+      "category": "timer",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-timer-001",
+      "category": "timer",
+      "check_name": "pit_init_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-timer-001",
+      "category": "timer",
+      "check_name": "pit_period_set",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-timer-001",
+      "category": "timer",
+      "check_name": "pit_timer_started",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-uart-001",
+      "category": "uart",
+      "check_name": "header_fsl_clock_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-uart-001",
+      "category": "uart",
+      "check_name": "header_fsl_port_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-uart-001",
+      "category": "uart",
+      "check_name": "header_fsl_uart_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-uart-001",
+      "category": "uart",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-uart-001",
+      "category": "uart",
+      "check_name": "uart_init_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-uart-001",
+      "category": "uart",
+      "check_name": "uart_write_blocking_used",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-uart-002",
+      "category": "uart",
+      "check_name": "header_fsl_clock_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-uart-002",
+      "category": "uart",
+      "check_name": "header_fsl_port_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-uart-002",
+      "category": "uart",
+      "check_name": "header_fsl_uart_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-uart-002",
+      "category": "uart",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-uart-002",
+      "category": "uart",
+      "check_name": "ring_buffer_array_declared",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-uart-002",
+      "category": "uart",
+      "check_name": "uart_rx_interrupt_enabled",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-watchdog-001",
+      "category": "watchdog",
+      "check_name": "cop_init_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-watchdog-001",
+      "category": "watchdog",
+      "check_name": "cop_refresh_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-watchdog-001",
+      "category": "watchdog",
+      "check_name": "header_fsl_cop_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-mcxc-watchdog-001",
+      "category": "watchdog",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-audio-001",
+      "category": "audio",
+      "check_name": "header_fsl_iomuxc_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-audio-001",
+      "category": "audio",
+      "check_name": "header_fsl_sai_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-audio-001",
+      "category": "audio",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-dma-001",
+      "category": "dma",
+      "check_name": "edma_init_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-dma-001",
+      "category": "dma",
+      "check_name": "edma_transfer_started",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-dma-001",
+      "category": "dma",
+      "check_name": "header_fsl_edma_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-dma-001",
+      "category": "dma",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "gpio_pin_init_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_gpio_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_iomuxc_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-gpio-001",
+      "category": "gpio-basic",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "header_fsl_gpio_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "interrupt_flag_cleared",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-gpio-002",
+      "category": "gpio-basic",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-gpt-001",
+      "category": "timer",
+      "check_name": "header_fsl_gpt_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-gpt-001",
+      "category": "timer",
+      "check_name": "interrupt_flag_cleared",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-gpt-001",
+      "category": "timer",
+      "check_name": "isr_handler_defined",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-gpt-001",
+      "category": "timer",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-isr-001",
+      "category": "isr-concurrency",
+      "check_name": "header_fsl_gpt_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-isr-001",
+      "category": "isr-concurrency",
+      "check_name": "interrupt_flag_cleared",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-isr-001",
+      "category": "isr-concurrency",
+      "check_name": "isr_handler_defined",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-isr-001",
+      "category": "isr-concurrency",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-isr-001",
+      "category": "isr-concurrency",
+      "check_name": "uptime_accessor_defined",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpi2c-001",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_clock_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpi2c-001",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_iomuxc_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpi2c-001",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_lpi2c_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpi2c-001",
+      "category": "spi-i2c",
+      "check_name": "lpi2c_blocking_transfer_used",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpi2c-001",
+      "category": "spi-i2c",
+      "check_name": "lpi2c_master_init_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpi2c-001",
+      "category": "spi-i2c",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpspi-001",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_iomuxc_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpspi-001",
+      "category": "spi-i2c",
+      "check_name": "header_fsl_lpspi_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpspi-001",
+      "category": "spi-i2c",
+      "check_name": "jedec_command_used",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpspi-001",
+      "category": "spi-i2c",
+      "check_name": "lpspi_transfer_used",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpspi-001",
+      "category": "spi-i2c",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpuart-001",
+      "category": "uart",
+      "check_name": "baud_rate_configured",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpuart-001",
+      "category": "uart",
+      "check_name": "echo_read_write_api",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpuart-001",
+      "category": "uart",
+      "check_name": "header_fsl_iomuxc_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpuart-001",
+      "category": "uart",
+      "check_name": "header_fsl_lpuart_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-lpuart-001",
+      "category": "uart",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-rtwdog-001",
+      "category": "watchdog",
+      "check_name": "header_fsl_rtwdog_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-rtwdog-001",
+      "category": "watchdog",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-rtwdog-001",
+      "category": "watchdog",
+      "check_name": "rtwdog_init_called",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-rtwdog-001",
+      "category": "watchdog",
+      "check_name": "rtwdog_refresh_used",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-sai-001",
+      "category": "audio",
+      "check_name": "header_fsl_lpi2c_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-sai-001",
+      "category": "audio",
+      "check_name": "header_fsl_sai_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-sai-001",
+      "category": "audio",
+      "check_name": "lpi2c_blocking_transfer_used",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-sai-001",
+      "category": "audio",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-sai-001",
+      "category": "audio",
+      "check_name": "sai_tx_configured",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-sai-002",
+      "category": "audio",
+      "check_name": "header_fsl_iomuxc_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-sai-002",
+      "category": "audio",
+      "check_name": "header_fsl_sai_h",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-sai-002",
+      "category": "audio",
+      "check_name": "isr_handler_defined",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "case_id": "nxp-rt1170-sai-002",
+      "category": "audio",
+      "check_name": "no_cross_platform_hallucination",
+      "model": "openrouter/openai/gpt-oss-120b",
+      "samples": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    }
+  ]
+}
