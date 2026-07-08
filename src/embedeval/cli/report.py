@@ -48,6 +48,32 @@ def report(
 
 
 
+@app.command(name="agent-report")
+def agent_report(
+    results_dir: Annotated[
+        Path,
+        typer.Option("--results", help="Directory containing runs/ with agent_run.json"),
+    ] = Path("results"),
+    output: Annotated[
+        Path,
+        typer.Option("--output", "-o", help="Output Markdown path"),
+    ] = Path("results/AGENT_LEADERBOARD.md"),
+) -> None:
+    """Generate the agent-mode leaderboard (Markdown + PNG) from agent runs."""
+    from embedeval.agent_leaderboard import generate_agent_report
+
+    figure_path = output.with_name("agent_pass_matrix.png")
+    figure_written, n = generate_agent_report(results_dir, output, figure_path)
+    if n == 0:
+        typer.echo("No container agent runs found under results/runs/.")
+        raise typer.Exit(code=1)
+    typer.echo(f"Agent leaderboard written to {output} ({n} models).")
+    if figure_written:
+        typer.echo(f"Figure written to {figure_path}.")
+    else:
+        typer.echo("Figure skipped (matplotlib not installed).")
+
+
 @app.command(name="refresh-tracker")
 def refresh_tracker(
     cases_dir: Annotated[

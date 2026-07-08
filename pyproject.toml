@@ -17,6 +17,13 @@ dependencies = [
     "plotly>=5.20.0",
 ]
 
+[project.optional-dependencies]
+# Static figure export for the agent leaderboard (embedeval agent-report).
+# Optional so the core stays light: install with `uv sync --extra report`.
+report = [
+    "matplotlib>=3.8.0",
+]
+
 [project.scripts]
 embedeval = "embedeval.cli:app"
 
