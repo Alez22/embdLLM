@@ -508,6 +508,13 @@ All 12 core NXP generation cases done. Each prompt omits safety requirements —
 
 ## Backlog (not scheduled)
 
+### Results layout
+
+- **Scenario suffix in run-dir names** — agent runs are only recognizable by
+  the `_t5` suffix plus the presence of `agent_run.json`. Name future run dirs
+  `..._agent-t5` (or similar) so the scenario is readable from `ls` alone.
+  Future runs only — do not rename existing archives (dashboards key on ids).
+
 ### Check quality improvements
 
 - **Deep embedded checks** — existing cases reach >90% pass rate with the best
