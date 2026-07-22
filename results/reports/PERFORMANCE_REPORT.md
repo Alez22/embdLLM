@@ -5,7 +5,7 @@ multi-turn probes are excluded — see [`AGENT_LEADERBOARD.md`](AGENT_LEADERBOAR
 **Audience:** Powersoft local-deploy model-selection.
 
 > **How the numbers are built — read this first.**
-> Aggregation is **identical to the TUI dashboard** (`_load_leaderboard`):
+> Aggregation (`load_groups` in `src/embedeval/perf_report.py`):
 > - All `generation` runs are merged and grouped by **(model, temperature, no_think, attempts)**.
 >   The same model at a different temperature or attempt-count is a **separate row** —
 >   that is why a model can appear more than once.
@@ -218,7 +218,7 @@ fail wholesale, so a feedback loop buys them less.
 
 ---
 
-*Regenerate with `uv run embedeval perf-report`. Leaderboards
-mirror `src/embedeval/tui/data.py::_load_leaderboard`; consistency and
+*Regenerate with `uv run embedeval perf-report`. Leaderboards come from
+`src/embedeval/perf_report.py::load_groups`; consistency and
 check-coverage read `pass_at_k` / `check_coverage` from run summaries
-(`src/embedeval/scorer.py`). Underlying figures in `results/_report_data.json`.*
+(`src/embedeval/scorer.py`). Underlying figures in `_report_data.json`.*

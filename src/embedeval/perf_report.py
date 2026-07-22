@@ -3,11 +3,11 @@
 Exposed as the `embedeval perf-report` CLI command (see cli/report.py);
 outputs land in <results>/reports/.
 
-Aggregation is IDENTICAL to the TUI dashboard (`_load_leaderboard` in
-src/embedeval/tui/data.py): all `generation` runs are merged, grouped by
-(model, temperature, no_think, attempts); within a group the last-written
-record per case_id wins. The reported rate is that config's pass-rate over the
-cases it covers — the same number the dashboard shows, denominators and all.
+Aggregation (`load_groups`, the canonical implementation — it used to mirror
+the TUI leaderboard, which has since been replaced by a run history): all
+`generation` runs are merged, grouped by (model, temperature, no_think,
+attempts); within a group the last-written record per case_id wins. The
+reported rate is that config's pass-rate over the cases it covers.
 
 Charts follow the dataviz skill: single-hue magnitude bars, recessive axes,
 direct value labels, fixed categorical hues only where NXP/Zephyr differ.
@@ -32,7 +32,7 @@ plt.rcParams.update({
 
 
 def load_groups(runs_dir: Path):
-    """Replicate dashboard _load_leaderboard grouping, tracking per-SDK counts."""
+    """Union-of-runs grouping by (model, temp, no_think, attempts), per-SDK."""
     groups = {}  # (model,temp,nt,att) -> {case_id: {passed, sdk}}
     for run_dir in sorted(runs_dir.iterdir()):
         sf = run_dir / "summary.json"

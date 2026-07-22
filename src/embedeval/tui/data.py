@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import yaml
@@ -45,179 +46,116 @@ def _load_subsets(cases_dir: Path) -> dict[str, list[str]]:
     }
 
 
-def _load_runs_summary() -> list[dict]:
-    """Return one dict per run dir, built from summary.json + detail stats."""
-    runs: list[dict] = []
-    runs_root = config.RESULTS_DIR / "runs"
-    if not runs_root.is_dir():
-        return runs
-    for run_dir in sorted(runs_root.iterdir(), reverse=True):
-        summary_file = run_dir / "summary.json"
-        if not summary_file.is_file():
-            continue
-        try:
-            summary = json.loads(summary_file.read_text(encoding="utf-8"))
-        except Exception:
-            continue
-
-        # Derive total, passed, score from detail files — the ground truth.
-        # summary.json totals can be stale if the run was partially overwritten.
-        details_dir = run_dir / "details"
-        scores: list[float] = []
-        passed = 0
-        sdks: set[str] = set()
-        if details_dir.is_dir():
-            for f in details_dir.glob("*.json"):
-                try:
-                    d = json.loads(f.read_text(encoding="utf-8"))
-                    s = d.get("total_score")
-                    if s is not None:
-                        scores.append(float(s))
-                    if d.get("passed"):
-                        passed += 1
-                    sdk = d.get("sdk", "")
-                    if sdk:
-                        sdks.add(sdk)
-                except Exception:
-                    pass
-
-        avg_score = sum(scores) / len(scores) if scores else 0.0
-        total = len(scores)
-        model = summary.get("model", "")
-        if model == "mock":
-            continue
-        run_date = summary.get("run_timestamp", run_dir.name[:10])
-        run_time = summary.get("run_time", "")
-        timestamp = f"{run_date} {run_time}".strip() if run_time else run_date
-
-        # Derive attempts and think from the run dir name or summary fields.
-        gen_params = summary.get("generation_params", {})
-        no_think = gen_params.get("no_think", False)
-        temperature = summary.get("temperature", 0.0)
-        # n_samples_per_case is the configured attempts count.
-        attempts = summary.get("n_samples_per_case", 1)
-
-        runs.append({
-            "run_id": run_dir.name,
-            "timestamp": timestamp,
-            "model": model,
-            "total": total,
-            "passed": passed,
-            "avg_score": avg_score,
-            "attempts": attempts,
-            "temperature": temperature,
-            "no_think": no_think,
-            "sdks": sorted(sdks),
-        })
-    return runs
+def _timestamp_from_dir_name(name: str) -> str:
+    """'2026-06-25_2008_openrouter_...' -> '2026-06-25 20:08' (best effort)."""
+    m = re.match(r"^(\d{4}-\d{2}-\d{2})_(\d{2})(\d{2})", name)
+    if not m:
+        return name[:16]
+    return f"{m.group(1)} {m.group(2)}:{m.group(3)}"
 
 
-def _load_leaderboard(cases: list[dict]) -> tuple[list[str], list[dict]]:
-    """Aggregate run results into a per-config leaderboard.
+def _generation_run_row(run_dir: Path, summary_file: Path) -> dict | None:
+    """History row for a single-shot generation run (summary.json + details)."""
+    try:
+        summary = json.loads(summary_file.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    model = summary.get("model", "")
+    if not model or model == "mock":
+        return None
 
-    A leaderboard row is identified by the tuple (model, temperature,
-    no_think, attempts) — the same model run with different parameters is a
-    distinct row. Multiple runs sharing that config are merged: for each case
-    the most recent run wins.
-
-    Coverage per SDK = distinct cases tested / total cases of that SDK present
-    on disk (cases/). The total score is the global pass-rate (passed cases /
-    tested cases) across all SDKs.
-
-    @param cases  Discovered case metadata dicts (provides the SDK denominators).
-    @return (sdk_list, rows) where sdk_list is every SDK discovered on disk and
-            rows is the leaderboard sorted by pass-rate descending.
-    """
-    # --- denominator: total cases per SDK from discovery ---
-    total_by_sdk: dict[str, int] = {}
-    for c in cases:
-        sdk = c.get("sdk", "")
-        if sdk:
-            total_by_sdk[sdk] = total_by_sdk.get(sdk, 0) + 1
-    sdk_list = sorted(total_by_sdk)
-
-    runs_root = config.RESULTS_DIR / "runs"
-    if not runs_root.is_dir():
-        return sdk_list, []
-
-    # config_key -> {meta, cases: {case_id: {passed, sdk}}}
-    groups: dict[tuple, dict] = {}
-
-    # Iterate ascending so later runs overwrite earlier ones per case.
-    for run_dir in sorted(runs_root.iterdir()):
-        summary_file = run_dir / "summary.json"
-        if not summary_file.is_file():
-            continue
-        try:
-            summary = json.loads(summary_file.read_text(encoding="utf-8"))
-        except Exception:
-            continue
-
-        model = summary.get("model", "")
-        if model == "mock" or not model:
-            continue
-
-        gen_params = summary.get("generation_params", {})
-        no_think = bool(gen_params.get("no_think", False))
-        temperature = float(summary.get("temperature", 0.0))
-        attempts = int(summary.get("n_samples_per_case", 1))
-        key = (model, temperature, no_think, attempts)
-
-        group = groups.setdefault(key, {
-            "model": model,
-            "temperature": temperature,
-            "no_think": no_think,
-            "attempts": attempts,
-            "cases": {},
-        })
-
-        details_dir = run_dir / "details"
-        if not details_dir.is_dir():
-            continue
+    # Derive total/passed from detail files — the ground truth.
+    # summary.json totals can be stale if the run was partially overwritten.
+    # Details are one file per (case, attempt): dedup to distinct cases,
+    # counting a case as passed when any attempt passed (pass@attempts).
+    details_dir = run_dir / "details"
+    passed_by_case: dict[str, bool] = {}
+    sdks: set[str] = set()
+    if details_dir.is_dir():
         for f in details_dir.glob("*.json"):
             try:
                 d = json.loads(f.read_text(encoding="utf-8"))
             except Exception:
                 continue
             case_id = d.get("case_id") or f.stem
-            group["cases"][case_id] = {
-                "passed": bool(d.get("passed")),
-                "sdk": d.get("sdk", ""),
-            }
-
-    rows: list[dict] = []
-    for group in groups.values():
-        tested_by_sdk: dict[str, int] = {}
-        tested_total = 0
-        passed_total = 0
-        for info in group["cases"].values():
-            tested_total += 1
-            if info["passed"]:
-                passed_total += 1
-            sdk = info["sdk"]
+            passed_by_case[case_id] = (
+                passed_by_case.get(case_id, False) or bool(d.get("passed"))
+            )
+            sdk = d.get("sdk", "")
             if sdk:
-                tested_by_sdk[sdk] = tested_by_sdk.get(sdk, 0) + 1
+                sdks.add(sdk)
+    total = len(passed_by_case)
+    passed = sum(passed_by_case.values())
 
-        coverage: dict[str, tuple[int, int]] = {}
-        for sdk in sdk_list:
-            coverage[sdk] = (tested_by_sdk.get(sdk, 0), total_by_sdk[sdk])
+    gen_params = summary.get("generation_params", {})
+    return {
+        "run_id": run_dir.name,
+        "timestamp": _timestamp_from_dir_name(run_dir.name),
+        "mode": "gen",
+        "model": model,
+        "temperature": summary.get("temperature", 0.0),
+        "no_think": bool(gen_params.get("no_think", False)),
+        # n_samples_per_case is the configured attempts count.
+        "attempts": summary.get("n_samples_per_case", 1),
+        "max_turns": None,
+        "context_pack": None,
+        "total": total,
+        "passed": passed,
+        "tokens": None,
+        "sdks": sorted(sdks),
+    }
 
-        pass_rate = passed_total / tested_total if tested_total else 0.0
-        rows.append({
-            "model": group["model"],
-            "temperature": group["temperature"],
-            "no_think": group["no_think"],
-            "attempts": group["attempts"],
-            "coverage": coverage,
-            "tested_total": tested_total,
-            "passed_total": passed_total,
-            "pass_rate": pass_rate,
-        })
 
-    rows.sort(key=lambda r: r["pass_rate"], reverse=True)
-    return sdk_list, rows
+def _agent_run_row(run_dir: Path, agent_file: Path) -> dict | None:
+    """History row for a multi-turn agent run (agent_run.json archive)."""
+    try:
+        data = json.loads(agent_file.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    model = data.get("model", "")
+    if not model or model == "mock":
+        return None
+    cases = data.get("cases", [])
+    summary = data.get("summary", {})
+    return {
+        "run_id": run_dir.name,
+        "timestamp": _timestamp_from_dir_name(run_dir.name),
+        "mode": "agent",
+        "model": model,
+        "temperature": data.get("temperature", 0.0),
+        "no_think": None,
+        "attempts": None,
+        "max_turns": data.get("max_turns", 0),
+        "context_pack": data.get("context_pack"),
+        "total": len(cases),
+        "passed": sum(1 for c in cases if c.get("passed")),
+        "tokens": summary.get("total_tokens"),
+        "sdks": [],  # agent archives carry no per-case sdk field
+    }
 
 
+def _load_runs_summary() -> list[dict]:
+    """Return one history row per run dir, newest first.
+
+    Covers both run kinds: agent archives (agent_run.json) and single-shot
+    generation runs (summary.json + details/). Mock runs are skipped.
+    """
+    runs: list[dict] = []
+    runs_root = config.RESULTS_DIR / "runs"
+    if not runs_root.is_dir():
+        return runs
+    for run_dir in sorted(runs_root.iterdir(), reverse=True):
+        agent_file = run_dir / "agent_run.json"
+        summary_file = run_dir / "summary.json"
+        if agent_file.is_file():
+            row = _agent_run_row(run_dir, agent_file)
+        elif summary_file.is_file():
+            row = _generation_run_row(run_dir, summary_file)
+        else:
+            row = None
+        if row is not None:
+            runs.append(row)
+    return runs
 
 
 

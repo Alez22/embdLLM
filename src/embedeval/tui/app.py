@@ -25,7 +25,7 @@ from textual.widgets import (
 # Aliased to avoid shadowing by local `config` dicts (run configs) in
 # methods like _launch_run / _on_run_config.
 from embedeval.tui import config as tui_config
-from embedeval.tui.data import _discover_cases, _load_leaderboard, _score_bar
+from embedeval.tui.data import _discover_cases, _load_runs_summary, _score_bar
 from embedeval.tui.log_format import (
     _AGENT_RESULT_RE,
     _CASE_UNHANDLED_RE,
@@ -126,63 +126,78 @@ class EmbedEvalTUI(App):
         # counting every matching line double-counts and the bar overshoots 100%.
         self._run_seen: set[tuple[str, str]] = set()
 
-        # Leaderboard columns are built dynamically once SDKs are known.
-        self._sdk_list: list[str] = []
         self._rows: list[dict] = []
         self._load_data()
 
-    def _build_columns(self, sdk_list: list[str]) -> None:
-        """(Re)build the leaderboard columns for the discovered SDKs."""
+    def _build_columns(self) -> None:
+        """Build the run-history columns (fixed set)."""
         table = self.query_one("#results-table", DataTable)
         table.clear(columns=True)
         table.cursor_type = "row"
+        table.add_column("When", key="when")
+        table.add_column("Mode", key="mode")
         table.add_column("Model", key="model")
         table.add_column("Temp", key="temperature")
         table.add_column("Think", key="think")
-        table.add_column("Att.", key="attempts")
-        for sdk in sdk_list:
-            table.add_column(sdk, key=f"sdk:{sdk}")
-        table.add_column("Score", key="score")
+        table.add_column("Att/Turns", key="budget")
+        table.add_column("Cases", key="cases")
+        table.add_column("Result", key="result")
+        table.add_column("Tokens", key="tokens")
 
     def _load_data(self) -> None:
-        self._sdk_list, self._rows = _load_leaderboard(self._cases)
-        self._build_columns(self._sdk_list)
+        self._rows = _load_runs_summary()
+        self._build_columns()
         self._refresh_table()
 
     def _refresh_table(self) -> None:
+        """One row per launched run, newest first."""
         table = self.query_one("#results-table", DataTable)
         table.clear()
 
         for r in self._rows:
-            think_str = "no" if r.get("no_think", False) else "yes"
-            temp = r.get("temperature", 0.0)
+            is_agent = r.get("mode") == "agent"
+            mode = "agent"
+            if is_agent and r.get("context_pack"):
+                mode = f"agent ({r['context_pack']})"
+            elif not is_agent:
+                mode = "gen"
+            if is_agent:
+                think_str = "—"
+                budget = f"t{r.get('max_turns', 0)}"
+            else:
+                think_str = "no" if r.get("no_think", False) else "yes"
+                budget = f"a{r.get('attempts', 1)}"
+            total = r.get("total", 0)
+            passed = r.get("passed", 0)
+            pass_rate = passed / total if total else 0.0
+            sdks = ",".join(s.replace("-sdk", "") for s in r.get("sdks", []))
+            tokens = r.get("tokens")
             cells = [
+                r.get("timestamp", ""),
+                mode,
                 r.get("model", "").split("/")[-1],
-                f"{temp:.1f}",
+                f"{r.get('temperature', 0.0):.1f}",
                 think_str,
-                str(r.get("attempts", 1)),
+                budget,
+                f"{total}" + (f" · {sdks}" if sdks else ""),
+                f"{_score_bar(pass_rate)} {passed}/{total}",
+                f"{tokens:,}" if tokens else "—",
             ]
-            coverage = r.get("coverage", {})
-            for sdk in self._sdk_list:
-                tested, total = coverage.get(sdk, (0, 0))
-                if total == 0:
-                    cells.append("—")
-                else:
-                    pct = int(tested / total * 100)
-                    cells.append(f"{tested}/{total} {pct}%")
-            pass_rate = r.get("pass_rate", 0.0)
-            cells.append(f"{_score_bar(pass_rate)} {pass_rate:.2f}")
-            table.add_row(*cells)
+            table.add_row(*cells, key=r.get("run_id", ""))
 
         summary = self.query_one("#summary-bar", Static)
-        # The score denominators differ per row (each config covers its own
-        # case set), so flag that cross-row comparison needs equal coverage.
         summary.update(
-            f"  {len(self._rows)} model configs  ·  "
-            f"coverage = tested/total cases per SDK  ·  "
-            f"score = pass-rate over covered cases only — "
-            f"compare rows with similar coverage"
+            f"  {len(self._rows)} runs  ·  newest first  ·  "
+            f"Enter on a row prints its path (for --resume)"
         )
+
+    @on(DataTable.RowSelected, "#results-table")
+    def on_run_row_selected(self, event: DataTable.RowSelected) -> None:
+        """Print the selected run's directory — handy for agent --resume."""
+        run_id = event.row_key.value
+        if run_id:
+            log = self.query_one("#run-log", Log)
+            log.write_line(f"[run] {tui_config.RESULTS_DIR / 'runs' / run_id}")
 
     # -----------------------------------------------------------------------
     # Actions
