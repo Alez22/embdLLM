@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import time
 from pathlib import Path
@@ -174,10 +175,13 @@ class EmbedEvalTUI(App):
             table.add_row(*cells)
 
         summary = self.query_one("#summary-bar", Static)
+        # The score denominators differ per row (each config covers its own
+        # case set), so flag that cross-row comparison needs equal coverage.
         summary.update(
             f"  {len(self._rows)} model configs  ·  "
             f"coverage = tested/total cases per SDK  ·  "
-            f"score = global pass-rate"
+            f"score = pass-rate over covered cases only — "
+            f"compare rows with similar coverage"
         )
 
     # -----------------------------------------------------------------------
@@ -474,7 +478,6 @@ class EmbedEvalTUI(App):
         via logger.info (visible only with --verbose).
         """
         # e.g. "INFO:embedeval.runner:Case nxp-mcxc-i2c-001 attempt 1: PASS"
-        import re
         # Infrastructure errors use a different log format — handled separately below.
         u = _CASE_UNHANDLED_RE.search(line)
         if u:

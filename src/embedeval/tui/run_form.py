@@ -39,6 +39,8 @@ def _model_label(info: ModelInfo) -> str:
 class RunFormScreen(ModalScreen[dict | None]):
     """Modal dialog to configure and launch a benchmark run."""
 
+    BINDINGS = [("escape", "cancel", "Cancel")]
+
     CSS = """
     RunFormScreen {
         align: center middle;
@@ -50,6 +52,10 @@ class RunFormScreen(ModalScreen[dict | None]):
         width: 90%;
         max-width: 160;
         height: 80%;
+    }
+    /* Scrollable body; the Cancel/Run row stays fixed below it. */
+    #form-body {
+        height: 1fr;
         overflow-y: auto;
     }
     #form-columns {
@@ -148,6 +154,8 @@ class RunFormScreen(ModalScreen[dict | None]):
         self._selected_models: set[str] = set()
         # Named case subsets from cases/subsets.yaml (name -> case IDs).
         self._subsets = _load_subsets(config.CASES_DIR)
+        # Running count of ticked case checkboxes (kept by Checkbox.Changed).
+        self._ticked_cases = 0
 
     def _subset_options(self) -> list[tuple[str, str]]:
         """Build the subset Select options: '(none)' plus each named subset."""
@@ -213,7 +221,8 @@ class RunFormScreen(ModalScreen[dict | None]):
         with Container(id="run-form"):
             yield Label("New Run", id="form-title")
 
-            with Horizontal(id="form-columns"):
+            with ScrollableContainer(id="form-body"), \
+                    Horizontal(id="form-columns"):
 
                 # --- Left column: model config ---
                 with Container(id="col-model"):
@@ -313,7 +322,8 @@ class RunFormScreen(ModalScreen[dict | None]):
                         )
 
                     with Horizontal(id="cases-header"):
-                        yield Label("Cases (empty = all matching filters)")
+                        yield Label("Cases (empty = all matching filters)",
+                                    id="lbl-cases-header")
                         yield Button("All", variant="default", id="btn-select-all")
                         yield Button("Clear", variant="default", id="btn-clear-all")
                     with ScrollableContainer(id="cases-list"):
@@ -346,6 +356,27 @@ class RunFormScreen(ModalScreen[dict | None]):
             cid = case.get("id", "")
             cb = self.query_one(f"#case-{cid}", Checkbox)
             cb.display = cid in visible_ids
+
+    def _update_case_count_label(self) -> None:
+        """Show how many case checkboxes are ticked — the glyph alone is
+        hard to read, and an empty selection means 'all matching filters'."""
+        label = self.query_one("#lbl-cases-header", Label)
+        if self._ticked_cases:
+            label.update(f"Cases  ·  {self._ticked_cases} ticked")
+        else:
+            label.update("Cases (empty = all matching filters)")
+
+    @on(Checkbox.Changed)
+    def on_case_checkbox_changed(self, event: Checkbox.Changed) -> None:
+        """Keep the ticked-cases counter current (case checkboxes only).
+
+        Counted incrementally: Checkbox.Changed only fires on real value
+        changes, and a full recount per event would be O(n²) on bulk
+        subset/All/Clear operations.
+        """
+        if (event.checkbox.id or "").startswith("case-"):
+            self._ticked_cases += 1 if event.value else -1
+            self._update_case_count_label()
 
     @on(Select.Changed, "#sel-form-sdk")
     @on(Select.Changed, "#sel-form-category")
@@ -485,6 +516,10 @@ class RunFormScreen(ModalScreen[dict | None]):
     def cancel(self) -> None:
         self.dismiss(None)
 
+    def action_cancel(self) -> None:
+        """Close the form on Escape."""
+        self.dismiss(None)
+
     @on(Button.Pressed, "#btn-run")
     def confirm(self) -> None:
         # Collect selected catalog models (sorted for stable run order).
@@ -494,6 +529,10 @@ class RunFormScreen(ModalScreen[dict | None]):
         if custom and custom not in models:
             models.append(custom)
         if not models:
+            self.app.notify(
+                "Select at least one model (or type a custom one).",
+                severity="warning",
+            )
             self.query_one("#input-custom-model", Input).focus()
             return
 
