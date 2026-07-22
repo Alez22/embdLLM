@@ -37,6 +37,11 @@ build/
 twister-out*/
 
 # Results — track summaries, ignore regenerable LLM caches and runtime artifacts
+# Legacy per-provider <model>-results.json layout: no longer written since the
+# run archives under results/runs/ are the canonical record. Old local copies
+# are kept on disk but untracked.
+results/groq/
+results/openrouter/
 results/runs/*/details/
 results/history.json
 results/reports/report.html

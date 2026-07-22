@@ -495,7 +495,6 @@ def run(
 
     from embedeval.reporter import (
         generate_failure_report,
-        generate_json,
         generate_leaderboard,
         generate_per_check_metrics,
         generate_run_archive,
@@ -507,8 +506,6 @@ def run(
     # caches and tracker state stay at the results/ root.
     reports_dir = output_dir / "reports"
     reports_dir.mkdir(parents=True, exist_ok=True)
-    json_path = output_dir / f"{model}-results.json"
-    generate_json(report, json_path)
 
     # Leaderboard needs every known model, not just the one that just ran,
     # otherwise a Sonnet-only invocation wipes Haiku off the page.
@@ -584,7 +581,6 @@ def run(
         checkpoint_path.unlink()
         logger.info("Checkpoint removed: %s", checkpoint_path)
 
-    typer.echo(f"Results: {json_path}")
     typer.echo(f"Leaderboard: {leaderboard_path}")
     typer.echo(f"Detailed: {run_dir}/")
     typer.echo(f"Tracker: {output_dir / 'test_tracker.json'}")
