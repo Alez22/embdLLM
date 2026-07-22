@@ -43,5 +43,5 @@ uv run embedeval run \
 After the runs, regenerate the report:
 
 ```bash
-uv run python results/gen_performance_report.py
+uv run embedeval perf-report
 ```

@@ -218,7 +218,7 @@ fail wholesale, so a feedback loop buys them less.
 
 ---
 
-*Regenerate with `uv run python results/gen_performance_report.py`. Leaderboards
+*Regenerate with `uv run embedeval perf-report`. Leaderboards
 mirror `src/embedeval/tui/data.py::_load_leaderboard`; consistency and
 check-coverage read `pass_at_k` / `check_coverage` from run summaries
 (`src/embedeval/scorer.py`). Underlying figures in `results/_report_data.json`.*

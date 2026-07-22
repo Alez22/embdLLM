@@ -1,5 +1,8 @@
 """Generate the non-agentic performance report (NXP vs Zephyr).
 
+Exposed as the `embedeval perf-report` CLI command (see cli/report.py);
+outputs land in <results>/reports/.
+
 Aggregation is IDENTICAL to the TUI dashboard (`_load_leaderboard` in
 src/embedeval/tui/data.py): all `generation` runs are merged, grouped by
 (model, temperature, no_think, attempts); within a group the last-written
@@ -11,15 +14,12 @@ direct value labels, fixed categorical hues only where NXP/Zephyr differ.
 """
 import json
 from pathlib import Path
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 
-# Resolve paths relative to this script (results/gen_performance_report.py)
-# so the report can be regenerated from any working directory / checkout.
-ROOT = Path(__file__).resolve().parents[1]
-RUNS = ROOT / "results" / "runs"
-OUT = ROOT / "results" / "reports"
+import matplotlib
+
+# Headless backend must be selected before pyplot is imported.
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt  # noqa: E402
 
 # --- design tokens (dataviz reference palette, light surface) ---
 SURFACE, INK, INK2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"
@@ -31,10 +31,10 @@ plt.rcParams.update({
 })
 
 
-def load_groups():
+def load_groups(runs_dir: Path):
     """Replicate dashboard _load_leaderboard grouping, tracking per-SDK counts."""
     groups = {}  # (model,temp,nt,att) -> {case_id: {passed, sdk}}
-    for run_dir in sorted(RUNS.iterdir()):
+    for run_dir in sorted(runs_dir.iterdir()):
         sf = run_dir / "summary.json"
         if not sf.is_file():
             continue
@@ -130,7 +130,7 @@ def hbar(rows, title, subtitle, bar_color, path, figh, cov_by_model=None):
     plt.close(fig)
 
 
-def consistency_rows(sdk):
+def consistency_rows(runs_dir: Path, sdk):
     """One row per model: pass@1/3/5 from its richest temp=0.5, attempts=5 run.
 
     Uses the project's official consistency metric (Chen et al. 2021 pass@k,
@@ -139,7 +139,7 @@ def consistency_rows(sdk):
     denominator. pass@5 − pass@1 is the flakiness (larger = more sampling-luck).
     """
     best = {}  # model -> (n_cases, p1, p3, p5)
-    for run_dir in sorted(RUNS.iterdir()):
+    for run_dir in sorted(runs_dir.iterdir()):
         sf = run_dir / "summary.json"
         if not sf.is_file():
             continue
@@ -209,8 +209,16 @@ def dumbbell(rows, title, subtitle, path, figh,
     plt.close(fig)
 
 
-def main():
-    groups = load_groups()
+def generate_performance_report(results_dir: Path) -> Path:
+    """@brief Build the NXP-vs-Zephyr PNG figures + data JSON under <results>/reports/.
+
+    @param results_dir Results root containing runs/.
+    @return The reports directory the artifacts were written to.
+    """
+    runs_dir = results_dir / "runs"
+    out = results_dir / "reports"
+    out.mkdir(parents=True, exist_ok=True)
+    groups = load_groups(runs_dir)
 
     # Both views compare like-for-like sampling: temperature=0.5, attempts=5 only.
     # For NXP this drops the strongest a1 probe rows (Opus, qwen3-235b-2507,
@@ -229,17 +237,18 @@ def main():
         return AQUA
 
     # check-coverage per model (richest a5·t0.5 single-SDK run) — reused below.
-    zep_cons = consistency_rows("zephyr")
-    nxp_cons = consistency_rows("mcuxpresso-sdk")
+    zep_cons = consistency_rows(runs_dir, "zephyr")
+    nxp_cons = consistency_rows(runs_dir, "mcuxpresso-sdk")
     zep_cov = {r["model"]: r["cov"] for r in zep_cons}
     nxp_cov = {r["model"]: r["cov"] for r in nxp_cons}
 
     hbar(nxp, "NXP MCUXpresso — ranked by check-coverage",
-         "temp=0.5 · attempts=5. Bar = check-coverage (ranks); dark inset = pass-rate. Best a1 rows excluded (see re-run checklist).",
-         nxp_color, OUT / "report_nxp_pass1.png", 3.2, cov_by_model=nxp_cov)
+         "temp=0.5 · attempts=5. Bar = check-coverage (ranks); dark inset = pass-rate. "
+         "Best a1 rows excluded (see re-run checklist).",
+         nxp_color, out / "report_nxp_pass1.png", 3.2, cov_by_model=nxp_cov)
     hbar(zep, "Zephyr RTOS — ranked by check-coverage",
          "temp=0.5 · attempts=5. Bar = check-coverage (ranks); dark inset = pass-rate.",
-         zep_color, OUT / "report_zephyr_pass1.png", 5.4, cov_by_model=zep_cov)
+         zep_color, out / "report_zephyr_pass1.png", 5.4, cov_by_model=zep_cov)
 
     # difficulty gap on the primary metric = check-coverage (from richest runs)
     def cov_stats(cons_rows):
@@ -277,30 +286,33 @@ def main():
             transform=ax.transAxes, fontsize=9.5, color=INK2, va="bottom")
     ax.legend(frameon=False, fontsize=9, loc="upper right")
     fig.subplots_adjust(left=0.10, right=0.97, top=0.82, bottom=0.10)
-    fig.savefig(OUT / "report_difficulty_gap.png", dpi=150)
+    fig.savefig(out / "report_difficulty_gap.png", dpi=150)
     plt.close(fig)
 
     # consistency (pass@1 → pass@5) — reuses zep_cons/nxp_cons from above
     dumbbell(zep_cons, "Zephyr — consistency (pass@1 → pass@5)",
-             "temp=0.5 · attempts=5, per model. Short Δ = stable; long Δ = needs multiple tries (flaky).",
-             OUT / "report_zephyr_consistency.png", 5.0)
+             "temp=0.5 · attempts=5, per model. Short Δ = stable; "
+             "long Δ = needs multiple tries (flaky).",
+             out / "report_zephyr_consistency.png", 5.0)
     if nxp_cons:
         dumbbell(nxp_cons, "NXP — consistency (pass@1 → pass@5)",
                  "temp=0.5 · attempts=5, per model. Short Δ = stable; long Δ = flaky.",
-                 OUT / "report_nxp_consistency.png", max(3.2, 0.5 * len(nxp_cons) + 1.2))
+                 out / "report_nxp_consistency.png", max(3.2, 0.5 * len(nxp_cons) + 1.2))
 
     # check-coverage gap: pass@1 (blue) → check-coverage (aqua). Long Δ = the model
     # writes mostly-correct code but misses the last checks ("near-miss").
     cov_xlabel = "grey ● pass@1, aqua ● check-coverage (Δ = near-miss gap)"
     dumbbell(zep_cons, "Zephyr — check-coverage vs pass-rate",
-             "temp=0.5 · attempts=5, per model. Long Δ = many checks satisfied but case not fully passed.",
-             OUT / "report_zephyr_coverage.png", 5.0,
+             "temp=0.5 · attempts=5, per model. Long Δ = many checks satisfied "
+             "but case not fully passed.",
+             out / "report_zephyr_coverage.png", 5.0,
              lo="p1", hi="cov", hi_color=AQUA, xlabel=cov_xlabel,
              sort_key=lambda r: r["cov"])
     if nxp_cons:
         dumbbell(nxp_cons, "NXP — check-coverage vs pass-rate",
-                 "temp=0.5 · attempts=5, per model. Long Δ = mostly-correct code missing the last implicit-knowledge checks.",
-                 OUT / "report_nxp_coverage.png", max(3.2, 0.5 * len(nxp_cons) + 1.2),
+                 "temp=0.5 · attempts=5, per model. Long Δ = mostly-correct code "
+                 "missing the last implicit-knowledge checks.",
+                 out / "report_nxp_coverage.png", max(3.2, 0.5 * len(nxp_cons) + 1.2),
                  lo="p1", hi="cov", hi_color=AQUA, xlabel=cov_xlabel,
                  sort_key=lambda r: r["cov"])
 
@@ -308,11 +320,13 @@ def main():
                "gap": {"nxp": [nxp_best, nxp_med, nxp_n],
                        "zephyr": [zep_best, zep_med, zep_n]},
                "consistency": {"zephyr": zep_cons, "nxp": nxp_cons}},
-              open(OUT / "_report_data.json", "w"), indent=1)
+              open(out / "_report_data.json", "w"), indent=1)
     print("NXP rows:", len(nxp), "Zephyr rows:", len(zep),
           "| consistency zep:", len(zep_cons), "nxp:", len(nxp_cons))
-    print(f"gap NXP best={nxp_best:.2f} med={nxp_med:.2f} | Zephyr best={zep_best:.2f} med={zep_med:.2f}")
+    print(f"gap NXP best={nxp_best:.2f} med={nxp_med:.2f} | "
+          f"Zephyr best={zep_best:.2f} med={zep_med:.2f}")
+    return out
 
 
 if __name__ == "__main__":
-    main()
+    generate_performance_report(Path("results"))

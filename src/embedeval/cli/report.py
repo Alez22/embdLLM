@@ -74,6 +74,20 @@ def agent_report(
         typer.echo("Figure skipped (matplotlib not installed).")
 
 
+@app.command(name="perf-report")
+def perf_report(
+    results_dir: Annotated[
+        Path,
+        typer.Option("--results", help="Results root containing runs/"),
+    ] = Path("results"),
+) -> None:
+    """Generate the non-agentic performance figures (NXP vs Zephyr)."""
+    from embedeval.perf_report import generate_performance_report
+
+    out = generate_performance_report(results_dir)
+    typer.echo(f"Performance report figures written to {out}/")
+
+
 @app.command(name="refresh-tracker")
 def refresh_tracker(
     cases_dir: Annotated[
