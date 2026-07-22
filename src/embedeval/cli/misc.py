@@ -44,6 +44,13 @@ def agent(
             ),
         ),
     ] = None,
+    case_ids: Annotated[
+        Optional[str],
+        typer.Option(
+            "--case-ids",
+            help="Comma-separated case IDs to run (e.g. nxp-mcxc-i2c-001).",
+        ),
+    ] = None,
     context_pack: Annotated[
         Optional[str],
         typer.Option(
@@ -125,6 +132,8 @@ def agent(
         filters.categories = [CaseCategory(c) for c in category]
     if sdk:
         filters.sdks = _parse_sdk_filter(sdk)
+    if case_ids:
+        filters.case_ids = [c.strip() for c in case_ids.split(",") if c.strip()]
     cases = filter_cases(cases, filters)
 
     if not cases:

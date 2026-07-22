@@ -283,8 +283,7 @@ class EmbedEvalTUI(App):
 
         mode = config.get("mode", "run")
         if mode == "agent":
-            # Agent mode: model is a positional arg, turns replace attempts,
-            # and only SDK/category filters apply (no --case-ids support).
+            # Agent mode: model is a positional arg, turns replace attempts.
             cmd = [
                 "uv", "run", "embedeval", "agent",
                 config["model"],
@@ -292,10 +291,13 @@ class EmbedEvalTUI(App):
                 "--output-dir", output_arg,
                 "--max-turns", str(config["max_turns"]),
             ]
-            if config.get("sdk_filter", "all") != "all":
-                cmd += ["--sdk", config["sdk_filter"]]
-            if config.get("cat_filter", "all") != "all":
-                cmd += ["--category", config["cat_filter"]]
+            if selected:
+                cmd += ["--case-ids", ",".join(selected)]
+            else:
+                if config.get("sdk_filter", "all") != "all":
+                    cmd += ["--sdk", config["sdk_filter"]]
+                if config.get("cat_filter", "all") != "all":
+                    cmd += ["--category", config["cat_filter"]]
             if config.get("resume_from"):
                 cmd += ["--resume", config["resume_from"]]
             if config.get("context_pack", "none") != "none":

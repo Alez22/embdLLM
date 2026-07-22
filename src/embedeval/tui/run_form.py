@@ -273,7 +273,8 @@ class RunFormScreen(ModalScreen[dict | None]):
                         allow_blank=False,
                     )
 
-                    yield Label("Attempts  (min 5 for consistency metric)")
+                    yield Label("Attempts  (min 5 for consistency metric)",
+                                id="lbl-attempts")
                     yield Input("5", id="input-attempts")
 
                     yield Label("Temperature (0.0 = deterministic)")
@@ -394,14 +395,17 @@ class RunFormScreen(ModalScreen[dict | None]):
         self._update_mode_visibility()
 
     def _update_mode_visibility(self) -> None:
-        """Show agent-only fields only in agent mode, attempts only in run."""
+        """Show agent-only fields only in agent mode, run-only fields in run."""
         is_agent = str(self.query_one("#sel-mode", Select).value) == "agent"
         for wid in ("#lbl-max-turns", "#input-max-turns",
                     "#lbl-resume", "#input-resume",
                     "#lbl-context-pack", "#sel-context-pack"):
             self.query_one(wid).display = is_agent
-        # Attempts is meaningless in agent mode (turns replace it).
-        self.query_one("#input-attempts").display = not is_agent
+        # Run-only fields: attempts (turns replace it) and the --force /
+        # --no-think flags, which the agent CLI does not accept.
+        for wid in ("#lbl-attempts", "#input-attempts",
+                    "#check-force", "#check-no-think"):
+            self.query_one(wid).display = not is_agent
 
     @on(Select.Changed, "#sel-mode")
     def on_mode_changed(self) -> None:
