@@ -132,6 +132,11 @@ def _fetch_openrouter() -> list[ModelInfo]:
         model_id = entry.get("id")
         if not model_id:
             continue
+        # The benchmark only sends and receives text: drop music/image/video
+        # and vision-input models (lyria, *-vl, ...) that clutter the picker.
+        # Entries without modality info are kept (fail open).
+        if not _is_text_to_text(entry.get("architecture")):
+            continue
         # OpenRouter ids look like "anthropic/claude-opus-4".
         sub_provider = model_id.split("/")[0]
         price_in, price_out = _openrouter_price_split(entry.get("pricing"))
@@ -146,6 +151,22 @@ def _fetch_openrouter() -> list[ModelInfo]:
             )
         )
     return catalog
+
+
+def _is_text_to_text(architecture: dict | None) -> bool:
+    """True when the model consumes and produces only text.
+
+    OpenRouter reports ``architecture.modality`` as e.g. ``text->text`` or
+    ``text+image->text``. Missing/unparsable info counts as text-to-text so
+    an API change never empties the catalog.
+    """
+    if not architecture:
+        return True
+    modality = architecture.get("modality")
+    if not isinstance(modality, str) or "->" not in modality:
+        return True
+    inputs, _, outputs = modality.partition("->")
+    return inputs.strip() == "text" and outputs.strip() == "text"
 
 
 def _openrouter_price(pricing: dict | None) -> float | None:
@@ -226,6 +247,11 @@ def _fetch_groq() -> list[ModelInfo]:
     for entry in data:
         model_id = entry.get("id")
         if not model_id:
+            continue
+        # Groq exposes no modality info, so filter the known non-chat
+        # families by name (speech-to-text, TTS, moderation models).
+        lowered = model_id.lower()
+        if any(t in lowered for t in ("whisper", "tts", "guard")):
             continue
         # Groq ids may be flat ("llama-3.3-70b-versatile") or vendored
         # ("meta-llama/llama-4-scout"). Derive the sub-provider accordingly.
