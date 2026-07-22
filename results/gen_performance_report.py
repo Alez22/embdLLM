@@ -15,7 +15,9 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-ROOT = Path("/home/alez22g/Workspace/EmbdLLM/embedeval-nxp")
+# Resolve paths relative to this script (results/gen_performance_report.py)
+# so the report can be regenerated from any working directory / checkout.
+ROOT = Path(__file__).resolve().parents[1]
 RUNS = ROOT / "results" / "runs"
 OUT = ROOT / "results"
 
