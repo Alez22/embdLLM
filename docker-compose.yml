@@ -16,6 +16,11 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.nxp
+    # Run as the host user so files written to the results/ mount are not
+    # root-owned (root-owned results break git checkout/merge on the host).
+    # UID/GID come from the environment or .env; 1000:1000 is the common
+    # single-user Linux default. The TUI overrides this with the real ids.
+    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./cases:/app/cases:ro
       - ./results:/app/results

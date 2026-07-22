@@ -26,14 +26,29 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
 WORKDIR /app
 
+# Managed Python must NOT live in /root (unreadable by the non-root runtime
+# user) — pin it to a world-readable location before the first uv invocation.
+ENV UV_PYTHON_INSTALL_DIR=/opt/uv/python
+
 # COPY src/ before uv sync so the local embedeval package is present for the build
 COPY pyproject.toml .python-version uv.lock README.md ./
 COPY src/ ./src/
-RUN uv sync --no-dev --frozen 2>/dev/null || uv sync --no-dev
+# Full sync (dev deps included): at runtime `uv run` then only audits the
+# venv and never writes to it, so the container can run as ANY uid
+# (compose sets user: to the host uid — files on the results/ mount must
+# not be root-owned or git on the host cannot touch them).
+RUN uv sync --frozen 2>/dev/null || uv sync
 
 COPY . .
 
 ENV NXP_SDK_PATH=/opt/nxp-sdk
 ENV EMBEDEVAL_ENABLE_BUILD=1
+# Arbitrary-uid support: the runtime user has no /etc/passwd entry, so HOME
+# and the uv cache must point at a world-writable location.
+ENV HOME=/tmp
+ENV UV_CACHE_DIR=/tmp/uv-cache
+# The venv is complete from the build-time sync; skip the runtime audit so
+# `uv run` never tries to write the root-owned venv or rebuild the package.
+ENV UV_NO_SYNC=1
 
 ENTRYPOINT ["uv", "run", "embedeval"]

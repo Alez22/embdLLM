@@ -364,9 +364,13 @@ class EmbedEvalTUI(App):
             # (-n: never prompt — a password prompt would hang the subprocess).
             # The image ENTRYPOINT is ["uv", "run", "embedeval"], so we drop
             # that prefix from cmd and pass only the subcommand + args.
+            # --user: run as the invoking user so files written to the
+            # results/ mount are not root-owned (root-owned results break
+            # git on the host). Overrides the compose UID/GID fallback.
             inner_args = cmd[3:]  # strip leading "uv run embedeval"
             cmd = [
                 "sudo", "-n", "docker", "compose", "run", "--rm",
+                "--user", f"{os.getuid()}:{os.getgid()}",
                 *key_flags, "embedeval-nxp",
             ] + inner_args
 
