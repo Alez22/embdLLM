@@ -315,7 +315,6 @@ class TestFactorCompetencyMatrix:
 
     def test_calculate_check_pass_rates(self) -> None:
         """Check pass rates computed from LayerResult details."""
-        from embedeval.models import CheckDetail
 
         results = [
             _make_result("c1", passed=True, category=CaseCategory.ISR_CONCURRENCY),

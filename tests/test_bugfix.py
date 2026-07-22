@@ -5,12 +5,6 @@ import re
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-
-def strip_ansi(text: str) -> str:
-    """Remove ANSI escape codes from text (e.g. color codes added by rich/typer in CI)."""
-    return re.sub(r"\x1b\[[0-9;]*m", "", text)
-
-
 from typer.testing import CliRunner
 
 from embedeval.bugfix import (
@@ -35,6 +29,11 @@ from embedeval.models import (
 CASES_DIR = Path(__file__).parent.parent / "cases"
 
 cli_runner = CliRunner()
+
+
+def strip_ansi(text: str) -> str:
+    """Remove ANSI escape codes from text (e.g. color codes added by rich/typer in CI)."""
+    return re.sub(r"\x1b\[[0-9;]*m", "", text)
 
 
 class TestDiscoverBugfixCases:

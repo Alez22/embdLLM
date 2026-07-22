@@ -136,14 +136,17 @@ def test_subtle_precision_report() -> None:
     caught = total - len(BLIND_SPOTS)
 
     print(f"\n{'='*60}")
-    print(f"CHECK PRECISION REPORT")
+    print("CHECK PRECISION REPORT")
     print(f"{'='*60}")
     print(f"Subtle mutations tested: {total}")
-    print(f"Caught by checks:        {caught}/{total} ({caught/total*100:.0f}%)" if total else "No subtle tests")
+    if total:
+        print(f"Caught by checks:        {caught}/{total} ({caught / total * 100:.0f}%)")
+    else:
+        print("No subtle tests")
     print(f"Blind spots:             {len(BLIND_SPOTS)}")
 
     if BLIND_SPOTS:
-        print(f"\nBLIND SPOTS (checks that missed bugs):")
+        print("\nBLIND SPOTS (checks that missed bugs):")
         for bs in BLIND_SPOTS:
             print(f"  [{bs['case']}] {bs['mutation']}")
             print(f"    Check: {bs['check']} → {bs['result']}")

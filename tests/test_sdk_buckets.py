@@ -8,20 +8,16 @@ the migration invariant is violated.
 
 from __future__ import annotations
 
+import json
 from collections import Counter
 from pathlib import Path
 
 import pytest
 import yaml
 
-import json
-
 from embedeval.cli import _parse_sdk_filter
 from embedeval.models import (
     CaseCategory,
-    CaseMetadata,
-    DifficultyTier,
-    EvalPlatform,
     EvalResult,
     LayerResult,
     Sdk,

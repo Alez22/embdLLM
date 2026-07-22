@@ -3,11 +3,11 @@
 from embedeval.sensitivity import (
     CaseSensitivity,
     SensitivityReport,
+    _find_bullet_groups,
+    _remove_output_instruction,
+    _rephrase_imperatives,
     calculate_robustness,
     generate_variants,
-    _find_bullet_groups,
-    _rephrase_imperatives,
-    _remove_output_instruction,
 )
 
 

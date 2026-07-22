@@ -2,9 +2,9 @@
 
 from embedeval.failure_taxonomy import (
     FailurePattern,
+    _match_check_to_pattern,
     classify_all,
     classify_failure,
-    _match_check_to_pattern,
 )
 from embedeval.models import (
     CheckDetail,

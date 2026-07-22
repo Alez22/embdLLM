@@ -295,17 +295,20 @@ class TestEspCaseChecks:
         [
             (
                 "esp-gpio-001",
-                "#include <zephyr/kernel.h>\nvoid main(void) { gpio_pin_configure(dev, 2, GPIO_OUTPUT); }",
+                "#include <zephyr/kernel.h>\n"
+                "void main(void) { gpio_pin_configure(dev, 2, GPIO_OUTPUT); }",
                 "no_zephyr_apis",
             ),
             (
                 "esp-spi-001",
-                "#include <zephyr/drivers/spi.h>\nvoid app_main(void) { spi_transceive(dev, &cfg, &tx, &rx); }",
+                "#include <zephyr/drivers/spi.h>\n"
+                "void app_main(void) { spi_transceive(dev, &cfg, &tx, &rx); }",
                 "no_zephyr_apis",
             ),
             (
                 "esp-gpio-001",
-                "void setup() { pinMode(2, OUTPUT); } void loop() { digitalWrite(2, HIGH); delay(500); }",
+                "void setup() { pinMode(2, OUTPUT); } "
+                "void loop() { digitalWrite(2, HIGH); delay(500); }",
                 "no_arduino_apis",
             ),
             (

@@ -2,11 +2,10 @@
 
 from pathlib import Path
 
-from embedeval.models import CaseCategory, CaseMetadata, DifficultyTier, Sdk
 from embedeval.model_catalog import ModelInfo, _openrouter_price, _preset_catalog
+from embedeval.models import CaseCategory, CaseMetadata, DifficultyTier, Sdk
 from embedeval.runner import Filters, filter_cases
 from embedeval.tui.run_form import _model_label
-
 
 # ============================================================
 # Feature 2: after_date filter

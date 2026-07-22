@@ -331,11 +331,11 @@ class TestGenerateLeaderboard:
         # Missing layers should show "-"
         lines = content.split("\n")
         heatmap_lines = [
-            l for l in lines if "partial-model" in l and "L0 Static" not in l
+            line for line in lines if "partial-model" in line and "L0 Static" not in line
         ]
         # Find the line in the layer heatmap section (not Model Comparison)
         # The heatmap line should contain "-" for missing layers
-        model_line = [l for l in heatmap_lines if "90%" in l][0]
+        model_line = [line for line in heatmap_lines if "90%" in line][0]
         parts = [p.strip() for p in model_line.split("|") if p.strip()]
         dash_cells = [p for p in parts if p == "-"]
         assert len(dash_cells) == 3
@@ -397,7 +397,10 @@ class TestComparabilityWarning:
                 best_model="sonnet",
                 best_pass_at_1=0.55,
                 common_cases=179,
-                case_set_warning="Models tested on different case sets: haiku=179, sonnet=227. Use comparable scores for fair comparison.",
+                case_set_warning=(
+                    "Models tested on different case sets: haiku=179, sonnet=227. "
+                    "Use comparable scores for fair comparison."
+                ),
             ),
         )
         output = tmp_path / "LEADERBOARD.md"

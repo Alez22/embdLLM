@@ -1,7 +1,6 @@
 """Tests for IRT difficulty calibration."""
 
 from embedeval.difficulty import (
-    IRTParams,
     _suggest_difficulty,
     calibrate_difficulty,
 )

@@ -1,6 +1,6 @@
 """Tests for ablation study module."""
 
-from embedeval.ablation import AblationReport, run_ablation
+from embedeval.ablation import run_ablation
 from embedeval.models import (
     CheckDetail,
     EvalResult,

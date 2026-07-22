@@ -6,16 +6,9 @@ from pathlib import Path
 import yaml
 from typer.testing import CliRunner
 
-
-def strip_ansi(text: str) -> str:
-    """Remove ANSI escape codes from text (e.g. color codes added by rich/typer in CI)."""
-    return re.sub(r"\x1b\[[0-9;]*m", "", text)
-
-
 from embedeval.cli import app
 from embedeval.models import (
     CaseTier,
-    CheckDetail,
     EvalResult,
     LayerResult,
     ReasoningType,
@@ -26,6 +19,11 @@ from embedeval.scorer import score
 cli_runner = CliRunner()
 
 CASES_DIR = Path(__file__).parent.parent / "cases"
+
+
+def strip_ansi(text: str) -> str:
+    """Remove ANSI escape codes from text (e.g. color codes added by rich/typer in CI)."""
+    return re.sub(r"\x1b\[[0-9;]*m", "", text)
 
 
 def _make_result(

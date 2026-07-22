@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import yaml
 
-from embedeval.models import CaseCategory, DifficultyTier, EvalPlatform
+from embedeval.models import CaseCategory, DifficultyTier
 from embedeval.runner import (
     Filters,
     _inject_board_target,
