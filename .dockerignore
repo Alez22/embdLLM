@@ -1,5 +1,8 @@
 .git/
 .venv/
+# Extracted vendor SDK — 2.8G, local-only, never needed inside the images
+# (the NXP image clones its own SDK repos; see docker/Dockerfile.nxp).
+sdk/
 __pycache__/
 *.pyc
 .mypy_cache/

@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
+    # See embedeval-nxp: run as the host user so results/ stays user-owned.
+    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./cases:/app/cases:ro
       - ./results:/app/results
@@ -32,6 +34,8 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
+    # See embedeval-nxp: run as the host user so results/ stays user-owned.
+    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./cases:/app/cases:ro
       - ./results:/app/results
