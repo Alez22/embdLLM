@@ -39,7 +39,7 @@ twister-out*/
 # Results — track summaries, ignore regenerable LLM caches and runtime artifacts
 results/runs/*/details/
 results/history.json
-results/report.html
+results/reports/report.html
 # regenerable LLM generation/grading cache
 results/corpus/
 # TUI runtime state and log

@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 # so the report can be regenerated from any working directory / checkout.
 ROOT = Path(__file__).resolve().parents[1]
 RUNS = ROOT / "results" / "runs"
-OUT = ROOT / "results"
+OUT = ROOT / "results" / "reports"
 
 # --- design tokens (dataviz reference palette, light surface) ---
 SURFACE, INK, INK2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"

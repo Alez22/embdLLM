@@ -530,12 +530,12 @@ Results are aggregated across multiple dimensions:
 | Output | Description |
 |--------|-------------|
 | `results/<model>-results.json` | Full benchmark report (JSON) |
-| `results/LEADERBOARD.md` | Model comparison, heatmaps, failure distribution |
+| `results/reports/LEADERBOARD.md` | Model comparison, heatmaps, failure distribution |
 | `results/runs/<date>_<model>/` | Per-case detailed results archive |
 | `results/runs/<date>_<model>/report.md` | Failure analysis with patterns |
-| `results/SAFE_GUIDE.md` | Risk-tier guidance for embedded engineers |
+| `results/reports/SAFE_GUIDE.md` | Risk-tier guidance for embedded engineers |
 | `results/test_tracker.json` | Incremental test state for `--retest-only` |
-| `results/TEST_RESULTS.md` | Human-readable test results summary |
+| `results/reports/TEST_RESULTS.md` | Human-readable test results summary |
 | `results/history.json` | Run history for trend tracking |
 
 ### Key Metrics

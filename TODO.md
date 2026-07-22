@@ -258,7 +258,7 @@ Known dashboard improvements not yet resolved, in order of usefulness:
   - `groq/llama-3.3-70b-versatile`: 0/12 pass, 61% avg — omits fsl_clock.h/fsl_port.h
   - `groq/openai/gpt-oss-120b`: 3/12 pass, 84% avg — best overall
   - `groq/openai/gpt-oss-20b`: 1/12 pass, 51% avg — inconsistent on ISR cases
-- [ ] **Re-publish leaderboard** in `results/LEADERBOARD.md` after the first
+- [ ] **Re-publish leaderboard** in `results/reports/LEADERBOARD.md` after the first
   clean run.
 - Latest real-gate data point (2026-06-22, `openrouter/z-ai/glm-5.2`, 1 sample/case,
   L1 active in container): **2/24 pass@1 (8.3%)**. 16 fails at L1, 5 at L0, 1 at L3.
@@ -471,7 +471,7 @@ code quality and consistency beyond normal sampling noise.
 - [ ] **Define the metric aggregation method** — normalize bool/int/bytes metrics before comparing
   intra-variant variance vs inter-variant difference. Document in `docs/LANGUAGE-VARIANT-METHOD.md`.
 - [ ] **Handle the binary metric correctly** — compile y/n is a proportion (4/5), use standard error.
-- [ ] **Report per model** — per-category "language sensitivity" in `results/LEADERBOARD.md`.
+- [ ] **Report per model** — per-category "language sensitivity" in `results/reports/LEADERBOARD.md`.
 
 **Reading rule:** language effect is real only if inter-variant difference > intra-variant variance.
 

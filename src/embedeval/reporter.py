@@ -1029,8 +1029,10 @@ def generate_safe_guide(
     )
     lines.append("")
 
-    # Write
-    output_path = output_base / "SAFE_GUIDE.md"
+    # Write — human-facing reports live under results/reports/.
+    reports_dir = output_base / "reports"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    output_path = reports_dir / "SAFE_GUIDE.md"
     output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     logger.info("Safe guide written to %s", output_path)
     return output_path

@@ -503,6 +503,10 @@ def run(
     )
 
     output_dir.mkdir(parents=True, exist_ok=True)
+    # Human-facing reports live under results/reports/; run archives,
+    # caches and tracker state stay at the results/ root.
+    reports_dir = output_dir / "reports"
+    reports_dir.mkdir(parents=True, exist_ok=True)
     json_path = output_dir / f"{model}-results.json"
     generate_json(report, json_path)
 
@@ -524,7 +528,7 @@ def run(
         leaderboard_reports.append(other_report)
         results_by_model[other_model] = other_merged
 
-    leaderboard_path = output_dir / "LEADERBOARD.md"
+    leaderboard_path = reports_dir / "LEADERBOARD.md"
     generate_leaderboard(leaderboard_reports, leaderboard_path)
 
     run_dir = generate_run_archive(
@@ -540,7 +544,7 @@ def run(
     generate_per_check_metrics(
         results_by_model,
         output_json=run_dir / "per_check_metrics.json",
-        output_md=output_dir / "LEADERBOARD_PER_CHECK.md",
+        output_md=reports_dir / "LEADERBOARD_PER_CHECK.md",
         run_id=run_id,
     )
     # Failure report still lists just this run's failures — the archive
@@ -567,7 +571,7 @@ def run(
     save_tracker(tracker, output_dir)
     generate_results_doc(
         tracker,
-        output_dir / "TEST_RESULTS.md",
+        reports_dir / "TEST_RESULTS.md",
         cases_dir,
         case_dir_map=case_dir_map,
     )

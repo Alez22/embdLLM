@@ -18,7 +18,7 @@ EmbedEval exposes six interop surfaces. Every surface carries an explicit stabil
 | 3 | Mutation oracle | `cases/<sdk>/<case-id>/checks/negatives.py` | **stable** (`NEGATIVES` list-of-dict schema) |
 | 4a | Per-check metrics (row shape) | `results/runs/<run-id>/per_check_metrics.json` | **additive-only** (pinned `schema_version`) |
 | 4b | Per-check aggregate (in summary.json) | `results/runs/<run-id>/summary.json` → `models[*].per_check_stats` | **additive-only** (via `BenchmarkReport.version`) |
-| 5 | Leaderboard | `results/LEADERBOARD.md` | **stable** (pinned `schema_version` HTML comment) |
+| 5 | Leaderboard | `results/reports/LEADERBOARD.md` | **stable** (pinned `schema_version` HTML comment) |
 | 6 | Forbidden APIs | `src/embedeval/data/forbidden_apis.yaml` | **additive-only** (platform buckets + entries) |
 
 Stability-tier meaning:
@@ -195,7 +195,7 @@ Per-check data is emitted in **two separate files** with different groupings. Co
 
 **Stability: additive-only within schema_version=1 for both artifacts.** New row/field keys (e.g., `case_git_hash`) may be added without a version bump. Removing or renaming any existing key → bump to `schema_version=2`. Note: only `per_check_metrics.json` carries an explicit `schema_version` field today; `summary.json` inherits its version from the `BenchmarkReport.version` field.
 
-### §2.5 `results/LEADERBOARD.md`
+### §2.5 `results/reports/LEADERBOARD.md`
 
 **Produced by:** `src/embedeval/reporter.py:generate_leaderboard` (writes `<!-- SCHEMA_VERSION: 1 -->` HTML comment after the top H1).
 
@@ -203,7 +203,7 @@ Per-check data is emitted in **two separate files** with different groupings. Co
 
 **Parse contract:**
 
-- File at `<embedeval>/results/LEADERBOARD.md`.
+- File at `<embedeval>/results/reports/LEADERBOARD.md`.
 - HTML comment `<!-- SCHEMA_VERSION: 1 -->` near the top — consumers MUST assert and fail loudly on unknown versions. Current: `LEADERBOARD_SCHEMA_VERSION = 1`.
 - Section `## Category Results` with `### <model-id>` subsections, each containing a markdown table of columns: `Category | Pass Rate | Passed | Total | Status`.
 - Cell shapes: `Pass Rate` ends in `%`; `Passed`/`Total` are integers; `Status` is a short enum string.

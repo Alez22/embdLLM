@@ -57,7 +57,7 @@ def agent_report(
     output: Annotated[
         Path,
         typer.Option("--output", "-o", help="Output Markdown path"),
-    ] = Path("results/AGENT_LEADERBOARD.md"),
+    ] = Path("results/reports/AGENT_LEADERBOARD.md"),
 ) -> None:
     """Generate the agent-mode leaderboard (Markdown + PNG) from agent runs."""
     from embedeval.agent_leaderboard import generate_agent_report
@@ -107,7 +107,9 @@ def refresh_tracker(
         save_tracker(tracker, results_dir)
         typer.echo(f"Marked {n} case/model pairs for retest: {', '.join(changed)}")
 
-    generate_results_doc(tracker, results_dir / "TEST_RESULTS.md", cases_dir)
+    reports_dir = results_dir / "reports"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    generate_results_doc(tracker, reports_dir / "TEST_RESULTS.md", cases_dir)
     typer.echo("TEST_RESULTS.md refreshed.")
 
 
@@ -163,7 +165,7 @@ def report_html(
         Optional[Path],
         typer.Option(
             "--output", "-o",
-            help="Output HTML path (default: <results>/report.html)",
+            help="Output HTML path (default: <results>/reports/report.html)",
         ),
     ] = None,
     cases_dir: Annotated[
@@ -181,6 +183,7 @@ def report_html(
     """Generate a standalone visual benchmark report (interactive HTML)."""
     from embedeval.report import write_standalone_report
 
-    out = output or (results_dir / "report.html")
+    out = output or (results_dir / "reports" / "report.html")
+    out.parent.mkdir(parents=True, exist_ok=True)
     path = write_standalone_report(results_dir, out, total_cases, cases_dir)
     typer.echo(f"Report written to {path}")

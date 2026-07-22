@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-13
 **Based on:** EmbedEval benchmark data (Haiku 4.5 vs Sonnet 4.6, **233 cases** = 185 public + 48 private, **n=3 aggregate** pass@1 means). Model 95% CIs do not overlap (Haiku [53.2%, 60.6%] vs Sonnet [64.4%, 71.3%]), so the Sonnet–Haiku gap is statistically distinguishable from run noise.
-**Test Results:** See [`results/LEADERBOARD.md`](../results/LEADERBOARD.md) for the latest aggregate pass@1 numbers.
+**Test Results:** See [`results/reports/LEADERBOARD.md`](../results/reports/LEADERBOARD.md) for the latest aggregate pass@1 numbers.
 **Full Factor Taxonomy:** [`LLM-EMBEDDED-FAILURE-FACTORS.md`](./LLM-EMBEDDED-FAILURE-FACTORS.md) (42 code factors + 19 non-code factors)
 **Token Scaling Economics:** [`LLM-EMBEDDED-TOKEN-SCALING.md`](./LLM-EMBEDDED-TOKEN-SCALING.md) — why infinite tokens aren't enough for embedded
 
@@ -726,4 +726,4 @@ Blind spots:                           9/15          (60%)
 
 ### EmbedEval Project
 - [LLM-EMBEDDED-FAILURE-FACTORS.md](./LLM-EMBEDDED-FAILURE-FACTORS.md) (42-factor taxonomy + 19 non-code factors)
-- [results/LEADERBOARD.md](../results/LEADERBOARD.md) (test data)
+- [results/reports/LEADERBOARD.md](../results/reports/LEADERBOARD.md) (test data)

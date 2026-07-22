@@ -224,7 +224,7 @@ Analyzing EmbedEval's 5-layer evaluation architecture from an automation perspec
 
 ### Failure Distribution by Layer from EmbedEval Data
 
-Layer **pass rates** below are from the **n=3** EmbedEval run (233 TCs: 185 public + 48 private); see [results/LEADERBOARD.md](../results/LEADERBOARD.md) for the full heatmap and methodology.
+Layer **pass rates** below are from the **n=3** EmbedEval run (233 TCs: 185 public + 48 private); see [results/reports/LEADERBOARD.md](../results/reports/LEADERBOARD.md) for the full heatmap and methodology.
 
 | Layer | Haiku pass@layer (n=3) | Sonnet pass@layer (n=3) | Solvable by Token Scaling? |
 |-------|------------------------|-------------------------|--------------------------|
@@ -920,7 +920,7 @@ EmbedEval can serve as a key tool for this token-scaling research:
 - [Five Levels of AI Agent Autonomy (Swarmia)](https://www.swarmia.com/blog/five-levels-ai-agent-autonomy/)
 
 ### EmbedEval Internal Data
-- [results/LEADERBOARD.md](../results/LEADERBOARD.md) — n=3 aggregate pass@1, CIs, layer heatmap (233 TCs)
+- [results/reports/LEADERBOARD.md](../results/reports/LEADERBOARD.md) — n=3 aggregate pass@1, CIs, layer heatmap (233 TCs)
 - [LLM-EMBEDDED-FAILURE-FACTORS.md](./LLM-EMBEDDED-FAILURE-FACTORS.md) — 42 failure factors
 - [LLM-EMBEDDED-CONSIDERATIONS.md](./LLM-EMBEDDED-CONSIDERATIONS.md) — 14 production-scale failure patterns
 - [LLM-EMBEDDED-DEVELOPMENT-GUIDE.md](./LLM-EMBEDDED-DEVELOPMENT-GUIDE.md) — 7-phase workflow
