@@ -132,9 +132,11 @@ def summarize_run(run: dict) -> ModelSummary:
 def build_leaderboard(results_dir: Path) -> list[ModelSummary]:
     """@brief Build the agent leaderboard, best models first.
 
-    Sorted by pass count desc, then by total cost asc (cheaper wins ties).
+    Sorted by pass count desc, then cheaper wins ties. Cost is the primary
+    tie-break but is 0 for providers that do not report it (see the cost-column
+    note in agent_leaderboard.py), so total tokens acts as the working proxy.
     """
     runs = latest_container_runs(load_agent_runs(results_dir))
     rows = [summarize_run(r) for r in runs]
-    rows.sort(key=lambda r: (-r.passed, r.total_cost_usd))
+    rows.sort(key=lambda r: (-r.passed, r.total_cost_usd, r.total_tokens))
     return rows

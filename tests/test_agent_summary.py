@@ -13,6 +13,7 @@ def _write_run(
     *,
     l1_check: str,
     cases: list[tuple[str, int | None]],
+    total_tokens: int = 1000,
 ) -> None:
     """@brief Write a minimal agent_run.json.
 
@@ -43,7 +44,7 @@ def _write_run(
         "summary": {
             "recovery_rate": 0.5,
             "total_cost_usd": 0.0,
-            "total_tokens": 1000,
+            "total_tokens": total_tokens,
         },
     }
     (run_dir / "agent_run.json").write_text(json.dumps(payload), encoding="utf-8")
@@ -89,6 +90,31 @@ def test_leaderboard_ranks_and_excludes_host_runs(tmp_path: Path) -> None:
     # passed_at_turn is carried through for the RT1170 discriminator table.
     assert rows[0].passed_at_turn["nxp-rt1170-dma-001"] == 3
     assert rows[1].passed_at_turn["nxp-rt1170-dma-001"] is None
+
+
+def test_equal_pass_tie_break_prefers_fewer_tokens(tmp_path: Path) -> None:
+    """With cost unreported (0), the cheaper run by tokens ranks first."""
+    _write_run(
+        tmp_path,
+        "2026-01-01_0000_openrouter_qwen_qwen3.6-plus_t5",
+        "openrouter/qwen/qwen3.6-plus",
+        l1_check="nxp_gcc",
+        cases=[("nxp-mcxc-gpio-001", 1)],
+        total_tokens=300_000,
+    )
+    _write_run(
+        tmp_path,
+        "2026-01-01_0001_openrouter_deepseek_deepseek-v4-flash_t5",
+        "openrouter/deepseek/deepseek-v4-flash",
+        l1_check="nxp_gcc",
+        cases=[("nxp-mcxc-gpio-001", 1)],
+        total_tokens=200_000,
+    )
+    rows = build_leaderboard(tmp_path)
+    assert [r.model for r in rows] == [
+        "openrouter/deepseek/deepseek-v4-flash",
+        "openrouter/qwen/qwen3.6-plus",
+    ]
 
 
 def test_open_weight_flag(tmp_path: Path) -> None:
